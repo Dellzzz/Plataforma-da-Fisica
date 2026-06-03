@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRUV | Movimento Retilíneo Uniformemente Variado</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --neon-orange:#ff8c00;
+  --neon-yellow:#ffe600;
+  --neon-red:#ff2244;
+  --neon-cyan:#00f0ff;
+  --neon-green:#39ff14;
+  --neon-purple:#bf00ff;
+  --bg-dark:#03050a;
+  --bg-panel:#060c14;
+  --bg-card:#08111e;
+  --border-o:rgba(255,140,0,.3);
+  --border-y:rgba(255,230,0,.25);
+  --text-main:#d8e8f0;
+  --text-dim:#4a7a8a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg-dark);color:var(--text-main);font-family:'Rajdhani',sans-serif;font-size:17px;line-height:1.7;overflow-x:hidden}
+
+/* scanlines */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,140,0,.012) 2px,rgba(255,140,0,.012) 4px);pointer-events:none;z-index:9999}
+
+/* grid */
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,140,0,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,140,0,.035) 1px,transparent 1px);background-size:55px 55px;animation:gridMove 18s linear infinite;z-index:0}
+@keyframes gridMove{0%{background-position:0 0}100%{background-position:55px 55px}}
+
+/* floating particles */
+.particles{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.particle{position:absolute;border-radius:50%;animation:float linear infinite;opacity:0}
+@keyframes float{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:.6}90%{opacity:.3}100%{transform:translateY(-10vh) scale(1);opacity:0}}
+
+/* ── HEADER ── */
+header{position:relative;z-index:10;text-align:center;padding:80px 20px 56px;border-bottom:1px solid var(--border-o)}
+.header-tag{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--neon-orange);letter-spacing:4px;border:1px solid var(--neon-orange);padding:4px 18px;margin-bottom:24px;animation:tagpulse 2.5s ease-in-out infinite}
+@keyframes tagpulse{0%,100%{box-shadow:0 0 4px var(--neon-orange),inset 0 0 4px rgba(255,140,0,.1)}50%{box-shadow:0 0 18px var(--neon-orange),0 0 50px rgba(255,140,0,.25),inset 0 0 12px rgba(255,140,0,.2)}}
+h1.title{font-family:'Orbitron',monospace;font-size:clamp(2rem,7.5vw,5rem);font-weight:900;letter-spacing:.06em;line-height:1;color:#fff;text-shadow:0 0 10px var(--neon-orange),0 0 35px var(--neon-orange),0 0 90px rgba(255,140,0,.35);animation:flicker 7s linear infinite}
+@keyframes flicker{0%,94%,100%{opacity:1}95%{opacity:.8}96%{opacity:1}97.5%{opacity:.65}98.5%{opacity:1}}
+.title-sub{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:1rem;color:var(--text-dim);letter-spacing:7px;text-transform:uppercase;margin-top:10px}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;background:rgba(3,5,10,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,140,0,.18);display:flex;justify-content:center;gap:6px;padding:11px 20px;flex-wrap:wrap}
+nav a{font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:2px;color:var(--text-dim);text-decoration:none;padding:6px 16px;border:1px solid rgba(255,140,0,.2);transition:all .3s}
+nav a:hover{color:var(--neon-orange);border-color:var(--neon-orange);box-shadow:0 0 14px var(--neon-orange),inset 0 0 8px rgba(255,140,0,.1);text-shadow:0 0 8px var(--neon-orange)}
+
+/* ── MAIN ── */
+main{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:0 24px 80px}
+section{margin-top:80px}
+
+/* section header */
+.sec-header{display:flex;align-items:center;gap:14px;margin-bottom:36px}
+.sec-num{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--neon-orange);opacity:.6}
+h2.sec-title{font-family:'Orbitron',monospace;font-size:clamp(1.2rem,2.8vw,1.75rem);font-weight:700;color:#fff;letter-spacing:.05em}
+h2.sec-title span{color:var(--neon-orange);text-shadow:0 0 12px var(--neon-orange)}
+.sec-line{flex:1;height:1px;background:linear-gradient(90deg,var(--neon-orange),transparent);opacity:.4}
+
+/* ── CARDS ── */
+.card{background:var(--bg-card);border:1px solid var(--border-o);padding:30px 32px;margin-bottom:22px;position:relative;transition:all .3s}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--neon-orange);box-shadow:0 0 10px var(--neon-orange)}
+.card:hover{border-color:var(--neon-orange);box-shadow:0 0 24px rgba(255,140,0,.1),inset 0 0 24px rgba(255,140,0,.03)}
+.card.yellow::before{background:var(--neon-yellow);box-shadow:0 0 10px var(--neon-yellow)}
+.card.yellow{border-color:var(--border-y)}
+.card.yellow:hover{border-color:var(--neon-yellow);box-shadow:0 0 24px rgba(255,230,0,.1)}
+.card.red::before{background:var(--neon-red);box-shadow:0 0 10px var(--neon-red)}
+.card.red{border-color:rgba(255,34,68,.28)}
+.card.green::before{background:var(--neon-green);box-shadow:0 0 10px var(--neon-green)}
+.card.green{border-color:rgba(57,255,20,.28)}
+.card.cyan::before{background:var(--neon-cyan);box-shadow:0 0 10px var(--neon-cyan)}
+.card.cyan{border-color:rgba(0,240,255,.28)}
+
+h3{font-family:'Orbitron',monospace;font-size:.9rem;color:var(--neon-orange);text-shadow:0 0 8px var(--neon-orange);margin-bottom:14px;letter-spacing:.05em}
+.card.yellow h3{color:var(--neon-yellow);text-shadow:0 0 8px var(--neon-yellow)}
+.card.red h3{color:var(--neon-red);text-shadow:0 0 8px var(--neon-red)}
+.card.green h3{color:var(--neon-green);text-shadow:0 0 8px var(--neon-green)}
+.card.cyan h3{color:var(--neon-cyan);text-shadow:0 0 8px var(--neon-cyan)}
+p{color:var(--text-main);margin-bottom:10px}
+
+/* ── LAW BOX ── */
+.law{background:rgba(255,140,0,.05);border:1px solid rgba(255,140,0,.45);border-left:4px solid var(--neon-orange);padding:18px 22px;margin:16px 0;font-family:'Share Tech Mono',monospace;font-size:.92rem;color:var(--neon-orange);text-shadow:0 0 4px rgba(255,140,0,.4);box-shadow:0 0 18px rgba(255,140,0,.07);line-height:1.8}
+.law.yellow{background:rgba(255,230,0,.05);border-color:rgba(255,230,0,.45);border-left-color:var(--neon-yellow);color:var(--neon-yellow);text-shadow:0 0 4px rgba(255,230,0,.4);box-shadow:0 0 18px rgba(255,230,0,.07)}
+.law.red{background:rgba(255,34,68,.05);border-color:rgba(255,34,68,.45);border-left-color:var(--neon-red);color:var(--neon-red);text-shadow:0 0 4px rgba(255,34,68,.4)}
+.law.cyan{background:rgba(0,240,255,.05);border-color:rgba(0,240,255,.45);border-left-color:var(--neon-cyan);color:var(--neon-cyan);text-shadow:0 0 4px rgba(0,240,255,.4);box-shadow:0 0 18px rgba(0,240,255,.07)}
+.law.green{background:rgba(57,255,20,.05);border-color:rgba(57,255,20,.45);border-left-color:var(--neon-green);color:var(--neon-green);text-shadow:0 0 4px rgba(57,255,20,.4)}
+
+/* ── BIG FORMULA ── */
+.formula-hero{text-align:center;padding:32px 20px;margin:24px 0;background:var(--bg-panel);border:1px solid rgba(255,140,0,.3);position:relative;overflow:hidden}
+.formula-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(255,140,0,.06) 0%,transparent 70%)}
+.formula-hero .big-f{font-family:'Orbitron',monospace;font-size:clamp(1.5rem,4vw,2.6rem);font-weight:700;color:#fff;text-shadow:0 0 12px var(--neon-orange),0 0 30px rgba(255,140,0,.4);letter-spacing:.04em;line-height:1.3}
+.formula-hero .f-label{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--text-dim);letter-spacing:3px;margin-top:10px}
+
+/* ── MNEUMONIC ── */
+.mneumonic{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:22px 0}
+.mn-cell{background:var(--bg-panel);border:1px solid rgba(255,140,0,.25);padding:18px 14px;text-align:center;transition:all .3s;position:relative;overflow:hidden}
+.mn-cell::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--neon-orange);box-shadow:0 0 8px var(--neon-orange)}
+.mn-cell:hover{border-color:var(--neon-orange);transform:translateY(-4px);box-shadow:0 8px 24px rgba(255,140,0,.15)}
+.mn-letter{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;line-height:1;margin-bottom:8px}
+.mn-word{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:1px;margin-bottom:6px}
+.mn-meaning{font-size:.85rem;color:var(--text-dim)}
+.mn-formula{font-family:'Share Tech Mono',monospace;font-size:.85rem;margin-top:6px}
+
+/* ── VISUAL ── */
+.visual{background:var(--bg-panel);border:1px solid var(--border-o);padding:22px;margin:22px 0;text-align:center;overflow:hidden}
+.visual-tag{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim);letter-spacing:3px;margin-bottom:14px;text-transform:uppercase}
+canvas{display:block;margin:0 auto;max-width:100%}
+
+/* ── CONTROLS ── */
+.controls{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;margin:18px 0}
+.ctrl{text-align:center}
+.ctrl label{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--neon-orange);display:block;margin-bottom:6px;letter-spacing:1px}
+input[type=range]{-webkit-appearance:none;width:180px;height:4px;background:rgba(255,140,0,.2);outline:none;border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--neon-orange);border-radius:50%;cursor:pointer;box-shadow:0 0 8px var(--neon-orange)}
+.ctrl-val{font-family:'Orbitron',monospace;font-size:1rem;color:var(--neon-orange);text-shadow:0 0 8px var(--neon-orange);margin-top:6px}
+
+/* ── INFO GRID ── */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin:18px 0}
+
+/* ── TABLE ── */
+table{width:100%;border-collapse:collapse;margin:16px 0;font-family:'Rajdhani',sans-serif}
+th{background:rgba(255,140,0,.1);color:var(--neon-orange);font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:2px;padding:11px 14px;text-align:left;border:1px solid rgba(255,140,0,.2)}
+td{padding:10px 14px;border:1px solid rgba(255,140,0,.1);color:var(--text-main);font-size:.93rem}
+tr:hover td{background:rgba(255,140,0,.03)}
+
+/* ── CALC ── */
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:18px 0}
+.cfield label{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim);letter-spacing:2px;display:block;margin-bottom:6px}
+.cfield input,.cfield select{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,140,0,.3);color:var(--neon-orange);font-family:'Share Tech Mono',monospace;font-size:1rem;padding:10px 13px;outline:none;transition:border-color .3s}
+.cfield input:focus,.cfield select:focus{border-color:var(--neon-orange);box-shadow:0 0 10px rgba(255,140,0,.2)}
+.cfield select option{background:var(--bg-dark)}
+.calc-result{background:rgba(255,140,0,.04);border:1px solid rgba(255,140,0,.3);padding:18px;text-align:center;grid-column:1/-1}
+.cr-label{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px}
+.cr-val{font-family:'Orbitron',monospace;font-size:1.9rem;color:var(--neon-orange);text-shadow:0 0 16px var(--neon-orange)}
+.calc-btn{background:transparent;border:1px solid var(--neon-orange);color:var(--neon-orange);font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:2px;padding:10px 24px;cursor:pointer;transition:all .3s;margin-top:4px}
+.calc-btn:hover{background:rgba(255,140,0,.12);box-shadow:0 0 14px var(--neon-orange)}
+
+/* ── QUIZ ── */
+.quiz-card{background:var(--bg-card);border:1px solid rgba(255,140,0,.25);padding:26px 30px;margin-bottom:18px;transition:all .3s}
+.quiz-card:hover{border-color:var(--neon-orange)}
+.qnum{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--neon-orange);letter-spacing:3px;margin-bottom:8px}
+.qtext{font-size:1.02rem;font-weight:600;color:#fff;margin-bottom:18px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.obt{background:rgba(0,0,0,.4);border:1px solid rgba(255,140,0,.25);color:var(--text-main);padding:11px 16px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:.93rem;cursor:pointer;transition:all .25s;display:flex;align-items:flex-start;gap:12px}
+.obt:hover{border-color:var(--neon-orange);background:rgba(255,140,0,.08);color:#fff;box-shadow:0 0 10px rgba(255,140,0,.18)}
+.obt.correct{border-color:var(--neon-green)!important;background:rgba(57,255,20,.1)!important;color:var(--neon-green)!important;box-shadow:0 0 12px rgba(57,255,20,.3)!important}
+.obt.wrong{border-color:var(--neon-red)!important;background:rgba(255,34,68,.1)!important;color:var(--neon-red)!important}
+.obt:disabled{cursor:not-allowed}
+.oletter{font-family:'Orbitron',monospace;font-size:.6rem;color:var(--neon-orange);min-width:18px;padding-top:2px}
+.feedback{margin-top:12px;padding:11px 14px;font-family:'Share Tech Mono',monospace;font-size:.8rem;display:none;border-left:3px solid;line-height:1.6}
+.feedback.show{display:block}
+.feedback.ok{color:var(--neon-green);border-color:var(--neon-green);background:rgba(57,255,20,.05)}
+.feedback.err{color:var(--neon-red);border-color:var(--neon-red);background:rgba(255,34,68,.05)}
+
+/* ── SCORE ── */
+.score-panel{background:var(--bg-card);border:1px solid var(--neon-orange);padding:28px;text-align:center;box-shadow:0 0 30px rgba(255,140,0,.12);margin-top:28px}
+.sc-label{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--text-dim);letter-spacing:3px;margin-bottom:8px}
+.sc-val{font-family:'Orbitron',monospace;font-size:3rem;font-weight:900;color:var(--neon-orange);text-shadow:0 0 20px var(--neon-orange)}
+.sc-msg{color:var(--text-dim);margin-top:8px;font-size:.95rem}
+.reset-btn{background:transparent;border:1px solid var(--neon-orange);color:var(--neon-orange);font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:2px;padding:10px 26px;cursor:pointer;margin-top:14px;transition:all .3s}
+.reset-btn:hover{background:rgba(255,140,0,.1);box-shadow:0 0 14px var(--neon-orange)}
+
+/* progress */
+.prog-wrap{height:4px;background:rgba(255,140,0,.1);margin-top:18px;border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--neon-orange),var(--neon-yellow));transition:width .5s ease;box-shadow:0 0 10px var(--neon-orange)}
+
+/* intro */
+.intro-box{background:linear-gradient(135deg,rgba(255,140,0,.04),rgba(255,230,0,.04));border:1px solid rgba(255,140,0,.2);padding:26px 30px;margin-top:36px;position:relative}
+.intro-box::after{content:'◈';position:absolute;top:-12px;left:24px;font-size:1.2rem;color:var(--neon-orange);text-shadow:0 0 10px var(--neon-orange);background:var(--bg-dark);padding:0 8px}
+
+.hl{color:var(--neon-orange);font-weight:600}
+.hl-y{color:var(--neon-yellow);font-weight:600}
+.hl-g{color:var(--neon-green);font-weight:600}
+.hl-r{color:var(--neon-red);font-weight:600}
+.hl-c{color:var(--neon-cyan);font-weight:600}
+
+/* graph axis labels */
+.graph-labels{display:flex;justify-content:space-around;font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim);margin-top:6px;padding:0 8px}
+
+/* step box */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:12px;margin:16px 0}
+.step{display:flex;gap:16px;align-items:flex-start;background:rgba(255,140,0,.04);border:1px solid rgba(255,140,0,.15);padding:14px 18px}
+.step::before{counter-increment:step;content:counter(step);font-family:'Orbitron',monospace;font-size:.8rem;color:var(--neon-orange);min-width:24px;text-align:center;padding-top:1px}
+.step-text{font-size:.95rem;color:var(--text-main)}
+
+footer{position:relative;z-index:10;text-align:center;padding:38px 20px;border-top:1px solid var(--border-o);font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);letter-spacing:2px}
+
+@media(max-width:600px){header{padding:48px 16px 36px}main{padding:0 14px 60px}.card{padding:18px}.formula-hero .big-f{font-size:1.5rem}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="particles" id="particles"></div>
+
+<header>
+  <div class="header-tag">MÓDULO 04 // CINEMÁTICA // NÍVEL MÉDIO</div>
+  <h1 class="title">M·R·U·V</h1>
+  <p class="title-sub">Movimento Retilíneo Uniformemente Variado</p>
+</header>
+
+<nav>
+  <a href="#intro">◈ Intro</a>
+  <a href="#aceleracao">◈ Aceleração</a>
+  <a href="#velocidade">◈ Velocidade</a>
+  <a href="#posicao">◈ Posição</a>
+  <a href="#torricelli">◈ Torricelli</a>
+  <a href="#graficos">◈ Gráficos</a>
+  <a href="#calculadora">◈ Calculadora</a>
+  <a href="#exercicios">◈ Exercícios</a>
+  <a href="#download">◈ Download PDF</a>
+</nav>
+
+<main>
+
+<!-- ── INTRO ── -->
+<section id="intro">
+  <div class="sec-header">
+    <span class="sec-num">01</span>
+    <h2 class="sec-title">O QUE É O <span>MRUV</span>?</h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="intro-box">
+    <p>O <span class="hl">MRUV — Movimento Retilíneo Uniformemente Variado</span> é aquele em que um corpo se move em <strong>linha reta</strong> com <strong>aceleração constante e diferente de zero</strong>. Isso significa que a velocidade do objeto <em>muda de forma uniforme</em> ao longo do tempo — aumentando (acelerado) ou diminuindo (retardado).</p>
+    <p>Exemplos reais: um carro que acelera a partir do repouso, uma bola lançada verticalmente, um objeto em queda livre e um carro que freia até parar.</p>
+  </div>
+
+  <div class="info-grid" style="margin-top:24px">
+    <div class="card">
+      <h3>CARACTERÍSTICAS</h3>
+      <p>✦ Trajetória <span class="hl">retilínea</span> (linha reta)<br>
+         ✦ Aceleração <span class="hl">constante</span> (a = cte ≠ 0)<br>
+         ✦ Velocidade <span class="hl">variável</span> (cresce ou decresce uniformemente)<br>
+         ✦ Posição varia como uma <span class="hl">função quadrática</span> do tempo</p>
+    </div>
+    <div class="card yellow">
+      <h3>MRUV × MRU</h3>
+      <p>No <span class="hl-y">MRU</span> a velocidade é constante e a aceleração é <strong>zero</strong>.<br>
+         No <span class="hl">MRUV</span> a aceleração é constante e <strong>diferente de zero</strong>, fazendo a velocidade mudar com o tempo.</p>
+      <div class="law yellow" style="font-size:.8rem">MRU:  a = 0,  v = cte<br>MRUV: a ≠ 0,  v varia linearmente</div>
+    </div>
+    <div class="card red">
+      <h3>ACELERADO × RETARDADO</h3>
+      <p>✦ <span class="hl-r">Acelerado:</span> velocidade e aceleração têm o mesmo sentido → |v| aumenta.<br>
+         ✦ <span class="hl-y">Retardado:</span> velocidade e aceleração têm sentidos opostos → |v| diminui.</p>
+      <div class="law red" style="font-size:.8rem">a · v &gt; 0  →  acelerado<br>a · v &lt; 0  →  retardado</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ACELERAÇÃO ── -->
+<section id="aceleracao">
+  <div class="sec-header">
+    <span class="sec-num">02</span>
+    <h2 class="sec-title"><span>ACELERAÇÃO</span> ESCALAR MÉDIA</h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card">
+    <h3>CONCEITO DE ACELERAÇÃO</h3>
+    <p>A <span class="hl">aceleração</span> mede o quanto a velocidade muda por unidade de tempo. É a taxa de variação da velocidade em relação ao tempo.</p>
+    <p>Quando um carro passa de 0 a 100 km/h em 5 segundos, sua aceleração média é de 20 km/h por segundo — a cada segundo, ele ganha 20 km/h.</p>
+  </div>
+
+  <div class="formula-hero">
+    <div class="big-f">a = Δv / Δt = (v − v₀) / t</div>
+    <div class="f-label">FÓRMULA DA ACELERAÇÃO ESCALAR MÉDIA</div>
+  </div>
+
+  <div class="info-grid">
+    <div class="card">
+      <h3>GRANDEZAS</h3>
+      <div class="law" style="font-size:.83rem;line-height:2">
+        a  → aceleração  [m/s²]<br>
+        v  → velocidade final  [m/s]<br>
+        v₀ → velocidade inicial  [m/s]<br>
+        t  → intervalo de tempo  [s]<br>
+        Δv → variação de velocidade = v − v₀
+      </div>
+    </div>
+    <div class="card yellow">
+      <h3>SINAL DA ACELERAÇÃO</h3>
+      <p>O sinal de <span class="hl-y">a</span> indica o sentido, não se o movimento é acelerado ou retardado:</p>
+      <div class="law yellow" style="font-size:.82rem;line-height:1.9">
+        a &gt; 0 → mesma direção que o referencial (+)<br>
+        a &lt; 0 → direção oposta ao referencial (−)<br>
+        a = 0 → velocidade constante (MRU)
+      </div>
+    </div>
+  </div>
+
+  <div class="card green">
+    <h3>EXEMPLO RESOLVIDO</h3>
+    <p>Um carro parte do repouso (v₀ = 0) e atinge v = 30 m/s em t = 6 s. Qual a aceleração?</p>
+    <div class="steps">
+      <div class="step"><div class="step-text"><strong>Dados:</strong> v₀ = 0 m/s,  v = 30 m/s,  t = 6 s</div></div>
+      <div class="step"><div class="step-text"><strong>Fórmula:</strong> a = (v − v₀) / t</div></div>
+      <div class="step"><div class="step-text"><strong>Cálculo:</strong> a = (30 − 0) / 6 = <span class="hl-g">5 m/s²</span></div></div>
+      <div class="step"><div class="step-text"><strong>Interpretação:</strong> A cada segundo, a velocidade aumenta 5 m/s.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── VELOCIDADE ── -->
+<section id="velocidade">
+  <div class="sec-header">
+    <span class="sec-num">03</span>
+    <h2 class="sec-title">FUNÇÃO HORÁRIA DA <span>VELOCIDADE</span></h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card">
+    <h3>VELOCIDADE EM FUNÇÃO DO TEMPO</h3>
+    <p>Rearranjar a fórmula da aceleração nos dá a <span class="hl">função horária da velocidade</span>: uma equação que nos permite calcular a velocidade em qualquer instante t.</p>
+    <p>É uma equação <strong>linear</strong> em t — o gráfico v(t) é uma <span class="hl">reta inclinada</span>, onde a inclinação é a própria aceleração.</p>
+  </div>
+
+  <div class="formula-hero" style="border-color:rgba(0,240,255,.3)">
+    <div class="big-f" style="color:#fff;text-shadow:0 0 12px var(--neon-cyan),0 0 30px rgba(0,240,255,.4)">v = v₀ + a · t</div>
+    <div class="f-label" style="color:var(--neon-cyan)">FUNÇÃO HORÁRIA DA VELOCIDADE</div>
+  </div>
+
+  <div class="visual">
+    <p class="visual-tag">[ SIMULAÇÃO INTERATIVA — VELOCIDADE x TEMPO ]</p>
+    <div class="controls">
+      <div class="ctrl">
+        <label>VELOCIDADE INICIAL v₀ (m/s)</label>
+        <input type="range" id="vCtrlV0" min="0" max="20" value="5" oninput="drawVT()">
+        <div class="ctrl-val" id="vCtrlV0Val">5 m/s</div>
+      </div>
+      <div class="ctrl">
+        <label>ACELERAÇÃO a (m/s²)</label>
+        <input type="range" id="vCtrlA" min="-8" max="8" value="3" oninput="drawVT()">
+        <div class="ctrl-val" id="vCtrlAVal">3 m/s²</div>
+      </div>
+    </div>
+    <canvas id="vtCanvas" width="700" height="300"></canvas>
+    <div class="graph-labels"><span>v(t) = v₀ + a·t</span><span>▸ Arraste para explorar</span></div>
+  </div>
+
+  <div class="info-grid">
+    <div class="card cyan">
+      <h3>LEITURA DO GRÁFICO v(t)</h3>
+      <p>✦ <span class="hl-c">Coeficiente angular</span> da reta = aceleração a<br>
+         ✦ <span class="hl-c">Interseção</span> com o eixo y = v₀<br>
+         ✦ Reta <strong>crescente</strong> → a &gt; 0 (acelerado)<br>
+         ✦ Reta <strong>decrescente</strong> → a &lt; 0 (retardado)<br>
+         ✦ Reta <strong>horizontal</strong> → a = 0 (MRU)</p>
+    </div>
+    <div class="card yellow">
+      <h3>EXEMPLO RESOLVIDO</h3>
+      <p>Moto com v₀ = 10 m/s e a = 2 m/s². Qual a velocidade em t = 8 s?</p>
+      <div class="law yellow" style="font-size:.85rem">
+        v = v₀ + a·t<br>
+        v = 10 + 2 × 8<br>
+        v = 10 + 16<br>
+        v = <strong>26 m/s</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── POSIÇÃO ── -->
+<section id="posicao">
+  <div class="sec-header">
+    <span class="sec-num">04</span>
+    <h2 class="sec-title">FUNÇÃO HORÁRIA DA <span>POSIÇÃO</span></h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card">
+    <h3>POSIÇÃO EM FUNÇÃO DO TEMPO</h3>
+    <p>A <span class="hl">função horária da posição</span> é uma equação do 2º grau em t — o gráfico s(t) é uma <strong>parábola</strong>. Ela nos diz onde o objeto está em qualquer instante.</p>
+  </div>
+
+  <div class="formula-hero">
+    <div class="big-f">s = s₀ + v₀t + ½ · a · t²</div>
+    <div class="f-label">FUNÇÃO HORÁRIA DA POSIÇÃO (EQUAÇÃO DO MOVIMENTO)</div>
+  </div>
+
+  <!-- MACETE -->
+  <div class="card" style="margin-top:28px;border-color:rgba(255,230,0,.4)">
+    <h3 style="color:var(--neon-yellow);text-shadow:0 0 10px var(--neon-yellow);font-size:1rem;letter-spacing:.06em">
+      ★ MACETE: "SAÍ = SOZINHO, VOLTEI 1/2 ATRASADO"
+    </h3>
+    <p style="margin-bottom:20px">Cada palavra do macete corresponde a um termo da equação — é só lembrar da frase e montar a fórmula!</p>
+    <div class="mneumonic">
+      <div class="mn-cell">
+        <div class="mn-letter" style="color:var(--neon-orange)">S</div>
+        <div class="mn-word" style="color:var(--neon-orange)">SAÍ</div>
+        <div class="mn-meaning">Posição final</div>
+        <div class="mn-formula" style="color:var(--neon-orange)">s</div>
+      </div>
+      <div class="mn-cell" style="background:rgba(255,140,0,.04)">
+        <div class="mn-letter" style="color:var(--text-dim);font-size:2.5rem">=</div>
+        <div class="mn-word" style="color:var(--text-dim)">IGUAL</div>
+        <div class="mn-meaning">&nbsp;</div>
+        <div class="mn-formula" style="color:var(--text-dim)">=</div>
+      </div>
+      <div class="mn-cell">
+        <div class="mn-letter" style="color:var(--neon-yellow)">S₀</div>
+        <div class="mn-word" style="color:var(--neon-yellow)">SOZINHO</div>
+        <div class="mn-meaning">Posição inicial</div>
+        <div class="mn-formula" style="color:var(--neon-yellow)">s₀</div>
+      </div>
+      <div class="mn-cell">
+        <div class="mn-letter" style="color:var(--neon-cyan)">V₀t</div>
+        <div class="mn-word" style="color:var(--neon-cyan)">VOLTEI</div>
+        <div class="mn-meaning">"v" de velocidade</div>
+        <div class="mn-formula" style="color:var(--neon-cyan)">+ v₀ · t</div>
+      </div>
+      <div class="mn-cell">
+        <div class="mn-letter" style="color:var(--neon-red);font-size:1.5rem">½at²</div>
+        <div class="mn-word" style="color:var(--neon-red)">1/2 ATRASADO</div>
+        <div class="mn-meaning">Meio · aceleração</div>
+        <div class="mn-formula" style="color:var(--neon-red)">+ ½ · a · t²</div>
+      </div>
+    </div>
+    <div class="law yellow" style="text-align:center;font-size:1.05rem;letter-spacing:.05em;margin-top:8px">
+      <span style="color:var(--neon-orange)">S</span> = <span style="color:var(--neon-yellow)">S₀</span> + <span style="color:var(--neon-cyan)">v₀ · t</span> + <span style="color:var(--neon-red)">½ · a · t²</span>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="card">
+      <h3>GRANDEZAS</h3>
+      <div class="law" style="font-size:.82rem;line-height:2.1">
+        s  → posição final  [m]<br>
+        s₀ → posição inicial  [m]<br>
+        v₀ → velocidade inicial  [m/s]<br>
+        a  → aceleração  [m/s²]<br>
+        t  → tempo  [s]
+      </div>
+    </div>
+    <div class="card green">
+      <h3>EXEMPLO RESOLVIDO</h3>
+      <p>Corpo em s₀ = 10 m, v₀ = 4 m/s, a = 2 m/s². Posição em t = 3 s?</p>
+      <div class="law green" style="font-size:.84rem;line-height:1.9">
+        s = s₀ + v₀t + ½at²<br>
+        s = 10 + 4×3 + ½×2×3²<br>
+        s = 10 + 12 + 9<br>
+        s = <strong>31 m</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="visual">
+    <p class="visual-tag">[ ANIMAÇÃO — MOVIMENTO COM MRUV ]</p>
+    <div class="controls">
+      <div class="ctrl">
+        <label>VELOCIDADE INICIAL v₀ (m/s)</label>
+        <input type="range" id="animV0" min="0" max="20" value="5" oninput="resetAnim()">
+        <div class="ctrl-val" id="animV0Val">5 m/s</div>
+      </div>
+      <div class="ctrl">
+        <label>ACELERAÇÃO a (m/s²)</label>
+        <input type="range" id="animA" min="-6" max="10" value="3" oninput="resetAnim()">
+        <div class="ctrl-val" id="animAVal">3 m/s²</div>
+      </div>
+    </div>
+    <canvas id="animCanvas" width="700" height="180"></canvas>
+    <div style="margin-top:12px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="calc-btn" onclick="startAnim()" id="animBtn">▶ INICIAR</button>
+      <button class="calc-btn" onclick="resetAnim()">↺ REINICIAR</button>
+    </div>
+    <div id="animInfo" style="font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--neon-orange);margin-top:10px;text-align:center;letter-spacing:1px"> </div>
+  </div>
+
+  <div class="visual" style="margin-top:0">
+    <p class="visual-tag">[ GRÁFICO — POSIÇÃO × TEMPO ]</p>
+    <div class="controls">
+      <div class="ctrl">
+        <label>v₀ (m/s)</label>
+        <input type="range" id="stV0" min="0" max="20" value="5" oninput="drawST()">
+        <div class="ctrl-val" id="stV0Val">5 m/s</div>
+      </div>
+      <div class="ctrl">
+        <label>a (m/s²)</label>
+        <input type="range" id="stA" min="-5" max="8" value="2" oninput="drawST()">
+        <div class="ctrl-val" id="stAVal">2 m/s²</div>
+      </div>
+    </div>
+    <canvas id="stCanvas" width="700" height="280"></canvas>
+    <div class="graph-labels"><span>s(t) = s₀ + v₀t + ½at²</span><span>Curva parabólica</span></div>
+  </div>
+</section>
+
+<!-- ── TORRICELLI ── -->
+<section id="torricelli">
+  <div class="sec-header">
+    <span class="sec-num">05</span>
+    <h2 class="sec-title">EQUAÇÃO DE <span>TORRICELLI</span></h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="card cyan">
+    <h3>PARA QUE SERVE?</h3>
+    <p>A equação de Torricelli é usada quando <span class="hl-c">não conhecemos o tempo t</span> do movimento, mas queremos relacionar velocidade, aceleração e deslocamento (Δs).</p>
+    <p>É obtida combinando as duas funções horárias para eliminar o tempo t.</p>
+  </div>
+
+  <div class="formula-hero" style="border-color:rgba(0,240,255,.35)">
+    <div class="big-f" style="color:#fff;text-shadow:0 0 12px var(--neon-cyan),0 0 30px rgba(0,240,255,.45)">v² = v₀² + 2 · a · Δs</div>
+    <div class="f-label" style="color:var(--neon-cyan)">EQUAÇÃO DE TORRICELLI &nbsp;|&nbsp; Δs = s − s₀</div>
+  </div>
+
+  <div class="card cyan">
+    <h3>DEDUÇÃO (PASSO A PASSO)</h3>
+    <div class="steps">
+      <div class="step"><div class="step-text">Da função horária da velocidade: <strong>t = (v − v₀) / a</strong></div></div>
+      <div class="step"><div class="step-text">Substitui t na função da posição: Δs = v₀ · [(v−v₀)/a] + ½ · a · [(v−v₀)/a]²</div></div>
+      <div class="step"><div class="step-text">Simplificando: Δs = (v·v₀ − v₀²)/a + (v−v₀)²/(2a)</div></div>
+      <div class="step"><div class="step-text">Multiplicando tudo por 2a e reorganizando:</div></div>
+      <div class="step"><div class="step-text"><strong>v² = v₀² + 2 · a · Δs</strong> ✓</div></div>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="card">
+      <h3>GRANDEZAS</h3>
+      <div class="law" style="font-size:.82rem;line-height:2.1">
+        v  → velocidade final  [m/s]<br>
+        v₀ → velocidade inicial  [m/s]<br>
+        a  → aceleração  [m/s²]<br>
+        Δs → deslocamento = s − s₀  [m]
+      </div>
+    </div>
+    <div class="card cyan">
+      <h3>EXEMPLO RESOLVIDO</h3>
+      <p>Carro com v₀ = 20 m/s, a = −4 m/s². Quanto percorre até parar?</p>
+      <div class="law cyan" style="font-size:.84rem;line-height:1.9">
+        v² = v₀² + 2·a·Δs<br>
+        0² = 20² + 2·(−4)·Δs<br>
+        0 = 400 − 8·Δs<br>
+        Δs = 400/8 = <strong>50 m</strong>
+      </div>
+    </div>
+    <div class="card yellow">
+      <h3>EXEMPLO 2 — ACELERAÇÃO</h3>
+      <p>Objeto parte de v₀ = 0 e após percorrer 45 m atinge v = 30 m/s. Qual a aceleração?</p>
+      <div class="law yellow" style="font-size:.84rem;line-height:1.9">
+        v² = v₀² + 2·a·Δs<br>
+        30² = 0 + 2·a·45<br>
+        900 = 90·a<br>
+        a = <strong>10 m/s²</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── GRAFICOS ── -->
+<section id="graficos">
+  <div class="sec-header">
+    <span class="sec-num">06</span>
+    <h2 class="sec-title">RESUMO DOS <span>GRÁFICOS</span></h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="visual">
+    <p class="visual-tag">[ PAINEL COMPARATIVO — s(t), v(t) e a(t) ]</p>
+    <canvas id="sumCanvas" width="700" height="320"></canvas>
+    <div class="graph-labels">
+      <span style="color:var(--neon-orange)">◼ s(t) — parábola</span>
+      <span style="color:var(--neon-cyan)">◼ v(t) — reta</span>
+      <span style="color:var(--neon-yellow)">◼ a(t) — constante</span>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>GRANDEZA</th><th>FÓRMULA</th><th>GRÁFICO</th><th>OBSERVAÇÃO</th></tr>
+    <tr><td>Posição s(t)</td><td>s = s₀ + v₀t + ½at²</td><td>Parábola (2º grau)</td><td>Côncava p/ cima se a&gt;0; p/ baixo se a&lt;0</td></tr>
+    <tr><td>Velocidade v(t)</td><td>v = v₀ + a·t</td><td>Reta inclinada (1º grau)</td><td>Coeficiente angular = a</td></tr>
+    <tr><td>Aceleração a(t)</td><td>a = constante</td><td>Reta horizontal (0º grau)</td><td>Paralela ao eixo t</td></tr>
+    <tr><td>Torricelli</td><td>v² = v₀² + 2aΔs</td><td>—</td><td>Usa quando t não é dado/pedido</td></tr>
+  </table>
+</section>
+
+<!-- ── CALCULADORA ── -->
+<section id="calculadora">
+  <div class="sec-header">
+    <span class="sec-num">07</span>
+    <h2 class="sec-title"><span>CALCULADORA</span> MRUV</h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="visual">
+    <p class="visual-tag">[ CALCULADORA INTERATIVA ]</p>
+    <div style="margin-bottom:16px">
+      <div class="calc-grid">
+        <div class="cfield">
+          <label>CALCULAR</label>
+          <select id="calcMode" onchange="updateCalcMode()">
+            <option value="v">Velocidade final  v</option>
+            <option value="s">Posição final  s</option>
+            <option value="ds_torr">Deslocamento Δs  (Torricelli)</option>
+            <option value="a_torr">Aceleração a  (Torricelli)</option>
+            <option value="t_v">Tempo  t  (via velocidade)</option>
+          </select>
+        </div>
+      </div>
+      <div class="calc-grid" id="calcFields"></div>
+      <div class="calc-grid">
+        <div class="calc-result">
+          <div class="cr-label" id="cr-label">RESULTADO</div>
+          <div class="cr-val" id="calcResultVal">—</div>
+          <div id="calcFormula" style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);margin-top:6px"></div>
+        </div>
+      </div>
+    </div>
+    <button class="calc-btn" onclick="calculate()">⟹ CALCULAR</button>
+  </div>
+</section>
+
+<!-- ── EXERCÍCIOS ── -->
+<section id="exercicios">
+  <div class="sec-header">
+    <span class="sec-num">08</span>
+    <h2 class="sec-title">EXERCÍCIOS DE <span>FIXAÇÃO</span></h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <p style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:.75rem;margin-bottom:24px;letter-spacing:2px">▸ SELECIONE A ALTERNATIVA CORRETA EM CADA QUESTÃO</p>
+
+  <div class="prog-wrap">
+    <div class="prog-fill" id="progBar" style="width:0%"></div>
+  </div>
+  <p style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--text-dim);text-align:right;margin-top:6px;margin-bottom:26px" id="progTxt">0 / 8 respondidas</p>
+
+  <!-- Q1 -->
+  <div class="quiz-card" id="q1">
+    <div class="qnum">QUESTÃO 01 // CONCEITO</div>
+    <div class="qtext">No MRUV, qual grandeza permanece constante ao longo do movimento?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="oletter">A</span>A velocidade escalar</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="oletter">B</span>A posição do corpo</button>
+      <button class="obt" onclick="ans(this,'q1','correct')"><span class="oletter">C</span>A aceleração escalar</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="oletter">D</span>O deslocamento por segundo</button>
+    </div>
+    <div class="feedback" id="f_q1"></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="quiz-card" id="q2">
+    <div class="qnum">QUESTÃO 02 // ACELERAÇÃO</div>
+    <div class="qtext">Um trem parte do repouso e em 10 s atinge 72 km/h. Qual é a aceleração? (72 km/h = 20 m/s)</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="oletter">A</span>7,2 m/s²</button>
+      <button class="obt" onclick="ans(this,'q2','correct')"><span class="oletter">B</span>2 m/s²</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="oletter">C</span>0,5 m/s²</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="oletter">D</span>20 m/s²</button>
+    </div>
+    <div class="feedback" id="f_q2"></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="quiz-card" id="q3">
+    <div class="qnum">QUESTÃO 03 // FUNÇÃO HORÁRIA DA VELOCIDADE</div>
+    <div class="qtext">Um corpo tem v₀ = 8 m/s e aceleração a = −2 m/s². Em qual instante o corpo para (v = 0)?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="oletter">A</span>2 s</button>
+      <button class="obt" onclick="ans(this,'q3','correct')"><span class="oletter">B</span>4 s</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="oletter">C</span>8 s</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="oletter">D</span>16 s</button>
+    </div>
+    <div class="feedback" id="f_q3"></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="quiz-card" id="q4">
+    <div class="qnum">QUESTÃO 04 // FUNÇÃO HORÁRIA DA POSIÇÃO — MACETE</div>
+    <div class="qtext">Usando o macete "S = Sozinho + Voltei + 1/2 Atrasado", um corpo parte de s₀ = 20 m, com v₀ = 6 m/s e a = 4 m/s². Qual é a posição em t = 3 s?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="oletter">A</span>38 m</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="oletter">B</span>44 m</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="oletter">C</span>52 m</button>
+      <button class="obt" onclick="ans(this,'q4','correct')"><span class="oletter">D</span>56 m</button>
+    </div>
+    <div class="feedback" id="f_q4"></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="quiz-card" id="q5">
+    <div class="qnum">QUESTÃO 05 // TORRICELLI</div>
+    <div class="qtext">Um carro a 30 m/s freia com a = −5 m/s². Qual o espaço percorrido até parar completamente?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="oletter">A</span>45 m</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="oletter">B</span>60 m</button>
+      <button class="obt" onclick="ans(this,'q5','correct')"><span class="oletter">C</span>90 m</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="oletter">D</span>150 m</button>
+    </div>
+    <div class="feedback" id="f_q5"></div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="quiz-card" id="q6">
+    <div class="qnum">QUESTÃO 06 // TORRICELLI</div>
+    <div class="qtext">Uma bola é lançada horizontalmente com v₀ = 0 e a = 10 m/s² (queda livre). Qual é a velocidade após percorrer 80 m?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="oletter">A</span>20 m/s</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="oletter">B</span>30 m/s</button>
+      <button class="obt" onclick="ans(this,'q6','correct')"><span class="oletter">C</span>40 m/s</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="oletter">D</span>80 m/s</button>
+    </div>
+    <div class="feedback" id="f_q6"></div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="quiz-card" id="q7">
+    <div class="qnum">QUESTÃO 07 // GRÁFICO</div>
+    <div class="qtext">No gráfico v × t de um MRUV, o que representa o coeficiente angular (inclinação) da reta?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="oletter">A</span>A posição inicial do corpo</button>
+      <button class="obt" onclick="ans(this,'q7','correct')"><span class="oletter">B</span>A aceleração do movimento</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="oletter">C</span>O deslocamento total</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="oletter">D</span>A velocidade média</button>
+    </div>
+    <div class="feedback" id="f_q7"></div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="quiz-card" id="q8">
+    <div class="qnum">QUESTÃO 08 // INTEGRAÇÃO DE CONCEITOS</div>
+    <div class="qtext">Um veículo parte de s₀ = 0, v₀ = 0 e a = 4 m/s². Qual a velocidade e a posição em t = 5 s?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="oletter">A</span>v = 10 m/s e s = 25 m</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="oletter">B</span>v = 15 m/s e s = 40 m</button>
+      <button class="obt" onclick="ans(this,'q8','correct')"><span class="oletter">C</span>v = 20 m/s e s = 50 m</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="oletter">D</span>v = 20 m/s e s = 100 m</button>
+    </div>
+    <div class="feedback" id="f_q8"></div>
+  </div>
+
+  <div class="score-panel" id="scorePanel" style="display:none">
+    <div class="sc-label">RESULTADO FINAL</div>
+    <div class="sc-val" id="scVal">0/8</div>
+    <div class="sc-msg" id="scMsg"></div>
+    <button class="reset-btn" onclick="resetQuiz()">↺ REFAZER EXERCÍCIOS</button>
+  </div>
+</section>
+
+<!-- ── DOWNLOAD ── -->
+<section id="download" style="margin-top:60px">
+  <div class="sec-header">
+    <span class="sec-num">09</span>
+    <h2 class="sec-title">BAIXAR <span>LISTA</span></h2>
+    <div class="sec-line"></div>
+  </div>
+  <div class="card" style="text-align:center;padding:40px 32px">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);letter-spacing:3px;margin-bottom:14px">◈ ARQUIVO PDF — 8 QUESTÕES COM GABARITO E RESOLUÇÕES</div>
+    <div style="font-size:4rem;margin-bottom:14px;filter:drop-shadow(0 0 14px var(--neon-orange))">⬇</div>
+    <p style="margin-bottom:26px;color:var(--text-dim);font-size:.95rem">Baixe a lista completa de exercícios com enunciados, gabarito e dicas de resolução em PDF.</p>
+    <a id="dlBtn" download="lista-exercicios-mruv.pdf"
+       style="display:inline-block;font-family:'Orbitron',monospace;font-size:.7rem;letter-spacing:3px;color:var(--neon-orange);border:1px solid var(--neon-orange);padding:14px 40px;text-decoration:none;transition:all .3s;box-shadow:0 0 10px rgba(255,140,0,.15)"
+       onmouseover="this.style.background='rgba(255,140,0,.1)';this.style.boxShadow='0 0 24px var(--neon-orange)'"
+       onmouseout="this.style.background='transparent';this.style.boxShadow='0 0 10px rgba(255,140,0,.15)'">
+      EM BREVE
+    </a>
+    <div style="margin-top:18px;font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim)">MRUV · ACELERAÇÃO · VELOCIDADE · POSIÇÃO · TORRICELLI · 8 QUESTÕES</div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div>◈ MRUV — CINEMÁTICA DO ENSINO MÉDIO ◈</div>
+  <div style="margin-top:8px">ACELERAÇÃO · VELOCIDADE · POSIÇÃO · TORRICELLI</div>
+</footer>
+
+<script>
+// ── PARTICLES ──────────────────────────────────
+(function(){
+  const c=document.getElementById('particles');
+  const colors=['rgba(255,140,0,.5)','rgba(255,230,0,.4)','rgba(255,34,68,.3)','rgba(0,240,255,.2)'];
+  for(let i=0;i<28;i++){
+    const d=document.createElement('div');
+    d.className='particle';
+    const sz=Math.random()*4+1;
+    d.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${8+Math.random()*14}s;animation-delay:${Math.random()*12}s`;
+    c.appendChild(d);
+  }
+})();
+
+// ── HELPERS ────────────────────────────────────
+function arrow(ctx,x1,y1,x2,y2,color,lw=2){
+  const angle=Math.atan2(y2-y1,x2-x1),len=10;
+  ctx.save();ctx.shadowColor=color;ctx.shadowBlur=14;
+  ctx.strokeStyle=color;ctx.lineWidth=lw;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.fillStyle=color;ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-len*Math.cos(angle-.4),y2-len*Math.sin(angle-.4));
+  ctx.lineTo(x2-len*Math.cos(angle+.4),y2-len*Math.sin(angle+.4));
+  ctx.closePath();ctx.fill();ctx.restore();
+}
+function bgFill(ctx,W,H){ctx.fillStyle='#060c14';ctx.fillRect(0,0,W,H);}
+
+// ── GRAPH: v(t) ────────────────────────────────
+function drawVT(){
+  const v0=+document.getElementById('vCtrlV0').value;
+  const a=+document.getElementById('vCtrlA').value;
+  document.getElementById('vCtrlV0Val').textContent=v0+' m/s';
+  document.getElementById('vCtrlAVal').textContent=a+' m/s²';
+  const canvas=document.getElementById('vtCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  bgFill(ctx,W,H);
+  const pad={l:60,r:30,t:30,b:50};
+  const gW=W-pad.l-pad.r,gH=H-pad.t-pad.b;
+  const tMax=12,vMax=Math.max(40,Math.abs(v0+a*tMax)+10);
+  const tx=t=>(pad.l+t/tMax*gW);
+  const vy=v=>(pad.t+gH-((v+vMax/2)/(vMax)*gH));
+  // zero line
+  const zeroV=0;const zy=vy(0);
+  ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(255,140,0,.2)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad.l,zy);ctx.lineTo(W-pad.r,zy);ctx.stroke();
+  ctx.setLineDash([]);
+  // axes
+  ctx.strokeStyle='rgba(255,140,0,.6)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,H-pad.b);
+  ctx.moveTo(pad.l,H-pad.b);ctx.lineTo(W-pad.r,H-pad.b);ctx.stroke();
+  // labels
+  ctx.font='11px Share Tech Mono,monospace';
+  ctx.fillStyle='rgba(255,140,0,.5)';
+  ctx.fillText('v(m/s)',4,pad.t+8);
+  ctx.fillText('t(s)',W-pad.r-14,H-pad.b+18);
+  // ticks
+  for(let i=0;i<=tMax;i+=2){
+    const x=tx(i);
+    ctx.fillStyle='rgba(255,140,0,.35)';ctx.fillText(i,x-4,H-pad.b+16);
+    ctx.strokeStyle='rgba(255,140,0,.15)';ctx.lineWidth=1;
+    ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,H-pad.b);ctx.stroke();ctx.setLineDash([]);
+  }
+  // v(t) line
+  ctx.save();ctx.shadowColor='#00f0ff';ctx.shadowBlur=16;
+  ctx.strokeStyle='#00f0ff';ctx.lineWidth=2.5;
+  ctx.beginPath();
+  for(let i=0;i<=100;i++){
+    const t=i/100*tMax;const vv=v0+a*t;
+    const x=tx(t),y=vy(vv);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();ctx.restore();
+  // v0 label
+  ctx.font='12px Share Tech Mono,monospace';ctx.fillStyle='#00f0ff';
+  ctx.fillText('v₀='+v0,pad.l+6,vy(v0)-8);
+  // formula
+  ctx.fillStyle='rgba(255,140,0,.45)';ctx.font='11px Share Tech Mono,monospace';
+  const sign=a>=0?'+':'';
+  ctx.fillText('v(t) = '+v0+' '+sign+a+'·t',pad.l+gW*.55,pad.t+20);
+}
+
+// ── GRAPH: s(t) ────────────────────────────────
+function drawST(){
+  const v0=+document.getElementById('stV0').value;
+  const a=+document.getElementById('stA').value;
+  document.getElementById('stV0Val').textContent=v0+' m/s';
+  document.getElementById('stAVal').textContent=a+' m/s²';
+  const canvas=document.getElementById('stCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  bgFill(ctx,W,H);
+  const pad={l:62,r:30,t:30,b:50};
+  const gW=W-pad.l-pad.r,gH=H-pad.t-pad.b;
+  const tMax=10;
+  const sAt=t=>0+v0*t+.5*a*t*t;
+  let sMin=0,sMax=10;
+  for(let i=0;i<=100;i++){const s=sAt(i/100*tMax);if(s<sMin)sMin=s;if(s>sMax)sMax=s;}
+  const span=Math.max(sMax-sMin,20);sMax+=span*.12;sMin-=span*.08;
+  const tx=t=>(pad.l+t/tMax*gW);
+  const sy=s=>(pad.t+gH-((s-sMin)/(sMax-sMin)*gH));
+  // zero line
+  const zy=sy(0);
+  if(zy>pad.t&&zy<H-pad.b){
+    ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(255,140,0,.18)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(pad.l,zy);ctx.lineTo(W-pad.r,zy);ctx.stroke();ctx.setLineDash([]);
+  }
+  // axes
+  ctx.strokeStyle='rgba(255,140,0,.6)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,H-pad.b);
+  ctx.moveTo(pad.l,H-pad.b);ctx.lineTo(W-pad.r,H-pad.b);ctx.stroke();
+  ctx.font='11px Share Tech Mono,monospace';ctx.fillStyle='rgba(255,140,0,.5)';
+  ctx.fillText('s(m)',4,pad.t+8);ctx.fillText('t(s)',W-pad.r-14,H-pad.b+18);
+  for(let i=0;i<=tMax;i+=2){
+    const x=tx(i);
+    ctx.fillStyle='rgba(255,140,0,.35)';ctx.fillText(i,x-4,H-pad.b+16);
+    ctx.strokeStyle='rgba(255,140,0,.12)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+    ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,H-pad.b);ctx.stroke();ctx.setLineDash([]);
+  }
+  // curve
+  ctx.save();ctx.shadowColor='var(--neon-orange)';ctx.shadowBlur=16;
+  ctx.strokeStyle='var(--neon-orange)';ctx.lineWidth=2.5;
+  ctx.beginPath();
+  for(let i=0;i<=200;i++){
+    const t=i/200*tMax,s=sAt(t);
+    const x=tx(t),y=sy(s);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();ctx.restore();
+  ctx.font='11px Share Tech Mono,monospace';ctx.fillStyle='rgba(255,140,0,.5)';
+  const sign=a>=0?'+':'';
+  ctx.fillText('s(t) = '+v0+'t '+sign+'½·'+a+'·t²',pad.l+gW*.35,pad.t+20);
+}
+
+// ── SUMMARY GRAPH ──────────────────────────────
+function drawSummary(){
+  const canvas=document.getElementById('sumCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  bgFill(ctx,W,H);
+  const v0=6,a=3,tMax=8;
+  const cols=['#ff8c00','#00f0ff','#ffe600'];
+  const labels=['s(t) — parábola','v(t) — reta','a(t) — constante'];
+  const pW=W/3-20;
+  [0,1,2].forEach(panel=>{
+    const ox=panel*(pW+20)+10;
+    const pad={l:40,r:10,t:36,b:36};
+    const gW=pW-pad.l-pad.r,gH=H-pad.t-pad.b;
+    const tx=t=>(ox+pad.l+t/tMax*gW);
+    ctx.font='10px Share Tech Mono,monospace';ctx.fillStyle=cols[panel];
+    ctx.fillText(labels[panel],ox+pad.l-20,pad.t-12);
+    // axes
+    ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(ox+pad.l,pad.t);ctx.lineTo(ox+pad.l,H-pad.b);
+    ctx.moveTo(ox+pad.l,H-pad.b);ctx.lineTo(ox+pad.l+gW,H-pad.b);ctx.stroke();
+    ctx.save();ctx.shadowColor=cols[panel];ctx.shadowBlur=14;ctx.strokeStyle=cols[panel];ctx.lineWidth=2.5;
+    ctx.beginPath();
+    for(let i=0;i<=100;i++){
+      const t=i/100*tMax;
+      let val;
+      if(panel===0)val=(v0*t+.5*a*t*t)/(v0*tMax+.5*a*tMax*tMax)*gH;
+      else if(panel===1)val=(v0+a*t)/(v0+a*tMax)*gH;
+      else val=0.5;
+      const x=tx(t),y=H-pad.b-val*gH*(panel===2?.3:1)*(panel===2?1:1);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.stroke();ctx.restore();
+    ctx.font='9px Share Tech Mono,monospace';ctx.fillStyle='rgba(255,255,255,.3)';
+    ctx.fillText('0',ox+pad.l-12,H-pad.b+2);
+    ctx.fillText('t',ox+pad.l+gW-4,H-pad.b+14);
+  });
+}
+
+// ── ANIMATION ──────────────────────────────────
+let animId=null,animT=0,animRunning=false;
+function getAnimParams(){
+  const v0=+document.getElementById('animV0').value;
+  const a=+document.getElementById('animA').value;
+  document.getElementById('animV0Val').textContent=v0+' m/s';
+  document.getElementById('animAVal').textContent=a+' m/s²';
+  return{v0,a};
+}
+function resetAnim(){
+  if(animId){cancelAnimationFrame(animId);animId=null;}
+  animT=0;animRunning=false;
+  getAnimParams();
+  document.getElementById('animBtn').textContent='▶ INICIAR';
+  drawAnimFrame(0,getAnimParams().v0,getAnimParams().a,false);
+}
+function startAnim(){
+  if(animRunning){
+    cancelAnimationFrame(animId);animId=null;animRunning=false;
+    document.getElementById('animBtn').textContent='▶ CONTINUAR';return;
+  }
+  animRunning=true;
+  document.getElementById('animBtn').textContent='⏸ PAUSAR';
+  const {v0,a}=getAnimParams();
+  let last=null;
+  function step(ts){
+    if(!last)last=ts;
+    const dt=(ts-last)/1000;last=ts;
+    animT+=dt;
+    drawAnimFrame(animT,v0,a,true);
+    const v=v0+a*animT;
+    if((a<0&&v<=0)||(a===0&&animT>12)||(a>0&&animT>10)){
+      animRunning=false;document.getElementById('animBtn').textContent='▶ INICIAR';
+      animT=0;return;
+    }
+    animId=requestAnimationFrame(step);
+  }
+  animId=requestAnimationFrame(step);
+}
+function drawAnimFrame(t,v0,a,running){
+  const canvas=document.getElementById('animCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  bgFill(ctx,W,H);
+  const tMax=a>0?10:a<0?Math.max((-v0/a)+1,8):12;
+  const roadY=H*.68;
+  // road
+  const rg=ctx.createLinearGradient(0,roadY,0,roadY+40);
+  rg.addColorStop(0,'rgba(255,140,0,.08)');rg.addColorStop(1,'transparent');
+  ctx.fillStyle=rg;ctx.fillRect(0,roadY,W,40);
+  ctx.strokeStyle='rgba(255,140,0,.3)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,roadY);ctx.lineTo(W,roadY);ctx.stroke();
+  // dashes
+  ctx.setLineDash([24,16]);ctx.strokeStyle='rgba(255,140,0,.18)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(0,roadY+20);ctx.lineTo(W,roadY+20);ctx.stroke();ctx.setLineDash([]);
+  // car position
+  const sNow=Math.max(0,v0*t+.5*a*t*t);
+  const sMax=Math.max(v0*tMax+.5*a*tMax*tMax,80);
+  const cx=60+Math.min(sNow/sMax,1)*(W-120);
+  // car body
+  const carW=54,carH=26;
+  ctx.save();ctx.shadowColor='var(--neon-orange)';ctx.shadowBlur=20;
+  ctx.fillStyle='#1a0a00';ctx.strokeStyle='var(--neon-orange)';ctx.lineWidth=1.5;
+  ctx.fillRect(cx-carW/2,roadY-carH-2,carW,carH);
+  ctx.strokeRect(cx-carW/2,roadY-carH-2,carW,carH);
+  // cabin
+  ctx.fillStyle='#0a1520';ctx.strokeStyle='rgba(0,240,255,.5)';ctx.lineWidth=1;
+  ctx.fillRect(cx-14,roadY-carH-2-14,28,14);ctx.strokeRect(cx-14,roadY-carH-2-14,28,14);
+  // wheels
+  [cx-16,cx+16].forEach(wx=>{
+    ctx.beginPath();ctx.arc(wx,roadY,7,0,Math.PI*2);
+    ctx.fillStyle='#111';ctx.fill();
+    ctx.strokeStyle='var(--neon-orange)';ctx.lineWidth=2;ctx.stroke();
+    ctx.beginPath();ctx.arc(wx,roadY,3,0,Math.PI*2);
+    ctx.fillStyle='var(--neon-orange)';ctx.fill();
+  });
+  ctx.restore();
+  // exhaust trail if accelerating
+  if(a>0&&running){
+    for(let i=0;i<5;i++){
+      ctx.beginPath();ctx.arc(cx-carW/2-8-i*7,roadY-8,3-i*.4,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,140,0,${.15-i*.025})`;ctx.fill();
+    }
+  }
+  // HUD
+  const vNow=Math.max(0,v0+a*t);
+  ctx.font='12px Orbitron,monospace';ctx.fillStyle='var(--neon-orange)';
+  ctx.fillText('t = '+t.toFixed(1)+' s',10,22);
+  ctx.fillText('v = '+vNow.toFixed(1)+' m/s',130,22);
+  ctx.fillText('s = '+sNow.toFixed(1)+' m',280,22);
+  ctx.fillText('a = '+a+' m/s²',430,22);
+  document.getElementById('animInfo').textContent=
+    running?`t=${t.toFixed(2)}s  |  v=${vNow.toFixed(2)}m/s  |  s=${sNow.toFixed(2)}m`:'Configure os parâmetros e pressione INICIAR';
+}
+
+// ── CALCULATOR ─────────────────────────────────
+const calcModes={
+  v:{fields:[{id:'cv0',l:'VELOCIDADE INICIAL v₀ (m/s)',d:10},{id:'ca',l:'ACELERAÇÃO a (m/s²)',d:3},{id:'ct',l:'TEMPO t (s)',d:5}],label:'VELOCIDADE FINAL  v (m/s)',
+     fn:f=>+(f.cv0+f.ca*f.ct).toFixed(3),formula:'v = v₀ + a·t'},
+  s:{fields:[{id:'cs0',l:'POSIÇÃO INICIAL s₀ (m)',d:0},{id:'cv0',l:'VELOCIDADE INICIAL v₀ (m/s)',d:10},{id:'ca',l:'ACELERAÇÃO a (m/s²)',d:3},{id:'ct',l:'TEMPO t (s)',d:5}],
+     label:'POSIÇÃO  s (m)',fn:f=>+(f.cs0+f.cv0*f.ct+.5*f.ca*f.ct*f.ct).toFixed(3),formula:'s = s₀ + v₀t + ½·a·t²'},
+  ds_torr:{fields:[{id:'cv0',l:'VELOCIDADE INICIAL v₀ (m/s)',d:20},{id:'cv',l:'VELOCIDADE FINAL v (m/s)',d:0},{id:'ca',l:'ACELERAÇÃO a (m/s²)',d:-5}],
+     label:'DESLOCAMENTO  Δs (m)',fn:f=>{if(f.ca===0)return 'a ≠ 0';return +((f.cv*f.cv-f.cv0*f.cv0)/(2*f.ca)).toFixed(3)},formula:'Δs = (v²−v₀²) / (2a)'},
+  a_torr:{fields:[{id:'cv0',l:'VELOCIDADE INICIAL v₀ (m/s)',d:0},{id:'cv',l:'VELOCIDADE FINAL v (m/s)',d:30},{id:'cds',l:'DESLOCAMENTO Δs (m)',d:45}],
+     label:'ACELERAÇÃO  a (m/s²)',fn:f=>{if(f.cds===0)return 'Δs ≠ 0';return +((f.cv*f.cv-f.cv0*f.cv0)/(2*f.cds)).toFixed(3)},formula:'a = (v²−v₀²) / (2Δs)'},
+  t_v:{fields:[{id:'cv0',l:'VELOCIDADE INICIAL v₀ (m/s)',d:0},{id:'cv',l:'VELOCIDADE FINAL v (m/s)',d:20},{id:'ca',l:'ACELERAÇÃO a (m/s²)',d:4}],
+     label:'TEMPO  t (s)',fn:f=>{if(f.ca===0)return 'a ≠ 0';return +((f.cv-f.cv0)/f.ca).toFixed(3)},formula:'t = (v−v₀) / a'},
+};
+function updateCalcMode(){
+  const mode=document.getElementById('calcMode').value;
+  const m=calcModes[mode];
+  const container=document.getElementById('calcFields');
+  container.innerHTML=m.fields.map(f=>`<div class="cfield"><label>${f.l}</label><input type="number" id="${f.id}" value="${f.d}" oninput="calculate()"></div>`).join('');
+  document.getElementById('cr-label').textContent=m.label;
+  document.getElementById('calcFormula').textContent='';
+  document.getElementById('calcResultVal').textContent='—';
+}
+function getField(id){const el=document.getElementById(id);return el?+el.value:0;}
+function calculate(){
+  const mode=document.getElementById('calcMode').value;
+  const m=calcModes[mode];
+  const fields={};
+  m.fields.forEach(f=>fields[f.id]=getField(f.id));
+  const result=m.fn(fields);
+  document.getElementById('calcResultVal').textContent=typeof result==='number'?result+' ':''+result;
+  document.getElementById('calcFormula').textContent=m.formula;
+}
+
+// ── QUIZ ───────────────────────────────────────
+const QA={q1:0,q2:0,q3:0,q4:0,q5:0,q6:0,q7:0,q8:0};
+const FB={
+  q1:{correct:'✓ Correto! No MRUV a ACELERAÇÃO é constante e diferente de zero — é justamente ela que caracteriza o movimento uniformemente variado.',
+      wrong:'✗ No MRUV a grandeza constante é a ACELERAÇÃO (a = cte ≠ 0). A velocidade varia linearmente e a posição varia de forma quadrática.'},
+  q2:{correct:'✓ Correto! a = Δv/t = (20−0)/10 = 2 m/s². A cada segundo a velocidade aumenta 2 m/s.',
+      wrong:'✗ Use a = (v−v₀)/t = (20−0)/10 = 2 m/s². Lembre de converter km/h para m/s: 72÷3,6 = 20 m/s.'},
+  q3:{correct:'✓ Correto! v = v₀ + at → 0 = 8 + (−2)t → 2t = 8 → t = 4 s.',
+      wrong:'✗ Aplique v = v₀ + at: 0 = 8 + (−2)·t → 2t = 8 → t = 4 s. O corpo para em 4 segundos.'},
+  q4:{correct:'✓ Correto! s = 20 + 6×3 + ½×4×9 = 20 + 18 + 18 = 56 m. Use o macete: S = Sozinho + Voltei + ½ Atrasado.',
+      wrong:'✗ s = s₀ + v₀t + ½at² = 20 + 6×3 + ½×4×3² = 20 + 18 + 18 = 56 m. Confira cada parcela do macete!'},
+  q5:{correct:'✓ Correto! v²=v₀²+2aΔs → 0=900+2×(−5)×Δs → 10Δs=900 → Δs=90 m.',
+      wrong:'✗ Torricelli: v²=v₀²+2aΔs → 0²=30²+2·(−5)·Δs → 10Δs=900 → Δs=90 m.'},
+  q6:{correct:'✓ Correto! v²=0+2×10×80=1600 → v=40 m/s.',
+      wrong:'✗ Torricelli com v₀=0: v²=2·a·Δs=2×10×80=1600 → v=√1600=40 m/s.'},
+  q7:{correct:'✓ Correto! No gráfico v(t), a inclinação (coeficiente angular) da reta = Δv/Δt = aceleração a.',
+      wrong:'✗ A inclinação da reta num gráfico v×t representa Δv/Δt, que é exatamente a definição de aceleração.'},
+  q8:{correct:'✓ Correto! v=0+4×5=20 m/s; s=0+0+½×4×25=50 m. Use as duas funções horárias juntas!',
+      wrong:'✗ v=v₀+at=0+4×5=20 m/s; s=s₀+v₀t+½at²=0+0+½×4×25=50 m.'},
+};
+let answered=0;
+function ans(btn,qId,result){
+  const card=document.getElementById(qId);
+  const btns=card.querySelectorAll('.obt');
+  btns.forEach(b=>b.disabled=true);
+  const fb=document.getElementById('f_'+qId);
+  if(result==='correct'){btn.classList.add('correct');fb.textContent=FB[qId].correct;fb.className='feedback show ok';QA[qId]=1;}
+  else{btn.classList.add('wrong');fb.textContent=FB[qId].wrong;fb.className='feedback show err';QA[qId]=0;btns.forEach(b=>{if(b.getAttribute('onclick').includes("'correct'"))b.classList.add('correct');});}
+  answered++;updateProg();if(answered===8)showScore();
+}
+function updateProg(){
+  const p=answered/8*100;
+  document.getElementById('progBar').style.width=p+'%';
+  document.getElementById('progTxt').textContent=`${answered} / 8 respondidas`;
+}
+function showScore(){
+  const sc=Object.values(QA).reduce((a,b)=>a+b,0);
+  const panel=document.getElementById('scorePanel');panel.style.display='block';
+  document.getElementById('scVal').textContent=sc+'/8';
+  const msgs=['Não desista! Revise o conteúdo e tente novamente.','Bom início! Releia as seções que errou.','Indo bem! Continue praticando.','Muito bem! Domínio sólido do MRUV.','Perfeito! 🚀 Resultado impecável!'];
+  const idx=sc<=2?0:sc<=4?1:sc<=5?2:sc<=7?3:4;
+  document.getElementById('scMsg').textContent=msgs[idx];
+  const colors=['var(--neon-red)','var(--neon-orange)','var(--neon-yellow)','var(--neon-green)','var(--neon-cyan)'];
+  document.getElementById('scVal').style.color=colors[idx];
+  document.getElementById('scVal').style.textShadow=`0 0 20px ${colors[idx]}`;
+  panel.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQuiz(){
+  Object.keys(QA).forEach(k=>QA[k]=0);answered=0;updateProg();
+  document.getElementById('scorePanel').style.display='none';
+  ['q1','q2','q3','q4','q5','q6','q7','q8'].forEach(qId=>{
+    document.getElementById(qId).querySelectorAll('.obt').forEach(b=>{b.disabled=false;b.classList.remove('correct','wrong');});
+    const fb=document.getElementById('f_'+qId);fb.className='feedback';fb.textContent='';
+  });
+}
+
+// ── INIT ───────────────────────────────────────
+window.addEventListener('load',()=>{
+  drawVT();drawST();drawSummary();
+  updateCalcMode();calculate();
+  resetAnim();
+});
+</script>
+</body>
+</html>

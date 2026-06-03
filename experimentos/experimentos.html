@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plataforma de Experimentos Científicos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --purple-neon: #bc13fe;
+      --magenta-neon: #ff00ff;
+      --bg-dark: #05010a;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: var(--bg-dark);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    /* Efeito de Brilho e Grid de Fundo */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 50% 50%, rgba(188, 19, 254, 0.12), transparent 70%),
+        linear-gradient(rgba(188, 19, 254, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(188, 19, 254, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 40px 40px, 40px 40px;
+      z-index: -1;
+    }
+
+    .container {
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    /* Cabeçalho e Botão Voltar */
+    .header-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .btn-back {
+      background: transparent;
+      color: #e0e0e0;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      font-family: 'Orbitron', sans-serif;
+      transition: 0.3s ease;
+    }
+    .btn-back:hover {
+      color: white;
+      border-color: var(--purple-neon);
+      box-shadow: 0 0 15px rgba(188, 19, 254, 0.4);
+      background: rgba(188, 19, 254, 0.1);
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--purple-neon);
+      text-shadow: 0 0 15px var(--purple-neon);
+      text-align: center;
+      font-size: 2.8rem;
+      letter-spacing: 2px;
+      margin-bottom: 40px;
+    }
+
+    /* SELETOR DE ÁREAS (Abas Principais) */
+    .area-selector {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .btn-area {
+      background: rgba(255, 255, 255, 0.02);
+      color: #cdefff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      padding: 15px 30px;
+      border: 1px solid rgba(188, 19, 254, 0.3);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    .btn-area:hover {
+      color: var(--magenta-neon);
+      border-color: var(--magenta-neon);
+      box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);
+    }
+    .btn-area.active-area {
+      color: white;
+      background: rgba(188, 19, 254, 0.2);
+      border-color: var(--purple-neon);
+      box-shadow: 0 0 20px rgba(188, 19, 254, 0.4);
+    }
+    
+    /* Menu Suspenso (Dropdown) */
+    .filter-section {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 50px;
+    }
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropbtn {
+      background: rgba(188, 19, 254, 0.1);
+      color: white;
+      padding: 12px 30px;
+      font-size: 15px;
+      border: 1px solid var(--purple-neon);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      transition: 0.3s;
+      box-shadow: 0 0 10px rgba(188, 19, 254, 0.2);
+      letter-spacing: 1px;
+    }
+    .dropdown:hover .dropbtn {
+      background: var(--purple-neon);
+      box-shadow: 0 0 20px var(--purple-neon);
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: #120120;
+      min-width: 220px;
+      box-shadow: 0px 8px 16px rgba(0,0,0,0.6);
+      z-index: 10;
+      border: 1px solid var(--purple-neon);
+      border-radius: 8px;
+      margin-top: 5px;
+    }
+    .dropdown-content a {
+      color: #e0e0e0;
+      padding: 14px 20px;
+      text-decoration: none;
+      display: block;
+      font-size: 0.95rem;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .dropdown-content a:hover {
+      background: rgba(188, 19, 254, 0.3);
+      color: var(--magenta-neon);
+      padding-left: 25px;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    /* Gerenciamento de Visibilidade das Áreas */
+    .section-area {
+      display: none;
+    }
+    .section-area.active-block {
+      display: block;
+    }
+
+    /* Grid de Experimentos */
+    .exp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 35px;
+    }
+    .exp-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(188, 19, 254, 0.25);
+      padding: 30px;
+      border-radius: 20px;
+      transition: 0.4s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .exp-card.hide {
+      display: none;
+    }
+
+    .exp-card::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255, 0, 255, 0.05), transparent 70%);
+      z-index: 0;
+    }
+    .exp-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--magenta-neon);
+      box-shadow: 0 0 25px rgba(255, 0, 255, 0.25);
+    }
+    
+    .exp-card h3 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--magenta-neon);
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 1;
+    }
+    .exp-card p {
+      color: #d0c0d8;
+      line-height: 1.6;
+      font-size: 1rem;
+      margin-bottom: 25px;
+      position: relative;
+      z-index: 1;
+    }
+    .btn-start {
+      align-self: flex-start;
+      background: transparent;
+      color: white;
+      border: 1px solid var(--purple-neon);
+      padding: 10px 22px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: 0.3s;
+      position: relative;
+      z-index: 1;
+    }
+    .btn-start:hover {
+      background: var(--purple-neon);
+      box-shadow: 0 0 15px var(--purple-neon);
+    }
+    .tag {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(188, 19, 254, 0.2);
+      border: 1px solid var(--purple-neon);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-family: 'Orbitron', sans-serif;
+      color: #ffc2ff;
+    }
+
+    @media (max-width: 768px) {
+      .header-actions { flex-direction: column; gap: 20px; text-align: center; }
+      .area-selector { flex-direction: column; width: 100%; }
+      h1 { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Topo com Botão Voltar -->
+    <div class="header-actions">
+      <a href="D:\Site Experimental\fisica.html" class="btn-back">← Voltar para Física</a>
+    </div>
+
+    <h1>Painel Científico</h1>
+
+    <!-- SELETOR DE MODALIDADES -->
+    <div class="area-selector">
+      <button class="btn-area active-area" id="tab-virtual" onclick="switchArea('virtual')">Laboratório Virtual</button>
+      <button class="btn-area" id="tab-create" onclick="switchArea('create')">Crie seus Experimentos</button>
+    </div>
+
+    <!-- Menu Dropdown Único de Categorias -->
+    <div class="filter-section">
+      <div class="dropdown">
+        <button class="dropbtn" id="current-category">Filtrar Categoria ▾</button>
+        <div class="dropdown-content">
+          <a onclick="filterCategory('todos')">Mostrar Todos</a>
+          <a onclick="filterCategory('cinematica')">Cinemática</a>
+          <a onclick="filterCategory('dinamica')">Dinâmica</a>
+          <a onclick="filterCategory('eletricidade')">Eletricidade</a>
+          <a onclick="filterCategory('ondulatoria')">Ondulatória</a>
+          <a onclick="filterCategory('optica')">Óptica</a>
+          <a onclick="filterCategory('termologia')">Termologia</a>
+          <a onclick="filterCategory('termodinamica')">Termodinâmica</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= ÁREA 1: LABORATÓRIO VIRTUAL ================= -->
+    <div id="area-virtual" class="section-area active-block">
+      <div class="exp-grid">
+
+        <div class="exp-card" data-category="cinematica">
+          <span class="tag">Cinemática</span>
+          <div>
+            <h3>Lançamento Oblíquo</h3>
+            <p>Simule a trajetória de projéteis com resistência do ar variável e ajuste vetorial de ângulo e velocidade inicial.</p>
+          </div>
+          <a href="D:\Site Experimental\principal\Física\Experimentos\lancamentoobliquo.html" class="btn-start">Iniciar Simulação</a>
+        </div>
+
+        <div class="exp-card" data-category="dinamica">
+          <span class="tag">Dinâmica</span>
+          <div>
+            <h3>2ª Lei de Newton</h3>
+            <p>Analise a relação fundamental entre Força Resultante, Massa e Aceleração através de blocos e sistemas de tração.</p>
+          </div>
+          <a href="D:\Site Experimental\principal\Física\Experimentos\2leinewton.html" class="btn-start">Iniciar Simulação</a>
+        </div>
+
+        <div class="exp-card" data-category="termodinamica">
+          <span class="tag">Termodinâmica</span>
+          <div>
+            <h3>Simulador de Gás Ideal</h3>
+            <p>Monitore o comportamento macroscópico de gases. Altere variáveis como Pressão (P), Volume (V) e Temperatura (T) baseando-se na equação de Clapeyron.</p>
+          </div>
+          <a href="D:\Site Experimental\principal\Física\Experimentos\gases_ideais.html" class="btn-start">Iniciar Simulação</a>
+        </div>
+
+        <div class="exp-card" data-category="cinematica">
+          <span class="tag">Cinemática</span>
+          <div>
+            <h3>Laboratório Temporal</h3>
+            <p>Analise gráficos de espaço, velocidade e aceleração em função do tempo através de múltiplos cenários e simulações de movimento cronometrado.</p>
+          </div>
+          <a href="D:\Site Experimental\principal\Física\Experimentos\Laboratório_Temporal_Simulações.html" class="btn-start">Iniciar Simulação</a>
+        </div>
+
+        <div class="exp-card" data-category="optica">
+          <span class="tag">Óptica</span>
+          <div>
+            <h3>Simulador de Óptica Geometrica</h3>
+            <p>Estude os fenômenos de reflexão, refração e dispersão da luz através de lentes, espelhos convexos/côncavos e prismas translúcidos.</p>
+          </div>
+          <a href="D:\Site Experimental\principal\Física\Experimentos\sim_optica.html" class="btn-start">Iniciar Simulação</a>
+        </div>
+
+        <div class="exp-card" data-category="eletricidade">
+          <span class="tag">Eletricidade</span>
+          <div>
+            <h3>Eletrodinâmica & Circuitos</h3>
+            <p>Monte circuitos elétricos em série e paralelo. Meça a corrente (A) e a diferença de potencial (V) usando resistores, geradores e chaves interruptoras.</p>
+          </div>
+          <a href="D:\Site Experimental\principal\Física\Experimentos\circuitos_eletricos.html" class="btn-start">Iniciar Simulação</a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= ÁREA 2: CRIE SEUS EXPERIMENTOS ================= -->
+    <div id="area-create" class="section-area">
+      <div class="exp-grid">
+        
+        <!-- Balão Foguete (Endereço Atualizado para a pasta makeex) -->
+        <div class="exp-card" data-category="dinamica">
+          <span class="tag">Dinâmica</span>
+          <div>
+            <h3>Balão Foguete</h3>
+            <p>Explore a Terceira Lei de Newton (Ação e Reação) observando as forças geradas pelo escape de ar em um sistema controlado.</p>
+          </div>
+          <a href="D:\Site Experimental\principal\Física\Experimentos\makeex\LdN-BalaoFoguete.html" class="btn-start">Iniciar</a>
+        </div>
+
+        <!-- Novo Experimento: Disco de Newton (Categoria: optica) -->
+        <div class="exp-card" data-category="optica">
+          <span class="tag">Óptica</span>
+          <div>
+            <h3>Disco de Newton</h3>
+            <p>Desenvolva a simulação da rotação veloz de cores espectrais para provar a recomposição da luz branca através da persistência retiniana.</p>
+          </div>
+          <a href="D:\Site Experimental\principal\Física\Experimentos\makeex\disco_newton.html" class="btn-start">Iniciar</a>
+        </div>
+
+        <!-- Novo Experimento: Eletrostática (Categoria: eletricidade) -->
+        <div class="exp-card" data-category="eletricidade">
+          <span class="tag">Eletricidade</span>
+          <div>
+            <h3>Laboratório de Eletrostática</h3>
+            <p>Programe interações de cargas elétricas em repouso. Calcule forças de atração e repulsão baseando-se na Lei de Coulomb.</p>
+          </div>
+          <a href="D:\Site Experimental\principal\Física\Experimentos\makeex\ex_eletrostática.html" class="btn-start">Iniciar</a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentActiveCategory = 'todos';
+
+    function switchArea(area) {
+      document.getElementById('area-virtual').classList.remove('active-block');
+      document.getElementById('area-create').classList.remove('active-block');
+      document.getElementById('tab-virtual').classList.remove('active-area');
+      document.getElementById('tab-create').classList.remove('active-area');
+
+      if (area === 'virtual') {
+        document.getElementById('area-virtual').classList.add('active-block');
+        document.getElementById('tab-virtual').classList.add('active-area');
+      } else {
+        document.getElementById('area-create').classList.add('active-block');
+        document.getElementById('tab-create').classList.add('active-area');
+      }
+      filterCategory(currentActiveCategory);
+    }
+
+    function filterCategory(category) {
+      currentActiveCategory = category;
+      const cards = document.querySelectorAll('.exp-card');
+      const button = document.getElementById('current-category');
+      
+      const names = {
+        'todos': 'Mostrar Todos ▾',
+        'cinematica': 'Cinemática ▾',
+        'dinamica': 'Dinâmica ▾',
+        'eletricidade': 'Eletricidade ▾',
+        'ondulatoria': 'Ondulatória ▾',
+        'optica': 'Óptica ▾',
+        'termologia': 'Termologia ▾',
+        'termodinamica': 'Termodinâmica ▾'
+      };
+      
+      if(names[category]) button.innerText = names[category];
+
+      cards.forEach(card => {
+        if (category === 'todos' || card.getAttribute('data-category') === category) {
+          card.classList.remove('hide');
+        } else {
+          card.classList.add('hide');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

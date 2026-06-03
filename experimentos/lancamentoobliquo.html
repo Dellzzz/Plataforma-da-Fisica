@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador de Lançamentos</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:
+    radial-gradient(circle at top,#37104f 0%, #12051f 45%, #05010d 100%);
+    color:white;
+    overflow-x:hidden;
+}
+
+/* GRID FUTURISTA */
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+    linear-gradient(90deg,transparent 48%,rgba(255,255,255,0.03) 50%,transparent 52%),
+    linear-gradient(transparent 48%,rgba(255,255,255,0.03) 50%,transparent 52%);
+    background-size:50px 50px;
+    animation:gridMove 10s linear infinite;
+    pointer-events:none;
+}
+
+@keyframes gridMove{
+    from{transform:translateY(0);}
+    to{transform:translateY(50px);}
+}
+
+/* HEADER */
+
+header{
+    text-align:center;
+    padding:50px 20px 20px;
+}
+
+header h1{
+    font-family:'Orbitron',sans-serif;
+    font-size:3.5rem;
+    color:#d58cff;
+    text-shadow:
+    0 0 10px #c94fff,
+    0 0 20px #c94fff,
+    0 0 40px #7a00ff;
+}
+
+header p{
+    margin-top:15px;
+    color:#ddd;
+    font-size:1.1rem;
+}
+
+/* CONTAINER */
+
+.container{
+    width:95%;
+    max-width:1300px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:350px 1fr;
+    gap:30px;
+    padding:30px;
+}
+
+.panel,
+.simulation-area{
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:25px;
+    backdrop-filter:blur(10px);
+    box-shadow:0 0 20px rgba(180,0,255,0.2);
+}
+
+/* PAINEL */
+
+.panel{
+    padding:30px;
+}
+
+.panel h2{
+    font-family:'Orbitron',sans-serif;
+    margin-bottom:25px;
+    color:#d58cff;
+}
+
+.control{
+    margin-bottom:30px;
+}
+
+.control label{
+    display:block;
+    margin-bottom:10px;
+    font-weight:600;
+}
+
+.control input{
+    width:100%;
+    appearance:none;
+    height:8px;
+    border-radius:10px;
+    background:#4a1664;
+    outline:none;
+}
+
+.control input::-webkit-slider-thumb{
+    appearance:none;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:#e879ff;
+    box-shadow:0 0 15px #d14dff;
+    cursor:pointer;
+}
+
+/* BOTÕES */
+
+.buttons{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+button{
+    flex:1;
+    padding:15px;
+    border:none;
+    border-radius:15px;
+    background:linear-gradient(135deg,#d96cff,#7f2cff);
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+    font-size:1rem;
+}
+
+button:hover{
+    transform:translateY(-3px);
+    box-shadow:0 0 20px #c84dff;
+}
+
+/* RESULTADOS */
+
+.results{
+    margin-top:35px;
+    background:rgba(255,255,255,0.04);
+    padding:20px;
+    border-radius:20px;
+    line-height:2;
+}
+
+.results span{
+    color:#ffb5ff;
+    font-weight:bold;
+}
+
+/* SIMULAÇÃO */
+
+.simulation-area{
+    position:relative;
+    overflow:hidden;
+    height:700px;
+}
+
+canvas{
+    width:100%;
+    height:100%;
+    display:block;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:1000px){
+
+.container{
+    grid-template-columns:1fr;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>SIMULADOR DE LANÇAMENTOS</h1>
+    <p>
+        Explore os lançamentos horizontal e oblíquo alterando velocidade,
+        ângulo e altura inicial.
+    </p>
+</header>
+
+<div class="container">
+
+    <!-- PAINEL -->
+
+    <div class="panel">
+
+        <h2>Controles</h2>
+
+        <div class="control">
+            <label>
+                Ângulo: <span id="angleValue">45</span>°
+            </label>
+
+            <input type="range" id="angle" min="0" max="90" value="45">
+        </div>
+
+        <div class="control">
+            <label>
+                Velocidade Inicial:
+                <span id="velocityValue">30</span> m/s
+            </label>
+
+            <input type="range" id="velocity" min="5" max="80" value="30">
+        </div>
+
+        <div class="control">
+            <label>
+                Altura Inicial:
+                <span id="heightValue">0</span> m
+            </label>
+
+            <input type="range" id="height" min="0" max="100" value="0">
+        </div>
+
+        <div class="buttons">
+            <button onclick="launchProjectile()">
+                Lançar
+            </button>
+
+            <button onclick="resetSimulation()">
+                Resetar
+            </button>
+        </div>
+
+        <div class="results">
+            <p>
+                Tipo:
+                <span id="typeResult">
+                    Lançamento Oblíquo
+                </span>
+            </p>
+
+            <p>
+                Distância:
+                <span id="distanceResult">
+                    0 m
+                </span>
+            </p>
+
+            <p>
+                Tempo:
+                <span id="timeResult">
+                    0 s
+                </span>
+            </p>
+
+            <p>
+                Altura Máxima:
+                <span id="maxHeightResult">
+                    0 m
+                </span>
+            </p>
+        </div>
+
+    </div>
+
+    <!-- ÁREA DA SIMULAÇÃO -->
+
+    <div class="simulation-area">
+        <canvas id="canvas"></canvas>
+    </div>
+
+</div>
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = 900;
+canvas.height = 700;
+
+const g = 9.8;
+
+let projectile = null;
+let animationId;
+
+const angleInput = document.getElementById("angle");
+const velocityInput = document.getElementById("velocity");
+const heightInput = document.getElementById("height");
+
+const angleValue = document.getElementById("angleValue");
+const velocityValue = document.getElementById("velocityValue");
+const heightValue = document.getElementById("heightValue");
+
+angleInput.oninput = () => {
+    angleValue.textContent = angleInput.value;
+
+    if(angleInput.value == 0){
+        document.getElementById("typeResult").textContent =
+        "Lançamento Horizontal";
+    }else{
+        document.getElementById("typeResult").textContent =
+        "Lançamento Oblíquo";
+    }
+};
+
+velocityInput.oninput = () => {
+    velocityValue.textContent = velocityInput.value;
+};
+
+heightInput.oninput = () => {
+    heightValue.textContent = heightInput.value;
+};
+
+/* DESENHAR CENÁRIO */
+
+function drawBackground(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    /* chão */
+
+    ctx.fillStyle = "#22002f";
+    ctx.fillRect(0,620,canvas.width,80);
+
+    /* grid */
+
+    ctx.strokeStyle = "rgba(255,255,255,0.05)";
+
+    for(let x=0;x<canvas.width;x+=50){
+
+        ctx.beginPath();
+        ctx.moveTo(x,0);
+        ctx.lineTo(x,canvas.height);
+        ctx.stroke();
+
+    }
+
+    for(let y=0;y<canvas.height;y+=50){
+
+        ctx.beginPath();
+        ctx.moveTo(0,y);
+        ctx.lineTo(canvas.width,y);
+        ctx.stroke();
+
+    }
+
+    drawCannon();
+
+}
+
+/* CANHÃO */
+
+function drawCannon(){
+
+    const angle =
+    parseFloat(angleInput.value) * Math.PI/180;
+
+    const height =
+    parseFloat(heightInput.value);
+
+    const baseX = 80;
+    const baseY = 620 - height*4;
+
+    ctx.save();
+
+    ctx.translate(baseX, baseY);
+
+    /* base */
+
+    ctx.beginPath();
+    ctx.arc(0,0,28,0,Math.PI*2);
+
+    const baseGradient =
+    ctx.createRadialGradient(0,0,5,0,0,30);
+
+    baseGradient.addColorStop(0,"#ffb8ff");
+    baseGradient.addColorStop(1,"#5d1485");
+
+    ctx.fillStyle = baseGradient;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "#d46cff";
+    ctx.fill();
+
+    /* cano */
+
+    ctx.rotate(-angle);
+
+    const barrelGradient =
+    ctx.createLinearGradient(0,0,80,0);
+
+    barrelGradient.addColorStop(0,"#f3d0ff");
+    barrelGradient.addColorStop(1,"#892dff");
+
+    ctx.fillStyle = barrelGradient;
+
+    ctx.fillRect(0,-10,85,20);
+
+    /* brilho neon */
+
+    ctx.strokeStyle = "#e57cff";
+    ctx.lineWidth = 2;
+
+    ctx.strokeRect(0,-10,85,20);
+
+    /* ponta */
+
+    ctx.beginPath();
+    ctx.arc(85,0,10,0,Math.PI*2);
+
+    ctx.fillStyle = "#d46cff";
+    ctx.fill();
+
+    ctx.restore();
+
+}
+/* LANÇAR */
+
+function launchProjectile(){
+
+    cancelAnimationFrame(animationId);
+
+    const angle =
+    parseFloat(angleInput.value) * Math.PI/180;
+
+    const velocity =
+    parseFloat(velocityInput.value);
+
+    const height =
+    parseFloat(heightInput.value);
+
+    const vx = velocity * Math.cos(angle);
+    const vy = velocity * Math.sin(angle);
+
+    projectile = {
+
+        x:80,
+        y:620 - height*4,
+
+        vx:vx,
+        vy:vy,
+
+        time:0,
+
+        trail:[]
+    };
+
+    animate();
+
+}
+
+/* RESET */
+
+function resetSimulation(){
+
+    cancelAnimationFrame(animationId);
+
+    projectile = null;
+
+    drawBackground();
+
+    document.getElementById("distanceResult")
+    .textContent = "0 m";
+
+    document.getElementById("timeResult")
+    .textContent = "0 s";
+
+    document.getElementById("maxHeightResult")
+    .textContent = "0 m";
+
+}
+
+function animate(){
+
+    drawBackground();
+
+    if(projectile){
+
+        projectile.time += 0.03;
+
+        const t = projectile.time;
+
+        const scale = 4;
+
+        const x =
+        80 + projectile.vx * t * scale;
+
+        const y =
+        (620 - parseFloat(heightInput.value)*4)
+        - ((projectile.vy * t)
+        - (0.5 * g * t * t)) * scale;
+
+        projectile.trail.push({x,y});
+
+        /* trajetória */
+
+        ctx.beginPath();
+
+        for(let i=0;i<projectile.trail.length;i++){
+
+            const p = projectile.trail[i];
+
+            if(i===0){
+                ctx.moveTo(p.x,p.y);
+            }else{
+                ctx.lineTo(p.x,p.y);
+            }
+
+        }
+
+        ctx.strokeStyle = "#d46cff";
+        ctx.lineWidth = 3;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "#d46cff";
+        ctx.stroke();
+
+        /* projétil */
+
+        ctx.beginPath();
+
+        ctx.arc(x,y,12,0,Math.PI*2);
+
+        const gradient =
+        ctx.createRadialGradient(x,y,2,x,y,15);
+
+        gradient.addColorStop(0,"#ffffff");
+        gradient.addColorStop(1,"#c84dff");
+
+        ctx.fillStyle = gradient;
+
+        ctx.shadowBlur = 25;
+        ctx.shadowColor = "#d46cff";
+
+        ctx.fill();
+
+        /* valores */
+
+        const distance = ((x - 80)/scale).toFixed(1);
+
+        document.getElementById("distanceResult")
+        .textContent = distance + " m";
+
+        document.getElementById("timeResult")
+        .textContent = t.toFixed(2) + " s";
+
+        const maxHeight =
+        (
+            (
+            Math.pow(projectile.vy,2)
+            /(2*g)
+            )
+            + parseFloat(heightInput.value)
+        ).toFixed(1);
+
+        document.getElementById("maxHeightResult")
+        .textContent = maxHeight + " m";
+
+        /* chão */
+
+        if(y >= 620){
+
+            cancelAnimationFrame(animationId);
+
+            return;
+
+        }
+
+    }
+
+    animationId =
+    requestAnimationFrame(animate);
+
+}
+
+drawBackground();
+
+</script>
+
+</body>
+</html>

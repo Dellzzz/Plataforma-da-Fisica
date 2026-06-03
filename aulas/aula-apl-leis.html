@@ -1,0 +1,2163 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leis de Newton — Alavancas, Plano Inclinado e Polias</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green:  #00ff88;
+    --cyan:   #00ddff;
+    --pink:   #ff0066;
+    --yellow: #ffdd00;
+    --orange: #ff8800;
+    --purple: #aa00ff;
+    --red:    #ff2244;
+    --bg:     #020a08;
+    --panel:  #060f0a;
+    --card:   #08160e;
+    --txt:    #cce8d8;
+    --dim:    #3a6a4a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--txt);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* SCANLINES */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(0,255,136,.013) 2px, rgba(0,255,136,.013) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* GRID */
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,136,.034) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,.034) 1px, transparent 1px);
+    background-size: 52px 52px;
+    animation: gridmove 20s linear infinite;
+    z-index: 0;
+  }
+  @keyframes gridmove {
+    from { background-position: 0 0; }
+    to   { background-position: 52px 52px; }
+  }
+
+  /* PARTICLES */
+  .particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+  .p {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0;
+    animation: pfloat linear infinite;
+  }
+  @keyframes pfloat {
+    0%   { transform: translateY(100vh); opacity: 0; }
+    10%  { opacity: .5; }
+    90%  { opacity: .2; }
+    100% { transform: translateY(-5vh); opacity: 0; }
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 80px 20px 56px;
+    border-bottom: 1px solid rgba(0,255,136,.25);
+  }
+  .hbadge {
+    display: inline-block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--green);
+    letter-spacing: 4px;
+    border: 1px solid var(--green);
+    padding: 4px 18px;
+    margin-bottom: 22px;
+    animation: badgepulse 2.5s ease-in-out infinite;
+  }
+  @keyframes badgepulse {
+    0%, 100% { box-shadow: 0 0 4px var(--green), inset 0 0 4px rgba(0,255,136,.1); }
+    50%       { box-shadow: 0 0 20px var(--green), 0 0 50px rgba(0,255,136,.2), inset 0 0 14px rgba(0,255,136,.15); }
+  }
+  h1.title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.9rem, 6.5vw, 4.6rem);
+    font-weight: 900;
+    letter-spacing: .07em;
+    line-height: 1;
+    color: #fff;
+    text-shadow: 0 0 10px var(--green), 0 0 32px var(--green), 0 0 80px rgba(0,255,136,.3);
+    animation: flick 7s linear infinite;
+  }
+  @keyframes flick {
+    0%,93%,100% { opacity:1; }
+    94%  { opacity:.78; }
+    96%  { opacity:.55; }
+    97.5%{ opacity:1;   }
+  }
+  .title-sub {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 1rem;
+    color: var(--dim);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(2,10,8,.93);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(0,255,136,.18);
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding: 11px 16px;
+    flex-wrap: wrap;
+  }
+  nav a {
+    font-family: 'Orbitron', monospace;
+    font-size: .58rem;
+    letter-spacing: 2px;
+    color: var(--dim);
+    text-decoration: none;
+    padding: 6px 14px;
+    border: 1px solid rgba(0,255,136,.2);
+    transition: all .3s;
+  }
+  nav a:hover {
+    color: var(--green);
+    border-color: var(--green);
+    box-shadow: 0 0 12px var(--green), inset 0 0 8px rgba(0,255,136,.1);
+    text-shadow: 0 0 8px var(--green);
+  }
+
+  /* ── LAYOUT ── */
+  main {
+    position: relative;
+    z-index: 10;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 22px 80px;
+  }
+  section { margin-top: 80px; }
+
+  .sh  { display: flex; align-items: center; gap: 14px; margin-bottom: 36px; }
+  .sn  { font-family: 'Share Tech Mono', monospace; font-size: .75rem; color: var(--green); opacity: .55; }
+  h2.st { font-family: 'Orbitron', monospace; font-size: clamp(1.15rem,2.7vw,1.75rem); font-weight: 700; color: #fff; letter-spacing: .05em; }
+  h2.st span { color: var(--green); text-shadow: 0 0 12px var(--green); }
+  .sl  { flex: 1; height: 1px; background: linear-gradient(90deg, var(--green), transparent); opacity: .4; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(0,255,136,.22);
+    padding: 28px 30px;
+    margin-bottom: 20px;
+    position: relative;
+    transition: all .3s;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--green);
+    box-shadow: 0 0 10px var(--green);
+  }
+  .card:hover { border-color: var(--green); box-shadow: 0 0 22px rgba(0,255,136,.08); }
+
+  .card.cy  { border-color: rgba(0,221,255,.22); }
+  .card.cy::before  { background: var(--cyan);   box-shadow: 0 0 10px var(--cyan);   }
+  .card.cy:hover    { border-color: var(--cyan);  box-shadow: 0 0 22px rgba(0,221,255,.1); }
+
+  .card.pk  { border-color: rgba(255,0,102,.22); }
+  .card.pk::before  { background: var(--pink);   box-shadow: 0 0 10px var(--pink);   }
+  .card.pk:hover    { border-color: var(--pink);  }
+
+  .card.ye  { border-color: rgba(255,221,0,.22); }
+  .card.ye::before  { background: var(--yellow); box-shadow: 0 0 10px var(--yellow); }
+  .card.ye:hover    { border-color: var(--yellow); }
+
+  .card.or  { border-color: rgba(255,136,0,.22); }
+  .card.or::before  { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
+  .card.or:hover    { border-color: var(--orange); }
+
+  .card.pu  { border-color: rgba(170,0,255,.22); }
+  .card.pu::before  { background: var(--purple); box-shadow: 0 0 10px var(--purple); }
+  .card.pu:hover    { border-color: var(--purple); }
+
+  h3 { font-family: 'Orbitron', monospace; font-size: .88rem; margin-bottom: 13px; letter-spacing: .05em; }
+  .card    h3 { color: var(--green);  text-shadow: 0 0 8px var(--green);  }
+  .card.cy h3 { color: var(--cyan);   text-shadow: 0 0 8px var(--cyan);   }
+  .card.pk h3 { color: var(--pink);   text-shadow: 0 0 8px var(--pink);   }
+  .card.ye h3 { color: var(--yellow); text-shadow: 0 0 8px var(--yellow); }
+  .card.or h3 { color: var(--orange); text-shadow: 0 0 8px var(--orange); }
+  .card.pu h3 { color: var(--purple); text-shadow: 0 0 8px var(--purple); }
+
+  p { color: var(--txt); margin-bottom: 10px; }
+
+  /* ── LAW BOX ── */
+  .law {
+    background: rgba(0,255,136,.04);
+    border: 1px solid rgba(0,255,136,.4);
+    border-left: 4px solid var(--green);
+    padding: 15px 20px;
+    margin: 14px 0;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .88rem;
+    color: var(--green);
+    box-shadow: 0 0 16px rgba(0,255,136,.06);
+    line-height: 1.9;
+  }
+  .law.cy { background: rgba(0,221,255,.04); border-color: rgba(0,221,255,.4); border-left-color: var(--cyan);   color: var(--cyan);   box-shadow: 0 0 16px rgba(0,221,255,.06); }
+  .law.pk { background: rgba(255,0,102,.04); border-color: rgba(255,0,102,.4); border-left-color: var(--pink);   color: var(--pink);   }
+  .law.ye { background: rgba(255,221,0,.04); border-color: rgba(255,221,0,.4); border-left-color: var(--yellow); color: var(--yellow); }
+  .law.or { background: rgba(255,136,0,.04); border-color: rgba(255,136,0,.4); border-left-color: var(--orange); color: var(--orange); }
+  .law.pu { background: rgba(170,0,255,.04); border-color: rgba(170,0,255,.4); border-left-color: var(--purple); color: var(--purple); }
+
+  /* ── BIG FORMULA ── */
+  .fhero {
+    text-align: center;
+    padding: 28px 18px;
+    margin: 18px 0;
+    background: var(--panel);
+    border: 1px solid rgba(0,255,136,.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .fhero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,255,136,.05) 0%, transparent 70%);
+  }
+  .bigf {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.3rem,3.5vw,2.2rem);
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 0 12px var(--green), 0 0 30px rgba(0,255,136,.35);
+    letter-spacing: .04em;
+    line-height: 1.4;
+  }
+  .flab {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .7rem;
+    color: var(--dim);
+    letter-spacing: 3px;
+    margin-top: 9px;
+    text-transform: uppercase;
+  }
+
+  /* ── VISUAL / CANVAS CONTAINER ── */
+  .visual {
+    background: var(--panel);
+    border: 1px solid rgba(0,255,136,.22);
+    padding: 20px 20px 16px;
+    margin: 20px 0;
+    text-align: center;
+    overflow: hidden;
+  }
+  .vtag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .67rem;
+    color: var(--dim);
+    letter-spacing: 3px;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    display: block;
+  }
+  canvas {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    border: 1px solid rgba(0,255,136,.08);
+  }
+
+  /* ── LEVER TABS ── */
+  .ltabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .ltab {
+    font-family: 'Orbitron', monospace;
+    font-size: .6rem;
+    letter-spacing: 1.5px;
+    color: var(--dim);
+    background: transparent;
+    border: 1px solid rgba(0,255,136,.22);
+    padding: 10px 22px;
+    cursor: pointer;
+    transition: all .3s;
+    line-height: 1.7;
+  }
+  .ltab:hover { color: var(--green); border-color: var(--green); }
+  .ltab.act-g  { color: var(--green);  border-color: var(--green);  background: rgba(0,255,136,.08);  box-shadow: 0 0 14px rgba(0,255,136,.2);  text-shadow: 0 0 8px var(--green);  }
+  .ltab.act-cy { color: var(--cyan);   border-color: var(--cyan);   background: rgba(0,221,255,.08);  box-shadow: 0 0 14px rgba(0,221,255,.2);  text-shadow: 0 0 8px var(--cyan);   }
+  .ltab.act-pk { color: var(--pink);   border-color: var(--pink);   background: rgba(255,0,102,.08);  box-shadow: 0 0 14px rgba(255,0,102,.2);  text-shadow: 0 0 8px var(--pink);   }
+
+  /* ── LEVER INFO PANEL ── */
+  .linfo {
+    border: 1px solid rgba(0,255,136,.2);
+    background: rgba(0,255,136,.03);
+    padding: 16px 20px;
+    margin-top: 14px;
+    min-height: 80px;
+    transition: border-color .4s, background .4s;
+    text-align: left;
+  }
+  .linfo-title { font-family: 'Orbitron', monospace; font-size: .8rem; letter-spacing: .06em; }
+  .linfo-body  { font-family: 'Share Tech Mono', monospace; font-size: .78rem; margin-top: 8px; line-height: 1.8; }
+
+  /* ── CONTROLS ── */
+  .ctrls { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; margin: 14px 0; }
+  .ctrl  { text-align: center; }
+  .ctrl label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .68rem;
+    color: var(--green);
+    display: block;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 180px;
+    height: 4px;
+    background: rgba(0,255,136,.2);
+    outline: none;
+    border-radius: 2px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--green);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--green);
+  }
+  .cval {
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem;
+    color: var(--green);
+    text-shadow: 0 0 8px var(--green);
+    margin-top: 6px;
+  }
+
+  /* ── INFO GRID ── */
+  .igrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(248px,1fr)); gap: 16px; margin: 16px 0; }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; }
+  th {
+    background: rgba(0,255,136,.09);
+    color: var(--green);
+    font-family: 'Orbitron', monospace;
+    font-size: .6rem;
+    letter-spacing: 2px;
+    padding: 11px 13px;
+    text-align: left;
+    border: 1px solid rgba(0,255,136,.18);
+  }
+  td { padding: 9px 13px; border: 1px solid rgba(0,255,136,.1); color: var(--txt); font-size: .93rem; }
+  tr:hover td { background: rgba(0,255,136,.03); }
+
+  /* ── VECTOR LEGEND ── */
+  .vlegend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .72rem;
+  }
+  .vl { display: flex; align-items: center; gap: 7px; }
+  .vdot { width: 18px; height: 3px; border-radius: 1px; }
+
+  /* ── RESULT GRID ── */
+  .resgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 12px; margin: 14px 0; }
+  .rescell { background: rgba(0,0,0,.4); border: 1px solid rgba(0,255,136,.2); padding: 14px; text-align: center; }
+  .reslab  { font-family: 'Share Tech Mono', monospace; font-size: .66rem; color: var(--dim); letter-spacing: 2px; margin-bottom: 6px; }
+  .resval  { font-family: 'Orbitron', monospace; font-size: 1.35rem; color: var(--green); text-shadow: 0 0 12px var(--green); }
+
+  /* ── PULLEY GRID ── */
+  .pulgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 18px 0; }
+  @media (max-width:620px) { .pulgrid { grid-template-columns: 1fr; } }
+
+  /* ── STEPS ── */
+  .steps { counter-reset: step; display: flex; flex-direction: column; gap: 10px; margin: 14px 0; }
+  .step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: rgba(0,255,136,.03);
+    border: 1px solid rgba(0,255,136,.13);
+    padding: 11px 15px;
+  }
+  .step::before {
+    counter-increment: step;
+    content: counter(step);
+    font-family: 'Orbitron', monospace;
+    font-size: .76rem;
+    color: var(--green);
+    min-width: 20px;
+    text-align: center;
+    padding-top: 1px;
+  }
+  .step p { margin: 0; font-size: .93rem; }
+
+  /* ── INTRO BOX ── */
+  .ibox {
+    background: linear-gradient(135deg, rgba(0,255,136,.04), rgba(0,221,255,.03));
+    border: 1px solid rgba(0,255,136,.2);
+    padding: 24px 28px;
+    margin-top: 32px;
+    position: relative;
+  }
+  .ibox::after {
+    content: '◈';
+    position: absolute;
+    top: -12px; left: 22px;
+    font-size: 1.15rem;
+    color: var(--green);
+    text-shadow: 0 0 10px var(--green);
+    background: var(--bg);
+    padding: 0 8px;
+  }
+
+  /* ── QUIZ ── */
+  .qcard { background: var(--card); border: 1px solid rgba(0,255,136,.22); padding: 24px 28px; margin-bottom: 16px; transition: border-color .3s; }
+  .qcard:hover { border-color: var(--green); }
+  .qnum  { font-family: 'Share Tech Mono', monospace; font-size: .67rem; color: var(--green); letter-spacing: 3px; margin-bottom: 8px; }
+  .qtext { font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 16px; }
+  .opts  { display: flex; flex-direction: column; gap: 8px; }
+  .obt {
+    background: rgba(0,0,0,.4);
+    border: 1px solid rgba(0,255,136,.22);
+    color: var(--txt);
+    padding: 10px 15px;
+    text-align: left;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: .92rem;
+    cursor: pointer;
+    transition: all .25s;
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+  }
+  .obt:hover { border-color: var(--green); background: rgba(0,255,136,.07); color: #fff; box-shadow: 0 0 10px rgba(0,255,136,.15); }
+  .obt.correct { border-color: var(--green) !important; background: rgba(0,255,136,.1) !important; color: var(--green) !important; box-shadow: 0 0 12px rgba(0,255,136,.3) !important; }
+  .obt.wrong   { border-color: var(--red)   !important; background: rgba(255,34,68,.1) !important;  color: var(--red)   !important; }
+  .obt:disabled { cursor: not-allowed; }
+  .oletter { font-family: 'Orbitron', monospace; font-size: .58rem; color: var(--green); min-width: 16px; padding-top: 2px; }
+  .fb { margin-top: 11px; padding: 10px 14px; font-family: 'Share Tech Mono', monospace; font-size: .78rem; display: none; border-left: 3px solid; line-height: 1.6; }
+  .fb.show { display: block; }
+  .fb.ok  { color: var(--green); border-color: var(--green); background: rgba(0,255,136,.05); }
+  .fb.err { color: var(--red);   border-color: var(--red);   background: rgba(255,34,68,.05); }
+
+  /* ── SCORE ── */
+  .spanel { background: var(--card); border: 1px solid var(--green); padding: 26px; text-align: center; box-shadow: 0 0 28px rgba(0,255,136,.1); margin-top: 26px; }
+  .sclabel { font-family: 'Share Tech Mono', monospace; font-size: .7rem; color: var(--dim); letter-spacing: 3px; margin-bottom: 8px; }
+  .scval   { font-family: 'Orbitron', monospace; font-size: 3rem; font-weight: 900; color: var(--green); text-shadow: 0 0 20px var(--green); }
+  .scmsg   { color: var(--dim); margin-top: 8px; font-size: .93rem; }
+  .reset-btn {
+    background: transparent;
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: 'Orbitron', monospace;
+    font-size: .62rem;
+    letter-spacing: 2px;
+    padding: 10px 26px;
+    cursor: pointer;
+    margin-top: 14px;
+    transition: all .3s;
+  }
+  .reset-btn:hover { background: rgba(0,255,136,.1); box-shadow: 0 0 14px var(--green); }
+
+  .prog-wrap { height: 4px; background: rgba(0,255,136,.1); margin-top: 16px; border-radius: 2px; overflow: hidden; }
+  .prog-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--cyan)); transition: width .5s; box-shadow: 0 0 10px var(--green); }
+
+  /* ── DOWNLOAD ── */
+  .dl-btn {
+    display: inline-block;
+    font-family: 'Orbitron', monospace;
+    font-size: .68rem;
+    letter-spacing: 3px;
+    color: var(--green);
+    border: 1px solid var(--green);
+    padding: 14px 42px;
+    text-decoration: none;
+    transition: all .3s;
+    box-shadow: 0 0 10px rgba(0,255,136,.15);
+  }
+  .dl-btn:hover { background: rgba(0,255,136,.1); box-shadow: 0 0 24px var(--green); }
+
+  /* ── HIGHLIGHT HELPERS ── */
+  .hl   { color: var(--green);  font-weight: 600; }
+  .hlc  { color: var(--cyan);   font-weight: 600; }
+  .hlp  { color: var(--pink);   font-weight: 600; }
+  .hly  { color: var(--yellow); font-weight: 600; }
+  .hlo  { color: var(--orange); font-weight: 600; }
+  .hlpu { color: var(--purple); font-weight: 600; }
+  .hlr  { color: var(--red);    font-weight: 600; }
+
+  footer {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 36px 20px;
+    border-top: 1px solid rgba(0,255,136,.2);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .68rem;
+    color: var(--dim);
+    letter-spacing: 2px;
+  }
+
+  @media (max-width:600px) {
+    header { padding: 46px 14px 36px; }
+    main   { padding: 0 13px 60px; }
+    .card  { padding: 16px 18px; }
+    .bigf  { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="particles" id="pts"></div>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="hbadge">MÓDULO 05 // DINÂMICA // ENSINO MÉDIO</div>
+  <h1 class="title">LEIS DE NEWTON</h1>
+  <p class="title-sub">Aplicações Práticas — Máquinas Simples</p>
+</header>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <a href="#intro">◈ Introdução</a>
+  <a href="#alavancas">◈ Alavancas</a>
+  <a href="#plano">◈ Plano Inclinado</a>
+  <a href="#polias">◈ Polias</a>
+  <a href="#exercicios">◈ Exercícios</a>
+  <a href="#download">◈ Download PDF</a>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════
+     SEÇÃO 1 — INTRODUÇÃO
+══════════════════════════════════════════════════ -->
+<section id="intro">
+  <div class="sh">
+    <span class="sn">01</span>
+    <h2 class="st">MÁQUINAS <span>SIMPLES</span></h2>
+    <div class="sl"></div>
+  </div>
+
+  <div class="ibox">
+    <p>As <span class="hl">máquinas simples</span> são dispositivos que facilitam a realização de trabalho, aproveitando as leis de Newton e os princípios do equilíbrio. Elas não criam energia — apenas a redistribuem, permitindo aplicar forças menores, mudar a direção de forças ou ampliar deslocamentos.</p>
+    <p>Estudaremos três tipos fundamentais: <span class="hl">Alavancas</span> (equilíbrio de torques), <span class="hlc">Plano Inclinado</span> (decomposição de forças) e <span class="hlpu">Polias</span> (transmissão e redução de forças).</p>
+  </div>
+
+  <div class="igrid" style="margin-top:24px">
+    <div class="card">
+      <h3>VANTAGEM MECÂNICA</h3>
+      <p>A <span class="hl">vantagem mecânica (VM)</span> é a razão entre a força resistente e a força motora aplicada. Indica o quanto a máquina amplifica (ou reduz) a força.</p>
+      <div class="law">VM = F_resistência / F_potência<br>
+VM &gt; 1 → reduz esforço necessário<br>
+VM = 1 → muda só a direção<br>
+VM &lt; 1 → aumenta velocidade/deslocamento</div>
+    </div>
+    <div class="card cy">
+      <h3>TORQUE / MOMENTO DE FORÇA</h3>
+      <p>O <span class="hlc">torque (τ)</span> é o efeito de rotação produzido por uma força em relação a um ponto de apoio. É o produto da força pelo braço de alavanca.</p>
+      <div class="law cy">τ = F × d<br>
+d = distância perpendicular ao ponto de apoio<br>
+Equilíbrio: Στ = 0 (soma dos torques = zero)</div>
+    </div>
+    <div class="card ye">
+      <h3>3ª LEI DE NEWTON</h3>
+      <p>O <span class="hly">princípio da ação e reação</span> está presente em todas as máquinas simples. Cada força aplicada gera uma reação igual e oposta, transmitida ao objeto a ser movido.</p>
+      <div class="law ye">F⃗_ação = −F⃗_reação<br>|F_ação| = |F_reação|<br>Suporte reage com força normal N</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SEÇÃO 2 — ALAVANCAS
+══════════════════════════════════════════════════ -->
+<section id="alavancas">
+  <div class="sh">
+    <span class="sn">02</span>
+    <h2 class="st"><span>ALAVANCAS</span></h2>
+    <div class="sl"></div>
+  </div>
+
+  <div class="card">
+    <h3>O QUE É UMA ALAVANCA?</h3>
+    <p>Uma <span class="hl">alavanca</span> é uma barra rígida que gira em torno de um ponto fixo denominado <span class="hly">Ponto de Apoio (PA)</span> ou <em>fulcro</em>. Três elementos compõem qualquer alavanca:</p>
+    <p>✦ <span class="hlc">Potência (F)</span> — força aplicada para mover a alavanca<br>
+       ✦ <span class="hlp">Resistência (R)</span> — força a ser vencida (geralmente o peso)<br>
+       ✦ <span class="hly">Ponto de Apoio (PA)</span> — eixo fixo de rotação (fulcro)</p>
+    <p>A posição relativa desses três elementos define os três tipos de alavanca.</p>
+  </div>
+
+  <div class="fhero">
+    <div class="bigf">F × B<sub style="font-size:.55em">P</sub> &nbsp;=&nbsp; R × B<sub style="font-size:.55em">R</sub></div>
+    <div class="flab">LEI DA ALAVANCA — ARQUIMEDES &nbsp;|&nbsp; Bp = Braço da Potência &nbsp;|&nbsp; Br = Braço da Resistência</div>
+  </div>
+
+  <!-- ── SIMULAÇÃO INTERATIVA DAS ALAVANCAS ── -->
+  <div class="visual">
+    <span class="vtag">[ simulação interativa — selecione o tipo de alavanca ]</span>
+
+    <div class="ltabs">
+      <button class="ltab act-g" id="tab-if" onclick="setLever('interfixa')">
+        ◈ INTERFIXA<br><span style="font-size:.52rem;letter-spacing:1px;opacity:.7">CLASSE 1 — PA NO MEIO</span>
+      </button>
+      <button class="ltab" id="tab-ir" onclick="setLever('interresistente')">
+        ◈ INTER-RESISTENTE<br><span style="font-size:.52rem;letter-spacing:1px;opacity:.7">CLASSE 2 — R NO MEIO</span>
+      </button>
+      <button class="ltab" id="tab-ip" onclick="setLever('interpotente')">
+        ◈ INTER-POTENTE<br><span style="font-size:.52rem;letter-spacing:1px;opacity:.7">CLASSE 3 — F NO MEIO</span>
+      </button>
+    </div>
+
+    <canvas id="levCanvas" width="720" height="300"></canvas>
+
+    <div class="ctrls" style="margin-top:16px">
+      <div class="ctrl">
+        <label>BRAÇO DA POTÊNCIA — Bp</label>
+        <input type="range" id="slBp" min="40" max="280" value="160" oninput="redrawLever()">
+        <div class="cval" id="valBp">160 cm</div>
+      </div>
+      <div class="ctrl">
+        <label>BRAÇO DA RESISTÊNCIA — Br</label>
+        <input type="range" id="slBr" min="40" max="280" value="80" oninput="redrawLever()">
+        <div class="cval" id="valBr">80 cm</div>
+      </div>
+      <div class="ctrl">
+        <label>RESISTÊNCIA — R</label>
+        <input type="range" id="slR" min="10" max="300" value="100" oninput="redrawLever()">
+        <div class="cval" id="valR">100 N</div>
+      </div>
+    </div>
+
+    <div class="linfo" id="leverInfo">
+      <div class="linfo-title" id="linfoTitle"></div>
+      <div class="linfo-body"  id="linfoBody"></div>
+    </div>
+  </div>
+
+  <!-- ── CARDS DOS TIPOS ── -->
+  <div class="igrid" style="margin-top:10px">
+    <div class="card">
+      <h3>◈ INTERFIXA — CLASSE 1</h3>
+      <p>O <span class="hly">Ponto de Apoio PA</span> fica <strong>entre</strong> a Potência F e a Resistência R. Os dois braços estão em lados opostos do fulcro, funcionando como uma balança.</p>
+      <div class="law" style="font-size:.82rem;letter-spacing:.02em">
+        Arranjo: F ——[PA]—— R<br>
+        Bp e Br em lados opostos<br>
+        VM = Bp / Br  (pode ser &gt; ou &lt; 1)
+      </div>
+      <p style="font-size:.87rem;color:var(--dim);margin-top:8px">
+        ✦ Gangorra &nbsp;✦ Tesoura &nbsp;✦ Alicate &nbsp;✦ Balança de dois pratos &nbsp;✦ Pé-de-cabra
+      </p>
+    </div>
+    <div class="card cy">
+      <h3>◈ INTER-RESISTENTE — CLASSE 2</h3>
+      <p>A <span class="hlp">Resistência R</span> fica <strong>entre</strong> o PA e a Potência F. O braço da potência é sempre maior que o da resistência, garantindo VM &gt; 1.</p>
+      <div class="law cy" style="font-size:.82rem;letter-spacing:.02em">
+        Arranjo: [PA] ——R—— F<br>
+        Bp &gt; Br  →  VM &gt; 1 sempre<br>
+        Facilita sempre o trabalho
+      </div>
+      <p style="font-size:.87rem;color:var(--dim);margin-top:8px">
+        ✦ Carriola &nbsp;✦ Quebra-nozes &nbsp;✦ Porta &nbsp;✦ Abridor de garrafas &nbsp;✦ Furador de papel
+      </p>
+    </div>
+    <div class="card pk">
+      <h3>◈ INTER-POTENTE — CLASSE 3</h3>
+      <p>A <span class="hlc">Potência F</span> fica <strong>entre</strong> o PA e a Resistência R. O braço da potência é sempre menor → VM &lt; 1. Perde força, mas ganha velocidade e alcance.</p>
+      <div class="law pk" style="font-size:.82rem;letter-spacing:.02em">
+        Arranjo: [PA] ——F—— R<br>
+        Bp &lt; Br  →  VM &lt; 1 sempre<br>
+        Ganha velocidade/deslocamento
+      </div>
+      <p style="font-size:.87rem;color:var(--dim);margin-top:8px">
+        ✦ Pinça &nbsp;✦ Antebraço humano &nbsp;✦ Vassoura &nbsp;✦ Remo &nbsp;✦ Baqueta de bateria
+      </p>
+    </div>
+  </div>
+
+  <div class="card ye">
+    <h3>EXEMPLO RESOLVIDO — LEI DA ALAVANCA</h3>
+    <p>Uma alavanca interfixa tem Bp = 120 cm e Br = 40 cm. Qual a força F necessária para equilibrar R = 300 N?</p>
+    <div class="steps">
+      <div class="step"><p><strong>Lei da alavanca:</strong> F × Bp = R × Br</p></div>
+      <div class="step"><p><strong>Substituindo:</strong> F × 120 = 300 × 40  →  F × 120 = 12 000</p></div>
+      <div class="step"><p><strong>Resultado:</strong> F = 12 000 ÷ 120 = <span class="hly">100 N</span></p></div>
+      <div class="step"><p><strong>Verificação:</strong> VM = 120 ÷ 40 = 3  →  a força foi reduzida 3 vezes ✓</p></div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>TIPO</th><th>ELEMENTO NO MEIO</th><th>VM</th><th>EXEMPLOS</th></tr>
+    <tr><td>Interfixa (Classe 1)</td><td>Ponto de Apoio PA</td><td>Pode ser &gt;1, =1 ou &lt;1</td><td>Gangorra, tesoura, alicate</td></tr>
+    <tr><td>Inter-resistente (Classe 2)</td><td>Resistência R</td><td>Sempre &gt; 1</td><td>Carriola, quebra-nozes, porta</td></tr>
+    <tr><td>Inter-potente (Classe 3)</td><td>Potência F</td><td>Sempre &lt; 1</td><td>Pinça, antebraço, vassoura</td></tr>
+  </table>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SEÇÃO 3 — PLANO INCLINADO
+══════════════════════════════════════════════════ -->
+<section id="plano">
+  <div class="sh">
+    <span class="sn">03</span>
+    <h2 class="st">PLANO <span>INCLINADO</span></h2>
+    <div class="sl"></div>
+  </div>
+
+  <div class="card cy">
+    <h3>DECOMPOSIÇÃO DO PESO</h3>
+    <p>Quando um objeto está sobre um <span class="hlc">plano inclinado</span> com ângulo θ em relação à horizontal, seu peso <strong>P</strong> é decomposto em dois componentes ortogonais em relação à superfície do plano:</p>
+    <p>✦ <span class="hlo">Px = P · sen(θ)</span> — componente <strong>paralela</strong> ao plano, responsável pelo deslizamento do objeto morro abaixo.<br>
+       ✦ <span class="hl">Py = P · cos(θ)</span> — componente <strong>perpendicular</strong> ao plano. É contrabalançada pela força normal N da superfície.</p>
+  </div>
+
+  <div class="igrid">
+    <div class="fhero" style="border-color:rgba(255,136,0,.35)">
+      <div class="bigf" style="text-shadow:0 0 12px var(--orange),0 0 30px rgba(255,136,0,.4)">Px = P · sen(θ)</div>
+      <div class="flab" style="color:var(--orange)">FORÇA PARALELA AO PLANO — TENDE A DESCER O OBJETO</div>
+    </div>
+    <div class="fhero">
+      <div class="bigf">Py = P · cos(θ) = N</div>
+      <div class="flab">FORÇA PERPENDICULAR AO PLANO — IGUAL À NORMAL N</div>
+    </div>
+  </div>
+
+  <!-- ── SIMULAÇÃO DO PLANO INCLINADO ── -->
+  <div class="visual">
+    <span class="vtag">[ simulação interativa — vetores no plano inclinado ]</span>
+    <div class="ctrls">
+      <div class="ctrl">
+        <label>ÂNGULO DE INCLINAÇÃO — θ</label>
+        <input type="range" id="plAngle" min="5" max="75" value="30" oninput="drawPlane()">
+        <div class="cval" id="plAngleVal">30°</div>
+      </div>
+      <div class="ctrl">
+        <label>PESO DO OBJETO — P (N)</label>
+        <input type="range" id="plWeight" min="50" max="500" value="200" step="10" oninput="drawPlane()">
+        <div class="cval" id="plWeightVal">200 N</div>
+      </div>
+    </div>
+    <canvas id="planeCanvas" width="720" height="380"></canvas>
+    <div class="vlegend">
+      <div class="vl"><div class="vdot" style="background:#ff0066;box-shadow:0 0 6px #ff0066"></div><span style="color:#ff0066">P — Peso (vertical)</span></div>
+      <div class="vl"><div class="vdot" style="background:#00ddff;box-shadow:0 0 6px #00ddff"></div><span style="color:#00ddff">N — Normal (⊥ ao plano)</span></div>
+      <div class="vl"><div class="vdot" style style="background:#ff8800;box-shadow:0 0 6px #ff8800"></div><span style="color:#ff8800">Px — Paralela (descendo)</span></div>
+      <div class="vl"><div class="vdot" style="background:#00ff88;box-shadow:0 0 6px #00ff88"></div><span style="color:#00ff88">Py — Perp. ao plano</span></div>
+    </div>
+    <div class="resgrid">
+      <div class="rescell">
+        <div class="reslab">PESO P</div>
+        <div class="resval" id="res_P" style="color:var(--pink);text-shadow:0 0 12px var(--pink)">— N</div>
+      </div>
+      <div class="rescell">
+        <div class="reslab">Px = P · sen(θ)</div>
+        <div class="resval" id="res_Px" style="color:var(--orange);text-shadow:0 0 12px var(--orange)">— N</div>
+      </div>
+      <div class="rescell">
+        <div class="reslab">Py = P · cos(θ)</div>
+        <div class="resval" id="res_Py">— N</div>
+      </div>
+      <div class="rescell">
+        <div class="reslab">NORMAL N = Py</div>
+        <div class="resval" id="res_N" style="color:var(--cyan);text-shadow:0 0 12px var(--cyan)">— N</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="igrid">
+    <div class="card or">
+      <h3>EXEMPLO — Px (PARALELA)</h3>
+      <p>Bloco de 10 kg (P = 100 N) em plano com θ = 30°. Calcule Px.</p>
+      <div class="law or" style="font-size:.84rem">
+        Px = P · sen(30°)<br>
+        Px = 100 × 0,5<br>
+        Px = <strong>50 N</strong>  ↙ tende a descer o plano
+      </div>
+    </div>
+    <div class="card">
+      <h3>EXEMPLO — Py E NORMAL N</h3>
+      <p>Mesmo bloco (P = 100 N, θ = 30°). Calcule N.</p>
+      <div class="law" style="font-size:.84rem">
+        Py = P · cos(30°)<br>
+        Py = 100 × 0,866 ≈ 86,6 N<br>
+        N = Py ≈ <strong>86,6 N</strong>
+      </div>
+    </div>
+    <div class="card cy">
+      <h3>VERIFICAÇÃO VETORIAL</h3>
+      <p>Px e Py são as pernas de um triângulo retângulo com hipotenusa P:</p>
+      <div class="law cy" style="font-size:.84rem">
+        P² = Px² + Py²<br>
+        P² = (Psenθ)² + (Pcosθ)²<br>
+        P² = P²(sen²θ + cos²θ) = P² ✓
+      </div>
+    </div>
+    <div class="card ye">
+      <h3>EQUILÍBRIO E ATRITO</h3>
+      <p>Para que o bloco fique em equilíbrio no plano (sem acelerar), o atrito estático f deve igualar Px:</p>
+      <div class="law ye" style="font-size:.84rem">
+        f = μ · N = μ · P · cos(θ)<br>
+        Equilíbrio: μ · cosθ = senθ<br>
+        μ_crítico = tg(θ)<br>
+        Sem atrito: a = g · sen(θ)
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SEÇÃO 4 — POLIAS
+══════════════════════════════════════════════════ -->
+<section id="polias">
+  <div class="sh">
+    <span class="sn">04</span>
+    <h2 class="st"><span>POLIAS</span></h2>
+    <div class="sl"></div>
+  </div>
+
+  <div class="card pu">
+    <h3>O QUE SÃO POLIAS?</h3>
+    <p>Uma <span class="hlpu">polia</span> é uma roda com ranhura por onde passa uma corda, cabo ou corrente. Funcionam aplicando a 3ª Lei de Newton: a tensão na corda se transmite ao longo de todo o comprimento (corda ideal, sem massa e sem atrito).</p>
+    <p>Existem dois tipos fundamentais: <span class="hl">polia fixa</span> (eixo preso ao suporte) e <span class="hlc">polia móvel</span> (eixo preso à carga). Combinando-as, obtemos sistemas com maior vantagem mecânica.</p>
+  </div>
+
+  <!-- ── DOIS CANVAS LADO A LADO ── -->
+  <div class="pulgrid">
+    <div class="visual">
+      <span class="vtag">[ polia fixa ]</span>
+      <canvas id="pulFixCanvas" width="310" height="360"></canvas>
+      <p style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim);margin-top:8px">
+        F = P &nbsp;|&nbsp; VM = 1 &nbsp;|&nbsp; Só muda a direção
+      </p>
+    </div>
+    <div class="visual">
+      <span class="vtag">[ polia móvel ]</span>
+      <canvas id="pulMovCanvas" width="310" height="360"></canvas>
+      <p style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim);margin-top:8px">
+        F = P/2 &nbsp;|&nbsp; VM = 2 &nbsp;|&nbsp; Reduz a força pela metade
+      </p>
+    </div>
+  </div>
+
+  <div class="igrid">
+    <div class="card">
+      <h3>POLIA FIXA</h3>
+      <p>O eixo está <span class="hl">preso ao suporte</span> e não se move. A corda passa pela ranhura. A força aplicada muda de direção, mas não de magnitude — a vantagem mecânica é 1.</p>
+      <div class="law" style="font-size:.84rem">
+        F = P<br>
+        VM = 1<br>
+        Segmentos de corda suportando a carga: 1<br>
+        Só muda a direção da força aplicada
+      </div>
+      <p style="font-size:.87rem;color:var(--dim);margin-top:8px">✦ Bandeira em mastro &nbsp;✦ Guindaste simples &nbsp;✦ Poço de água</p>
+    </div>
+    <div class="card cy">
+      <h3>POLIA MÓVEL</h3>
+      <p>O eixo está <span class="hlc">preso à carga</span> e sobe junto com ela. A carga fica sustentada por <strong>2 segmentos de corda</strong>, dividindo o esforço pela metade.</p>
+      <div class="law cy" style="font-size:.84rem">
+        F = P / 2<br>
+        VM = 2<br>
+        Segmentos de corda suportando a carga: 2<br>
+        Reduz a força necessária à metade
+      </div>
+      <p style="font-size:.87rem;color:var(--dim);margin-top:8px">✦ Guincho de construção &nbsp;✦ Içamento industrial &nbsp;✦ Polipasto</p>
+    </div>
+    <div class="card pu">
+      <h3>SISTEMA COMBINADO</h3>
+      <p>Combinando <span class="hlpu">n</span> polias móveis com polias fixas de redirecionamento, cada polia móvel adiciona 2 segmentos de corda que sustentam a carga.</p>
+      <div class="law pu" style="font-size:.84rem">
+        Segmentos totais = 2n<br>
+        F = P / (2n)<br>
+        VM = 2n<br>
+        n = número de polias móveis
+      </div>
+      <p style="font-size:.87rem;color:var(--dim);margin-top:8px">✦ Talha de corrente &nbsp;✦ Polipasto &nbsp;✦ Guincho de navio</p>
+    </div>
+  </div>
+
+  <!-- ── CALCULADORA DE SISTEMA DE POLIAS ── -->
+  <div class="visual">
+    <span class="vtag">[ calculadora — sistema de polias combinadas ]</span>
+    <div class="ctrls">
+      <div class="ctrl">
+        <label>NÚMERO DE POLIAS MÓVEIS (n)</label>
+        <input type="range" id="pulN" min="1" max="5" value="1" step="1" oninput="updatePulleyCalc()">
+        <div class="cval" id="pulNVal">1</div>
+      </div>
+      <div class="ctrl">
+        <label>PESO DA CARGA — P (N)</label>
+        <input type="range" id="pulW" min="100" max="2000" value="400" step="100" oninput="updatePulleyCalc()">
+        <div class="cval" id="pulWVal">400 N</div>
+      </div>
+    </div>
+    <canvas id="combCanvas" width="720" height="200"></canvas>
+    <div class="resgrid" style="margin-top:12px">
+      <div class="rescell">
+        <div class="reslab">POLIAS MÓVEIS (n)</div>
+        <div class="resval" id="c_n" style="color:var(--purple);text-shadow:0 0 12px var(--purple)">—</div>
+      </div>
+      <div class="rescell">
+        <div class="reslab">SEGMENTOS DE CORDA</div>
+        <div class="resval" id="c_seg">—</div>
+      </div>
+      <div class="rescell">
+        <div class="reslab">FORÇA NECESSÁRIA F</div>
+        <div class="resval" id="c_F" style="color:var(--cyan);text-shadow:0 0 12px var(--cyan)">—</div>
+      </div>
+      <div class="rescell">
+        <div class="reslab">VANTAGEM MECÂNICA</div>
+        <div class="resval" id="c_VM" style="color:var(--yellow);text-shadow:0 0 12px var(--yellow)">—</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SEÇÃO 5 — EXERCÍCIOS
+══════════════════════════════════════════════════ -->
+<section id="exercicios">
+  <div class="sh">
+    <span class="sn">05</span>
+    <h2 class="st">EXERCÍCIOS DE <span>FIXAÇÃO</span></h2>
+    <div class="sl"></div>
+  </div>
+
+  <p style="color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:.72rem;margin-bottom:22px;letter-spacing:2px">
+    ▸ SELECIONE A ALTERNATIVA CORRETA EM CADA QUESTÃO
+  </p>
+
+  <div class="prog-wrap">
+    <div class="prog-fill" id="progBar" style="width:0%"></div>
+  </div>
+  <p style="font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--dim);text-align:right;margin-top:5px;margin-bottom:22px" id="progTxt">
+    0 / 8 respondidas
+  </p>
+
+  <!-- QUESTÃO 01 -->
+  <div class="qcard" id="q1">
+    <div class="qnum">QUESTÃO 01 // ALAVANCAS — LEI</div>
+    <div class="qtext">Numa alavanca interfixa, o braço da potência é Bp = 80 cm e o braço da resistência é Br = 20 cm. Para equilibrar uma resistência R = 200 N, qual deve ser a força F aplicada?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q1','wrong')">  <span class="oletter">A</span> 100 N </button>
+      <button class="obt" onclick="ans(this,'q1','wrong')">  <span class="oletter">B</span> 80 N  </button>
+      <button class="obt" onclick="ans(this,'q1','correct')"><span class="oletter">C</span> 50 N  </button>
+      <button class="obt" onclick="ans(this,'q1','wrong')">  <span class="oletter">D</span> 200 N </button>
+    </div>
+    <div class="fb" id="f_q1"></div>
+  </div>
+
+  <!-- QUESTÃO 02 -->
+  <div class="qcard" id="q2">
+    <div class="qnum">QUESTÃO 02 // TIPOS DE ALAVANCA</div>
+    <div class="qtext">Um carrinho de mão (carriola) é um exemplo de alavanca em que a carga (resistência) fica entre o eixo da roda (ponto de apoio) e as alças onde se aplica a força. Qual é o tipo correto dessa alavanca?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q2','wrong')">  <span class="oletter">A</span> Interfixa (Classe 1), pois o PA está entre F e R </button>
+      <button class="obt" onclick="ans(this,'q2','correct')"><span class="oletter">B</span> Inter-resistente (Classe 2), pois R está entre PA e F </button>
+      <button class="obt" onclick="ans(this,'q2','wrong')">  <span class="oletter">C</span> Inter-potente (Classe 3), pois F está entre PA e R </button>
+      <button class="obt" onclick="ans(this,'q2','wrong')">  <span class="oletter">D</span> Não é uma alavanca, pois possui rodas </button>
+    </div>
+    <div class="fb" id="f_q2"></div>
+  </div>
+
+  <!-- QUESTÃO 03 -->
+  <div class="qcard" id="q3">
+    <div class="qnum">QUESTÃO 03 // INTER-POTENTE</div>
+    <div class="qtext">Na alavanca inter-potente (Classe 3), como sempre é a vantagem mecânica VM = Bp/Br, e qual a principal consequência prática disso?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q3','wrong')">  <span class="oletter">A</span> VM &gt; 1; a força necessária é sempre menor que a resistência </button>
+      <button class="obt" onclick="ans(this,'q3','wrong')">  <span class="oletter">B</span> VM = 1; a força aplicada é sempre igual à resistência </button>
+      <button class="obt" onclick="ans(this,'q3','correct')"><span class="oletter">C</span> VM &lt; 1; requer mais força que a resistência, mas amplia velocidade e deslocamento </button>
+      <button class="obt" onclick="ans(this,'q3','wrong')">  <span class="oletter">D</span> VM varia; pode ser qualquer valor dependendo do ângulo de aplicação da força </button>
+    </div>
+    <div class="fb" id="f_q3"></div>
+  </div>
+
+  <!-- QUESTÃO 04 -->
+  <div class="qcard" id="q4">
+    <div class="qnum">QUESTÃO 04 // PLANO INCLINADO — Px</div>
+    <div class="qtext">Um bloco de 50 kg (P = 500 N) repousa sobre um plano inclinado com θ = 30°. Qual é a componente do peso paralela ao plano (Px)? Dados: sen 30° = 0,5 e cos 30° ≈ 0,866.</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q4','wrong')">  <span class="oletter">A</span> 433 N </button>
+      <button class="obt" onclick="ans(this,'q4','correct')"><span class="oletter">B</span> 250 N </button>
+      <button class="obt" onclick="ans(this,'q4','wrong')">  <span class="oletter">C</span> 500 N </button>
+      <button class="obt" onclick="ans(this,'q4','wrong')">  <span class="oletter">D</span> 125 N </button>
+    </div>
+    <div class="fb" id="f_q4"></div>
+  </div>
+
+  <!-- QUESTÃO 05 -->
+  <div class="qcard" id="q5">
+    <div class="qnum">QUESTÃO 05 // PLANO INCLINADO — FORÇA NORMAL</div>
+    <div class="qtext">Para o mesmo bloco do exercício anterior (P = 500 N, θ = 30°), qual é a força normal N exercida pelo plano sobre o bloco?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q5','wrong')">  <span class="oletter">A</span> 250 N </button>
+      <button class="obt" onclick="ans(this,'q5','wrong')">  <span class="oletter">B</span> 500 N </button>
+      <button class="obt" onclick="ans(this,'q5','correct')"><span class="oletter">C</span> ≈ 433 N </button>
+      <button class="obt" onclick="ans(this,'q5','wrong')">  <span class="oletter">D</span> ≈ 577 N </button>
+    </div>
+    <div class="fb" id="f_q5"></div>
+  </div>
+
+  <!-- QUESTÃO 06 -->
+  <div class="qcard" id="q6">
+    <div class="qnum">QUESTÃO 06 // POLIA FIXA</div>
+    <div class="qtext">Uma polia fixa é usada para içar um caixote de 300 N. Qual a força mínima F necessária para manter o caixote em equilíbrio (ignore atrito e massa da polia)?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q6','wrong')">  <span class="oletter">A</span> 150 N — a polia fixa reduz a força à metade </button>
+      <button class="obt" onclick="ans(this,'q6','correct')"><span class="oletter">B</span> 300 N — a polia fixa tem VM = 1, apenas muda a direção </button>
+      <button class="obt" onclick="ans(this,'q6','wrong')">  <span class="oletter">C</span> 600 N — é preciso o dobro da força na polia fixa </button>
+      <button class="obt" onclick="ans(this,'q6','wrong')">  <span class="oletter">D</span> 100 N — a polia fixa tem VM = 3 </button>
+    </div>
+    <div class="fb" id="f_q6"></div>
+  </div>
+
+  <!-- QUESTÃO 07 -->
+  <div class="qcard" id="q7">
+    <div class="qnum">QUESTÃO 07 // POLIA MÓVEL</div>
+    <div class="qtext">Uma polia móvel é usada para levantar um objeto de P = 240 N. Qual força F deve ser aplicada para içar o objeto em equilíbrio?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q7','wrong')">  <span class="oletter">A</span> 240 N </button>
+      <button class="obt" onclick="ans(this,'q7','correct')"><span class="oletter">B</span> 120 N </button>
+      <button class="obt" onclick="ans(this,'q7','wrong')">  <span class="oletter">C</span> 60 N  </button>
+      <button class="obt" onclick="ans(this,'q7','wrong')">  <span class="oletter">D</span> 480 N </button>
+    </div>
+    <div class="fb" id="f_q7"></div>
+  </div>
+
+  <!-- QUESTÃO 08 -->
+  <div class="qcard" id="q8">
+    <div class="qnum">QUESTÃO 08 // SISTEMA COMBINADO DE POLIAS</div>
+    <div class="qtext">Um sistema de içamento possui 3 polias móveis (e polias fixas de redirecionamento). Qual é a vantagem mecânica do sistema e qual força F é necessária para levantar uma carga P = 600 N?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q8','wrong')">  <span class="oletter">A</span> VM = 3 e F = 200 N </button>
+      <button class="obt" onclick="ans(this,'q8','wrong')">  <span class="oletter">B</span> VM = 3 e F = 100 N </button>
+      <button class="obt" onclick="ans(this,'q8','correct')"><span class="oletter">C</span> VM = 6 e F = 100 N </button>
+      <button class="obt" onclick="ans(this,'q8','wrong')">  <span class="oletter">D</span> VM = 6 e F = 300 N </button>
+    </div>
+    <div class="fb" id="f_q8"></div>
+  </div>
+
+  <!-- PAINEL DE PONTUAÇÃO -->
+  <div class="spanel" id="scorePanel" style="display:none">
+    <div class="sclabel">RESULTADO FINAL</div>
+    <div class="scval" id="scVal">0/8</div>
+    <div class="scmsg" id="scMsg"></div>
+    <button class="reset-btn" onclick="resetQuiz()">↺ REFAZER EXERCÍCIOS</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SEÇÃO 6 — DOWNLOAD
+══════════════════════════════════════════════════ -->
+<section id="download" style="margin-top:60px">
+  <div class="sh">
+    <span class="sn">06</span>
+    <h2 class="st">BAIXAR <span>LISTA</span></h2>
+    <div class="sl"></div>
+  </div>
+  <div class="card" style="text-align:center;padding:40px 32px">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:3px;margin-bottom:14px">
+      ◈ ARQUIVO PDF — 8 QUESTÕES COM GABARITO E RESOLUÇÕES DETALHADAS
+    </div>
+    <div style="font-size:3.8rem;margin-bottom:14px;filter:drop-shadow(0 0 14px var(--green))">⬇</div>
+    <p style="margin-bottom:26px;color:var(--dim);font-size:.95rem">
+      Baixe a lista completa com todos os enunciados, gabarito e explicação de cada resolução em PDF.
+    </p>
+    <a id="dlBtn" download="lista-exercicios-newton.pdf" class="dl-btn">
+      EM BREVE 
+    </a>
+    <div style="margin-top:18px;font-family:'Share Tech Mono',monospace;font-size:.63rem;color:var(--dim)">
+      ALAVANCAS · PLANO INCLINADO · POLIAS · 8 QUESTÕES
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div>◈ LEIS DE NEWTON — MÁQUINAS SIMPLES — ENSINO MÉDIO ◈</div>
+  <div style="margin-top:7px">ALAVANCAS · PLANO INCLINADO · POLIAS</div>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════
+//  PARTÍCULAS
+// ════════════════════════════════════════════════════
+(function () {
+  var container = document.getElementById('pts');
+  var colors = [
+    'rgba(0,255,136,.5)',
+    'rgba(0,221,255,.4)',
+    'rgba(255,221,0,.3)',
+    'rgba(170,0,255,.3)'
+  ];
+  for (var i = 0; i < 28; i++) {
+    var el = document.createElement('div');
+    el.className = 'p';
+    var sz = Math.random() * 3.5 + 1;
+    el.style.cssText =
+      'width:'  + sz + 'px;' +
+      'height:' + sz + 'px;' +
+      'left:'   + (Math.random() * 100) + '%;' +
+      'background:' + colors[i % 4] + ';' +
+      'animation-duration:' + (9 + Math.random() * 14) + 's;' +
+      'animation-delay:'    + (Math.random() * 12) + 's;';
+    container.appendChild(el);
+  }
+}());
+
+// ════════════════════════════════════════════════════
+//  FUNÇÕES AUXILIARES DE CANVAS
+// ════════════════════════════════════════════════════
+function bgFill(ctx, W, H) {
+  ctx.fillStyle = '#060f0a';
+  ctx.fillRect(0, 0, W, H);
+}
+
+function drawArrow(ctx, x1, y1, x2, y2, color, lineWidth, headSize) {
+  lineWidth = lineWidth || 2.5;
+  headSize  = headSize  || 11;
+  var angle = Math.atan2(y2 - y1, x2 - x1);
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur  = 16;
+  ctx.strokeStyle = color;
+  ctx.lineWidth   = lineWidth;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(
+    x2 - headSize * Math.cos(angle - 0.42),
+    y2 - headSize * Math.sin(angle - 0.42)
+  );
+  ctx.lineTo(
+    x2 - headSize * Math.cos(angle + 0.42),
+    y2 - headSize * Math.sin(angle + 0.42)
+  );
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawLabel(ctx, x, y, text, color, fontSize, align) {
+  fontSize = fontSize || 12;
+  align    = align    || 'center';
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur  = 8;
+  ctx.fillStyle   = color;
+  ctx.font        = fontSize + 'px "Share Tech Mono", monospace';
+  ctx.textAlign   = align;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+function drawLabelOrbitron(ctx, x, y, text, color, fontSize, align) {
+  fontSize = fontSize || 13;
+  align    = align    || 'center';
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur  = 10;
+  ctx.fillStyle   = color;
+  ctx.font        = 'bold ' + fontSize + 'px Orbitron, monospace';
+  ctx.textAlign   = align;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+// ════════════════════════════════════════════════════
+//  ALAVANCA
+// ════════════════════════════════════════════════════
+var leverType = 'interfixa';
+
+function setLever(type) {
+  leverType = type;
+
+  // Remove todas as classes ativas dos botões
+  document.getElementById('tab-if').className = 'ltab';
+  document.getElementById('tab-ir').className = 'ltab';
+  document.getElementById('tab-ip').className = 'ltab';
+
+  // Aplica a classe correta ao botão selecionado
+  if (type === 'interfixa')       document.getElementById('tab-if').className = 'ltab act-g';
+  if (type === 'interresistente') document.getElementById('tab-ir').className = 'ltab act-cy';
+  if (type === 'interpotente')    document.getElementById('tab-ip').className = 'ltab act-pk';
+
+  redrawLever();
+}
+
+function redrawLever() {
+  var bp  = parseInt(document.getElementById('slBp').value, 10);
+  var br  = parseInt(document.getElementById('slBr').value, 10);
+  var R   = parseInt(document.getElementById('slR').value,  10);
+  var F   = (R * br / bp).toFixed(1);
+  var VM  = (bp / br).toFixed(2);
+
+  document.getElementById('valBp').textContent = bp + ' cm';
+  document.getElementById('valBr').textContent = br + ' cm';
+  document.getElementById('valR').textContent  = R  + ' N';
+
+  // Atualiza painel de informações
+  var typeData = {
+    interfixa: {
+      color: '#00ff88',
+      title: 'INTERFIXA (CLASSE 1) — Ponto de Apoio no meio',
+      body:  'Arranjo: F ——[PA]—— R\n' +
+             'Lei: F x Bp = R x Br\n' +
+             'F = ' + R + ' x ' + br + ' / ' + bp + ' = ' + F + ' N\n' +
+             'VM = Bp/Br = ' + bp + '/' + br + ' = ' + VM
+    },
+    interresistente: {
+      color: '#00ddff',
+      title: 'INTER-RESISTENTE (CLASSE 2) — Resistência no meio',
+      body:  'Arranjo: [PA] ——R—— F\n' +
+             'Lei: F x Bp = R x Br\n' +
+             'F = ' + R + ' x ' + br + ' / ' + bp + ' = ' + F + ' N\n' +
+             'VM = Bp/Br = ' + bp + '/' + br + ' = ' + VM + '  (sempre > 1)'
+    },
+    interpotente: {
+      color: '#ff0066',
+      title: 'INTER-POTENTE (CLASSE 3) — Potência no meio',
+      body:  'Arranjo: [PA] ——F—— R\n' +
+             'Lei: F x Bp = R x Br\n' +
+             'F = ' + R + ' x ' + br + ' / ' + bp + ' = ' + F + ' N\n' +
+             'VM = Bp/Br = ' + bp + '/' + br + ' = ' + VM + '  (sempre < 1)'
+    }
+  };
+
+  var td = typeData[leverType];
+  var titleEl = document.getElementById('linfoTitle');
+  var bodyEl  = document.getElementById('linfoBody');
+  var infoEl  = document.getElementById('leverInfo');
+
+  infoEl.style.borderColor  = td.color;
+  infoEl.style.background   = 'rgba(0,0,0,.3)';
+  titleEl.style.color       = td.color;
+  titleEl.style.textShadow  = '0 0 8px ' + td.color;
+  titleEl.textContent       = td.title;
+  bodyEl.style.color        = td.color;
+  bodyEl.style.whiteSpace   = 'pre-line';
+  bodyEl.textContent        = td.body;
+
+  drawLever(bp, br, R, parseFloat(F));
+}
+
+function drawLever(bp, br, R, F) {
+  var canvas = document.getElementById('levCanvas');
+  var ctx    = canvas.getContext('2d');
+  var W = canvas.width;
+  var H = canvas.height;
+
+  bgFill(ctx, W, H);
+
+  // ── Geometria da barra ──
+  var margin  = 52;
+  var totalPx = W - 2 * margin;
+  var scale   = totalPx / (bp + br); // pixels por cm
+  var bpPx    = bp * scale;
+  var brPx    = br * scale;
+
+  var barStart = margin;
+  var barEnd   = margin + bpPx + brPx;
+  var barY     = H * 0.52;
+
+  var paX, fX, rX;
+  if (leverType === 'interfixa') {
+    // F ——[PA]—— R
+    fX  = barStart;
+    paX = barStart + bpPx;
+    rX  = barEnd;
+  } else if (leverType === 'interresistente') {
+    // [PA] ——R—— F
+    paX = barStart;
+    rX  = barStart + brPx;
+    fX  = barEnd;
+  } else {
+    // [PA] ——F—— R  (interpotente)
+    paX = barStart;
+    fX  = barStart + bpPx;
+    rX  = barEnd;
+  }
+
+  // ── Barra principal ──
+  ctx.save();
+  ctx.shadowColor = '#00ff88';
+  ctx.shadowBlur  = 20;
+  var barGrad = ctx.createLinearGradient(barStart, 0, barEnd, 0);
+  barGrad.addColorStop(0,   'rgba(0,255,136,.15)');
+  barGrad.addColorStop(0.5, 'rgba(0,255,136,1)');
+  barGrad.addColorStop(1,   'rgba(0,255,136,.15)');
+  ctx.strokeStyle = barGrad;
+  ctx.lineWidth   = 7;
+  ctx.lineCap     = 'round';
+  ctx.beginPath();
+  ctx.moveTo(barStart, barY);
+  ctx.lineTo(barEnd,   barY);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Fulcro (triângulo invertido) no paX ──
+  var triW = 22;
+  var triH = 30;
+  ctx.save();
+  ctx.shadowColor = '#ffdd00';
+  ctx.shadowBlur  = 14;
+  ctx.fillStyle   = 'rgba(40,30,0,.92)';
+  ctx.strokeStyle = '#ffdd00';
+  ctx.lineWidth   = 2;
+  ctx.beginPath();
+  ctx.moveTo(paX,           barY + 2);
+  ctx.lineTo(paX - triW/2,  barY + triH + 2);
+  ctx.lineTo(paX + triW/2,  barY + triH + 2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  // Base do fulcro
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(paX - triW,    barY + triH + 2);
+  ctx.lineTo(paX + triW,    barY + triH + 2);
+  ctx.stroke();
+  ctx.restore();
+
+  // Rótulo PA
+  drawLabel(ctx, paX, barY + triH + 20, 'PA', '#ffdd00', 12);
+
+  // ── Seta da Potência F (para cima) ──
+  var fArrowLen = Math.min(88, Math.max(40, F * 0.55));
+  drawArrow(ctx, fX, barY, fX, barY - fArrowLen, '#00ddff', 2.5, 11);
+  drawLabelOrbitron(ctx, fX, barY - fArrowLen - 16, 'F', '#00ddff', 13);
+  drawLabel(ctx, fX, barY - fArrowLen - 30, F.toFixed(1) + ' N', '#00ddff', 11);
+  drawLabel(ctx, fX, barY - fArrowLen - 44, 'Potencia', '#00ddff', 10);
+
+  // ── Seta da Resistência R (para baixo) ──
+  var rArrowLen = Math.min(80, Math.max(36, R * 0.4));
+  drawArrow(ctx, rX, barY, rX, barY + rArrowLen, '#ff0066', 2.5, 11);
+  drawLabelOrbitron(ctx, rX, barY + rArrowLen + 18, 'R', '#ff0066', 13);
+  drawLabel(ctx, rX, barY + rArrowLen + 32, R + ' N', '#ff0066', 11);
+  drawLabel(ctx, rX, barY + rArrowLen + 46, 'Resistencia', '#ff0066', 10);
+
+  // ── Colchetes dos braços ──
+  function drawBracket(x1, x2, y, color, label) {
+    var tick = 6;
+    ctx.save();
+    ctx.shadowColor = color;
+    ctx.shadowBlur  = 7;
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x1, y - tick); ctx.lineTo(x1, y + tick);
+    ctx.moveTo(x1, y);        ctx.lineTo(x2, y);
+    ctx.moveTo(x2, y - tick); ctx.lineTo(x2, y + tick);
+    ctx.stroke();
+    ctx.restore();
+    drawLabel(ctx, (x1 + x2) / 2, y - 10, label, color, 11);
+  }
+
+  // Colchete Bp (entre fX e paX)
+  var bpLeft  = Math.min(fX, paX);
+  var bpRight = Math.max(fX, paX);
+  drawBracket(bpLeft, bpRight, barY - fArrowLen - 68, '#00ddff', 'Bp = ' + bp + ' cm');
+
+  // Colchete Br (entre paX e rX)
+  var brLeft  = Math.min(paX, rX);
+  var brRight = Math.max(paX, rX);
+  drawBracket(brLeft, brRight, barY - fArrowLen - 86, '#ff0066', 'Br = ' + br + ' cm');
+
+  // ── Zona colorida leve na barra ──
+  var zoneColor = leverType === 'interfixa'       ? 'rgba(0,255,136,.07)' :
+                  leverType === 'interresistente' ? 'rgba(0,221,255,.07)' :
+                                                    'rgba(255,0,102,.07)';
+  ctx.fillStyle = zoneColor;
+  ctx.fillRect(barStart, barY - 4, barEnd - barStart, 8);
+}
+
+// ════════════════════════════════════════════════════
+//  PLANO INCLINADO
+// ════════════════════════════════════════════════════
+function drawPlane() {
+  var angleDeg = parseInt(document.getElementById('plAngle').value,  10);
+  var P        = parseInt(document.getElementById('plWeight').value, 10);
+
+  document.getElementById('plAngleVal').textContent  = angleDeg + 'graus';
+  document.getElementById('plWeightVal').textContent = P + ' N';
+
+  var theta = angleDeg * Math.PI / 180;
+  var Px    = (P * Math.sin(theta)).toFixed(1);
+  var Py    = (P * Math.cos(theta)).toFixed(1);
+
+  document.getElementById('res_P').textContent  = P   + ' N';
+  document.getElementById('res_Px').textContent = Px  + ' N';
+  document.getElementById('res_Py').textContent = Py  + ' N';
+  document.getElementById('res_N').textContent  = Py  + ' N';
+
+  var canvas = document.getElementById('planeCanvas');
+  var ctx    = canvas.getContext('2d');
+  var W = canvas.width;
+  var H = canvas.height;
+
+  bgFill(ctx, W, H);
+
+  // ── Geometria do triângulo ──
+  var ax = 60;
+  var ay = H - 70;
+  var maxBase = W - 130;
+  var maxHgt  = H - 130;
+
+  // Base e altura limitadas pelo canvas
+  var base, hgt;
+  if (maxBase * Math.tan(theta) <= maxHgt) {
+    base = maxBase;
+    hgt  = base * Math.tan(theta);
+  } else {
+    hgt  = maxHgt;
+    base = hgt / Math.tan(theta);
+  }
+
+  var bx = ax + base;  // canto inferior direito
+  var by = ay;
+  var cx = bx;          // canto superior direito
+  var cy = ay - hgt;
+
+  // ── Linhas do chão ──
+  ctx.setLineDash([6, 5]);
+  ctx.strokeStyle = 'rgba(0,255,136,.14)';
+  ctx.lineWidth   = 1;
+  ctx.beginPath();
+  ctx.moveTo(20, ay);
+  ctx.lineTo(W - 20, ay);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // ── Triângulo (plano inclinado) ──
+  ctx.save();
+  ctx.shadowColor = '#00ff88';
+  ctx.shadowBlur  = 10;
+  ctx.fillStyle   = 'rgba(0,255,136,.05)';
+  ctx.strokeStyle = 'rgba(0,255,136,.65)';
+  ctx.lineWidth   = 2;
+  ctx.beginPath();
+  ctx.moveTo(ax, ay);   // canto inferior esquerdo
+  ctx.lineTo(bx, by);   // canto inferior direito
+  ctx.lineTo(cx, cy);   // canto superior direito
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Arco do ângulo θ na base esquerda ──
+  ctx.save();
+  ctx.shadowColor = '#ffdd00';
+  ctx.shadowBlur  = 8;
+  ctx.strokeStyle = '#ffdd00';
+  ctx.lineWidth   = 2;
+  ctx.beginPath();
+  ctx.arc(ax, ay, 38, -theta, 0);
+  ctx.stroke();
+  ctx.restore();
+  drawLabel(ctx, ax + 48, ay - 12, 'theta=' + angleDeg + 'graus', '#ffdd00', 12);
+
+  // ── Marca de ângulo reto no canto inferior direito ──
+  var sqS = 12;
+  ctx.strokeStyle = 'rgba(255,255,255,.25)';
+  ctx.lineWidth   = 1;
+  ctx.beginPath();
+  ctx.moveTo(bx - sqS, by);
+  ctx.lineTo(bx - sqS, by - sqS);
+  ctx.lineTo(bx,       by - sqS);
+  ctx.stroke();
+
+  // ── Posição do bloco (42% ao longo da rampa) ──
+  var t     = 0.42;
+  var bkX   = ax + t * base;   // x na rampa (em canvas)
+  var bkY   = ay - t * hgt;    // y na rampa (em canvas)
+
+  // ── Bloco rotacionado ──
+  var bw = 46;
+  var bh = 28;
+  ctx.save();
+  ctx.translate(bkX, bkY);
+  ctx.rotate(-theta);
+  ctx.shadowColor = '#00ff88';
+  ctx.shadowBlur  = 14;
+  ctx.fillStyle   = 'rgba(0,40,20,.9)';
+  ctx.strokeStyle = '#00ff88';
+  ctx.lineWidth   = 2;
+  ctx.fillRect(-bw / 2, -bh, bw, bh);
+  ctx.strokeRect(-bw / 2, -bh, bw, bh);
+  ctx.fillStyle  = '#00ff88';
+  ctx.font       = '10px "Share Tech Mono", monospace';
+  ctx.textAlign  = 'center';
+  ctx.fillText('m', 0, -bh / 2 + 4);
+  ctx.restore();
+
+  // ── Centro visual do bloco (para origem dos vetores) ──
+  // O centro do bloco em coordenadas de canvas:
+  // partindo de (bkX, bkY) que é o ponto do meio-baixo do bloco na rampa,
+  // deslocamos metade da altura do bloco na direção normal (para cima da superfície)
+  var halfH  = bh / 2;
+  var vcX    = bkX + halfH * (-Math.sin(theta));  // deslocamento na direção normal
+  var vcY    = bkY + halfH * (-Math.cos(theta));
+
+  // ── Comprimentos dos vetores (proporcional a P, fixado max em ~90px) ──
+  var pLen  = Math.min(90, P * 0.35);
+  var nLen  = pLen * Math.cos(theta);   // N = P*cos(theta)
+  var pxLen = pLen * Math.sin(theta);   // Px = P*sin(theta)
+  var pyLen = pLen * Math.cos(theta);   // Py = P*cos(theta)
+
+  // ── Vetor P (para baixo, vertical) ──
+  drawArrow(ctx, vcX, vcY, vcX, vcY + pLen, '#ff0066', 2.5, 11);
+  drawLabelOrbitron(ctx, vcX + 18, vcY + pLen / 2 + 5, 'P', '#ff0066', 13);
+
+  // ── Vetor N (perpendicular à superfície, afastando-se: direção (-sinθ, -cosθ)) ──
+  var nEndX = vcX + nLen * (-Math.sin(theta));
+  var nEndY = vcY + nLen * (-Math.cos(theta));
+  drawArrow(ctx, vcX, vcY, nEndX, nEndY, '#00ddff', 2.5, 11);
+  drawLabelOrbitron(ctx, nEndX - 14, nEndY - 10, 'N', '#00ddff', 13);
+
+  // ── Vetor Px (paralelo à rampa, descendo: direção (-cosθ, +sinθ)) ──
+  var pxEndX = vcX + pxLen * (-Math.cos(theta));
+  var pxEndY = vcY + pxLen * Math.sin(theta);
+  drawArrow(ctx, vcX, vcY, pxEndX, pxEndY, '#ff8800', 2.5, 11);
+  drawLabelOrbitron(ctx, pxEndX - 18, pxEndY + 14, 'Px', '#ff8800', 13);
+
+  // ── Vetor Py (perpendicular à superfície, entrando: direção (+sinθ, +cosθ)) ──
+  // Mostrado mais suave (dashed) pois é cancelado por N
+  var pyEndX = vcX + pyLen * Math.sin(theta);
+  var pyEndY = vcY + pyLen * Math.cos(theta);
+  ctx.save();
+  ctx.setLineDash([5, 4]);
+  drawArrow(ctx, vcX, vcY, pyEndX, pyEndY, '#00aa66', 2, 10);
+  ctx.restore();
+  drawLabelOrbitron(ctx, pyEndX + 20, pyEndY + 5, 'Py', '#00aa66', 12);
+
+  // ── Linhas de construção da decomposição (tracejadas) ──
+  ctx.save();
+  ctx.setLineDash([4, 4]);
+  ctx.strokeStyle = 'rgba(255,136,0,.25)';
+  ctx.lineWidth   = 1;
+  // Linha de Px até a ponta de P
+  ctx.beginPath();
+  ctx.moveTo(pxEndX, pxEndY);
+  ctx.lineTo(vcX, vcY + pLen);
+  ctx.stroke();
+  // Linha de Py até a ponta de P
+  ctx.strokeStyle = 'rgba(0,170,102,.2)';
+  ctx.beginPath();
+  ctx.moveTo(pyEndX, pyEndY);
+  ctx.lineTo(vcX, vcY + pLen);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // ── Anotações numéricas na margem direita ──
+  var labelX = cx + 18;
+  ctx.font       = '11px "Share Tech Mono", monospace';
+  ctx.textAlign  = 'left';
+
+  ctx.fillStyle  = 'rgba(255,0,102,.7)';
+  ctx.fillText('P = ' + P + ' N', labelX, cy + (ay - cy) * 0.18);
+
+  ctx.fillStyle  = 'rgba(255,136,0,.7)';
+  ctx.fillText('Px = P.sen(theta) = ' + Px + ' N', labelX, cy + (ay - cy) * 0.38);
+
+  ctx.fillStyle  = 'rgba(0,255,136,.7)';
+  ctx.fillText('Py = N = P.cos(theta) = ' + Py + ' N', labelX, cy + (ay - cy) * 0.55);
+}
+
+// ════════════════════════════════════════════════════
+//  POLIA FIXA
+// ════════════════════════════════════════════════════
+function drawFixedPulley() {
+  var canvas = document.getElementById('pulFixCanvas');
+  var ctx    = canvas.getContext('2d');
+  var W = canvas.width;
+  var H = canvas.height;
+
+  bgFill(ctx, W, H);
+
+  var cx = W / 2;
+  var pR = 32;         // raio da polia
+  var pY = 88;         // centro Y da polia
+
+  // ── Teto ──
+  ctx.fillStyle = 'rgba(0,255,136,.12)';
+  ctx.fillRect(10, 20, W - 20, 24);
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,255,136,.5)';
+  ctx.shadowBlur  = 6;
+  ctx.strokeStyle = 'rgba(0,255,136,.6)';
+  ctx.lineWidth   = 2;
+  ctx.beginPath();
+  ctx.moveTo(10, 44);
+  ctx.lineTo(W - 10, 44);
+  ctx.stroke();
+  ctx.restore();
+  // Hachurado
+  ctx.strokeStyle = 'rgba(0,255,136,.2)';
+  ctx.lineWidth   = 1;
+  for (var xi = 22; xi < W - 10; xi += 16) {
+    ctx.beginPath();
+    ctx.moveTo(xi,      20);
+    ctx.lineTo(xi - 12, 44);
+    ctx.stroke();
+  }
+
+  // ── Eixo de suspensão ──
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,255,136,.4)';
+  ctx.shadowBlur  = 6;
+  ctx.strokeStyle = 'rgba(0,255,136,.45)';
+  ctx.lineWidth   = 2;
+  ctx.beginPath();
+  ctx.moveTo(cx, 44);
+  ctx.lineTo(cx, pY - pR);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Roda da polia ──
+  ctx.save();
+  ctx.shadowColor = '#00ff88';
+  ctx.shadowBlur  = 18;
+  ctx.fillStyle   = 'rgba(0,20,10,.9)';
+  ctx.strokeStyle = '#00ff88';
+  ctx.lineWidth   = 2.5;
+  ctx.beginPath();
+  ctx.arc(cx, pY, pR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  // Ranhura interna
+  ctx.strokeStyle = 'rgba(0,255,136,.35)';
+  ctx.lineWidth   = 1.5;
+  ctx.beginPath();
+  ctx.arc(cx, pY, pR - 9, 0, Math.PI * 2);
+  ctx.stroke();
+  // Eixo central
+  ctx.fillStyle = '#00ff88';
+  ctx.beginPath();
+  ctx.arc(cx, pY, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // ── Corda esquerda (carga P) ──
+  var lx = cx - pR + 5;
+  ctx.save();
+  ctx.shadowColor = '#00ddff';
+  ctx.shadowBlur  = 10;
+  ctx.strokeStyle = '#00ddff';
+  ctx.lineWidth   = 2.5;
+  // Arco da corda sobre a polia (lado esquerdo — de cima para a esquerda)
+  ctx.beginPath();
+  ctx.arc(cx, pY, pR, Math.PI * 1.5, Math.PI, true);
+  ctx.stroke();
+  // Corda descendo até o bloco
+  ctx.beginPath();
+  ctx.moveTo(lx, pY);
+  ctx.lineTo(lx, H - 80);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Bloco da carga P ──
+  var bw = 52, bh = 32;
+  ctx.save();
+  ctx.shadowColor = '#ff0066';
+  ctx.shadowBlur  = 12;
+  ctx.fillStyle   = 'rgba(40,0,20,.92)';
+  ctx.strokeStyle = '#ff0066';
+  ctx.lineWidth   = 2;
+  ctx.fillRect(lx - bw / 2, H - 80, bw, bh);
+  ctx.strokeRect(lx - bw / 2, H - 80, bw, bh);
+  ctx.restore();
+  drawLabelOrbitron(ctx, lx, H - 80 + bh / 2 + 5, 'P', '#ff0066', 13);
+
+  // ── Corda direita (força F) ──
+  var rx = cx + pR - 5;
+  ctx.save();
+  ctx.shadowColor = '#00ddff';
+  ctx.shadowBlur  = 10;
+  ctx.strokeStyle = '#00ddff';
+  ctx.lineWidth   = 2.5;
+  // Arco da corda sobre a polia (lado direito — de cima para a direita)
+  ctx.beginPath();
+  ctx.arc(cx, pY, pR, Math.PI * 1.5, 0, false);
+  ctx.stroke();
+  // Corda descendo para onde é aplicada F
+  ctx.beginPath();
+  ctx.moveTo(rx, pY);
+  ctx.lineTo(rx, H - 60);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Seta de F (puxando para baixo no lado direito — muda direção) ──
+  drawArrow(ctx, rx, H - 60, rx, H - 20, '#00ff88', 2.5, 10);
+  drawLabelOrbitron(ctx, rx + 20, H - 40, 'F', '#00ff88', 13);
+
+  // ── Rótulos ──
+  drawLabel(ctx, W / 2, H - 6, 'F = P  |  VM = 1  |  Muda direcao', '#3a6a4a', 9);
+}
+
+// ════════════════════════════════════════════════════
+//  POLIA MÓVEL
+// ════════════════════════════════════════════════════
+function drawMobilePulley() {
+  var canvas = document.getElementById('pulMovCanvas');
+  var ctx    = canvas.getContext('2d');
+  var W = canvas.width;
+  var H = canvas.height;
+
+  bgFill(ctx, W, H);
+
+  var pR   = 32;         // raio da polia
+  var pCX  = W / 2;
+  var pCY  = H - 130;   // centro da polia (baixo = polia move com a carga)
+
+  // ── Teto ──
+  ctx.fillStyle = 'rgba(0,255,136,.12)';
+  ctx.fillRect(10, 20, W - 20, 24);
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,255,136,.5)';
+  ctx.shadowBlur  = 6;
+  ctx.strokeStyle = 'rgba(0,255,136,.6)';
+  ctx.lineWidth   = 2;
+  ctx.beginPath();
+  ctx.moveTo(10, 44);
+  ctx.lineTo(W - 10, 44);
+  ctx.stroke();
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(0,255,136,.2)';
+  ctx.lineWidth   = 1;
+  for (var xi = 22; xi < W - 10; xi += 16) {
+    ctx.beginPath();
+    ctx.moveTo(xi, 20);
+    ctx.lineTo(xi - 12, 44);
+    ctx.stroke();
+  }
+
+  // ── Ponto fixo da corda na esquerda do teto ──
+  var anchorX = pCX - pR + 5;
+  ctx.save();
+  ctx.shadowColor = '#ffdd00';
+  ctx.shadowBlur  = 10;
+  ctx.fillStyle   = '#ffdd00';
+  ctx.beginPath();
+  ctx.arc(anchorX, 44, 7, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // ── Corda esquerda: do ponto fixo no teto até a tangente esquerda da polia ──
+  ctx.save();
+  ctx.shadowColor = '#00ddff';
+  ctx.shadowBlur  = 10;
+  ctx.strokeStyle = '#00ddff';
+  ctx.lineWidth   = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(anchorX, 44);
+  ctx.lineTo(anchorX, pCY);    // desce até o lado esquerdo da polia
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Arco da corda sob a polia (da esquerda, pelo baixo, até a direita) ──
+  ctx.save();
+  ctx.shadowColor = '#00ddff';
+  ctx.shadowBlur  = 10;
+  ctx.strokeStyle = '#00ddff';
+  ctx.lineWidth   = 2.5;
+  ctx.beginPath();
+  // De Math.PI (esquerda) passando por baixo (3π/2) até 0 (direita)
+  // anticlockwise = true → vai da esquerda para baixo para direita ✓
+  ctx.arc(pCX, pCY, pR, Math.PI, 0, true);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Corda direita: da tangente direita da polia sobe até o teto ──
+  var cordaRx = pCX + pR - 5;
+  var cordaRTopY = 44;
+  ctx.save();
+  ctx.shadowColor = '#00ddff';
+  ctx.shadowBlur  = 10;
+  ctx.strokeStyle = '#00ddff';
+  ctx.lineWidth   = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(cordaRx, pCY);
+  ctx.lineTo(cordaRx, cordaRTopY);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Seta de F (puxando para cima no topo da corda direita) ──
+  drawArrow(ctx, cordaRx, cordaRTopY + 60, cordaRx, cordaRTopY + 5, '#00ff88', 2.5, 10);
+  drawLabelOrbitron(ctx, cordaRx + 20, cordaRTopY + 35, 'F', '#00ff88', 13);
+  drawLabel(ctx, cordaRx + 20, cordaRTopY + 50, '= P/2', '#00ff88', 10);
+
+  // ── Roda da polia (móvel) ──
+  ctx.save();
+  ctx.shadowColor = '#aa00ff';
+  ctx.shadowBlur  = 18;
+  ctx.fillStyle   = 'rgba(20,0,30,.9)';
+  ctx.strokeStyle = '#aa00ff';
+  ctx.lineWidth   = 2.5;
+  ctx.beginPath();
+  ctx.arc(pCX, pCY, pR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(170,0,255,.35)';
+  ctx.lineWidth   = 1.5;
+  ctx.beginPath();
+  ctx.arc(pCX, pCY, pR - 9, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = '#aa00ff';
+  ctx.beginPath();
+  ctx.arc(pCX, pCY, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // ── Conector polia → bloco ──
+  ctx.save();
+  ctx.shadowColor = 'rgba(170,0,255,.5)';
+  ctx.shadowBlur  = 8;
+  ctx.strokeStyle = 'rgba(170,0,255,.6)';
+  ctx.lineWidth   = 2;
+  ctx.beginPath();
+  ctx.moveTo(pCX, pCY + pR);
+  ctx.lineTo(pCX, pCY + pR + 12);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Bloco da carga P ──
+  var bw = 56, bh = 32;
+  var blockTop = pCY + pR + 12;
+  ctx.save();
+  ctx.shadowColor = '#ff0066';
+  ctx.shadowBlur  = 12;
+  ctx.fillStyle   = 'rgba(40,0,20,.92)';
+  ctx.strokeStyle = '#ff0066';
+  ctx.lineWidth   = 2;
+  ctx.fillRect(pCX - bw / 2, blockTop, bw, bh);
+  ctx.strokeRect(pCX - bw / 2, blockTop, bw, bh);
+  ctx.restore();
+  drawLabelOrbitron(ctx, pCX, blockTop + bh / 2 + 5, 'P', '#ff0066', 13);
+
+  // ── Rótulos dos segmentos de corda ──
+  drawLabel(ctx, anchorX - 18, (44 + pCY) / 2, '1', '#00ddff', 13);
+  drawLabel(ctx, cordaRx + 14, (44 + pCY) / 2, '2', '#00ddff', 13);
+
+  // ── Rótulo inferior ──
+  drawLabel(ctx, W / 2, H - 6, 'F = P/2  |  VM = 2  |  2 segmentos', '#3a6a4a', 9);
+}
+
+// ════════════════════════════════════════════════════
+//  CALCULADORA DE POLIAS COMBINADAS
+// ════════════════════════════════════════════════════
+function updatePulleyCalc() {
+  var n   = parseInt(document.getElementById('pulN').value, 10);
+  var P   = parseInt(document.getElementById('pulW').value, 10);
+  var seg = 2 * n;
+  var VM  = 2 * n;
+  var F   = (P / VM).toFixed(1);
+
+  document.getElementById('pulNVal').textContent = n;
+  document.getElementById('pulWVal').textContent = P + ' N';
+  document.getElementById('c_n').textContent     = n;
+  document.getElementById('c_seg').textContent   = seg;
+  document.getElementById('c_F').textContent     = F + ' N';
+  document.getElementById('c_VM').textContent    = VM;
+
+  drawCombPulley(n, P, parseFloat(F), VM);
+}
+
+function drawCombPulley(n, P, F, VM) {
+  var canvas = document.getElementById('combCanvas');
+  var ctx    = canvas.getContext('2d');
+  var W = canvas.width;
+  var H = canvas.height;
+
+  bgFill(ctx, W, H);
+
+  // ── Teto ──
+  ctx.fillStyle = 'rgba(0,255,136,.1)';
+  ctx.fillRect(0, 0, W, 22);
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,255,136,.45)';
+  ctx.shadowBlur  = 5;
+  ctx.strokeStyle = 'rgba(0,255,136,.5)';
+  ctx.lineWidth   = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(0, 22);
+  ctx.lineTo(W, 22);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Polias móveis distribuídas ──
+  var pR    = 20;
+  var pY    = H - 52;
+  var step  = W / (n + 1);
+  var segColors = ['#00ddff', '#00ff88', '#ffdd00', '#ff8800', '#aa00ff'];
+
+  for (var i = 0; i < n; i++) {
+    var px = step * (i + 1);
+    var col = segColors[i % segColors.length];
+
+    // Corda esquerda do par
+    ctx.save();
+    ctx.shadowColor = col;
+    ctx.shadowBlur  = 8;
+    ctx.strokeStyle = col;
+    ctx.lineWidth   = 2;
+    ctx.beginPath();
+    ctx.moveTo(px - pR + 4, 22);
+    ctx.lineTo(px - pR + 4, pY);
+    ctx.stroke();
+    ctx.restore();
+
+    // Corda direita do par
+    ctx.save();
+    ctx.shadowColor = col;
+    ctx.shadowBlur  = 8;
+    ctx.strokeStyle = col;
+    ctx.lineWidth   = 2;
+    ctx.beginPath();
+    ctx.moveTo(px + pR - 4, 22);
+    ctx.lineTo(px + pR - 4, pY);
+    ctx.stroke();
+    ctx.restore();
+
+    // Polia
+    ctx.save();
+    ctx.shadowColor = '#aa00ff';
+    ctx.shadowBlur  = 12;
+    ctx.fillStyle   = 'rgba(20,0,30,.9)';
+    ctx.strokeStyle = '#aa00ff';
+    ctx.lineWidth   = 2;
+    ctx.beginPath();
+    ctx.arc(px, pY, pR, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#aa00ff';
+    ctx.beginPath();
+    ctx.arc(px, pY, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Número dos segmentos
+    ctx.font       = '10px "Share Tech Mono", monospace';
+    ctx.textAlign  = 'center';
+    ctx.fillStyle  = 'rgba(255,255,255,.4)';
+    ctx.fillText(2 * i + 1, px - pR + 4, H - 30);
+    ctx.fillText(2 * i + 2, px + pR - 4, H - 30);
+  }
+
+  // ── Seta de F no lado direito ──
+  var arrowX = step * n + pR;
+  if (arrowX > W - 20) arrowX = W - 26;
+  drawArrow(ctx, arrowX, H - 20, arrowX, 50, '#00ff88', 2.5, 10);
+
+  // ── Texto de resultado ──
+  ctx.font      = '12px Orbitron, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(0,255,136,.75)';
+  ctx.fillText(
+    n + (n === 1 ? ' polia movel' : ' polias moveis') +
+    '  \u2192  F = P/' + VM + ' = ' + F + ' N  |  VM = ' + VM,
+    W / 2, H - 6
+  );
+}
+
+// ════════════════════════════════════════════════════
+//  QUIZ
+// ════════════════════════════════════════════════════
+var QA       = { q1:0, q2:0, q3:0, q4:0, q5:0, q6:0, q7:0, q8:0 };
+var answered = 0;
+
+var feedbacks = {
+  q1: {
+    c: 'Correto! Lei da alavanca: F x Bp = R x Br  ->  F x 80 = 200 x 20  ->  F = 4000 / 80 = 50 N. A VM = 80/20 = 4, ou seja, a forca foi reduzida 4 vezes.',
+    w: 'Errado. Use F x Bp = R x Br: F x 80 = 200 x 20  ->  F = 4000 / 80 = 50 N. Nao confunda os bracos com as forcas.'
+  },
+  q2: {
+    c: 'Correto! Na carriola: PA = roda (ponto de apoio), R = carga (no centro), F = alcas (extremidade). Como R esta entre PA e F, e uma alavanca inter-resistente (Classe 2).',
+    w: 'Errado. Na carriola, a carga R fica entre o eixo PA e as alcas F. Isso caracteriza a Classe 2 (inter-resistente), onde VM = Bp/Br > 1.'
+  },
+  q3: {
+    c: 'Correto! Na inter-potente, F esta mais proximo do PA, entao Bp < Br, logo VM = Bp/Br < 1. E preciso mais forca, mas o ponto de aplicacao se move mais rapido e com maior deslocamento.',
+    w: 'Errado. Como F esta entre PA e R, temos Bp < Br, portanto VM = Bp/Br < 1. O exemplo classico e o antebraco humano: o biceps (F) esta perto do cotovelo (PA), mas a mao (R) se move muito.'
+  },
+  q4: {
+    c: 'Correto! Px = P . sen(theta) = 500 x sen(30) = 500 x 0,5 = 250 N. Esta componente paralela e responsavel pelo deslizamento do bloco morro abaixo.',
+    w: 'Errado. Px = P . sen(theta) = 500 x 0,5 = 250 N. Nao confunda: sen(30) = 0,5 da Px; cos(30) = 0,866 da Py. A componente 433 N e a forca perpendicular Py (= Normal N).'
+  },
+  q5: {
+    c: 'Correto! N = Py = P . cos(theta) = 500 x cos(30) = 500 x 0,866 = 433 N. A forca normal e sempre perpendicular ao plano e igual em modulo a Py.',
+    w: 'Errado. A forca normal N = Py = P . cos(theta) = 500 x 0,866 = 433 N. Nao confunda N com Px (= 250 N). A normal equilibra a componente do peso que empurra o bloco contra o plano.'
+  },
+  q6: {
+    c: 'Correto! A polia fixa tem VM = 1. Ela nao reduz a forca necessaria, apenas muda sua direcao. Por isso F = P = 300 N. Sua vantagem e ergonomica (puxar para baixo e mais facil que levantar).',
+    w: 'Errado. A polia FIXA tem vantagem mecanica VM = 1. Ela nao multiplica a forca: F = P = 300 N. Quem reduz a forca e a polia movel (VM = 2).'
+  },
+  q7: {
+    c: 'Correto! Polia movel: dois segmentos de corda sustentam a carga, entao F = P/2 = 240/2 = 120 N. A VM = 2 significa que a forca necessaria e reduzida a metade.',
+    w: 'Errado. Polia movel tem VM = 2 porque dois segmentos de corda sustentam o peso. Portanto F = P/2 = 240/2 = 120 N.'
+  },
+  q8: {
+    c: 'Correto! Com n = 3 polias moveis: VM = 2n = 6 segmentos de corda. F = P/VM = 600/6 = 100 N. Cada polia movel adiciona 2 segmentos e dobra a vantagem mecanica.',
+    w: 'Errado. Com 3 polias moveis: VM = 2 x 3 = 6 (seis segmentos de corda sustentam a carga). Entao F = P/6 = 600/6 = 100 N. VM = 3 seria para 1,5 polia movel, o que nao existe.'
+  }
+};
+
+function ans(btn, qId, result) {
+  var card = document.getElementById(qId);
+  var btns = card.querySelectorAll('.obt');
+
+  // Desabilita todos os botões
+  btns.forEach(function (b) { b.disabled = true; });
+
+  var fb = document.getElementById('f_' + qId);
+
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    fb.textContent = feedbacks[qId].c;
+    fb.className   = 'fb show ok';
+    QA[qId]        = 1;
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = feedbacks[qId].w;
+    fb.className   = 'fb show err';
+    QA[qId]        = 0;
+    // Destaca a alternativa correta
+    btns.forEach(function (b) {
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').indexOf("'correct'") !== -1) {
+        b.classList.add('correct');
+      }
+    });
+  }
+
+  answered++;
+  updateProgress();
+  if (answered === 8) showScore();
+}
+
+function updateProgress() {
+  var pct = (answered / 8) * 100;
+  document.getElementById('progBar').style.width = pct + '%';
+  document.getElementById('progTxt').textContent = answered + ' / 8 respondidas';
+}
+
+function showScore() {
+  var score = 0;
+  Object.keys(QA).forEach(function (k) { score += QA[k]; });
+
+  var panel = document.getElementById('scorePanel');
+  panel.style.display = 'block';
+  document.getElementById('scVal').textContent = score + '/8';
+
+  var msgs = [
+    'Nao desista! Revise o conteudo e tente novamente.',
+    'Bom inicio! Releia as secoes em que errou.',
+    'Indo bem! Continue praticando.',
+    'Excelente! Dominio solido das maquinas simples.',
+    'Perfeito! Resultado impecavel!'
+  ];
+  var cols = ['#ff2244', '#ff8800', '#ffdd00', '#00ff88', '#00ddff'];
+  var idx  = score <= 2 ? 0 : score <= 4 ? 1 : score <= 5 ? 2 : score <= 7 ? 3 : 4;
+
+  document.getElementById('scMsg').textContent     = msgs[idx];
+  document.getElementById('scVal').style.color     = cols[idx];
+  document.getElementById('scVal').style.textShadow = '0 0 20px ' + cols[idx];
+
+  panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetQuiz() {
+  Object.keys(QA).forEach(function (k) { QA[k] = 0; });
+  answered = 0;
+  updateProgress();
+  document.getElementById('scorePanel').style.display = 'none';
+
+  ['q1','q2','q3','q4','q5','q6','q7','q8'].forEach(function (qId) {
+    var card = document.getElementById(qId);
+    card.querySelectorAll('.obt').forEach(function (b) {
+      b.disabled = false;
+      b.classList.remove('correct', 'wrong');
+    });
+    var fb = document.getElementById('f_' + qId);
+    fb.className   = 'fb';
+    fb.textContent = '';
+  });
+}
+
+// ════════════════════════════════════════════════════
+//  INICIALIZAÇÃO
+// ════════════════════════════════════════════════════
+window.addEventListener('load', function () {
+  // Inicializa a alavanca
+  setLever('interfixa');
+
+  // Inicializa o plano inclinado
+  drawPlane();
+
+  // Inicializa as polias
+  drawFixedPulley();
+  drawMobilePulley();
+
+  // Inicializa a calculadora de polias
+  updatePulleyCalc();
+
+  // Corrige rótulo do ângulo (grau)
+  document.getElementById('plAngleVal').textContent = '30°';
+});
+
+// Corrige símbolo de grau após cada interação do slider do plano
+document.addEventListener('DOMContentLoaded', function () {
+  var slAngle = document.getElementById('plAngle');
+  if (slAngle) {
+    slAngle.addEventListener('input', function () {
+      document.getElementById('plAngleVal').textContent = slAngle.value + '\u00b0';
+    });
+  }
+});
+</script>
+</body>
+</html>

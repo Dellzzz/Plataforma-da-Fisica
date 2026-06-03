@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aulas Prontas - Física</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --purple-neon: #bc13fe;
+      --magenta-neon: #ff00ff;
+      --bg-dark: #05010a;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: var(--bg-dark);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    /* Efeito de Brilho e Grid de Fundo */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 50% 50%, rgba(188, 19, 254, 0.12), transparent 70%),
+        linear-gradient(rgba(188, 19, 254, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(188, 19, 254, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 40px 40px, 40px 40px;
+      z-index: -1;
+    }
+
+    .container {
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    /* Cabeçalho e Botão Voltar */
+    .header-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .btn-back {
+      background: transparent;
+      color: #e0e0e0;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      font-family: 'Orbitron', sans-serif;
+      transition: 0.3s ease;
+    }
+    .btn-back:hover {
+      color: white;
+      border-color: var(--purple-neon);
+      box-shadow: 0 0 15px rgba(188, 19, 254, 0.4);
+      background: rgba(188, 19, 254, 0.1);
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--purple-neon);
+      text-shadow: 0 0 15px var(--purple-neon);
+      text-align: center;
+      font-size: 2.8rem;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #d0c0d8;
+      font-size: 1.1rem;
+      margin-bottom: 40px;
+    }
+
+    /* Menu Suspenso (Dropdown) */
+    .filter-section {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 50px;
+    }
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropbtn {
+      background: rgba(188, 19, 254, 0.1);
+      color: white;
+      padding: 12px 30px;
+      font-size: 15px;
+      border: 1px solid var(--purple-neon);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      transition: 0.3s;
+      box-shadow: 0 0 10px rgba(188, 19, 254, 0.2);
+      letter-spacing: 1px;
+    }
+    .dropdown:hover .dropbtn {
+      background: var(--purple-neon);
+      box-shadow: 0 0 20px var(--purple-neon);
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: #120120;
+      min-width: 240px;
+      box-shadow: 0px 8px 16px rgba(0,0,0,0.6);
+      z-index: 10;
+      border: 1px solid var(--purple-neon);
+      border-radius: 8px;
+      margin-top: 5px;
+    }
+    .dropdown-content a {
+      color: #e0e0e0;
+      padding: 14px 20px;
+      text-decoration: none;
+      display: block;
+      font-size: 0.95rem;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .dropdown-content a:hover {
+      background: rgba(188, 19, 254, 0.3);
+      color: var(--magenta-neon);
+      padding-left: 25px;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    /* Estrutura das Categorias */
+    .category-section {
+      margin-bottom: 60px;
+    }
+    .category-section h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: white;
+      font-size: 1.8rem;
+      border-bottom: 2px solid rgba(188, 19, 254, 0.3);
+      padding-bottom: 10px;
+      margin-bottom: 30px;
+      text-shadow: 0 0 8px rgba(188, 19, 254, 0.5);
+    }
+    
+    /* Mensagem Vazia */
+    .empty-message {
+      text-align: center;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed rgba(188, 19, 254, 0.4);
+      border-radius: 12px;
+      color: #a092a8;
+      font-style: italic;
+      font-size: 1.1rem;
+      display: none; /* Controlado via JS */
+    }
+
+    /* Grid de Aulas */
+    .exp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 35px;
+    }
+    .exp-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(188, 19, 254, 0.25);
+      padding: 30px;
+      border-radius: 20px;
+      transition: 0.4s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .exp-card::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255, 0, 255, 0.05), transparent 70%);
+      z-index: 0;
+    }
+    .exp-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--magenta-neon);
+      box-shadow: 0 0 25px rgba(255, 0, 255, 0.25);
+    }
+    .exp-card h3 {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--magenta-neon);
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 1;
+    }
+    .exp-card p {
+      color: #d0c0d8;
+      line-height: 1.6;
+      font-size: 1rem;
+      margin-bottom: 25px;
+      position: relative;
+      z-index: 1;
+    }
+    .btn-start {
+      align-self: flex-start;
+      background: transparent;
+      color: white;
+      border: 1px solid var(--purple-neon);
+      padding: 10px 22px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: 0.3s;
+      position: relative;
+      z-index: 1;
+    }
+    .btn-start:hover {
+      background: var(--purple-neon);
+      box-shadow: 0 0 15px var(--purple-neon);
+    }
+    .tag {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(188, 19, 254, 0.2);
+      border: 1px solid var(--purple-neon);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-family: 'Orbitron', sans-serif;
+      color: #ffc2ff;
+    }
+
+    @media (max-width: 768px) {
+      .header-actions { flex-direction: column; gap: 20px; text-align: center; }
+      h1 { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <div class="header-actions">
+      <a href="index.html" class="btn-back">← Voltar para Física</a>
+    </div>
+
+    <h1>Aulas Prontas</h1>
+    <p class="subtitle">Material didático e apresentações completas</p>
+
+    <div class="filter-section">
+      <div class="dropdown">
+        <button class="dropbtn" id="current-category">Filtrar por Conteúdo ▾</button>
+        <div class="dropdown-content">
+          <a onclick="filterCategory('todos')">Mostrar Todos</a>
+          <a onclick="filterCategory('cinematica')">Cinemática</a>
+          <a onclick="filterCategory('dinamica')">Dinâmica</a>
+          <a onclick="filterCategory('trabalho_energia')">Trabalho e Energia</a>
+          <a onclick="filterCategory('termologia')">Termologia</a>
+          <a onclick="filterCategory('termodinamica')">Termodinâmica</a>
+          <a onclick="filterCategory('ondulatoria')">Ondulatória</a>
+          <a onclick="filterCategory('optica')">Óptica</a>
+          <a onclick="filterCategory('eletrostatica')">Eletrostática</a>
+          <a onclick="filterCategory('eletrodinamica')">Eletrodinâmica</a>
+          <a onclick="filterCategory('eletromagnetismo')">Eletromagnetismo</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-section" id="sec-cinematica">
+      <h2>1. Cinemática</h2>
+      <div class="exp-grid">
+        <div class="exp-card">
+          <span class="tag">Cinemática</span>
+          <div>
+            <h3>Aula - MRUV</h3>
+            <p>Aprenda os conceitos fundamentais do Movimento Retilíneo Uniformemente Variado, equações horárias e análise gráfica.</p>
+          </div>
+          <a href="aulas/aula-mruv.html" class="btn-start">Acessar Aula</a>
+        </div>
+      </div>
+      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
+    </div>
+
+    <div class="category-section" id="sec-dinamica">
+      <h2>2. Dinâmica</h2>
+      <div class="exp-grid">
+        <div class="exp-card">
+          <span class="tag">Dinâmica</span>
+          <div>
+            <h3>Aplicações das Leis de Newton</h3>
+            <p>Estudo aprofundado sobre forças de tração, peso, normal e atrito através de sistemas de blocos e roldanas.</p>
+          </div>
+          <a href="aulas/aula-apl-leis.html" class="btn-start">Acessar Aula</a>
+        </div>
+      </div>
+      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
+    </div>
+
+    <div class="category-section" id="sec-trabalho_energia">
+      <h2>3. Trabalho e Energia</h2>
+      <div class="exp-grid">
+        </div>
+      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
+    </div>
+
+    <div class="category-section" id="sec-termologia">
+      <h2>4. Termologia</h2>
+      <div class="exp-grid">
+        </div>
+      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
+    </div>
+
+    <div class="category-section" id="sec-termodinamica">
+      <h2>5. Termodinâmica</h2>
+      <div class="exp-grid">
+        </div>
+      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
+    </div>
+
+    <div class="category-section" id="sec-ondulatoria">
+      <h2>6. Ondulatória</h2>
+      <div class="exp-grid">
+        <div class="exp-card">
+          <span class="tag">Ondulatória</span>
+          <div>
+            <h3>Introdução à Ondulatória</h3>
+            <p>Compreenda o conceito de ondas, as suas classificações quanto à natureza e direção, e as grandezas fundamentais como frequência, período e velocidade.</p>
+          </div>
+          <a href="aulas/ondulatoria.html" class="btn-start">Acessar Aula</a>
+        </div>
+      </div>
+      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
+    </div>
+
+    <div class="category-section" id="sec-optica">
+      <h2>7. Óptica</h2>
+      <div class="exp-grid">
+        <div class="exp-card">
+          <span class="tag">Óptica</span>
+          <div>
+            <h3>Princípios da Óptica</h3>
+            <p>Desvende a propagação retilínea da luz, os princípios da independência dos raios e os conceitos de sombra e penumbra.</p>
+          </div>
+          <a href="aulas/aula-optica.html" class="btn-start">Acessar Aula</a>
+        </div>
+      </div>
+      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
+    </div>
+
+    <div class="category-section" id="sec-eletrostatica">
+      <h2>8. Eletrostática</h2>
+      <div class="exp-grid">
+        <div class="exp-card">
+          <span class="tag">Eletrostática</span>
+          <div>
+            <h3>Princípios da Eletrostática</h3>
+            <p>Compreenda as propriedades das cargas elétricas, processos de eletrização, força elétrica e a aplicação da Lei de Coulomb.</p>
+          </div>
+          <a href="aulas/eletrostatica.html" class="btn-start">Acessar Aula</a>
+        </div>
+      </div>
+      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
+    </div>
+
+    <div class="category-section" id="sec-eletrodinamica">
+      <h2>9. Eletrodinâmica</h2>
+      <div class="exp-grid">
+        </div>
+      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
+    </div>
+
+    <div class="category-section" id="sec-eletromagnetismo">
+      <h2>10. Eletromagnetismo</h2>
+      <div class="exp-grid">
+        </div>
+      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
+    </div>
+
+  </div>
+
+  <script>
+    // Inicialização da verificação de conteúdo vazio ao carregar a página
+    document.addEventListener("DOMContentLoaded", () => {
+      checkEmptySections();
+    });
+
+    // Função que verifica se há cards (aulas) em cada seção
+    function checkEmptySections() {
+      const sections = document.querySelectorAll('.category-section');
+      
+      sections.forEach(sec => {
+        const grid = sec.querySelector('.exp-grid');
+        const emptyMsg = sec.querySelector('.empty-message');
+        
+        if (grid.children.length === 0 || grid.innerHTML.trim() === '') {
+          grid.style.display = 'none';
+          emptyMsg.style.display = 'block';
+        } else {
+          grid.style.display = 'grid';
+          emptyMsg.style.display = 'none';
+        }
+      });
+    }
+
+    // Lógica do filtro de navegação
+    function filterCategory(category) {
+      const sections = document.querySelectorAll('.category-section');
+      const button = document.getElementById('current-category');
+      
+      const names = {
+        'todos': 'Mostrar Todos ▾',
+        'cinematica': 'Cinemática ▾',
+        'dinamica': 'Dinâmica ▾',
+        'trabalho_energia': 'Trabalho e Energia ▾',
+        'termologia': 'Termologia ▾',
+        'termodinamica': 'Termodinâmica ▾',
+        'ondulatoria': 'Ondulatória ▾',
+        'optica': 'Óptica ▾',
+        'eletrostatica': 'Eletrostática ▾',
+        'eletrodinamica': 'Eletrodinâmica ▾',
+        'eletromagnetismo': 'Eletromagnetismo ▾'
+      };
+      
+      if(names[category]) button.innerText = names[category];
+
+      sections.forEach(sec => {
+        if (category === 'todos' || sec.id === `sec-${category}`) {
+          sec.style.display = 'block';
+        } else {
+          sec.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

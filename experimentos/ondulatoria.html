@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ondulatória — Simulador Interativo</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --neon:#bc13fe;
+  --pink:#ff00ff;
+  --bg:#05010a;
+  --card:rgba(188,19,254,.07);
+  --border:rgba(188,19,254,.25);
+  --text:#d0c0d8;
+  --cyan:#00eeff;
+  --green:#44ff88;
+  --red:#ff5555;
+  --yellow:#ffee44;
+  --orange:#ff9933;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:var(--bg);
+  color:white;
+  font-family:'Poppins',sans-serif;
+  padding:14px;
+  overflow-x:hidden;
+}
+
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at top,
+    rgba(188,19,254,.15),
+    transparent 55%);
+  pointer-events:none;
+}
+
+.app{
+  max-width:1100px;
+  margin:auto;
+}
+
+.lab-title{
+  font-family:'Orbitron',monospace;
+  text-align:center;
+  color:var(--neon);
+  letter-spacing:3px;
+  text-shadow:0 0 20px var(--neon);
+  margin-bottom:6px;
+}
+
+.lab-sub{
+  text-align:center;
+  color:var(--text);
+  font-size:12px;
+  margin-bottom:14px;
+}
+
+.tabs{
+  display:flex;
+  gap:6px;
+  margin-bottom:14px;
+}
+
+.tab{
+  flex:1;
+  border:none;
+  padding:10px;
+  border-radius:10px;
+  background:var(--card);
+  border:1px solid var(--border);
+  color:var(--text);
+  cursor:pointer;
+  transition:.2s;
+  font-family:'Orbitron',monospace;
+  font-size:11px;
+}
+
+.tab:hover{
+  border-color:var(--neon);
+}
+
+.tab.active{
+  color:var(--pink);
+  border-color:var(--pink);
+  background:rgba(255,0,255,.1);
+}
+
+.layout{
+  display:flex;
+  gap:14px;
+}
+
+.canvas-wrap{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:10px;
+}
+
+canvas{
+  display:block;
+  background:#06000f;
+  border-radius:10px;
+}
+
+.side{
+  width:280px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.panel{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px;
+}
+
+.panel-title{
+  color:var(--neon);
+  font-family:'Orbitron',monospace;
+  font-size:11px;
+  letter-spacing:2px;
+  margin-bottom:10px;
+}
+
+.eq{
+  padding:10px;
+  border-radius:8px;
+  background:rgba(0,0,0,.3);
+  border:1px solid rgba(255,0,255,.2);
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.eq-main{
+  color:var(--pink);
+  font-family:'Orbitron',monospace;
+  margin-bottom:5px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.box{
+  background:rgba(255,0,255,.05);
+  border:1px solid rgba(255,0,255,.12);
+  border-radius:8px;
+  padding:8px;
+  text-align:center;
+}
+
+.box-label{
+  font-size:9px;
+  color:var(--text);
+  margin-bottom:4px;
+}
+
+.box-value{
+  font-family:'Orbitron',monospace;
+  color:var(--pink);
+  font-size:14px;
+}
+
+.controls{
+  margin-top:14px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+}
+
+.control-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.slider-row{
+  margin-bottom:8px;
+}
+
+.slider-label{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:4px;
+  font-size:11px;
+}
+
+.slider-label b{
+  color:var(--pink);
+}
+
+input[type=range]{
+  width:100%;
+  accent-color:var(--neon);
+}
+
+.note{
+  text-align:center;
+  margin-top:10px;
+  font-size:11px;
+  color:rgba(208,192,216,.8);
+}
+
+@media(max-width:980px){
+  .layout{
+    flex-direction:column;
+  }
+
+  .side{
+    width:100%;
+  }
+
+  canvas{
+    width:100%;
+    height:auto;
+  }
+
+  .control-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<h1 class="lab-title">ONDULATÓRIA</h1>
+<p class="lab-sub">
+Simulador Interativo — Ondas · Interferência · Doppler
+</p>
+
+<div class="tabs">
+  <button class="tab active" data-tab="wave">ONDA</button>
+  <button class="tab" data-tab="super">SUPERPOSIÇÃO</button>
+  <button class="tab" data-tab="stand">ESTACIONÁRIA</button>
+  <button class="tab" data-tab="interf">INTERFERÊNCIA</button>
+  <button class="tab" data-tab="doppler">DOPPLER</button>
+</div>
+
+<div class="layout">
+
+<div class="canvas-wrap">
+<canvas id="cv" width="700" height="430"></canvas>
+</div>
+
+<div class="side">
+
+<div class="panel">
+<div class="panel-title">EQUAÇÃO</div>
+
+<div class="eq">
+<div class="eq-main" id="eqMain">
+y(x,t)=A·sin(kx−ωt)
+</div>
+
+<div id="eqSub">
+Onda progressiva transversal
+</div>
+</div>
+
+</div>
+
+<div class="panel">
+
+<div class="panel-title">VALORES</div>
+
+<div class="grid">
+
+<div class="box">
+<div class="box-label">Amplitude</div>
+<div class="box-value" id="vA">60</div>
+</div>
+
+<div class="box">
+<div class="box-label">Frequência</div>
+<div class="box-value" id="vF">1.5</div>
+</div>
+
+<div class="box">
+<div class="box-label">λ</div>
+<div class="box-value" id="vL">160</div>
+</div>
+
+<div class="box">
+<div class="box-label">Velocidade</div>
+<div class="box-value" id="vV">240</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="controls">
+
+<div class="control-grid">
+
+<div class="slider-row">
+<div class="slider-label">
+Amplitude
+<b id="aLabel">60</b>
+</div>
+
+<input type="range" id="amp" min="10" max="120" value="60">
+</div>
+
+<div class="slider-row">
+<div class="slider-label">
+Frequência
+<b id="fLabel">1.5</b>
+</div>
+
+<input type="range" id="freq" min="0.3" max="5" step="0.1" value="1.5">
+</div>
+
+<div class="slider-row">
+<div class="slider-label">
+Velocidade
+<b id="vLabel">240</b>
+</div>
+
+<input type="range" id="vel" min="60" max="500" value="240">
+</div>
+
+</div>
+
+<div class="note">
+Espaço = Pausar animação
+</div>
+
+</div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("cv");
+const ctx = canvas.getContext("2d");
+
+const W = canvas.width;
+const H = canvas.height;
+
+const TAU = Math.PI * 2;
+
+let paused = false;
+let time = 0;
+
+let active = "wave";
+
+const state = {
+
+wave:{
+  A:60,
+  f:1.5,
+  v:240
+},
+
+super:{
+  A1:50,
+  A2:50,
+  f1:2,
+  f2:2.2
+},
+
+stand:{
+  A:60,
+  n:2,
+  v:300
+},
+
+interf:{
+  lambda:60,
+  d:140
+},
+
+doppler:{
+  f0:2,
+  ratio:0.35,
+  vw:220,
+  sourceX:140,
+  dir:1,
+  waves:[]
+}
+
+};
+
+function glow(color, blur=14){
+  ctx.shadowColor = color;
+  ctx.shadowBlur = blur;
+}
+
+function clearGlow(){
+  ctx.shadowBlur = 0;
+}
+
+function bg(){
+
+  ctx.fillStyle = "#06000f";
+  ctx.fillRect(0,0,W,H);
+
+  ctx.strokeStyle = "rgba(188,19,254,.06)";
+  ctx.lineWidth = 1;
+
+  for(let x=0;x<W;x+=20){
+    ctx.beginPath();
+    ctx.moveTo(x,0);
+    ctx.lineTo(x,H);
+    ctx.stroke();
+  }
+
+  for(let y=0;y<H;y+=20){
+    ctx.beginPath();
+    ctx.moveTo(0,y);
+    ctx.lineTo(W,y);
+    ctx.stroke();
+  }
+
+}
+
+function axis(y){
+
+  ctx.strokeStyle = "rgba(188,19,254,.3)";
+  ctx.setLineDash([6,5]);
+
+  ctx.beginPath();
+  ctx.moveTo(0,y);
+  ctx.lineTo(W,y);
+  ctx.stroke();
+
+  ctx.setLineDash([]);
+
+}
+
+function drawWave(){
+
+  bg();
+
+  const s = state.wave;
+
+  const lambda = s.v / s.f;
+
+  const k = TAU / lambda;
+
+  const omega = TAU * s.f;
+
+  const mid = H/2;
+
+  axis(mid);
+
+  ctx.beginPath();
+
+  for(let x=0;x<W;x++){
+
+    const y =
+      mid -
+      s.A *
+      Math.sin(k*x - omega*time);
+
+    if(x===0){
+      ctx.moveTo(x,y);
+    }else{
+      ctx.lineTo(x,y);
+    }
+
+  }
+
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "#00eeff";
+
+  glow("#00eeff");
+
+  ctx.stroke();
+
+  clearGlow();
+
+  const px = 180;
+
+  const py =
+    mid -
+    s.A *
+    Math.sin(k*px - omega*time);
+
+  for(let i=6;i>=1;i--){
+
+    const alpha = i/6;
+
+    ctx.save();
+
+    ctx.globalAlpha = alpha * .25;
+
+    ctx.fillStyle = "#ff00ff";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      px - i*10,
+      py,
+      10 - i,
+      0,
+      TAU
+    );
+
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  glow("#ff00ff");
+
+  ctx.fillStyle = "#ff00ff";
+
+  ctx.beginPath();
+  ctx.arc(px,py,8,0,TAU);
+  ctx.fill();
+
+  clearGlow();
+
+  document.getElementById("eqMain").textContent =
+    "y(x,t)=A·sin(kx−ωt)";
+
+  document.getElementById("eqSub").textContent =
+    "λ = " + lambda.toFixed(1);
+
+  document.getElementById("vA").textContent =
+    s.A;
+
+  document.getElementById("vF").textContent =
+    s.f;
+
+  document.getElementById("vL").textContent =
+    lambda.toFixed(0);
+
+  document.getElementById("vV").textContent =
+    s.v;
+
+}
+
+function drawSuper(){
+
+  bg();
+
+  const s = state.super;
+
+  const mid1 = 120;
+  const mid2 = 220;
+  const mid3 = 330;
+
+  function plot(mid, amp, freq, color){
+
+    ctx.beginPath();
+
+    for(let x=0;x<W;x++){
+
+      const t =
+        time -
+        (1-x/W)*3;
+
+      const y =
+        mid -
+        amp*Math.sin(TAU*freq*t);
+
+      if(x===0){
+        ctx.moveTo(x,y);
+      }else{
+        ctx.lineTo(x,y);
+      }
+
+    }
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+
+    glow(color);
+
+    ctx.stroke();
+
+    clearGlow();
+  }
+
+  plot(mid1,s.A1,s.f1,"#ff5555");
+  plot(mid2,s.A2,s.f2,"#4488ff");
+
+  ctx.beginPath();
+
+  for(let x=0;x<W;x++){
+
+    const t =
+      time -
+      (1-x/W)*3;
+
+    const y =
+      mid3 -
+      (
+      s.A1*Math.sin(TAU*s.f1*t) +
+      s.A2*Math.sin(TAU*s.f2*t)
+      );
+
+    if(x===0){
+      ctx.moveTo(x,y);
+    }else{
+      ctx.lineTo(x,y);
+    }
+
+  }
+
+  ctx.strokeStyle = "#ffee44";
+  ctx.lineWidth = 3;
+
+  glow("#ffee44");
+
+  ctx.stroke();
+
+  clearGlow();
+
+}
+
+function drawStanding(){
+
+  bg();
+
+  const s = state.stand;
+
+  const mid = H/2;
+
+  const L = 520;
+
+  const startX = 90;
+
+  const omega =
+    TAU *
+    (
+      s.n *
+      s.v /
+      (2*L)
+    );
+
+  ctx.beginPath();
+
+  for(let x=0;x<=L;x++){
+
+    const y =
+      mid -
+      s.A *
+      Math.sin(
+        s.n*Math.PI*x/L
+      ) *
+      Math.cos(omega*time);
+
+    if(x===0){
+      ctx.moveTo(startX+x,y);
+    }else{
+      ctx.lineTo(startX+x,y);
+    }
+
+  }
+
+  ctx.strokeStyle = "#ff00ff";
+  ctx.lineWidth = 3;
+
+  glow("#ff00ff");
+
+  ctx.stroke();
+
+  clearGlow();
+
+}
+
+let interferenceCache = null;
+
+function buildInterference(){
+
+  const img =
+    ctx.createImageData(W,H);
+
+  const data = img.data;
+
+  const s = state.interf;
+
+  const s1x = W/2 - s.d/2;
+  const s2x = W/2 + s.d/2;
+
+  const sy = H/2;
+
+  const k = TAU / s.lambda;
+
+  const step = 4;
+
+  for(let py=0;py<H;py+=step){
+
+    for(let px=0;px<W;px+=step){
+
+      const r1 =
+        Math.hypot(px-s1x,py-sy);
+
+      const r2 =
+        Math.hypot(px-s2x,py-sy);
+
+      const delta = r1-r2;
+
+      const I =
+        Math.cos(k*delta/2)**2;
+
+      const c =
+        Math.floor(I*255);
+
+      for(let yy=0;yy<step;yy++){
+
+        for(let xx=0;xx<step;xx++){
+
+          const p =
+            ((py+yy)*W + (px+xx))*4;
+
+          if(p >= data.length) continue;
+
+          data[p] = c;
+          data[p+1] = 20;
+          data[p+2] = 255;
+          data[p+3] = 255;
+
+        }
+
+      }
+
+    }
+
+  }
+
+  interferenceCache = img;
+
+}
+
+function drawInterference(){
+
+  if(!interferenceCache){
+    buildInterference();
+  }
+
+  ctx.putImageData(
+    interferenceCache,
+    0,
+    0
+  );
+
+  const s = state.interf;
+
+  const s1x = W/2 - s.d/2;
+  const s2x = W/2 + s.d/2;
+
+  const sy = H/2;
+
+  function source(x){
+
+    glow("#ff00ff");
+
+    ctx.fillStyle = "#ff00ff";
+
+    ctx.beginPath();
+    ctx.arc(x,sy,8,0,TAU);
+    ctx.fill();
+
+    clearGlow();
+
+  }
+
+  source(s1x);
+  source(s2x);
+
+}
+
+function updateDoppler(dt){
+
+  const d = state.doppler;
+
+  const vs = d.vw * d.ratio;
+
+  d.sourceX += d.dir * vs * dt;
+
+  if(d.sourceX > W-90){
+    d.sourceX = W-90;
+    d.dir = -1;
+  }
+
+  if(d.sourceX < 90){
+    d.sourceX = 90;
+    d.dir = 1;
+  }
+
+  if(!d.lastEmit){
+    d.lastEmit = 0;
+  }
+
+  if(time - d.lastEmit >= 1/d.f0){
+
+    d.waves.push({
+      x:d.sourceX,
+      y:H/2,
+      t:time
+    });
+
+    d.lastEmit = time;
+
+  }
+
+  if(d.waves.length > 120){
+    d.waves.shift();
+  }
+
+}
+
+function drawDoppler(){
+
+  bg();
+
+  const d = state.doppler;
+
+  d.waves.forEach(w=>{
+
+    const r =
+      (time - w.t) *
+      d.vw;
+
+    ctx.beginPath();
+
+    ctx.arc(w.x,w.y,r,0,TAU);
+
+    ctx.strokeStyle =
+      "rgba(188,19,254,.5)";
+
+    ctx.lineWidth = 2;
+
+    ctx.stroke();
+
+  });
+
+  glow("#ff00ff");
+
+  ctx.fillStyle = "#ff00ff";
+
+  ctx.beginPath();
+  ctx.arc(d.sourceX,H/2,12,0,TAU);
+  ctx.fill();
+
+  clearGlow();
+
+}
+
+function render(){
+
+  switch(active){
+
+    case "wave":
+      drawWave();
+      break;
+
+    case "super":
+      drawSuper();
+      break;
+
+    case "stand":
+      drawStanding();
+      break;
+
+    case "interf":
+      drawInterference();
+      break;
+
+    case "doppler":
+      drawDoppler();
+      break;
+
+  }
+
+}
+
+let last = 0;
+
+function loop(ts){
+
+  const dt =
+    Math.min(
+      (ts-last)/1000,
+      .03
+    );
+
+  last = ts;
+
+  if(!paused){
+
+    time += dt;
+
+    if(active==="doppler"){
+      updateDoppler(dt);
+    }
+
+  }
+
+  render();
+
+  requestAnimationFrame(loop);
+
+}
+
+requestAnimationFrame(loop);
+
+document.addEventListener("keydown",e=>{
+
+  if(e.code==="Space"){
+
+    e.preventDefault();
+
+    paused = !paused;
+
+  }
+
+});
+
+document.querySelectorAll(".tab")
+.forEach(btn=>{
+
+  btn.addEventListener("click",()=>{
+
+    document
+    .querySelectorAll(".tab")
+    .forEach(t=>t.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    active = btn.dataset.tab;
+
+  });
+
+});
+
+const amp =
+  document.getElementById("amp");
+
+const freq =
+  document.getElementById("freq");
+
+const vel =
+  document.getElementById("vel");
+
+amp.addEventListener("input",()=>{
+
+  state.wave.A = +amp.value;
+
+  document.getElementById("aLabel")
+  .textContent = amp.value;
+
+});
+
+freq.addEventListener("input",()=>{
+
+  state.wave.f = +freq.value;
+
+  document.getElementById("fLabel")
+  .textContent = freq.value;
+
+});
+
+vel.addEventListener("input",()=>{
+
+  state.wave.v = +vel.value;
+
+  document.getElementById("vLabel")
+  .textContent = vel.value;
+
+});
+
+</script>
+
+</body>
+</html>

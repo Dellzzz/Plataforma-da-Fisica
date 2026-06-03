@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experimentos de Eletrostática</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Orbitron', sans-serif;
+    background:#05010a;
+    color:white;
+    overflow-x:hidden;
+    min-height:100vh;
+    background-image:
+        radial-gradient(circle at top, rgba(188,19,254,0.18), transparent 40%),
+        radial-gradient(circle at bottom, rgba(255,0,255,0.12), transparent 40%);
+}
+
+.container{
+    width:95%;
+    max-width:1400px;
+    margin:auto;
+    padding:30px;
+}
+
+.title{
+    text-align:center;
+    font-size:3rem;
+    margin-bottom:15px;
+    color:#bc13fe;
+    text-shadow:
+        0 0 10px #bc13fe,
+        0 0 25px #ff00ff,
+        0 0 45px #ff00ff;
+}
+
+.subtitle{
+    text-align:center;
+    color:#ddd;
+    margin-bottom:50px;
+}
+
+.exp-card{
+    margin-bottom:40px;
+    padding:30px;
+    border-radius:25px;
+    background:rgba(15,10,30,0.9);
+    border:2px solid #bc13fe;
+    box-shadow:
+        0 0 20px rgba(188,19,254,0.3),
+        inset 0 0 20px rgba(255,0,255,0.05);
+}
+
+.exp-title{
+    font-size:2rem;
+    margin-bottom:20px;
+    color:#ff00ff;
+    text-shadow:0 0 10px #ff00ff;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
+}
+
+.step{
+    margin-bottom:18px;
+    padding:18px;
+    border-left:4px solid #ff00ff;
+    background:rgba(255,255,255,0.03);
+    border-radius:14px;
+    transition:0.3s;
+}
+
+.step:hover{
+    transform:translateX(5px);
+    box-shadow:0 0 15px rgba(255,0,255,0.3);
+}
+
+.step h3{
+    color:#bc13fe;
+    margin-bottom:8px;
+}
+
+.step p{
+    line-height:1.7;
+    color:#ddd;
+}
+
+.materials{
+    color:#ffb6ff;
+}
+
+.sim-area{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:450px;
+}
+
+canvas{
+    background:#0f0a18;
+    border:2px solid #bc13fe;
+    border-radius:20px;
+    box-shadow:
+        0 0 25px rgba(188,19,254,0.5),
+        0 0 50px rgba(255,0,255,0.2);
+}
+
+button{
+    margin-top:20px;
+    padding:14px 28px;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    font-family:'Orbitron', sans-serif;
+    font-size:1rem;
+    font-weight:bold;
+    color:white;
+    background:linear-gradient(45deg,#bc13fe,#ff00ff);
+    box-shadow:
+        0 0 15px #bc13fe,
+        0 0 30px rgba(255,0,255,0.3);
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+.final-box{
+    margin-top:50px;
+    padding:30px;
+    border-radius:25px;
+    border:2px solid #ff00ff;
+    background:rgba(255,0,255,0.05);
+    box-shadow:0 0 25px rgba(255,0,255,0.25);
+}
+
+.final-box h2{
+    color:#ff00ff;
+    margin-bottom:20px;
+}
+
+.final-box p{
+    line-height:1.9;
+    color:#ddd;
+}
+
+.glow{
+    color:#bc13fe;
+    text-shadow:0 0 10px #bc13fe;
+}
+
+@media(max-width:1000px){
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    canvas{
+        width:100%;
+        max-width:420px;
+    }
+
+    .title{
+        font-size:2.2rem;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1 class="title">EXPERIMENTOS DE ELETROSTÁTICA</h1>
+
+<p class="subtitle">
+Explore os fenômenos elétricos através de experiências interativas.
+</p>
+
+<h2 style="text-align: center; color: purple"> Prof. Jardel A. Leite </h2> 
+
+<!-- EXPERIMENTO 1 -->
+
+<div class="exp-card">
+
+<h2 class="exp-title">1. A Lata que Anda</h2>
+
+<div class="grid">
+
+<div>
+
+<div class="step">
+<h3>Materiais</h3>
+<p class="materials">
+• Lata de alumínio vazia<br>
+• Cano PVC ou balão<br>
+• Lã ou cabelo seco
+</p>
+</div>
+
+<div class="step">
+<h3>Passo 1</h3>
+<p>
+Deite a lata sobre uma mesa lisa.
+</p>
+</div>
+
+<div class="step">
+<h3>Passo 2</h3>
+<p>
+Atrite o cano de PVC ou o balão no cabelo ou na lã.
+</p>
+</div>
+
+<div class="step">
+<h3>Passo 3</h3>
+<p>
+Aproxime o objeto carregado da lata sem encostar.
+</p>
+</div>
+
+<div class="step">
+<h3>Por que acontece?</h3>
+<p>
+O objeto carregado reorganiza as cargas elétricas da lata,
+criando atração elétrica por indução.
+</p>
+</div>
+
+</div>
+
+<div class="sim-area">
+
+<canvas id="lataCanvas" width="420" height="320"></canvas>
+
+<button onclick="moverLata()">
+Ativar Experimento
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- EXPERIMENTO 2 -->
+
+<div class="exp-card">
+
+<h2 class="exp-title">2. Canudo Giratório</h2>
+
+<div class="grid">
+
+<div>
+
+<div class="step">
+<h3>Materiais</h3>
+<p class="materials">
+• Dois canudos plásticos<br>
+• Palito de churrasco<br>
+• Fita adesiva<br>
+• Papel higiênico
+</p>
+</div>
+
+<div class="step">
+<h3>Passo 1</h3>
+<p>
+Fixe o palito verticalmente.
+</p>
+</div>
+
+<div class="step">
+<h3>Passo 2</h3>
+<p>
+Equilibre um canudo dobrado no topo do palito.
+</p>
+</div>
+
+<div class="step">
+<h3>Passo 3</h3>
+<p>
+Atrite o segundo canudo no papel.
+</p>
+</div>
+
+<div class="step">
+<h3>Passo 4</h3>
+<p>
+Aproxime o canudo carregado do canudo equilibrado.
+</p>
+</div>
+
+<div class="step">
+<h3>Por que acontece?</h3>
+<p>
+As cargas elétricas podem gerar atração ou repulsão,
+fazendo o canudo girar.
+</p>
+</div>
+
+</div>
+
+<div class="sim-area">
+
+<canvas id="canudoCanvas" width="420" height="320"></canvas>
+
+<button onclick="girarCanudo()">
+Ativar Experimento
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- EXPERIMENTO 3 -->
+
+<div class="exp-card">
+
+<h2 class="exp-title">3. Caneta Eletrostática</h2>
+
+<div class="grid">
+
+<div>
+
+<div class="step">
+<h3>Materiais</h3>
+<p class="materials">
+• Caneta plástica<br>
+• Papel picado<br>
+• Cabelo seco ou lã
+</p>
+</div>
+
+<div class="step">
+<h3>Passo 1</h3>
+<p>
+Pique pequenos pedaços de papel.
+</p>
+</div>
+
+<div class="step">
+<h3>Passo 2</h3>
+<p>
+Atrite a caneta no cabelo ou na lã.
+</p>
+</div>
+
+<div class="step">
+<h3>Passo 3</h3>
+<p>
+Aproxime a caneta dos papéis.
+</p>
+</div>
+
+<div class="step">
+<h3>Por que acontece?</h3>
+<p>
+A caneta carregada polariza os papéis neutros,
+gerando atração eletrostática.
+</p>
+</div>
+
+</div>
+
+<div class="sim-area">
+
+<canvas id="papelCanvas" width="420" height="320"></canvas>
+
+<button onclick="atrairPapeis()">
+Ativar Experimento
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- CONCLUSÃO -->
+
+<div class="final-box">
+
+<h2>Conclusão Geral</h2>
+
+<p>
+O estudo da <span class="glow">Eletrostática</span>
+é fundamental para compreender os fenômenos elétricos presentes
+na natureza e nas tecnologias modernas.
+Esses experimentos demonstram como cargas elétricas podem gerar
+atração, repulsão e indução sem contato direto.
+A Eletrostática está presente em equipamentos eletrônicos,
+impressoras, para-raios, sensores industriais e até nos relâmpagos.
+Compreender esses princípios permite desenvolver tecnologias
+mais eficientes e compreender melhor o comportamento da matéria
+e da eletricidade no cotidiano.
+</p>
+
+</div>
+
+</div>
+
+<script>
+
+/* ======================
+   EXPERIMENTO 1
+====================== */
+
+const lataCanvas = document.getElementById("lataCanvas");
+const lctx = lataCanvas.getContext("2d");
+
+let lataX = 120;
+let pvcX = 330;
+
+function desenharLata(){
+
+    lctx.clearRect(0,0,420,320);
+
+    // mesa
+    lctx.fillStyle = "#333";
+    lctx.fillRect(0,230,420,12);
+
+    // lata
+    lctx.save();
+    lctx.translate(lataX,210);
+
+    lctx.fillStyle = "#bbbbbb";
+    lctx.fillRect(-45,-20,90,40);
+
+    lctx.strokeStyle = "#ffffff";
+    lctx.lineWidth = 2;
+    lctx.strokeRect(-45,-20,90,40);
+
+    lctx.restore();
+
+    // pvc
+    lctx.fillStyle = "#bc13fe";
+    lctx.fillRect(pvcX,120,20,120);
+
+}
+
+function moverLata(){
+
+    let intervalo = setInterval(()=>{
+
+        if(lataX < 250){
+            lataX += 2;
+            desenharLata();
+        }else{
+            clearInterval(intervalo);
+        }
+
+    },16);
+
+}
+
+desenharLata();
+
+/* ======================
+   EXPERIMENTO 2
+====================== */
+
+const canudoCanvas = document.getElementById("canudoCanvas");
+const cctx = canudoCanvas.getContext("2d");
+
+let angulo = 0;
+
+function desenharCanudo(){
+
+    cctx.clearRect(0,0,420,320);
+
+    // base
+    cctx.fillStyle = "#888";
+    cctx.fillRect(180,250,60,12);
+
+    // palito
+    cctx.fillStyle = "#ffffff";
+    cctx.fillRect(207,100,6,150);
+
+    // canudo giratório
+    cctx.save();
+    cctx.translate(210,100);
+    cctx.rotate(angulo);
+
+    cctx.fillStyle = "#ff00ff";
+    cctx.fillRect(-90,-6,180,12);
+
+    cctx.restore();
+
+    // canudo carregado
+    cctx.fillStyle = "#bc13fe";
+    cctx.fillRect(320,120,16,120);
+
+}
+
+function girarCanudo(){
+
+    let velocidade = 0.18;
+
+    function animar(){
+
+        angulo += velocidade;
+        velocidade *= 0.985;
+
+        desenharCanudo();
+
+        if(velocidade > 0.002){
+            requestAnimationFrame(animar);
+        }
+
+    }
+
+    animar();
+
+}
+
+desenharCanudo();
+
+/* ======================
+   EXPERIMENTO 3
+====================== */
+
+const papelCanvas = document.getElementById("papelCanvas");
+const pctx = papelCanvas.getContext("2d");
+
+let papeis = [];
+
+for(let i=0;i<25;i++){
+
+    papeis.push({
+        x:Math.random()*300 + 40,
+        y:Math.random()*80 + 180,
+        size:6 + Math.random()*5
+    });
+
+}
+
+function desenharPapeis(){
+
+    pctx.clearRect(0,0,420,320);
+
+    // caneta
+    pctx.fillStyle = "#bc13fe";
+    pctx.fillRect(280,80,20,140);
+
+    // ponta
+    pctx.fillStyle = "#ffffff";
+    pctx.beginPath();
+    pctx.moveTo(280,80);
+    pctx.lineTo(300,80);
+    pctx.lineTo(290,50);
+    pctx.fill();
+
+    // papeis
+    pctx.fillStyle = "#ffffff";
+
+    papeis.forEach(p=>{
+
+        pctx.fillRect(p.x,p.y,p.size,p.size);
+
+    });
+
+}
+
+function atrairPapeis(){
+
+    let intervalo = setInterval(()=>{
+
+        papeis.forEach(p=>{
+
+            let dx = 290 - p.x;
+            let dy = 80 - p.y;
+
+            p.x += dx * 0.03;
+            p.y += dy * 0.03;
+
+        });
+
+        desenharPapeis();
+
+    },16);
+
+    setTimeout(()=>{
+        clearInterval(intervalo);
+    },3000);
+
+}
+
+desenharPapeis();
+
+</script>
+
+</body>
+</html>

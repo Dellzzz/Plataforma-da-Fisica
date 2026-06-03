@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Disco de Newton Interativo</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Orbitron', sans-serif;
+    background:#05010a;
+    color:white;
+    overflow-x:hidden;
+    min-height:100vh;
+    background-image:
+        radial-gradient(circle at top, rgba(188,19,254,0.15), transparent 40%),
+        radial-gradient(circle at bottom, rgba(255,0,255,0.1), transparent 40%);
+}
+
+.container{
+    width:95%;
+    max-width:1300px;
+    margin:auto;
+    padding:30px;
+}
+
+.title{
+    text-align:center;
+    font-size:3rem;
+    color:#bc13fe;
+    text-shadow:
+        0 0 10px #bc13fe,
+        0 0 20px #bc13fe,
+        0 0 40px #ff00ff;
+    margin-bottom:20px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#d9b3ff;
+    margin-bottom:50px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
+}
+
+.panel{
+    background:rgba(20,10,35,0.85);
+    border:2px solid #bc13fe;
+    border-radius:25px;
+    padding:25px;
+    box-shadow:
+        0 0 20px rgba(188,19,254,0.4),
+        inset 0 0 20px rgba(255,0,255,0.08);
+    backdrop-filter:blur(8px);
+}
+
+.step{
+    margin-bottom:25px;
+    padding:18px;
+    border-left:4px solid #ff00ff;
+    background:rgba(255,255,255,0.03);
+    border-radius:15px;
+    transition:0.3s;
+}
+
+.step:hover{
+    transform:translateX(6px);
+    box-shadow:0 0 15px rgba(255,0,255,0.4);
+}
+
+.step h2{
+    color:#ff00ff;
+    margin-bottom:10px;
+    font-size:1.2rem;
+}
+
+.step p{
+    color:#ddd;
+    line-height:1.6;
+}
+
+.material{
+    margin-top:10px;
+    color:#bc13fe;
+}
+
+.canvas-container{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+canvas{
+    border-radius:50%;
+    border:3px solid #bc13fe;
+    background:#111;
+    box-shadow:
+        0 0 25px #bc13fe,
+        0 0 60px rgba(255,0,255,0.4);
+}
+
+button{
+    margin-top:25px;
+    padding:15px 35px;
+    border:none;
+    border-radius:14px;
+    font-family:'Orbitron', sans-serif;
+    font-size:1rem;
+    font-weight:bold;
+    cursor:pointer;
+    color:white;
+    background:linear-gradient(45deg,#bc13fe,#ff00ff);
+    box-shadow:
+        0 0 15px #bc13fe,
+        0 0 30px rgba(255,0,255,0.4);
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.06);
+    box-shadow:
+        0 0 25px #ff00ff,
+        0 0 50px #bc13fe;
+}
+
+.info-box{
+    margin-top:25px;
+    padding:18px;
+    border-radius:15px;
+    background:rgba(188,19,254,0.08);
+    border:1px solid #bc13fe;
+    color:#ddd;
+    line-height:1.6;
+}
+
+.glow{
+    color:#ff00ff;
+    text-shadow:0 0 10px #ff00ff;
+}
+
+@media(max-width:900px){
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .title{
+        font-size:2.2rem;
+    }
+
+    canvas{
+        width:300px;
+        height:300px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1 class="title">DISCO DE NEWTON</h1>
+
+    <p class="subtitle">
+        Experimento Interativo de Mistura das Cores da Luz
+    </p>
+    <h2 style="text-align: center; color: purple"> Prof. Jardel A. Leite </h2> 
+    <div class="grid">
+
+        <!-- PASSO A PASSO -->
+        <div class="panel">
+
+            <div class="step">
+                <h2>1. O que é o Disco de Newton?</h2>
+                <p>
+                    O Disco de Newton é um experimento criado por
+                    <span class="glow">Isaac Newton</span>
+                    para demonstrar que a luz branca é formada pela mistura
+                    das cores do espectro visível.
+                </p>
+            </div>
+
+            <div class="step">
+                <h2>2. Materiais Necessários</h2>
+                <p>
+                    Você precisará de:
+                </p>
+
+                <div class="material">
+                    • Papel ou cartolina<br>
+                    • Compasso<br>
+                    • Régua<br>
+                    • Lápis de cor ou tinta<br>
+                    • Tesoura<br>
+                    • Palito ou motor giratório
+                </div>
+            </div>
+
+            <div class="step">
+                <h2>3. Desenhando o Disco</h2>
+                <p>
+                    Faça um círculo e divida-o em 7 partes iguais.
+                    Cada setor representa uma cor do espectro:
+                    vermelho, laranja, amarelo, verde, azul,
+                    anil e violeta.
+                </p>
+            </div>
+
+            <div class="step">
+                <h2>4. Pintando</h2>
+                <p>
+                    Pinte cada setor com sua respectiva cor.
+                    Quanto mais vibrantes forem as cores,
+                    melhor será o efeito visual durante a rotação.
+                </p>
+            </div>
+
+            <div class="step">
+                <h2>5. Montagem</h2>
+                <p>
+                    Recorte o disco e coloque-o em um eixo.
+                    Pode ser um lápis, palito ou motor elétrico.
+                </p>
+            </div>
+
+            <div class="step">
+                <h2>6. Resultado Esperado</h2>
+                <p>
+                    Ao girar rapidamente, as cores começam
+                    a se misturar visualmente e o disco aparenta
+                    ficar branco ou acinzentado.
+                </p>
+            </div>
+
+            <div class="info-box">
+                <strong class="glow">Explicação Científica:</strong><br><br>
+
+                O olho humano possui persistência visual.
+                Quando o disco gira rapidamente, o cérebro
+                mistura as cores percebidas, produzindo
+                a sensação de luz branca.
+            </div>
+
+        </div>
+
+        <!-- SIMULAÇÃO -->
+        <div class="panel canvas-container">
+
+            <canvas id="disco" width="420" height="420"></canvas>
+
+            <button id="spinBtn">
+                Girar Disco
+            </button>
+
+            <div class="info-box">
+                Clique no botão para observar o efeito
+                de mistura das cores do espectro visível.
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("disco");
+const ctx = canvas.getContext("2d");
+
+const centerX = canvas.width / 2;
+const centerY = canvas.height / 2;
+const radius = 180;
+
+const colors = [
+    "#ff0000",
+    "#ff7f00",
+    "#ffff00",
+    "#00ff00",
+    "#0000ff",
+    "#4b0082",
+    "#8f00ff"
+];
+
+let angle = 0;
+let spinning = false;
+let speed = 0;
+
+function drawDisc(rotation){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(rotation);
+
+    const slice = (Math.PI * 2) / colors.length;
+
+    for(let i=0;i<colors.length;i++){
+
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+
+        ctx.arc(
+            0,
+            0,
+            radius,
+            i * slice,
+            (i + 1) * slice
+        );
+
+        ctx.closePath();
+
+        ctx.fillStyle = colors[i];
+        ctx.fill();
+    }
+
+    // centro
+    ctx.beginPath();
+    ctx.arc(0,0,18,0,Math.PI*2);
+    ctx.fillStyle = "#ffffff";
+    ctx.fill();
+
+    ctx.restore();
+
+    // brilho externo
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI*2);
+    ctx.strokeStyle = "#bc13fe";
+    ctx.lineWidth = 4;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = "#ff00ff";
+    ctx.stroke();
+}
+
+function animate(){
+
+    if(spinning){
+
+        angle += speed;
+
+        // efeito de mistura visual
+        if(speed > 0.25){
+
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI*2);
+
+            const gradient = ctx.createRadialGradient(
+                centerX,
+                centerY,
+                20,
+                centerX,
+                centerY,
+                radius
+            );
+
+            gradient.addColorStop(0,"#ffffff");
+            gradient.addColorStop(1,"#d9d9d9");
+
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI*2);
+            ctx.strokeStyle = "#bc13fe";
+            ctx.lineWidth = 4;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = "#ff00ff";
+            ctx.stroke();
+
+        }else{
+            drawDisc(angle);
+        }
+
+        speed *= 0.992;
+
+        if(speed < 0.01){
+            spinning = false;
+            speed = 0;
+            drawDisc(angle);
+        }
+    }
+
+    requestAnimationFrame(animate);
+}
+
+drawDisc(0);
+animate();
+
+document.getElementById("spinBtn")
+.addEventListener("click", ()=>{
+
+    speed = 0.45;
+    spinning = true;
+
+});
+</script>
+
+</body>
+</html>

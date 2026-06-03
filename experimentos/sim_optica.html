@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Óptica Geométrica — Simulador Interativo</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#bc13fe;--pink:#ff00ff;--bg:#05010a;--card:rgba(188,19,254,0.07);--border:rgba(188,19,254,0.25);--text:#d0c0d8;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:#fff;font-family:'Poppins',sans-serif;padding:16px;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 50% 15%,rgba(188,19,254,0.09),transparent 60%);pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;max-width:920px;margin:0 auto;}
+.lab-title{font-family:'Orbitron',monospace;color:var(--neon);text-align:center;font-size:18px;letter-spacing:3px;text-shadow:0 0 14px var(--neon);margin-bottom:4px;}
+.lab-sub{text-align:center;font-size:11px;color:var(--text);margin-bottom:14px;}
+.tabs{display:flex;gap:4px;margin-bottom:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:5px;}
+.tab{flex:1;font-family:'Orbitron',monospace;font-size:8px;letter-spacing:1px;padding:7px 3px;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--text);cursor:pointer;transition:.2s;text-transform:uppercase;}
+.tab:hover{background:rgba(188,19,254,0.15);border-color:var(--neon);color:#ffc2ff;}
+.tab.on{background:rgba(255,0,255,0.15);border-color:var(--pink);color:var(--pink);}
+.main-area{display:flex;gap:12px;margin-bottom:12px;}
+.cv-wrap{flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;}
+canvas{display:block;border-radius:8px;background:#06000f;cursor:default;}
+.info-col{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px;}
+.pt{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;color:var(--neon);margin-bottom:9px;text-transform:uppercase;}
+.eq{background:rgba(0,0,0,.3);border:1px solid rgba(255,0,255,.2);border-radius:8px;padding:9px;text-align:center;margin-bottom:7px;}
+.eq-f{font-family:'Orbitron',monospace;font-size:12px;color:var(--pink);margin-bottom:3px;letter-spacing:1px;}
+.eq-v{font-size:10px;color:var(--text);}
+.vg{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.vb{background:rgba(255,0,255,.05);border:1px solid rgba(255,0,255,.15);border-radius:7px;padding:6px 4px;text-align:center;}
+.vl{font-size:8px;color:var(--text);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.vn{font-family:'Orbitron',monospace;font-size:12px;color:var(--pink);font-weight:700;}
+.vu{font-size:7px;color:var(--neon);}
+.it{text-align:center;font-family:'Orbitron',monospace;font-size:9px;padding:5px 8px;border-radius:7px;letter-spacing:1px;border:1px solid;margin-top:7px;}
+.it.real{background:rgba(0,255,100,.1);border-color:#00cc55;color:#00cc55;}
+.it.virt{background:rgba(100,100,255,.1);border-color:#5555ff;color:#8888ff;}
+.it.none{background:rgba(120,120,120,.1);border-color:#666;color:#999;}
+.ctrl-area{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px;}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:8px 22px;}
+.sr{margin-bottom:0;}
+.sl{font-size:11px;color:var(--text);display:flex;justify-content:space-between;margin-bottom:3px;}
+.sl b{color:var(--pink);font-weight:600;}
+input[type=range]{width:100%;accent-color:var(--neon);cursor:pointer;}
+.br{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px;}
+.btn{font-family:'Orbitron',monospace;font-size:8px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;letter-spacing:1px;transition:.2s;}
+.btn:hover{background:rgba(188,19,254,.2);border-color:var(--neon);color:#ffc2ff;}
+.btn.on{background:rgba(255,0,255,.18);border-color:var(--pink);color:var(--pink);}
+.note{font-size:10px;color:rgba(188,19,254,.7);margin-top:7px;text-align:center;}
+.prose{font-size:10px;color:var(--text);line-height:1.8;}
+.prose b{color:var(--pink);}
+.prose span{color:var(--neon);}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1 class="lab-title">ÓPTICA GEOMÉTRICA</h1>
+  <p class="lab-sub">Simulador Interativo — Reflexão · Refração · Formação de Imagens</p>
+  <div class="info" id="info">Prof. Jardel A. Leite</div>	
+  <nav class="tabs">
+    <button class="tab on"  id="t0" onclick="setMod('plane')">Espelho Plano</button>
+    <button class="tab"     id="t1" onclick="setMod('spher')">Espelhos Esféricos</button>
+    <button class="tab"     id="t2" onclick="setMod('refrac')">Refração</button>
+    <button class="tab"     id="t3" onclick="setMod('lens')">Lentes</button>
+    <button class="tab"     id="t4" onclick="setMod('instru')">Instrumentos</button>
+  </nav>
+  <div class="main-area">
+    <div class="cv-wrap"><canvas id="cv" width="640" height="420"></canvas></div>
+    <div class="info-col" id="infoPnl"></div>
+  </div>
+  <div class="ctrl-area" id="ctrlPnl"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  SETUP
+// ════════════════════════════════════════════════════════════════
+const CW=640, CH=420;
+const cv=document.getElementById('cv');
+const g=cv.getContext('2d');
+const D2R=Math.PI/180, R2D=180/Math.PI;
+
+/* Palette */
+const K={
+  neon:'#bc13fe', pink:'#ff00ff',
+  r1:'#ff5050', r2:'#44ee88', r3:'#4499ff',  // three notable rays
+  obj:'#ffcc00', img:'#ff8833', vrt:'#6688ff', // object / real-image / virtual-image
+  ax:'rgba(188,19,254,0.28)', bg:'#06000f'
+};
+
+// ════════════════════════════════════════════════════════════════
+//  LOW-LEVEL DRAWING HELPERS
+// ════════════════════════════════════════════════════════════════
+function clearBG(){
+  g.fillStyle=K.bg; g.fillRect(0,0,CW,CH);
+  g.strokeStyle='rgba(188,19,254,0.04)'; g.lineWidth=0.5;
+  for(let x=0;x<CW;x+=20){g.beginPath();g.moveTo(x,0);g.lineTo(x,CH);g.stroke();}
+  for(let y=0;y<CH;y+=20){g.beginPath();g.moveTo(0,y);g.lineTo(CW,y);g.stroke();}
+}
+
+/* Draw segment */
+function seg(x1,y1,x2,y2,col,w=1.5,dash=[]){
+  g.save(); g.strokeStyle=col; g.lineWidth=w; g.setLineDash(dash);
+  g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.stroke(); g.restore();
+}
+
+/* Arrowhead at (x,y) pointing in direction (dx,dy) */
+function arrowHead(x,y,dx,dy,col,sz=8){
+  const a=Math.atan2(dy,dx);
+  g.save(); g.fillStyle=col; g.beginPath();
+  g.moveTo(x,y);
+  g.lineTo(x-sz*Math.cos(a-0.42),y-sz*Math.sin(a-0.42));
+  g.lineTo(x-sz*Math.cos(a+0.42),y-sz*Math.sin(a+0.42));
+  g.closePath(); g.fill(); g.restore();
+}
+
+/* Extend ray from (x1,y1) in direction (dx,dy) to canvas edge */
+function rayExt(x1,y1,dx,dy,col,dashed=false){
+  const M=2; let t=6000;
+  if(dx>1e-4)  t=Math.min(t,(CW-M-x1)/dx);
+  else if(dx<-1e-4) t=Math.min(t,(M-x1)/dx);
+  if(dy>1e-4)  t=Math.min(t,(CH-M-y1)/dy);
+  else if(dy<-1e-4) t=Math.min(t,(M-y1)/dy);
+  t=Math.max(0,t);
+  seg(x1,y1,x1+t*dx,y1+t*dy,col,1.5,dashed?[7,5]:[]);
+  if(!dashed) arrowHead(x1+t*dx,y1+t*dy,dx,dy,col);
+}
+
+/* Draw optical axis */
+function drawAxis(ay){
+  seg(0,ay,CW,ay,K.ax,1,[9,6]);
+}
+
+/* Draw object arrow (upward from axis) */
+function drawObj(x,ay,h,col=K.obj){
+  seg(x,ay,x,ay-h,col,2.5);
+  arrowHead(x,ay-h,0,-1,col,9);
+  g.save(); g.fillStyle=col; g.beginPath(); g.arc(x,ay,3.5,0,Math.PI*2); g.fill(); g.restore();
+}
+
+/* Draw image arrow (hi positive = above axis, negative = below) */
+function drawImg(x,ay,hi,col,dashed=false){
+  seg(x,ay,x,ay-hi,col,dashed?1.5:2.5,dashed?[5,4]:[]);
+  arrowHead(x,ay-hi,0,hi>=0?-1:1,col,9);
+  g.save(); g.fillStyle=col; g.beginPath(); g.arc(x,ay,3,0,Math.PI*2); g.fill(); g.restore();
+}
+
+/* Small dot */
+function dot(x,y,col,r=4){
+  g.save(); g.fillStyle=col; g.beginPath(); g.arc(x,y,r,0,Math.PI*2); g.fill(); g.restore();
+}
+
+/* Text label */
+function lbl(x,y,txt,col='#d0c0d8',sz=10,align='center'){
+  g.save(); g.fillStyle=col; g.font=sz+'px Poppins,sans-serif';
+  g.textAlign=align; g.fillText(txt,x,y); g.restore();
+}
+function lblBold(x,y,txt,col,sz=10){
+  g.save(); g.fillStyle=col; g.font='bold '+sz+'px Orbitron,monospace';
+  g.textAlign='center'; g.fillText(txt,x,y); g.restore();
+}
+
+/* Named point marker */
+function marker(x,y,label,col=K.neon,above=true){
+  dot(x,y,col);
+  lbl(x,above?y-11:y+17,label,col,11);
+}
+
+/* Ray legend top-left */
+function drawLegend(rays){
+  rays.forEach((r,i)=>{
+    seg(10,13+i*17,28,13+i*17,r.c,1.8);
+    arrowHead(28,13+i*17,1,0,r.c,6);
+    lbl(32,16+i*17,r.t,r.c,9,'left');
+  });
+}
+
+/* Dimension line with label */
+function dimLine(x1,x2,ay,label,col,yOff=44){
+  const y=ay+yOff;
+  seg(x1,y-4,x1,y+4,col,1); seg(x2,y-4,x2,y+4,col,1);
+  seg(x1,y,x2,y,col,1,[3,3]);
+  lbl((x1+x2)/2,y+11,label,col,9);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  MODULE STATES
+// ════════════════════════════════════════════════════════════════
+const ST={
+  plane:{ d:160, h:85 },
+  spher:{ type:'concave', f:110, d:240, h:65 },
+  refrac:{ n1:1.0, n2:1.5, theta:40 },
+  lens:{ type:'conv', f:130, d:270, h:70 }
+};
+
+// ════════════════════════════════════════════════════════════════
+//  MODULE 1 — ESPELHO PLANO
+// ════════════════════════════════════════════════════════════════
+function drawPlane(){
+  clearBG();
+  const{d,h}=ST.plane;
+  const mx=CW/2, ay=CH/2;
+  const ox=mx-d, ix=mx+d;
+
+  /* Mirror */
+  g.save(); g.strokeStyle=K.neon; g.lineWidth=3;
+  g.beginPath(); g.moveTo(mx,ay-165); g.lineTo(mx,ay+165); g.stroke();
+  g.strokeStyle='rgba(188,19,254,0.28)'; g.lineWidth=1;
+  for(let y=ay-160;y<=ay+160;y+=13){g.beginPath();g.moveTo(mx,y);g.lineTo(mx+11,y+11);g.stroke();}
+  g.restore();
+  lblBold(mx+7,ay-172,'ESPELHO',K.neon,9);
+
+  drawAxis(ay);
+
+  /* Object */
+  drawObj(ox,ay,h);
+  lbl(ox,ay+16,'Objeto',K.obj,10);
+
+  /* Virtual image (dashed) */
+  drawImg(ix,ay,h,K.vrt,true);
+  lbl(ix,ay+16,'Imagem',K.vrt,10);
+
+  /* Reflected angle annotation */
+  const angDeg=Math.round(Math.atan2(h,d)*R2D);
+  lbl(mx-28,ay-16,'θ='+angDeg+'°',K.r1,9);
+  lbl(mx+28,ay-16,'θ='+angDeg+'°',K.r1,9);
+
+  /* Ray 1 — horizontal: obj tip → mirror → reflects back */
+  seg(ox,ay-h,mx,ay-h,K.r1,1.5);
+  arrowHead(mx-14,ay-h,-1,0,K.r1);
+  rayExt(mx,ay-h,-1,0,K.r1);           // reflected going left
+  seg(mx,ay-h,ix,ay-h,K.r1,1,[6,5]);  // virtual extension
+
+  /* Ray 2 — oblique: obj tip → foot of mirror (mx,ay) → reflects */
+  const dx2=mx-ox, dy2=ay-(ay-h);
+  seg(ox,ay-h,mx,ay,K.r2,1.5);
+  arrowHead(mx-14,ay-14,-1,-1/*(dy2/dx2 norms)*/,K.r2);
+  rayExt(mx,ay,-dx2,dy2,K.r2);         // reflected (flipped x)
+  seg(mx,ay,ix,ay-h,K.r2,1,[6,5]);    // virtual extension
+
+  /* Dimension lines */
+  dimLine(ox,mx,ay,'d₀ = '+d+' px',K.obj);
+  dimLine(mx,ix,ay,'d_i = '+d+' px  (virtual)',K.vrt,56);
+
+  drawLegend([{c:K.r1,t:'Raio horizontal'},{c:K.r2,t:'Raio oblíquo'}]);
+
+  /* Info panel */
+  setInfo(`
+  <div class="panel">
+    <div class="pt">Lei da Reflexão</div>
+    <div class="eq"><div class="eq-f">θᵢ = θᵣ</div><div class="eq-v">ângulo incidência = ângulo reflexão</div></div>
+    <div class="eq"><div class="eq-f">d_i = d₀</div><div class="eq-v">d_i = ${d} px  (imagem virtual)</div></div>
+    <div class="vg">
+      <div class="vb"><div class="vl">d₀</div><div class="vn">${d}</div><div class="vu">px</div></div>
+      <div class="vb"><div class="vl">d_i</div><div class="vn">${d}</div><div class="vu">px</div></div>
+      <div class="vb"><div class="vl">Ampliação</div><div class="vn">1.0×</div><div class="vu">M</div></div>
+      <div class="vb"><div class="vl">Tipo</div><div class="vn">Virtual</div><div class="vu">–</div></div>
+    </div>
+    <div class="it virt">IMAGEM VIRTUAL · DIREITA · IGUAL</div>
+  </div>
+  <div class="panel">
+    <div class="pt">Propriedades</div>
+    <div class="prose">• Imagem sempre <b>virtual</b><br>• Sempre <b>direita</b> (não invertida)<br>• Mesmo tamanho do objeto<br>• Simetricamente atrás do espelho<br>• θ incidência = θ reflexão</div>
+  </div>`);
+
+  setCtrl(`
+  <div class="cg">
+    <div class="sr"><div class="sl">Distância do objeto (d₀) <b id="lPd">${d} px</b></div>
+      <input type="range" id="sPd" min="60" max="270" value="${d}"
+        oninput="ST.plane.d=+this.value;document.getElementById('lPd').textContent=this.value+' px';render()"></div>
+    <div class="sr"><div class="sl">Altura do objeto (h) <b id="lPh">${h} px</b></div>
+      <input type="range" id="sPh" min="20" max="150" value="${h}"
+        oninput="ST.plane.h=+this.value;document.getElementById('lPh').textContent=this.value+' px';render()"></div>
+  </div>
+  <p class="note">🖱 Arraste o objeto no canvas para mover</p>`);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  MODULE 2 — ESPELHOS ESFÉRICOS
+// ════════════════════════════════════════════════════════════════
+function calcMirror(){
+  const{f,d,type}=ST.spher;
+  const fv=type==='concave'?f:-f;
+  if(Math.abs(d-fv)<2) return{di:Infinity,M:Infinity,fv};
+  const di=fv*d/(d-fv);
+  return{di,M:-di/d,fv};
+}
+
+function drawSpher(){
+  clearBG();
+  const{f,d,h,type}=ST.spher;
+  const{di,M,fv}=calcMirror();
+  const mx=CW-80, ay=CH/2;
+  const ox=mx-d;
+  const isConc=type==='concave';
+  const mcol=isConc?K.neon:'#44aaff';
+
+  drawAxis(ay);
+
+  /* Curved mirror arc (circular approximation) */
+  const R=2*Math.abs(fv);
+  const arcCX=isConc?mx-R:mx+R;
+  const a0=isConc?-0.24:Math.PI-0.24, a1=isConc?0.24:Math.PI+0.24;
+  g.save(); g.strokeStyle=mcol; g.lineWidth=3;
+  g.beginPath(); g.arc(arcCX,ay,R,a0,a1); g.stroke();
+  g.strokeStyle=mcol.replace('#','rgba(').replace(/^rgba\(([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i,
+    (_,r,g2,b)=>`rgba(${parseInt(r,16)},${parseInt(g2,16)},${parseInt(b,16)}`)+'0.28)';
+  // simple hatch
+  g.strokeStyle='rgba(100,100,220,0.25)'; g.lineWidth=1;
+  for(let a=a0;a<=a1;a+=0.065){
+    const bx=arcCX+R*Math.cos(a),by=ay+R*Math.sin(a);
+    const nx=(bx-arcCX)/R,ny=(by-ay)/R,dir=isConc?1:-1;
+    g.beginPath();g.moveTo(bx,by);g.lineTo(bx+dir*nx*10,by+dir*ny*10);g.stroke();
+  }
+  g.restore();
+  lblBold(mx+8,ay-20,isConc?'CÔNCAVO':'CONVEXO',mcol,9);
+
+  /* Key points */
+  const Fx=mx-fv, Cx=mx-2*fv;
+  marker(mx,ay,'V',K.neon,false);
+  if(Fx>8&&Fx<CW-8) marker(Fx,ay,'F',K.pink);
+  if(Cx>8&&Cx<CW-8) marker(Cx,ay,'C',K.r2);
+
+  /* Object */
+  if(ox>8){ drawObj(ox,ay,h); lbl(ox,ay+16,'Objeto',K.obj,10); }
+
+  /* Image */
+  const valid=isFinite(di)&&isFinite(M);
+  const ix=mx-di;
+  if(valid&&ix>5&&ix<CW-10){
+    const isReal=di>0;
+    drawImg(ix,ay,h*M,isReal?K.img:K.vrt,!isReal);
+    lbl(ix,ay+16,'Imagem',isReal?K.img:K.vrt,10);
+  }
+
+  /* ── THREE NOTABLE RAYS ── */
+  if(ox>8&&valid&&isFinite(Fx)){
+    const tx=ox, ty=ay-h;   // object tip
+
+    /* RAY 1 — parallel to axis → reflects through F (concave) or as if from F (convex) */
+    seg(tx,ty,mx,ty,K.r1,1.5);
+    arrowHead(mx-14,ty,-1,0,K.r1);
+    // reflected direction: from (mx,ty) toward F=(Fx,ay)
+    rayExt(mx,ty,Fx-mx,ay-ty,K.r1);
+    if(di<0) seg(mx,ty,mx+70,ty+(ay-ty)*70/(Fx-mx),K.r1,1,[6,5]); // virtual
+
+    /* RAY 2 — through C → reflects back on itself */
+    if(isFinite(Cx)&&Cx>4&&Cx<CW-4){
+      const s2=(ay-ty)/(Cx-tx);
+      const y2=ty+s2*(mx-tx);
+      seg(tx,ty,mx,y2,K.r2,1.5);
+      arrowHead(mx-12,y2-s2*12,-1,-s2,K.r2);
+      rayExt(mx,y2,tx-mx,ty-y2,K.r2);              // reflected = reverse
+      if(di<0) seg(mx,y2,mx+60,y2+(y2-ty)*60/(mx-tx),K.r2,1,[6,5]);
+    }
+
+    /* RAY 3 — through F → reflects parallel to axis */
+    if(Fx>tx&&Fx<mx){
+      const s3=(ay-ty)/(Fx-tx);
+      const y3=ty+s3*(mx-tx);
+      seg(tx,ty,mx,y3,K.r3,1.5);
+      arrowHead(mx-12,y3-s3*12,-1,-s3,K.r3);
+      rayExt(mx,y3,-1,0,K.r3);                     // reflected parallel going left
+      if(di<0) seg(mx,y3,mx+80,y3,K.r3,1,[6,5]);
+    }
+  }
+
+  /* Dimension annotations */
+  if(ox>8) dimLine(ox,mx,ay,'d₀ = '+d+' px',K.obj);
+  if(valid&&isFinite(ix)&&ix>5&&ix<CW-5)
+    dimLine(mx,ix,ay,'d_i = '+Math.abs(di).toFixed(0)+'px'+(di<0?' (V)':''),di>0?K.img:K.vrt,56);
+
+  drawLegend([
+    {c:K.r1,t:'Raio ∥ eixo → pelo F'},
+    {c:K.r2,t:'Raio pelo C'},
+    {c:K.r3,t:'Raio pelo F → ∥ eixo'}
+  ]);
+
+  /* Info & controls */
+  const vl=valid, isR=vl&&di>0;
+  const iTag=!vl?'OBJETO NO FOCO':isR?'IMAGEM REAL · INVERTIDA':'IMAGEM VIRTUAL · DIREITA';
+  const iCls=!vl?'none':isR?'real':'virt';
+  setInfo(`
+  <div class="panel">
+    <div class="pt">Equação de Gauss</div>
+    <div class="eq"><div class="eq-f">1/f = 1/d₀ + 1/d_i</div>
+      <div class="eq-v">1/${Math.abs(fv)} = 1/${d} + 1/${vl?Math.abs(di).toFixed(0):'∞'}</div></div>
+    <div class="eq"><div class="eq-f">M = −d_i / d₀</div>
+      <div class="eq-v">M = ${vl?M.toFixed(2):'∞'}</div></div>
+  </div>
+  <div class="panel">
+    <div class="pt">Valores</div>
+    <div class="vg">
+      <div class="vb"><div class="vl">f</div><div class="vn">${Math.abs(fv)}</div><div class="vu">px</div></div>
+      <div class="vb"><div class="vl">d₀</div><div class="vn">${d}</div><div class="vu">px</div></div>
+      <div class="vb"><div class="vl">d_i</div><div class="vn">${vl?Math.abs(di).toFixed(0):'∞'}</div><div class="vu">px${di<0?' (V)':''}</div></div>
+      <div class="vb"><div class="vl">|M|</div><div class="vn">${vl?Math.abs(M).toFixed(2):'∞'}</div><div class="vu">×</div></div>
+    </div>
+    <div class="it ${iCls}">${iTag}</div>
+  </div>`);
+
+  setCtrl(`
+  <div class="br">
+    <button class="btn ${type==='concave'?'on':''}" onclick="ST.spher.type='concave';render()">Côncavo</button>
+    <button class="btn ${type==='convex'?'on':''}" onclick="ST.spher.type='convex';render()">Convexo</button>
+  </div>
+  <div class="cg">
+    <div class="sr"><div class="sl">Distância focal (f) <b id="lSf">${f} px</b></div>
+      <input type="range" id="sSf" min="40" max="200" value="${f}"
+        oninput="ST.spher.f=+this.value;document.getElementById('lSf').textContent=this.value+' px';render()"></div>
+    <div class="sr"><div class="sl">Distância do objeto (d₀) <b id="lSd">${d} px</b></div>
+      <input type="range" id="sSd" min="20" max="500" value="${d}"
+        oninput="ST.spher.d=+this.value;document.getElementById('lSd').textContent=this.value+' px';render()"></div>
+    <div class="sr"><div class="sl">Altura (h) <b id="lSh">${h} px</b></div>
+      <input type="range" id="sSh" min="20" max="130" value="${h}"
+        oninput="ST.spher.h=+this.value;document.getElementById('lSh').textContent=this.value+' px';render()"></div>
+  </div>
+  <p class="note">🖱 Arraste o objeto · Experimente d₀ = f, 2f, 3f para cada caso clássico</p>`);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  MODULE 3 — REFRAÇÃO
+// ════════════════════════════════════════════════════════════════
+function drawRefrac(){
+  clearBG();
+  const{n1,n2,theta}=ST.refrac;
+  const bY=CH/2, bX=CW/2;
+  const t1=theta*D2R;
+
+  /* Media backgrounds */
+  g.fillStyle='rgba(0,100,255,0.06)'; g.fillRect(0,0,CW,bY);
+  g.fillStyle='rgba(0,210,130,0.06)'; g.fillRect(0,bY,CW,bY);
+  lblBold(22,24,'Meio 1    n₁ = '+n1.toFixed(2),'rgba(110,160,255,0.9)',12);
+  lblBold(22,bY+24,'Meio 2    n₂ = '+n2.toFixed(2),'rgba(80,220,150,0.9)',12);
+
+  /* Boundary */
+  seg(0,bY,CW,bY,'rgba(188,19,254,0.65)',2.5);
+
+  /* Normal (dashed vertical) */
+  seg(bX,bY-165,bX,bY+165,'rgba(255,255,255,0.18)',1,[5,4]);
+  lbl(bX+8,bY-152,'Normal','rgba(255,255,255,0.32)',9,'left');
+
+  /* Incident ray */
+  const iLen=190;
+  seg(bX-iLen*Math.sin(t1),bY-iLen*Math.cos(t1),bX,bY,K.r1,2);
+  arrowHead(bX-8,bY-8*Math.cos(t1)/Math.sin(t1+0.001),-Math.sin(t1),-Math.cos(t1),K.r1);
+
+  /* Snell */
+  const sinT2=n1*Math.sin(t1)/n2;
+  const TIR=sinT2>1;
+
+  if(TIR){
+    /* Total Internal Reflection */
+    const rx=bX+iLen*Math.sin(t1), ry=bY-iLen*Math.cos(t1);
+    seg(bX,bY,rx,ry,'#ff8800',2.5);
+    arrowHead(rx,ry,Math.sin(t1),-Math.cos(t1),'#ff8800');
+
+    g.save(); g.fillStyle='#ff8800';
+    g.font='bold 14px Orbitron,monospace'; g.textAlign='center';
+    g.fillText('⚡  REFLEXÃO TOTAL INTERNA',CW/2,bY+58); g.restore();
+    if(n1>n2){
+      const tc=Math.asin(n2/n1)*R2D;
+      lbl(CW/2,bY+78,'Ângulo crítico θ_c = '+tc.toFixed(1)+'°','#ff8800',11);
+    }
+  } else {
+    const t2=Math.asin(sinT2);
+    /* Refracted ray */
+    const rfLen=200;
+    seg(bX,bY,bX+rfLen*Math.sin(t2),bY+rfLen*Math.cos(t2),K.r3,2);
+    arrowHead(bX+rfLen*0.7*Math.sin(t2),bY+rfLen*0.7*Math.cos(t2),Math.sin(t2),Math.cos(t2),K.r3);
+    /* Partial reflection (dashed) */
+    seg(bX,bY,bX+90*Math.sin(t1),bY-90*Math.cos(t1),K.r1,1,[5,4]);
+
+    /* Angle arcs */
+    g.save(); g.lineWidth=1.2;
+    g.strokeStyle=K.r1; g.setLineDash([4,3]);
+    g.beginPath(); g.arc(bX,bY,60,-Math.PI/2,-Math.PI/2+t1); g.stroke();
+    g.strokeStyle=K.r3;
+    g.beginPath(); g.arc(bX,bY,60,Math.PI/2-t2,Math.PI/2); g.stroke();
+    g.restore();
+
+    lbl(bX-42,bY-46,'θ₁ = '+theta+'°',K.r1);
+    lbl(bX+44,bY+46,'θ₂ = '+(t2*R2D).toFixed(1)+'°',K.r3);
+  }
+
+  /* Critical angle guide line */
+  if(n1>n2){
+    const tc=Math.asin(n2/n1)*R2D;
+    const tcRad=tc*D2R;
+    seg(bX-130*Math.sin(tcRad),bY-50,bX,bY,'rgba(255,200,0,0.4)',1,[4,3]);
+    lbl(bX-130*Math.sin(tcRad)-4,bY-54,'θ_c = '+tc.toFixed(1)+'°','#ffcc00',9);
+  }
+
+  /* Legend */
+  drawLegend([{c:K.r1,t:'Raio incidente / refletido'},{c:K.r3,t:'Raio refratado'}]);
+
+  /* Info */
+  const t2d=TIR?null:(Math.asin(sinT2)*R2D);
+  const tc2=n1>n2?Math.asin(n2/n1)*R2D:null;
+  const presets=[['Ar → Vidro',[1,1.5]],['Ar → Água',[1,1.33]],['Vidro → Ar',[1.5,1]],['Ar → Diamante',[1,2.42]]];
+  const pBtns=presets.map(([l,[a,b]])=>
+    `<button class="btn ${n1===a&&n2===b?'on':''}" onclick="ST.refrac.n1=${a};ST.refrac.n2=${b};syncRsliders();render()">${l}</button>`
+  ).join('');
+
+  setInfo(`
+  <div class="panel">
+    <div class="pt">Lei de Snell-Descartes</div>
+    <div class="eq"><div class="eq-f">n₁ · sin θ₁ = n₂ · sin θ₂</div>
+      <div class="eq-v">${n1.toFixed(2)}·sin(${theta}°) = ${n2.toFixed(2)}·sin(θ₂)</div></div>
+  </div>
+  <div class="panel">
+    <div class="pt">Valores</div>
+    <div class="vg">
+      <div class="vb"><div class="vl">n₁</div><div class="vn">${n1.toFixed(2)}</div><div class="vu">—</div></div>
+      <div class="vb"><div class="vl">n₂</div><div class="vn">${n2.toFixed(2)}</div><div class="vu">—</div></div>
+      <div class="vb"><div class="vl">θ₁</div><div class="vn">${theta}</div><div class="vu">graus</div></div>
+      <div class="vb"><div class="vl">θ₂</div><div class="vn">${TIR?'RIT':t2d.toFixed(1)}</div><div class="vu">${TIR?'':'°'}</div></div>
+    </div>
+    ${tc2?`<div class="it none" style="border-color:#ffcc00;color:#ffcc00;margin-top:7px">θ crítico = ${tc2.toFixed(1)}°</div>`:''}
+    ${TIR?`<div class="it none" style="border-color:#ff8800;color:#ff8800;margin-top:7px">REFLEXÃO TOTAL INTERNA</div>`:''}
+  </div>`);
+
+  setCtrl(`
+  <div class="br">${pBtns}</div>
+  <div class="cg">
+    <div class="sr"><div class="sl">Índice n₁ <b id="lRn1">${n1.toFixed(2)}</b></div>
+      <input type="range" id="sRn1" min="1.0" max="3.0" step="0.01" value="${n1}"
+        oninput="ST.refrac.n1=+this.value;document.getElementById('lRn1').textContent=(+this.value).toFixed(2);render()"></div>
+    <div class="sr"><div class="sl">Índice n₂ <b id="lRn2">${n2.toFixed(2)}</b></div>
+      <input type="range" id="sRn2" min="1.0" max="3.0" step="0.01" value="${n2}"
+        oninput="ST.refrac.n2=+this.value;document.getElementById('lRn2').textContent=(+this.value).toFixed(2);render()"></div>
+    <div class="sr"><div class="sl">Ângulo de incidência θ₁ <b id="lRt">${theta}°</b></div>
+      <input type="range" id="sRt" min="1" max="89" value="${theta}"
+        oninput="ST.refrac.theta=+this.value;document.getElementById('lRt').textContent=this.value+'°';render()"></div>
+  </div>
+  <p class="note">🖱 Arraste o raio incidente · Aumente θ₁ até a Reflexão Total Interna (quando n₁ &gt; n₂)</p>`);
+}
+
+function syncRsliders(){
+  const{n1,n2}=ST.refrac;
+  const e1=document.getElementById('sRn1'),e2=document.getElementById('sRn2');
+  const l1=document.getElementById('lRn1'),l2=document.getElementById('lRn2');
+  if(e1){e1.value=n1;} if(l1){l1.textContent=n1.toFixed(2);}
+  if(e2){e2.value=n2;} if(l2){l2.textContent=n2.toFixed(2);}
+}
+
+// ════════════════════════════════════════════════════════════════
+//  MODULE 4 — LENTES
+// ════════════════════════════════════════════════════════════════
+function calcLens(){
+  const{f:fv,d,type}=ST.lens;
+  const f=type==='conv'?fv:-fv;
+  if(Math.abs(d-f)<2) return{di:Infinity,M:Infinity,f};
+  const di=f*d/(d-f);
+  return{di,M:-di/d,f};
+}
+
+function drawLensShape(lx,ay,H,col,conv){
+  g.save(); g.strokeStyle=col; g.lineWidth=2.5;
+  if(conv){
+    g.beginPath(); g.arc(lx-15,ay,21,-0.9,0.9); g.stroke();
+    g.beginPath(); g.arc(lx+15,ay,21,Math.PI-0.9,Math.PI+0.9); g.stroke();
+    g.fillStyle=col.replace('0.85','0.06');
+    g.beginPath(); g.arc(lx-15,ay,21,-0.9,0.9); g.arc(lx+15,ay,21,Math.PI-0.9,Math.PI+0.9);
+    g.closePath(); g.fill();
+  } else {
+    g.beginPath(); g.arc(lx+15,ay,21,Math.PI-0.9,Math.PI+0.9); g.stroke();
+    g.beginPath(); g.arc(lx-15,ay,21,-0.9,0.9); g.stroke();
+  }
+  seg(lx,ay-H/2,lx,ay+H/2,col,2);
+  /* Arrowheads on lens bar */
+  arrowHead(lx,ay-H/2,0,conv?-1:1,col,8);
+  arrowHead(lx,ay+H/2,0,conv?1:-1,col,8);
+  g.restore();
+}
+
+function drawLens(){
+  clearBG();
+  const{f:fv,d,h,type}=ST.lens;
+  const{di,M,f}=calcLens();
+  const lx=CW/2, ay=CH/2;
+  const ox=lx-d;
+  const isConv=type==='conv';
+  const lcol=isConv?'rgba(100,210,255,0.85)':'rgba(255,160,90,0.85)';
+  const lH=160;
+
+  drawAxis(ay);
+  drawLensShape(lx,ay,lH,lcol,isConv);
+  lblBold(lx,ay-lH/2-17,isConv?'CONVERGENTE':'DIVERGENTE',lcol,9);
+
+  /* Foci */
+  const F1x=isConv?lx-Math.abs(f):lx+Math.abs(f);
+  const F2x=isConv?lx+Math.abs(f):lx-Math.abs(f);
+  if(F1x>8&&F1x<CW-8) marker(F1x,ay,'F₁',K.pink);
+  if(F2x>8&&F2x<CW-8) marker(F2x,ay,'F₂',K.pink,false);
+  marker(lx,ay,'O',K.neon,false);
+
+  /* Object */
+  if(ox>8){ drawObj(ox,ay,h); lbl(ox,ay+16,'Objeto',K.obj,10); }
+
+  /* Image */
+  const valid=isFinite(di)&&isFinite(M);
+  const ix=lx+di;
+  if(valid&&ix>5&&ix<CW-10){
+    const isReal=di>0;
+    drawImg(ix,ay,h*M,isReal?K.img:K.vrt,!isReal);
+    lbl(ix,ay+16,'Imagem',isReal?K.img:K.vrt,10);
+  }
+
+  /* ── THREE NOTABLE RAYS ── */
+  if(ox>8&&valid){
+    const tx=ox, ty=ay-h;    // object tip (above axis)
+
+    /* RAY 1 — parallel to axis */
+    seg(tx,ty,lx,ty,K.r1,1.5);
+    arrowHead(lx-14,ty,-1,0,K.r1);
+    if(isConv){
+      // Exits toward F2 (right)
+      rayExt(lx,ty,F2x-lx,ay-ty,K.r1);
+      if(di<0) rayExt(lx,ty,lx-F2x,ty-ay,K.r1,true);  // virtual backward
+    } else {
+      // Diverges as if from F2 (left): direction away from F2
+      rayExt(lx,ty,lx-F2x,ty-ay,K.r1);           // = (|f|, -h) going right
+      seg(lx,ty,F2x,ay,K.r1,1,[6,5]);             // virtual toward F2
+    }
+
+    /* RAY 2 — through optical centre O (straight through) */
+    const dx2=lx-tx, dy2=ay-ty;
+    seg(tx,ty,lx,ay,K.r2,1.5);
+    arrowHead(lx-12,ay-dy2*12/dx2,-1,-dy2/dx2,K.r2);
+    rayExt(lx,ay,dx2,dy2,K.r2);
+
+    /* RAY 3 — through F1 → exits parallel to axis */
+    const sl3=(ay-ty)/(F1x-tx);
+    const y3=ty+sl3*(lx-tx);
+    seg(tx,ty,lx,y3,K.r3,1.5);
+    arrowHead(lx-12,y3-sl3*12,-1,-sl3,K.r3);
+    rayExt(lx,y3,1,0,K.r3);                         // exits parallel right
+    if(!isConv||di<0) rayExt(lx,y3,-1,0,K.r3,true); // virtual dashed left
+  }
+
+  /* Dimension lines */
+  if(ox>8) dimLine(ox,lx,ay,'d₀ = '+d+' px',K.obj);
+  if(valid&&isFinite(ix)&&ix>5&&ix<CW-5)
+    dimLine(lx,ix,ay,'d_i = '+Math.abs(di).toFixed(0)+'px'+(di<0?' (V)':''),di>0?K.img:K.vrt,56);
+
+  drawLegend([
+    {c:K.r1,t:'Raio ∥ eixo → F₂'},
+    {c:K.r2,t:'Raio pelo centro O'},
+    {c:K.r3,t:'Raio pelo F₁ → ∥ eixo'}
+  ]);
+
+  const vl=valid, isR=vl&&di>0;
+  const iTag=!vl?'OBJETO NO FOCO — RAIOS PARALELOS':isR?'IMAGEM REAL · INVERTIDA':'IMAGEM VIRTUAL · DIREITA';
+  const iCls=!vl?'none':isR?'real':'virt';
+  setInfo(`
+  <div class="panel">
+    <div class="pt">Equação de Gauss</div>
+    <div class="eq"><div class="eq-f">1/f = 1/d₀ + 1/d_i</div>
+      <div class="eq-v">1/${Math.abs(f)} = 1/${d} + 1/${vl?Math.abs(di).toFixed(0):'∞'}</div></div>
+    <div class="eq"><div class="eq-f">M = −d_i / d₀</div>
+      <div class="eq-v">M = ${vl?M.toFixed(2):'∞'}  ${vl&&M<0?'(invertida)':'(direita)'}</div></div>
+  </div>
+  <div class="panel">
+    <div class="pt">Valores</div>
+    <div class="vg">
+      <div class="vb"><div class="vl">f</div><div class="vn">${Math.abs(f)}</div><div class="vu">px</div></div>
+      <div class="vb"><div class="vl">d₀</div><div class="vn">${d}</div><div class="vu">px</div></div>
+      <div class="vb"><div class="vl">d_i</div><div class="vn">${vl?Math.abs(di).toFixed(0):'∞'}</div><div class="vu">px${di<0?' (V)':''}</div></div>
+      <div class="vb"><div class="vl">|M|</div><div class="vn">${vl?Math.abs(M).toFixed(2):'∞'}</div><div class="vu">×</div></div>
+    </div>
+    <div class="it ${iCls}">${iTag}</div>
+  </div>`);
+
+  setCtrl(`
+  <div class="br">
+    <button class="btn ${type==='conv'?'on':''}" onclick="ST.lens.type='conv';render()">Convergente  (f &gt; 0)</button>
+    <button class="btn ${type==='div'?'on':''}" onclick="ST.lens.type='div';render()">Divergente  (f &lt; 0)</button>
+  </div>
+  <div class="cg">
+    <div class="sr"><div class="sl">Distância focal |f| <b id="lLf">${fv} px</b></div>
+      <input type="range" id="sLf" min="40" max="220" value="${fv}"
+        oninput="ST.lens.f=+this.value;document.getElementById('lLf').textContent=this.value+' px';render()"></div>
+    <div class="sr"><div class="sl">Distância do objeto (d₀) <b id="lLd">${d} px</b></div>
+      <input type="range" id="sLd" min="20" max="560" value="${d}"
+        oninput="ST.lens.d=+this.value;document.getElementById('lLd').textContent=this.value+' px';render()"></div>
+    <div class="sr"><div class="sl">Altura (h) <b id="lLh">${h} px</b></div>
+      <input type="range" id="sLh" min="20" max="130" value="${h}"
+        oninput="ST.lens.h=+this.value;document.getElementById('lLh').textContent=this.value+' px';render()"></div>
+  </div>
+  <p class="note">🖱 Arraste o objeto · Experimente d₀ = f, 2f, 3f · Observe o caso virtual (d₀ &lt; f)</p>`);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  MODULE 5 — INSTRUMENTOS ÓPTICOS
+// ════════════════════════════════════════════════════════════════
+function lensIcon(x,ay,H,col,labelLines){
+  g.save(); g.strokeStyle=col; g.lineWidth=2;
+  seg(x,ay-H/2,x,ay+H/2,col,2);
+  arrowHead(x,ay-H/2,0,-1,col,7);
+  arrowHead(x,ay+H/2,0,1,col,7);
+  labelLines.forEach((line,i)=>lbl(x,ay-H/2-18+i*13,line,col,9));
+  g.restore();
+}
+
+function drawInstru(){
+  clearBG();
+  const ay1=CH*0.27, ay2=CH*0.77;
+
+  // ── MICROSCÓPIO ──────────────────────────────────────────────
+  lblBold(CW/2,13,'MICROSCÓPIO',K.neon,11);
+  drawAxis(ay1);
+
+  const oX=82,oF=33, eX=450,eF=52;
+  lensIcon(oX,ay1,75,K.r2,['Objetiva','f='+oF+'px']);
+  lensIcon(eX,ay1,75,'#ff88cc',['Ocular','f='+eF+'px']);
+  marker(oX-oF,ay1,'F₀',K.r2); marker(oX+oF,ay1,"F₀'",K.r2,false);
+  marker(eX-eF,ay1,'Fₑ','#ff88cc'); marker(eX+eF,ay1,"Fₑ'",'#ff88cc',false);
+
+  // Object near objective focus
+  const mOx=oX-oF-10, mOh=14;
+  drawObj(mOx,ay1,mOh,K.obj);
+  lbl(mOx,ay1+13,'obj.',K.obj,8);
+
+  // Intermediate real image
+  const mDo=oX-mOx;
+  const mDi=oF*mDo/(mDo-oF);
+  const mM=-mDi/mDo;
+  const mIx=oX+mDi, mIh=mOh*mM;
+  if(mIx<eX-6){ drawImg(mIx,ay1,mIh,'#ff8833',false); lbl(mIx,ay1+13,'img. intermed.',K.img,8); }
+
+  // Schematic rays through objective
+  seg(mOx,ay1-mOh,oX,ay1-mOh,K.r1,1);
+  if(mIx<eX){ seg(oX,ay1-mOh,mIx,ay1-mIh,K.r1,1); }
+  seg(mOx,ay1-mOh,oX,ay1,K.r3,1);
+  if(mIx<eX){ seg(oX,ay1,mIx,ay1-mIh,K.r3,1); }
+
+  // Through eyepiece → diverges toward eye
+  if(mIx<eX){
+    seg(mIx,ay1-mIh,eX,ay1-mIh*0.4,K.r2,1);
+    seg(eX,ay1-mIh*0.4,CW-20,ay1-32,K.r2,1);
+    arrowHead(CW-20,ay1-32,CW-25-eX,-32-(ay1-mIh*0.4-ay1),K.r2,6);
+    seg(mIx,ay1-mIh,eX,ay1+mIh*0.4,K.r3,1);
+    seg(eX,ay1+mIh*0.4,CW-20,ay1+18,K.r3,1);
+    arrowHead(CW-20,ay1+18,1,0.3,K.r3,6);
+  }
+  lbl(CW-14,ay1+6,'👁','white',18);
+
+  // ── LUNETA / TELESCÓPIO ──────────────────────────────────────
+  lblBold(CW/2,ay2-30,'LUNETA / TELESCÓPIO',K.pink,11);
+  drawAxis(ay2);
+
+  const tOx=65,tOf=175, tEf=48, tEx=tOx+tOf+tOf/4|0;
+  lensIcon(tOx,ay2,75,K.r2,['Objetiva','f='+tOf+'px']);
+  lensIcon(tEx,ay2,65,'#ff88cc',['Ocular','f='+tEf+'px']);
+  marker(tOx+tOf,ay2,'F₀=Fₑ','#aaffcc',false);
+
+  // Parallel incoming rays (from distant star)
+  const tOffsets=[-22,-11,0,11,22];
+  tOffsets.forEach(yo=>{
+    seg(0,ay2+yo,tOx,ay2+yo,K.r1,1);
+    seg(tOx,ay2+yo,tOx+tOf,ay2,K.r1,1); // converge to focus
+  });
+
+  // Diverge from focus, pass through eyepiece, exit parallel
+  tOffsets.forEach((yo,i)=>{
+    const mag=yo*tEf/tOf;
+    seg(tOx+tOf,ay2,tEx,ay2+mag,K.r3,1);
+    seg(tEx,ay2+mag,CW-20,ay2+mag,K.r3,1);
+    arrowHead(CW-20,ay2+mag,1,0,K.r3,6);
+  });
+  lbl(CW-14,ay2+6,'👁','white',18);
+
+  // ── Info ─────────────────────────────────────────────────────
+  setInfo(`
+  <div class="panel">
+    <div class="pt">Microscópio</div>
+    <div class="prose">Duas lentes <b>convergentes</b>:<br>
+      <span>Objetiva</span> (f curto): forma imagem real ampliada próxima do objeto.<br>
+      <span>Ocular</span>: atua como lupa dessa imagem.<br><br>
+      <b>M = M_obj × M_oc</b></div>
+  </div>
+  <div class="panel">
+    <div class="pt">Luneta / Telescópio</div>
+    <div class="prose">Também duas lentes <b>convergentes</b>:<br>
+      <span>Objetiva</span> (f longo): coleta luz do objeto distante.<br>
+      <span>Ocular</span> (f curto): amplia a imagem formada.<br><br>
+      <b>M = f_obj / f_oc</b><br><br>
+      F₀ e Fₑ coincidem (luneta afocal): raios entram e saem paralelos.</div>
+  </div>`);
+
+  setCtrl(`
+  <p style="font-size:11px;color:#d0c0d8;text-align:center;padding:4px 0;">
+    <span style="color:${K.r2}">■</span> Objetiva &nbsp;·&nbsp;
+    <span style="color:#ff88cc">■</span> Ocular &nbsp;·&nbsp;
+    <span style="color:${K.r1}">■</span> Raio incidente/paralelo &nbsp;·&nbsp;
+    <span style="color:${K.r3}">■</span> Raio saída
+  </p>`);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  DRAG INTERACTION
+// ════════════════════════════════════════════════════════════════
+let dragging=false;
+
+function cvCoords(e){
+  const r=cv.getBoundingClientRect();
+  return{mx:(e.clientX-r.left)*(CW/r.width), my:(e.clientY-r.top)*(CH/r.height)};
+}
+
+cv.addEventListener('mousedown',e=>{
+  const{mx,my}=cvCoords(e); const ay=CH/2;
+  if(active==='plane'){
+    const ox=CW/2-ST.plane.d;
+    if(Math.abs(mx-ox)<22&&my<ay+12) dragging=true;
+  }
+  if(active==='spher'){
+    const ox=(CW-80)-ST.spher.d;
+    if(Math.abs(mx-ox)<22&&my<ay+12) dragging=true;
+  }
+  if(active==='lens'){
+    const ox=CW/2-ST.lens.d;
+    if(Math.abs(mx-ox)<22&&my<ay+12) dragging=true;
+  }
+  if(active==='refrac'&&my<ay-10) dragging=true;
+  if(dragging) cv.style.cursor='grabbing';
+});
+
+cv.addEventListener('mousemove',e=>{
+  if(!dragging) return;
+  const{mx,my}=cvCoords(e); const ay=CH/2;
+
+  if(active==='plane'){
+    ST.plane.d=Math.max(50,Math.min(270,Math.round(CW/2-mx)));
+    const el=document.getElementById('sPd');
+    if(el){el.value=ST.plane.d; document.getElementById('lPd').textContent=ST.plane.d+' px';}
+  }
+  if(active==='spher'){
+    ST.spher.d=Math.max(20,Math.min(500,Math.round((CW-80)-mx)));
+    const el=document.getElementById('sSd');
+    if(el){el.value=ST.spher.d; document.getElementById('lSd').textContent=ST.spher.d+' px';}
+  }
+  if(active==='lens'){
+    ST.lens.d=Math.max(20,Math.min(560,Math.round(CW/2-mx)));
+    const el=document.getElementById('sLd');
+    if(el){el.value=ST.lens.d; document.getElementById('lLd').textContent=ST.lens.d+' px';}
+  }
+  if(active==='refrac'){
+    const dx=mx-CW/2, dy=ay-my;
+    ST.refrac.theta=Math.max(1,Math.min(89,Math.round(Math.atan2(Math.abs(dx),Math.max(dy,1))*R2D)));
+    const el=document.getElementById('sRt');
+    if(el){el.value=ST.refrac.theta; document.getElementById('lRt').textContent=ST.refrac.theta+'°';}
+  }
+  render();
+});
+
+cv.addEventListener('mouseup',()=>{ dragging=false; cv.style.cursor='default'; });
+cv.addEventListener('mouseleave',()=>{ dragging=false; cv.style.cursor='default'; });
+
+/* Hover cursor hint */
+cv.addEventListener('mousemove',e=>{
+  if(dragging) return;
+  const{mx,my}=cvCoords(e); const ay=CH/2; let near=false;
+  if(active==='plane'){const ox=CW/2-ST.plane.d; if(Math.abs(mx-ox)<22&&my<ay+12) near=true;}
+  if(active==='spher'){const ox=(CW-80)-ST.spher.d; if(Math.abs(mx-ox)<22&&my<ay+12) near=true;}
+  if(active==='lens'){const ox=CW/2-ST.lens.d; if(Math.abs(mx-ox)<22&&my<ay+12) near=true;}
+  if(active==='refrac'&&my<ay-10) near=true;
+  cv.style.cursor=near?'grab':'default';
+});
+
+// ════════════════════════════════════════════════════════════════
+//  MODULE SYSTEM
+// ════════════════════════════════════════════════════════════════
+const MODS=['plane','spher','refrac','lens','instru'];
+let active='plane';
+
+function setMod(id){
+  active=id;
+  MODS.forEach((m,i)=>document.getElementById('t'+i).classList.toggle('on',m===id));
+  render();
+}
+
+function setInfo(html){ document.getElementById('infoPnl').innerHTML=html; }
+function setCtrl(html){ document.getElementById('ctrlPnl').innerHTML=html; }
+
+function render(){
+  if(active==='plane')  drawPlane();
+  else if(active==='spher')  drawSpher();
+  else if(active==='refrac') drawRefrac();
+  else if(active==='lens')   drawLens();
+  else                       drawInstru();
+}
+
+// ════════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════════
+render();
+</script>
+</body>
+</html>

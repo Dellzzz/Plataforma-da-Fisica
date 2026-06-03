@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eletrostática | Aula Interativa</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --eb:#00ccff;--ey:#ffee00;--ep:#aa00ff;
+  --er:#ff3300;--eg:#00ff88;--ew:#e8f4ff;
+  --bg:#02040c;--pan:#04080f;--card:#060e1a;
+  --bb:rgba(0,204,255,.24);--by:rgba(255,238,0,.2);--bp:rgba(170,0,255,.2);
+  --dim:#2a7a9a;--txt:#b8dce8;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:'Rajdhani',sans-serif;font-size:17px;line-height:1.7;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,204,255,.011) 2px,rgba(0,204,255,.011) 4px);pointer-events:none;z-index:9998}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(0,204,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,204,255,.03) 1px,transparent 1px);background-size:56px 56px;animation:gm 22s linear infinite;z-index:0}
+@keyframes gm{0%{background-position:0 0}100%{background-position:56px 56px}}
+#bgL{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.4}
+header{position:relative;z-index:10;text-align:center;padding:78px 20px 54px;border-bottom:1px solid var(--bb)}
+.htag{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--eb);letter-spacing:4px;border:1px solid var(--eb);padding:4px 18px;margin-bottom:22px;animation:tp 2.2s ease-in-out infinite}
+@keyframes tp{0%,100%{box-shadow:0 0 4px var(--eb),inset 0 0 4px rgba(0,204,255,.1)}50%{box-shadow:0 0 22px var(--eb),0 0 60px rgba(0,204,255,.22),inset 0 0 14px rgba(0,204,255,.2)}}
+h1.title{font-family:'Orbitron',monospace;font-size:clamp(2rem,7vw,5rem);font-weight:900;letter-spacing:.07em;line-height:1;color:#fff;text-shadow:0 0 10px var(--eb),0 0 40px var(--eb),0 0 100px rgba(0,204,255,.35);animation:flk 9s linear infinite}
+@keyframes flk{0%,92%,100%{opacity:1}93%{opacity:.78}94.5%{opacity:1}96%{opacity:.6}97%{opacity:1}}
+.tsub{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:.95rem;color:var(--dim);letter-spacing:7px;text-transform:uppercase;margin-top:10px}
+.spark-row{display:flex;justify-content:center;gap:22px;margin-top:20px}
+.spark{width:6px;height:6px;border-radius:50%;animation:sparkle 1.4s ease-in-out infinite}
+.spark:nth-child(1){background:var(--er);box-shadow:0 0 10px var(--er);animation-delay:0s}
+.spark:nth-child(2){background:var(--eb);box-shadow:0 0 10px var(--eb);animation-delay:.28s}
+.spark:nth-child(3){background:var(--ey);box-shadow:0 0 10px var(--ey);animation-delay:.56s}
+.spark:nth-child(4){background:var(--ep);box-shadow:0 0 10px var(--ep);animation-delay:.84s}
+.spark:nth-child(5){background:var(--eg);box-shadow:0 0 10px var(--eg);animation-delay:1.12s}
+@keyframes sparkle{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(2);opacity:.4}}
+nav{position:sticky;top:0;z-index:100;background:rgba(2,4,12,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,204,255,.16);display:flex;justify-content:center;gap:6px;padding:10px 18px;flex-wrap:wrap}
+nav a{font-family:'Orbitron',monospace;font-size:.57rem;letter-spacing:2px;color:var(--dim);text-decoration:none;padding:6px 13px;border:1px solid rgba(0,204,255,.17);transition:all .28s}
+nav a:hover{color:var(--eb);border-color:var(--eb);box-shadow:0 0 12px var(--eb),inset 0 0 8px rgba(0,204,255,.1);text-shadow:0 0 8px var(--eb)}
+main{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:0 22px 80px}
+section{margin-top:78px}
+.sh{display:flex;align-items:center;gap:14px;margin-bottom:34px}
+.sn{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--eb);opacity:.6}
+h2.st{font-family:'Orbitron',monospace;font-size:clamp(1.15rem,2.8vw,1.75rem);font-weight:700;color:#fff;letter-spacing:.05em}
+h2.st span{color:var(--eb);text-shadow:0 0 12px var(--eb)}
+.sl{flex:1;height:1px;background:linear-gradient(90deg,var(--eb),transparent);opacity:.38}
+.card{background:var(--card);border:1px solid var(--bb);padding:28px 30px;margin-bottom:20px;position:relative;transition:all .28s}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--eb);box-shadow:0 0 10px var(--eb)}
+.card:hover{border-color:var(--eb);box-shadow:0 0 22px rgba(0,204,255,.1),inset 0 0 22px rgba(0,204,255,.03)}
+.card.yel::before{background:var(--ey);box-shadow:0 0 10px var(--ey)}.card.yel{border-color:var(--by)}.card.yel:hover{border-color:var(--ey)}
+.card.pur::before{background:var(--ep);box-shadow:0 0 10px var(--ep)}.card.pur{border-color:var(--bp)}.card.pur:hover{border-color:var(--ep)}
+.card.red::before{background:var(--er);box-shadow:0 0 10px var(--er)}.card.red{border-color:rgba(255,51,0,.22)}
+.card.grn::before{background:var(--eg);box-shadow:0 0 10px var(--eg)}.card.grn{border-color:rgba(0,255,136,.2)}
+h3{font-family:'Orbitron',monospace;font-size:.88rem;color:var(--eb);text-shadow:0 0 8px var(--eb);margin-bottom:12px;letter-spacing:.05em}
+.card.yel h3{color:var(--ey);text-shadow:0 0 8px var(--ey)}.card.pur h3{color:var(--ep);text-shadow:0 0 8px var(--ep)}
+.card.red h3{color:var(--er);text-shadow:0 0 8px var(--er)}.card.grn h3{color:var(--eg);text-shadow:0 0 8px var(--eg)}
+p{color:var(--txt);margin-bottom:10px}
+.law{background:rgba(0,204,255,.05);border:1px solid rgba(0,204,255,.38);border-left:4px solid var(--eb);padding:16px 20px;margin:12px 0;font-family:'Share Tech Mono',monospace;font-size:.88rem;color:var(--eb);text-shadow:0 0 4px rgba(0,204,255,.3);line-height:1.9}
+.law.yel{background:rgba(255,238,0,.05);border-color:rgba(255,238,0,.38);border-left-color:var(--ey);color:var(--ey)}
+.law.pur{background:rgba(170,0,255,.05);border-color:rgba(170,0,255,.38);border-left-color:var(--ep);color:var(--ep)}
+.law.grn{background:rgba(0,255,136,.05);border-color:rgba(0,255,136,.38);border-left-color:var(--eg);color:var(--eg)}
+.law.red{background:rgba(255,51,0,.05);border-color:rgba(255,51,0,.38);border-left-color:var(--er);color:var(--er)}
+.fhero{text-align:center;padding:30px 18px;margin:20px 0;background:var(--pan);border:1px solid rgba(0,204,255,.28);position:relative;overflow:hidden}
+.fhero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,204,255,.07) 0%,transparent 70%)}
+.fhero .bf{font-family:'Orbitron',monospace;font-size:clamp(1.3rem,3.2vw,2.3rem);font-weight:700;color:#fff;text-shadow:0 0 14px var(--eb),0 0 35px rgba(0,204,255,.42);letter-spacing:.04em;line-height:1.35}
+.fhero .fl{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:3px;margin-top:10px}
+.vis{background:var(--pan);border:1px solid var(--bb);padding:20px;margin:20px 0;overflow:hidden}
+.vis.pur{border-color:var(--bp)}.vis.yel{border-color:var(--by);border-width:2px}
+.vtag{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--dim);letter-spacing:3px;margin-bottom:14px;text-transform:uppercase;text-align:center}
+canvas{display:block;margin:0 auto;max-width:100%}
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:18px;margin:18px 0}
+table{width:100%;border-collapse:collapse;margin:14px 0}
+th{background:rgba(0,204,255,.09);color:var(--eb);font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:2px;padding:10px 13px;text-align:left;border:1px solid rgba(0,204,255,.18)}
+td{padding:10px 13px;border:1px solid rgba(0,204,255,.1);color:var(--txt);font-size:.92rem}
+tr:hover td{background:rgba(0,204,255,.03)}
+.ctrl-row{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;margin:14px 0}
+.ctrl{text-align:center}
+.ctrl label{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--eb);display:block;margin-bottom:5px;letter-spacing:1px}
+input[type=range]{-webkit-appearance:none;width:180px;height:4px;background:rgba(0,204,255,.2);outline:none;border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--eb);border-radius:50%;cursor:pointer;box-shadow:0 0 8px var(--eb)}
+.ctrl-val{font-family:'Orbitron',monospace;font-size:1rem;color:var(--eb);text-shadow:0 0 8px var(--eb);margin-top:5px}
+.tabs{display:flex;gap:7px;justify-content:center;margin:12px 0;flex-wrap:wrap}
+.tab{font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:2px;color:var(--dim);padding:7px 16px;border:1px solid rgba(0,204,255,.2);background:transparent;cursor:pointer;transition:all .26s}
+.tab:hover{color:var(--eb);border-color:var(--eb)}
+.tab.active{color:var(--bg);background:var(--eb);border-color:var(--eb);box-shadow:0 0 14px var(--eb)}
+.neon-btn{font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:3px;color:var(--ey);border:1px solid var(--ey);background:transparent;padding:12px 30px;cursor:pointer;transition:all .3s;margin:10px auto;display:block}
+.neon-btn:hover,.neon-btn.on{background:rgba(255,238,0,.12);box-shadow:0 0 20px var(--ey),inset 0 0 10px rgba(255,238,0,.1)}
+.neon-btn.on{animation:btnP 2s ease-in-out infinite}
+@keyframes btnP{0%,100%{box-shadow:0 0 14px var(--ey)}50%{box-shadow:0 0 32px var(--ey),0 0 64px rgba(255,238,0,.28)}}
+.fhint{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.fhi{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--dim);display:flex;align-items:center;gap:6px}
+.fhd{width:10px;height:10px;border-radius:50%}
+.step{display:flex;gap:14px;align-items:flex-start;background:rgba(0,204,255,.04);border:1px solid rgba(0,204,255,.12);padding:12px 16px;margin-bottom:8px}
+.sn2{font-family:'Orbitron',monospace;font-size:.75rem;color:var(--eb);min-width:22px}
+.qc{background:var(--card);border:1px solid var(--bb);padding:24px 28px;margin-bottom:16px;transition:all .28s}
+.qc:hover{border-color:var(--eb)}
+.qnum{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--eb);letter-spacing:3px;margin-bottom:8px}
+.qtext{font-size:1rem;font-weight:600;color:#fff;margin-bottom:16px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.obt{background:rgba(0,0,0,.4);border:1px solid rgba(0,204,255,.22);color:var(--txt);padding:10px 15px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:.92rem;cursor:pointer;transition:all .24s;display:flex;align-items:flex-start;gap:11px}
+.obt:hover{border-color:var(--eb);background:rgba(0,204,255,.07);color:#fff}
+.obt.correct{border-color:var(--eg)!important;background:rgba(0,255,136,.1)!important;color:var(--eg)!important;box-shadow:0 0 12px rgba(0,255,136,.25)!important}
+.obt.wrong{border-color:var(--er)!important;background:rgba(255,51,0,.1)!important;color:var(--er)!important}
+.obt:disabled{cursor:not-allowed}
+.ol{font-family:'Orbitron',monospace;font-size:.58rem;color:var(--eb);min-width:17px;padding-top:2px}
+.fb{margin-top:11px;padding:10px 13px;font-family:'Share Tech Mono',monospace;font-size:.78rem;display:none;border-left:3px solid;line-height:1.6}
+.fb.show{display:block}
+.fb.ok{color:var(--eg);border-color:var(--eg);background:rgba(0,255,136,.05)}
+.fb.err{color:var(--er);border-color:var(--er);background:rgba(255,51,0,.05)}
+.sp{background:var(--card);border:1px solid var(--eb);padding:26px;text-align:center;box-shadow:0 0 30px rgba(0,204,255,.12);margin-top:26px}
+.scl{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim);letter-spacing:3px;margin-bottom:8px}
+.scv{font-family:'Orbitron',monospace;font-size:2.8rem;font-weight:900;color:var(--eb);text-shadow:0 0 20px var(--eb)}
+.scm{color:var(--dim);margin-top:7px;font-size:.93rem}
+.rbtn{background:transparent;border:1px solid var(--eb);color:var(--eb);font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:2px;padding:9px 24px;cursor:pointer;margin-top:13px;transition:all .28s}
+.rbtn:hover{background:rgba(0,204,255,.1);box-shadow:0 0 14px var(--eb)}
+.pw{height:4px;background:rgba(0,204,255,.1);margin-top:16px;border-radius:2px;overflow:hidden}
+.pf{height:100%;background:linear-gradient(90deg,var(--eb),var(--ep));transition:width .5s ease;box-shadow:0 0 10px var(--eb)}
+.ibox{background:linear-gradient(135deg,rgba(0,204,255,.04),rgba(170,0,255,.04));border:1px solid rgba(0,204,255,.2);padding:24px 28px;margin-top:32px;position:relative}
+.ibox::after{content:'⚡';position:absolute;top:-14px;left:22px;font-size:1.2rem;text-shadow:0 0 10px var(--ey);background:var(--bg);padding:0 8px}
+.dlbtn{display:inline-block;font-family:'Orbitron',monospace;font-size:.67rem;letter-spacing:3px;color:var(--eb);border:1px solid var(--eb);padding:13px 38px;text-decoration:none;transition:all .28s;box-shadow:0 0 10px rgba(0,204,255,.14)}
+.dlbtn:hover{background:rgba(0,204,255,.1);box-shadow:0 0 24px var(--eb)}
+.hl{color:var(--eb);font-weight:600}.hly{color:var(--ey);font-weight:600}
+.hlp{color:var(--ep);font-weight:600}.hlr{color:var(--er);font-weight:600}.hlg{color:var(--eg);font-weight:600}
+#potCanvas{image-rendering:pixelated}
+footer{position:relative;z-index:10;text-align:center;padding:34px 20px;border-top:1px solid var(--bb);font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:2px}
+@media(max-width:600px){header{padding:46px 14px 34px}main{padding:0 13px 58px}.card{padding:16px 18px}.fhero .bf{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<canvas id="bgL"></canvas>
+
+<header>
+  <div class="htag">MÓDULO 06 // ELETROMAGNETISMO // ENSINO MÉDIO</div>
+  <h1 class="title">ELETROSTÁTICA</h1>
+  <p class="tsub">Cargas · Coulomb · Campo · Potencial · Gaiola de Faraday</p>
+  <div class="spark-row">
+    <div class="spark"></div><div class="spark"></div><div class="spark"></div>
+    <div class="spark"></div><div class="spark"></div>
+  </div>
+</header>
+
+<nav>
+  <a href="#carga">⚡ Carga</a>
+  <a href="#coulomb">⚡ Coulomb</a>
+  <a href="#campo">⚡ Campo E</a>
+  <a href="#potencial">⚡ Potencial</a>
+  <a href="#faraday">⚡ Faraday</a>
+  <a href="#fenomenos">⚡ Fenômenos</a>
+  <a href="#exercicios">⚡ Exercícios</a>
+  <a href="#download">⚡ PDF</a>
+</nav>
+
+<main>
+
+<!-- CARGA ELÉTRICA -->
+<section id="carga">
+  <div class="sh"><span class="sn">01</span><h2 class="st">CARGA <span>ELÉTRICA</span></h2><div class="sl"></div></div>
+  <div class="ibox">
+    <p>A <span class="hl">eletrostática</span> estuda fenômenos relacionados a cargas elétricas <strong>em repouso</strong>. A <span class="hl">carga elétrica</span> é uma propriedade fundamental da matéria — responsável pelas interações eletromagnéticas. Existem dois tipos: <span class="hlr">positiva (+)</span> e <span class="hl">negativa (−)</span>.</p>
+    <p>Cargas iguais se <span class="hlr">repelem</span>; cargas opostas se <span class="hlg">atraem</span>. O elétron tem carga negativa (e⁻) e o próton tem carga positiva (p⁺).</p>
+  </div>
+  <div class="igrid" style="margin-top:22px">
+    <div class="card">
+      <h3>CONSERVAÇÃO DA CARGA</h3>
+      <p>A carga total de um sistema isolado permanece <span class="hl">constante</span>. Cargas não são criadas nem destruídas, apenas transferidas entre corpos.</p>
+      <div class="law">Q_total = constante<br>Sigma_Q_antes = Sigma_Q_depois</div>
+    </div>
+    <div class="card yel">
+      <h3>QUANTIZAÇÃO DA CARGA</h3>
+      <p>A carga existe apenas em múltiplos da <span class="hly">carga elementar e</span>. Não existe carga menor que e na natureza.</p>
+      <div class="law yel">q = n · e<br>e = 1,6 x 10^-19 C<br>n = numero inteiro (±1, ±2, ...)</div>
+    </div>
+    <div class="card pur">
+      <h3>CONDUTORES E ISOLANTES</h3>
+      <p><span class="hlp">Condutores:</span> elétrons livres se movem facilmente (metais). A carga se distribui na superfície.<br><span class="hlp">Isolantes:</span> elétrons presos aos átomos (borracha, vidro, plástico).</p>
+    </div>
+  </div>
+
+  <!-- CHARGE INTERACTION CANVAS -->
+  <div class="vis">
+    <p class="vtag">[ SIMULAÇÃO — INTERAÇÃO ENTRE CARGAS ]</p>
+    <div class="tabs" id="chTabs">
+      <button class="tab active" onclick="setCS('rpos',this)">+Q / +Q REPULSÃO</button>
+      <button class="tab" onclick="setCS('rneg',this)">-Q / -Q REPULSÃO</button>
+      <button class="tab" onclick="setCS('atr',this)">+Q / -Q ATRAÇÃO</button>
+    </div>
+    <canvas id="chCanvas" width="700" height="220"></canvas>
+    <div class="fhint">
+      <div class="fhi"><div class="fhd" style="background:var(--er);box-shadow:0 0 6px var(--er)"></div>Carga positiva (+)</div>
+      <div class="fhi"><div class="fhd" style="background:#4488ff;box-shadow:0 0 6px #4488ff"></div>Carga negativa (−)</div>
+      <div class="fhi"><div class="fhd" style="background:var(--ey);width:18px;height:3px;border-radius:0"></div>Força elétrica F</div>
+    </div>
+  </div>
+
+  <div class="card grn">
+    <h3>FORMAS DE ELETRIZAÇÃO</h3>
+    <table>
+      <tr><th>TIPO</th><th>COMO OCORRE</th><th>RESULTADO</th><th>EXEMPLO</th></tr>
+      <tr><td>Por atrito</td><td>Esfregamento entre materiais diferentes</td><td>Ambos carregados (sinais opostos)</td><td>Régua de plástico no cabelo</td></tr>
+      <tr><td>Por contato</td><td>Toque direto com condutor carregado</td><td>Mesmo sinal da carga original</td><td>Esferas condutoras</td></tr>
+      <tr><td>Por indução</td><td>Aproximação sem contato + aterramento</td><td>Sinal oposto ao indutor</td><td>Balão na parede</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- LEI DE COULOMB -->
+<section id="coulomb">
+  <div class="sh"><span class="sn">02</span><h2 class="st">LEI DE <span>COULOMB</span></h2><div class="sl"></div></div>
+  <div class="card">
+    <h3>ENUNCIADO</h3>
+    <p>A força entre duas cargas puntiformes é <span class="hl">diretamente proporcional ao produto dos módulos das cargas</span> e <span class="hl">inversamente proporcional ao quadrado da distância</span>. Atua na linha que une as cargas.</p>
+  </div>
+  <div class="fhero">
+    <div class="bf">F = k · |q₁ · q₂| / r²</div>
+    <div class="fl">LEI DE COULOMB  |  k = 9 × 10⁹ N·m²/C² (no vácuo)</div>
+  </div>
+  <div class="igrid">
+    <div class="card">
+      <h3>GRANDEZAS</h3>
+      <div class="law" style="font-size:.82rem;line-height:2.1">F → força elétrica [N]<br>k → 9 × 10⁹ N·m²/C²<br>q₁, q₂ → cargas [C]<br>r → distância entre cargas [m]</div>
+    </div>
+    <div class="card yel">
+      <h3>INTERPRETAÇÃO</h3>
+      <p>✦ q₁·q₂ &gt; 0: mesmo sinal → <strong>repulsão</strong><br>✦ q₁·q₂ &lt; 0: sinais opostos → <strong>atração</strong><br>✦ Dobrar r → F cai 4 vezes (inverso do quadrado)<br>✦ Dobrar q → F dobra</p>
+    </div>
+  </div>
+  <div class="vis">
+    <p class="vtag">[ CALCULADORA INTERATIVA — LEI DE COULOMB ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>|q₁| (µC)</label><input type="range" id="cq1" min="1" max="20" value="8" oninput="drawCoulomb()"><div class="ctrl-val" id="cq1v">8</div></div>
+      <div class="ctrl"><label>|q₂| (µC)</label><input type="range" id="cq2" min="1" max="20" value="5" oninput="drawCoulomb()"><div class="ctrl-val" id="cq2v">5</div></div>
+      <div class="ctrl"><label>r (m)</label><input type="range" id="cr" min="1" max="20" value="6" oninput="drawCoulomb()"><div class="ctrl-val" id="crv">6</div></div>
+    </div>
+    <canvas id="colCanvas" width="700" height="230"></canvas>
+    <div id="colResult" style="font-family:'Orbitron',monospace;font-size:1.3rem;color:var(--eb);text-shadow:0 0 12px var(--eb);text-align:center;margin-top:10px">F = — N</div>
+  </div>
+  <div class="card grn">
+    <h3>EXEMPLO RESOLVIDO</h3>
+    <p>Duas cargas q₁ = 4 µC e q₂ = 3 µC separadas por r = 0,6 m. Calcule F.</p>
+    <div class="step"><div class="sn2">1</div><p>Dados: q₁ = 4×10⁻⁶ C, q₂ = 3×10⁻⁶ C, r = 0,6 m, k = 9×10⁹</p></div>
+    <div class="step"><div class="sn2">2</div><p>F = 9×10⁹ × (4×10⁻⁶ × 3×10⁻⁶) / 0,36 = 9×10⁹ × 12×10⁻¹² / 0,36</p></div>
+    <div class="step"><div class="sn2">3</div><p>F = 108×10⁻³ / 0,36 = <span class="hlg">0,3 N</span> (repulsão, pois mesmo sinal)</p></div>
+  </div>
+</section>
+
+<!-- CAMPO ELÉTRICO -->
+<section id="campo">
+  <div class="sh"><span class="sn">03</span><h2 class="st">CAMPO <span>ELÉTRICO</span></h2><div class="sl"></div></div>
+  <div class="card pur">
+    <h3>CONCEITO</h3>
+    <p>O <span class="hlp">campo elétrico</span> é uma região do espaço onde uma carga de prova q₀ sofre ação de força elétrica. É uma grandeza <strong>vetorial</strong>. Criado exclusivamente pela <span class="hlp">carga-fonte Q</span>.</p>
+    <p>Linhas de campo saem de cargas <span class="hlr">positivas</span> e entram em cargas <span class="hl">negativas</span>. Nunca se cruzam.</p>
+  </div>
+  <div class="fhero" style="border-color:rgba(170,0,255,.3)">
+    <div class="bf" style="text-shadow:0 0 14px var(--ep),0 0 35px rgba(170,0,255,.42)">E = F / q₀ = k · |Q| / r²</div>
+    <div class="fl" style="color:var(--ep)">CAMPO ELÉTRICO  |  Unidade: N/C = V/m</div>
+  </div>
+  <div class="vis pur">
+    <p class="vtag">[ VISUALIZADOR DE LINHAS DE CAMPO — SELECIONE UM PRESET ]</p>
+    <div class="tabs" id="flTabs">
+      <button class="tab active" onclick="setFP('mp',this)">+Q</button>
+      <button class="tab" onclick="setFP('mn',this)">-Q</button>
+      <button class="tab" onclick="setFP('dp',this)">+Q / -Q</button>
+      <button class="tab" onclick="setFP('pp',this)">+Q / +Q</button>
+      <button class="tab" onclick="setFP('nn',this)">-Q / -Q</button>
+      <button class="tab" onclick="setFP('cu',this)">PERSONALIZADO</button>
+    </div>
+    <canvas id="flCanvas" width="700" height="340" style="cursor:crosshair"></canvas>
+    <div id="flInfo" style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);text-align:center;margin-top:6px">Clique no canvas para adicionar cargas (modo Personalizado) | Shift+clique = negativa | Duplo-clique = limpar</div>
+    <div class="fhint" style="margin-top:8px">
+      <div class="fhi"><div class="fhd" style="background:var(--er);box-shadow:0 0 6px var(--er)"></div>Linhas saem de (+)</div>
+      <div class="fhi"><div class="fhd" style="background:#4488ff;box-shadow:0 0 6px #4488ff"></div>Linhas entram em (−)</div>
+    </div>
+  </div>
+  <div class="igrid">
+    <div class="card">
+      <h3>REGRAS DAS LINHAS</h3>
+      <p>✦ Saem de (+), entram em (−)<br>✦ Nunca se cruzam<br>✦ Perpendiculares a superfícies equipotenciais<br>✦ Densidade das linhas ∝ intensidade do campo</p>
+    </div>
+    <div class="card yel">
+      <h3>CAMPO UNIFORME</h3>
+      <p>Entre placas paralelas carregadas, o campo é aproximadamente uniforme:</p>
+      <div class="law yel" style="font-size:.83rem">E = V / d<br>F = q · E<br>E [V/m], V [V], d [m]</div>
+    </div>
+  </div>
+</section>
+
+<!-- POTENCIAL ELÉTRICO -->
+<section id="potencial">
+  <div class="sh"><span class="sn">04</span><h2 class="st">POTENCIAL <span>ELÉTRICO</span></h2><div class="sl"></div></div>
+  <div class="card">
+    <h3>CONCEITO</h3>
+    <p>O <span class="hl">potencial elétrico V</span> em um ponto é a energia potencial por unidade de carga. É uma grandeza <strong>escalar</strong>. Pontos com mesmo V formam <span class="hl">superfícies equipotenciais</span>.</p>
+  </div>
+  <div class="fhero">
+    <div class="bf">V = k · Q / r &nbsp;&nbsp; | &nbsp;&nbsp; U = q · V</div>
+    <div class="fl">POTENCIAL [V]  |  ENERGIA POTENCIAL [J]  |  TRABALHO: τ = q·ΔV</div>
+  </div>
+  <div class="vis">
+    <p class="vtag">[ MAPA DE POTENCIAL ELÉTRICO ]</p>
+    <div class="tabs">
+      <button class="tab active" onclick="setPP('pos',this)">+Q</button>
+      <button class="tab" onclick="setPP('neg',this)">-Q</button>
+      <button class="tab" onclick="setPP('dip',this)">DIPOLO +Q/-Q</button>
+    </div>
+    <canvas id="potCanvas" width="350" height="175" style="width:700px;height:350px;border:1px solid rgba(0,204,255,.15)"></canvas>
+    <div class="fhint" style="margin-top:8px">
+      <div class="fhi"><div class="fhd" style="background:var(--er);box-shadow:0 0 6px var(--er)"></div>V alto (+)</div>
+      <div class="fhi"><div class="fhd" style="background:#0a1aff;box-shadow:0 0 6px #0a1aff"></div>V baixo (−)</div>
+      <div class="fhi" style="color:rgba(0,204,255,.6)">Curvas brancas = superfícies equipotenciais</div>
+    </div>
+  </div>
+  <div class="igrid">
+    <div class="card">
+      <h3>GRANDEZAS</h3>
+      <div class="law" style="font-size:.82rem;line-height:2.1">V → potencial [V = Volt]<br>k → 9 × 10⁹ N·m²/C²<br>Q → carga fonte [C]<br>r → distância [m]<br>U → energia potencial [J]</div>
+    </div>
+    <div class="card yel">
+      <h3>RELAÇÃO E × V</h3>
+      <p>O campo aponta de maior para menor potencial:</p>
+      <div class="law yel" style="font-size:.83rem">E = -ΔV/Δr<br>E = V/d (campo uniforme)<br>tau = q·ΔV (trabalho)</div>
+    </div>
+    <div class="card pur">
+      <h3>SUPERPOSIÇÃO</h3>
+      <p>O potencial total é a <span class="hlp">soma algébrica</span> (escalar) dos potenciais individuais — mais simples que somar vetores de campo:</p>
+      <div class="law pur" style="font-size:.83rem">V_total = V₁ + V₂ + V₃ + ...</div>
+    </div>
+  </div>
+</section>
+
+<!-- GAIOLA DE FARADAY -->
+<section id="faraday">
+  <div class="sh"><span class="sn">05</span><h2 class="st">GAIOLA DE <span>FARADAY</span></h2><div class="sl"></div></div>
+  <div class="card yel">
+    <h3>O QUE É?</h3>
+    <p>A <span class="hly">Gaiola de Faraday</span> é um invólucro condutor que <strong>blinda seu interior de campos elétricos externos</strong>. Proposta por Michael Faraday em 1836, funciona pela redistribuição de cargas nos condutores.</p>
+    <p>Quando um campo externo E₀ é aplicado, os <span class="hly">elétrons livres</span> redistribuem-se na superfície, criando um campo interno E_ind que cancela exatamente E₀. Resultado: <span class="hly">campo elétrico NULO dentro do condutor</span>.</p>
+  </div>
+
+  <div class="vis yel">
+    <p class="vtag" style="color:var(--ey);font-size:.74rem;letter-spacing:4px">[ ★ GAIOLA DE FARADAY — ANIMAÇÃO INTERATIVA ★ ]</p>
+    <button class="neon-btn" id="fBtn" onclick="toggleFaraday()">⚡ APLICAR CAMPO ELÉTRICO EXTERNO</button>
+    <canvas id="fCanvas" width="700" height="380"></canvas>
+    <div id="fStatus" style="font-family:'Orbitron',monospace;font-size:.74rem;color:var(--eb);text-align:center;margin-top:10px;letter-spacing:2px;text-shadow:0 0 8px var(--eb)">
+      GAIOLA EM REPOUSO — SEM CAMPO EXTERNO
+    </div>
+  </div>
+
+  <div class="igrid">
+    <div class="card">
+      <h3>COMO FUNCIONA</h3>
+      <div class="step"><div class="sn2">1</div><p>Campo externo E₀ é aplicado (ex: relâmpago)</p></div>
+      <div class="step"><div class="sn2">2</div><p>Elétrons livres migram: acumulam-se no lado oposto ao campo</p></div>
+      <div class="step"><div class="sn2">3</div><p>Surgem cargas (−) numa face e (+) na outra</p></div>
+      <div class="step"><div class="sn2">4</div><p>Essas cargas criam E_ind oposto a E₀</p></div>
+      <div class="step"><div class="sn2">5</div><p>E_interno = E₀ + E_ind = 0 — campo nulo!</p></div>
+    </div>
+    <div class="card">
+      <h3>APLICAÇÕES REAIS</h3>
+      <p>✦ <span class="hl">Carros durante raios</span> — carroceria metálica protege<br>✦ <span class="hl">Forno micro-ondas</span> — tela metálica contém as ondas<br>✦ <span class="hl">Cabos coaxiais</span> — malha evita interferências<br>✦ <span class="hl">Salas blindadas</span> — proteção de equipamentos<br>✦ <span class="hl">Elevadores e aviões</span> — proteção natural<br>✦ <span class="hl">Embalagens anti-estáticas</span> — proteção de chips</p>
+    </div>
+  </div>
+  <div class="card red">
+    <h3>LEI DE GAUSS — FUNDAMENTO TEÓRICO</h3>
+    <p>A blindagem decorre da <span class="hlr">Lei de Gauss</span>: em equilíbrio eletrostático, o campo dentro de qualquer condutor é obrigatoriamente nulo.</p>
+    <div class="law red">Em equilíbrio: E_interno = 0<br>Cargas livres → superficie externa<br>Cavidade interna: E = 0 (independente do campo externo)<br>Lei de Gauss: contorno(E·dA) = Q_enc / epsilon_0 = 0</div>
+  </div>
+</section>
+
+<!-- OUTROS FENÔMENOS -->
+<section id="fenomenos">
+  <div class="sh"><span class="sn">06</span><h2 class="st">OUTROS <span>FENÔMENOS</span></h2><div class="sl"></div></div>
+  <div class="igrid">
+    <div class="card yel">
+      <h3>PARA-RAIOS (FRANKLIN)</h3>
+      <p>Haste condutora pontiaguda no ponto mais alto de edificações. A ponta concentra cargas induzidas (<span class="hly">efeito de ponta</span>), ionizando o ar e criando caminho preferencial para a descarga ao solo, protegendo a edificação.</p>
+      <div class="law yel" style="font-size:.82rem">Efeito de ponta: r pequeno → E grande<br>E ∝ sigma/epsilon_0 (quanto menor a área, maior E)</div>
+    </div>
+    <div class="card pur">
+      <h3>ELETRIZAÇÃO POR INDUÇÃO</h3>
+      <p>Condutor eletrizado <span class="hlp">sem contato</span>: aproxima indutor → redistribuição → aterramento → retirar terra → retirar indutor. Resultado: sinal <span class="hlp">oposto ao indutor</span>.</p>
+      <div class="law pur" style="font-size:.82rem">Indutor (+) → atrai (-) → conduz (-) ao terra<br>Retira terra → retira indutor<br>Corpo fica com carga (-)</div>
+    </div>
+    <div class="card">
+      <h3>GERADOR VAN DE GRAAFF</h3>
+      <p>Acumula cargas por eletrização contínua em uma esfera condutora. Gera centenas de milhares de volts, usado em aceleradores de partículas e demonstrações didáticas.</p>
+      <div class="law" style="font-size:.82rem">V = k · Q / R<br>Limite: ionização do ar ≈ 3×10⁶ V/m</div>
+    </div>
+    <div class="card grn">
+      <h3>CAPACITORES</h3>
+      <p>Armazenam <span class="hlg">energia elétrica</span> em campo elétrico entre duas placas condutoras separadas por dielétrico.</p>
+      <div class="law grn" style="font-size:.82rem">C = Q / V  [F = Farad]<br>U = CV²/2 = Q²/(2C)<br>E_campo = V / d</div>
+    </div>
+  </div>
+  <!-- LIGHTNING ANIMATION -->
+  <div class="vis yel" style="padding:20px">
+    <p class="vtag" style="color:var(--ey)">[ ANIMAÇÃO — PARA-RAIOS EM AÇÃO ]</p>
+    <canvas id="ltCanvas" width="700" height="280"></canvas>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);text-align:center;margin-top:8px">A descarga percorre o menor caminho de resistência via para-raios até o solo</div>
+  </div>
+</section>
+
+<!-- EXERCÍCIOS -->
+<section id="exercicios">
+  <div class="sh"><span class="sn">07</span><h2 class="st">EXERCÍCIOS DE <span>FIXAÇÃO</span></h2><div class="sl"></div></div>
+  <p style="color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:.72rem;margin-bottom:22px;letter-spacing:2px">SELECIONE A ALTERNATIVA CORRETA</p>
+  <div class="pw"><div class="pf" id="pBar" style="width:0%"></div></div>
+  <p style="font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--dim);text-align:right;margin:6px 0 24px" id="pTxt">0 / 8 respondidas</p>
+
+  <div class="qc" id="q1">
+    <div class="qnum">QUESTÃO 01 // CARGA ELÉTRICA</div>
+    <div class="qtext">Um corpo neutro recebe 5×10¹² elétrons. Qual é a carga adquirida? (e = 1,6×10⁻¹⁹ C)</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">A</span>+8×10⁻⁷ C</button>
+      <button class="obt" onclick="ans(this,'q1','correct')"><span class="ol">B</span>−8×10⁻⁷ C</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">C</span>+5×10¹² C</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">D</span>−3,2×10⁻⁷ C</button>
+    </div><div class="fb" id="f_q1"></div>
+  </div>
+
+  <div class="qc" id="q2">
+    <div class="qnum">QUESTÃO 02 // LEI DE COULOMB</div>
+    <div class="qtext">Dois prótons (q = 1,6×10⁻¹⁹ C) estão separados por r = 2×10⁻¹⁰ m. Qual a força de Coulomb? (k = 9×10⁹)</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">A</span>2,3×10⁻⁹ N</button>
+      <button class="obt" onclick="ans(this,'q2','correct')"><span class="ol">B</span>5,76×10⁻⁹ N</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">C</span>1,44×10⁻¹⁸ N</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">D</span>9×10⁹ N</button>
+    </div><div class="fb" id="f_q2"></div>
+  </div>
+
+  <div class="qc" id="q3">
+    <div class="qnum">QUESTÃO 03 // LEI DE COULOMB — DISTÂNCIA</div>
+    <div class="qtext">A distância entre duas cargas é triplicada. O que acontece com a força elétrica entre elas?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">A</span>Diminui 3 vezes</button>
+      <button class="obt" onclick="ans(this,'q3','correct')"><span class="ol">B</span>Diminui 9 vezes</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">C</span>Aumenta 3 vezes</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">D</span>Não se altera</button>
+    </div><div class="fb" id="f_q3"></div>
+  </div>
+
+  <div class="qc" id="q4">
+    <div class="qnum">QUESTÃO 04 // CAMPO ELÉTRICO</div>
+    <div class="qtext">Uma carga de prova q₀ = 2×10⁻⁶ C sofre força F = 0,04 N. Qual é o campo elétrico nesse ponto?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">A</span>8×10⁻⁸ N/C</button>
+      <button class="obt" onclick="ans(this,'q4','correct')"><span class="ol">B</span>2×10⁴ N/C</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">C</span>0,04 N/C</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">D</span>5×10⁻⁵ N/C</button>
+    </div><div class="fb" id="f_q4"></div>
+  </div>
+
+  <div class="qc" id="q5">
+    <div class="qnum">QUESTÃO 05 // POTENCIAL ELÉTRICO</div>
+    <div class="qtext">Qual é o potencial elétrico a r = 0,3 m de uma carga Q = 2×10⁻⁶ C? (k = 9×10⁹)</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">A</span>2×10⁴ V</button>
+      <button class="obt" onclick="ans(this,'q5','correct')"><span class="ol">B</span>6×10⁴ V</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">C</span>6×10³ V</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">D</span>1,8×10⁵ V</button>
+    </div><div class="fb" id="f_q5"></div>
+  </div>
+
+  <div class="qc" id="q6">
+    <div class="qnum">QUESTÃO 06 // GAIOLA DE FARADAY</div>
+    <div class="qtext">Por que uma pessoa dentro de um carro metálico está protegida durante uma tempestade com raios?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">A</span>O metal absorve e elimina os raios</button>
+      <button class="obt" onclick="ans(this,'q6','correct')"><span class="ol">B</span>A carroceria metálica age como Gaiola de Faraday, tornando o campo interno nulo</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">C</span>Os pneus de borracha isolam totalmente o carro do solo</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">D</span>O vidro reflete os raios para longe</button>
+    </div><div class="fb" id="f_q6"></div>
+  </div>
+
+  <div class="qc" id="q7">
+    <div class="qnum">QUESTÃO 07 // CONDUTORES</div>
+    <div class="qtext">Sobre distribuição de cargas em condutor em equilíbrio eletrostático, é CORRETO afirmar:</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">A</span>Distribuição uniforme por todo o volume</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">B</span>Campo interno igual ao campo externo</button>
+      <button class="obt" onclick="ans(this,'q7','correct')"><span class="ol">C</span>Cargas na superfície e campo interno nulo</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">D</span>Cargas acumulam-se no centro geométrico</button>
+    </div><div class="fb" id="f_q7"></div>
+  </div>
+
+  <div class="qc" id="q8">
+    <div class="qnum">QUESTÃO 08 // ELETRIZAÇÃO</div>
+    <div class="qtext">Ao eletrizar por indução com aterramento na presença do indutor, o corpo adquire carga de sinal:</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q8','correct')"><span class="ol">A</span>Oposto ao do indutor</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">B</span>Igual ao do indutor</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">C</span>Sempre positivo</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">D</span>Nulo — corpo permanece neutro</button>
+    </div><div class="fb" id="f_q8"></div>
+  </div>
+
+  <div class="sp" id="spanel" style="display:none">
+    <div class="scl">RESULTADO FINAL</div>
+    <div class="scv" id="scv">0/8</div>
+    <div class="scm" id="scm"></div>
+    <button class="rbtn" onclick="resetQ()">REFAZER EXERCÍCIOS</button>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section id="download" style="margin-top:56px">
+  <div class="sh"><span class="sn">08</span><h2 class="st">BAIXAR <span>LISTA</span></h2><div class="sl"></div></div>
+  <div class="card" style="text-align:center;padding:36px 28px">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:3px;margin-bottom:12px">8 QUESTÕES COM GABARITO E RESOLUÇÕES</div>
+    <div style="font-size:3.5rem;margin-bottom:12px;filter:drop-shadow(0 0 18px var(--eb))">⚡</div>
+    <p style="margin-bottom:22px;color:var(--dim);font-size:.93rem">Lista completa com gabarito comentado, fórmulas e referências em PDF.</p>
+    <a id="dlBtn" download="lista-eletrostatica.pdf" class="dlbtn">BAIXAR LISTA DE EXERCÍCIOS (PDF)</a>
+    <div style="margin-top:14px;font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--dim)">CARGA · COULOMB · CAMPO · POTENCIAL · FARADAY · 8 QUESTÕES</div>
+  </div>
+</section>
+</main>
+<footer>
+  <div>ELETROSTÁTICA — FÍSICA DO ENSINO MÉDIO</div>
+  <div style="margin-top:7px">CARGA · LEI DE COULOMB · CAMPO ELÉTRICO · POTENCIAL · GAIOLA DE FARADAY</div>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════
+// BACKGROUND LIGHTNING
+// ════════════════════════════════════════════════
+(function(){
+  var c=document.getElementById('bgL');
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  var ctx=c.getContext('2d');var bolts=[];
+  function mkBolt(){
+    var x=Math.random()*c.width,pts=[],cx2=x,cy2=0;
+    while(cy2<c.height*.55){
+      var nx=cx2+(Math.random()-.5)*110,ny=cy2+22+Math.random()*35;
+      pts.push([cx2,cy2,nx,ny]);cx2=nx;cy2=ny;
+    }
+    if(pts.length>0) bolts.push({pts:pts,life:0,maxLife:14+Math.floor(Math.random()*8),col:Math.random()<.3?'#aa00ff':Math.random()<.5?'#00ccff':'#ffee00'});
+  }
+  function loop(){
+    ctx.clearRect(0,0,c.width,c.height);
+    if(Math.random()<.014)mkBolt();
+    bolts=bolts.filter(function(b){
+      var t=b.life/b.maxLife;if(t>1)return false;
+      var a=t<.3?t/.3:(1-t)/.7;
+      ctx.save();ctx.globalAlpha=a*.65;ctx.shadowColor=b.col;ctx.shadowBlur=10;
+      ctx.strokeStyle=b.col;ctx.lineWidth=1.5;ctx.beginPath();
+      b.pts.forEach(function(p,i){i===0?ctx.moveTo(p[0],p[1]):null;ctx.lineTo(p[2],p[3]);});
+      ctx.stroke();ctx.restore();b.life++;return true;
+    });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+// ════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════
+function bgFill(ctx,W,H){ctx.fillStyle='#04080f';ctx.fillRect(0,0,W,H);}
+function gArrow(ctx,x1,y1,x2,y2,col,lw,blur){
+  lw=lw||2.5;blur=blur||14;
+  var a=Math.atan2(y2-y1,x2-x1),L=11;
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=blur;
+  ctx.strokeStyle=col;ctx.lineWidth=lw;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.fillStyle=col;ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-L*Math.cos(a-.42),y2-L*Math.sin(a-.42));
+  ctx.lineTo(x2-L*Math.cos(a+.42),y2-L*Math.sin(a+.42));
+  ctx.closePath();ctx.fill();ctx.restore();
+}
+function lbl(ctx,x,y,txt,col,sz,align){
+  sz=sz||12;align=align||'center';
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=7;ctx.fillStyle=col;
+  ctx.font=sz+'px Share Tech Mono,monospace';ctx.textAlign=align;ctx.fillText(txt,x,y);ctx.restore();
+}
+function drawSphere(ctx,x,y,r,col,label){
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=20;
+  var g=ctx.createRadialGradient(x-r*.3,y-r*.3,r*.08,x,y,r);
+  g.addColorStop(0,'#fff');g.addColorStop(.35,col);g.addColorStop(1,'rgba(0,0,0,.55)');
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+  ctx.strokeStyle=col;ctx.lineWidth=2;ctx.stroke();ctx.restore();
+  lbl(ctx,x,y+5,label,'#fff',15);
+}
+
+// ════════════════════════════════════════════════
+// CHARGE INTERACTION ANIMATION
+// ════════════════════════════════════════════════
+var chScene='rpos',chT=0;
+function setCS(s,btn){
+  chScene=s;
+  document.querySelectorAll('#chTabs .tab').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+}
+function animCharges(){
+  chT++;
+  var cv=document.getElementById('chCanvas');if(!cv){requestAnimationFrame(animCharges);return;}
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bgFill(ctx,W,H);
+  var bounce=Math.sin(chT*.05)*18;
+  var cx=W/2,cy=H/2;
+  // separation oscillates: repulsion = farther apart, attraction = closer
+  var sep,c1col,c2col,c1lbl,c2lbl,fcol,repel;
+  if(chScene==='rpos'){sep=160+bounce;c1col='#ff3300';c2col='#ff3300';c1lbl='+';c2lbl='+';fcol='#ffee00';repel=true;}
+  else if(chScene==='rneg'){sep=160+bounce;c1col='#4488ff';c2col='#4488ff';c1lbl='-';c2lbl='-';fcol='#ffee00';repel=true;}
+  else{sep=160-bounce;c1col='#ff3300';c2col='#4488ff';c1lbl='+';c2lbl='-';fcol='#00ff88';repel=false;}
+  var x1=cx-sep/2,x2=cx+sep/2;
+  // distance line
+  ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle='rgba(0,204,255,.25)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x1,cy+54);ctx.lineTo(x2,cy+54);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  lbl(ctx,(x1+x2)/2,cy+70,'r = '+(sep/55).toFixed(1)+' u.a.','rgba(0,204,255,.55)',10);
+  // force arrows
+  if(repel){
+    gArrow(ctx,x1,cy,x1-55,cy,fcol,2.5);
+    gArrow(ctx,x2,cy,x2+55,cy,fcol,2.5);
+    lbl(ctx,x1-70,cy-12,'F','#ffee00',12);
+    lbl(ctx,x2+70,cy-12,'F','#ffee00',12);
+  } else {
+    gArrow(ctx,x1-30,cy,x1+5,cy,fcol,2.5);
+    gArrow(ctx,x2+30,cy,x2-5,cy,fcol,2.5);
+    lbl(ctx,x1-50,cy-12,'F','#00ff88',12);
+    lbl(ctx,x2+50,cy-12,'F','#00ff88',12);
+  }
+  drawSphere(ctx,x1,cy,28,c1col,c1lbl);
+  drawSphere(ctx,x2,cy,28,c2col,c2lbl);
+  var tag=repel?'REPULSÃO (cargas de mesmo sinal)':'ATRAÇÃO (cargas de sinais opostos)';
+  lbl(ctx,cx,28,tag,fcol,12);
+  requestAnimationFrame(animCharges);
+}
+
+// ════════════════════════════════════════════════
+// COULOMB CANVAS
+// ════════════════════════════════════════════════
+function drawCoulomb(){
+  var q1=+document.getElementById('cq1').value;
+  var q2=+document.getElementById('cq2').value;
+  var r=+document.getElementById('cr').value;
+  document.getElementById('cq1v').textContent=q1;
+  document.getElementById('cq2v').textContent=q2;
+  document.getElementById('crv').textContent=r;
+  var cv=document.getElementById('colCanvas');
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bgFill(ctx,W,H);
+  var k=9e9,F=k*(q1*1e-6)*(q2*1e-6)/(r*r);
+  var cx=W/2,cy=H/2;
+  var gap=Math.min(210,r*12+40);
+  var x1=cx-gap/2-28,x2=cx+gap/2+28;
+  var fScale=Math.min(120,F*1e7);
+  // force arrows pointing outward (repulsion for same-sign charges)
+  gArrow(ctx,x1,cy,x1-fScale,cy,'#ffee00',3);
+  gArrow(ctx,x2,cy,x2+fScale,cy,'#ffee00',3);
+  // distance line
+  ctx.save();ctx.setLineDash([6,5]);ctx.strokeStyle='rgba(0,204,255,.3)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x1,cy+52);ctx.lineTo(x2,cy+52);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  lbl(ctx,(x1+x2)/2,cy+68,'r = '+r+' m','rgba(0,204,255,.65)',11);
+  drawSphere(ctx,x1,cy,28,'#ff3300','+');
+  drawSphere(ctx,x2,cy,28,'#ff3300','+');
+  lbl(ctx,x1-32,cy-42,'q₁ = '+q1+' µC','#ff3300',11);
+  lbl(ctx,x2+32,cy-42,'q₂ = '+q2+' µC','#ff3300',11);
+  lbl(ctx,x1-fScale/2-10,cy-18,'F','#ffee00',12);
+  lbl(ctx,x2+fScale/2+10,cy-18,'F','#ffee00',12);
+  document.getElementById('colResult').textContent='F = '+F.toFixed(5)+' N  (repulsao)';
+}
+
+// ════════════════════════════════════════════════
+// FIELD LINES — FIX: handles negative-only configs
+// ════════════════════════════════════════════════
+var flPreset='mp';
+var flCustom=[];
+var flConfigs={
+  mp:[{x:.5,y:.5,q:1}],
+  mn:[{x:.5,y:.5,q:-1}],
+  dp:[{x:.32,y:.5,q:1},{x:.68,y:.5,q:-1}],
+  pp:[{x:.3,y:.5,q:1},{x:.7,y:.5,q:1}],
+  nn:[{x:.3,y:.5,q:-1},{x:.7,y:.5,q:-1}],
+  cu:[]
+};
+function setFP(p,btn){
+  flPreset=p;
+  document.querySelectorAll('#flTabs .tab').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  if(p==='cu'){flCustom=[];}
+  drawFL();
+}
+var flCV=document.getElementById('flCanvas');
+flCV.addEventListener('click',function(e){
+  if(flPreset!=='cu')return;
+  var r=flCV.getBoundingClientRect();
+  var fx=(e.clientX-r.left)/flCV.width,fy=(e.clientY-r.top)/flCV.height;
+  flCustom.push({x:fx,y:fy,q:e.shiftKey?-1:1});
+  drawFL();
+});
+flCV.addEventListener('dblclick',function(){if(flPreset==='cu'){flCustom=[];drawFL();}});
+
+function getE(charges,px,py,W,H){
+  var Ex=0,Ey=0;
+  for(var i=0;i<charges.length;i++){
+    var c=charges[i];
+    var dx=px-c.x*W,dy=py-c.y*H;
+    var r2=dx*dx+dy*dy,r=Math.sqrt(r2);
+    if(r<1)continue;
+    var mag=c.q/(r2*r);Ex+=mag*dx;Ey+=mag*dy;
+  }
+  return{Ex:Ex,Ey:Ey};
+}
+
+function drawFL(){
+  var cv=document.getElementById('flCanvas');
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bgFill(ctx,W,H);
+  var charges=flPreset==='cu'?flCustom:flConfigs[flPreset];
+  if(!charges||charges.length===0){
+    lbl(ctx,W/2,H/2,'Clique no canvas para adicionar cargas','rgba(0,204,255,.4)',13);
+    return;
+  }
+  // FIX: determine trace direction
+  // If any positive charge → trace from positives forward
+  // If ALL negative → trace from negatives BACKWARD (follow -E)
+  var hasPos=charges.some(function(c){return c.q>0;});
+  var sources=hasPos?charges.filter(function(c){return c.q>0;}):charges;
+  var dir=hasPos?1:-1;
+  var N=16,STEP=3.5,MAX=280;
+  for(var si=0;si<sources.length;si++){
+    var ch=sources[si];
+    for(var i=0;i<N;i++){
+      var ang=(2*Math.PI*i)/N;
+      var px=ch.x*W+Math.cos(ang)*20,py=ch.y*H+Math.sin(ang)*20;
+      var pts=[[px,py]];
+      for(var s=0;s<MAX;s++){
+        var e=getE(charges,px,py,W,H);
+        var E=Math.sqrt(e.Ex*e.Ex+e.Ey*e.Ey);
+        if(E<1e-8)break;
+        px+=dir*STEP*e.Ex/E;py+=dir*STEP*e.Ey/E;
+        if(px<2||px>W-2||py<2||py>H-2)break;
+        // stop if hit opposite-sign charge
+        var stop=false;
+        for(var j=0;j<charges.length;j++){
+          var c2=charges[j];
+          if(c2.q*ch.q<0&&Math.sqrt(Math.pow(px-c2.x*W,2)+Math.pow(py-c2.y*H,2))<16){stop=true;break;}
+        }
+        if(stop)break;
+        pts.push([px,py]);
+      }
+      if(pts.length<3)continue;
+      var lineCol=ch.q>0?'#ff4400':'#4488ff';
+      ctx.save();ctx.shadowColor=lineCol;ctx.shadowBlur=5;
+      ctx.strokeStyle=lineCol;ctx.lineWidth=1.6;
+      ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
+      for(var k=1;k<pts.length;k++)ctx.lineTo(pts[k][0],pts[k][1]);
+      ctx.stroke();ctx.restore();
+      // midpoint arrow
+      var m=Math.floor(pts.length*.5);
+      if(m+1<pts.length)gArrow(ctx,pts[m][0],pts[m][1],pts[m+1][0],pts[m+1][1],lineCol,1.5,6);
+    }
+  }
+  // draw charge spheres
+  for(var ci=0;ci<charges.length;ci++){
+    var c=charges[ci];
+    drawSphere(ctx,c.x*W,c.y*H,18,c.q>0?'#ff3300':'#4488ff',c.q>0?'+':'-');
+  }
+}
+
+// ════════════════════════════════════════════════
+// POTENTIAL MAP — FIX: 350×175 canvas (4× faster)
+// ════════════════════════════════════════════════
+var potP='pos';
+function setPP(p,btn){
+  potP=p;
+  document.querySelectorAll('button[onclick*="setPP"]').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  setTimeout(drawPot,0);
+}
+function drawPot(){
+  var cv=document.getElementById('potCanvas');
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  var cfgs={pos:[{x:.5,y:.5,q:1}],neg:[{x:.5,y:.5,q:-1}],dip:[{x:.32,y:.5,q:1},{x:.68,y:.5,q:-1}]};
+  var charges=cfgs[potP];
+  var img=ctx.createImageData(W,H);
+  var Vmap=new Float32Array(W*H);
+  var Vmax=0;
+  for(var y=0;y<H;y++){
+    for(var x=0;x<W;x++){
+      var V=0;
+      for(var ci=0;ci<charges.length;ci++){
+        var c=charges[ci];
+        var dx=x-c.x*W,dy=y-c.y*H;
+        var rr=Math.sqrt(dx*dx+dy*dy)||0.15;
+        V+=c.q/rr*160;
+      }
+      Vmap[y*W+x]=V;if(Math.abs(V)>Vmax)Vmax=Math.abs(V);
+    }
+  }
+  for(var i=0;i<W*H;i++){
+    var v=Vmax>0?Vmap[i]/Vmax:0;
+    var rc=v>0?Math.min(255,Math.floor(v*230)):0;
+    var bc=v<0?Math.min(255,Math.floor(-v*230)):0;
+    var gc=Math.floor((1-Math.min(1,Math.abs(v)*.8))*25);
+    img.data[i*4]=rc;img.data[i*4+1]=gc;img.data[i*4+2]=bc;img.data[i*4+3]=255;
+  }
+  ctx.putImageData(img,0,0);
+  // equipotential lines
+  var levels=[-0.75,-0.5,-0.25,0.25,0.5,0.75];
+  ctx.fillStyle='rgba(255,255,255,.5)';
+  for(var li=0;li<levels.length;li++){
+    var lev=levels[li]*Vmax;
+    for(var ey2=1;ey2<H-1;ey2++){
+      for(var ex2=1;ex2<W-1;ex2++){
+        var va=Vmap[ey2*W+ex2],vb=Vmap[ey2*W+ex2+1],vc=Vmap[(ey2+1)*W+ex2];
+        if((va-lev)*(vb-lev)<0||(va-lev)*(vc-lev)<0)ctx.fillRect(ex2,ey2,1,1);
+      }
+    }
+  }
+  for(var ci2=0;ci2<charges.length;ci2++){
+    var c2=charges[ci2];
+    drawSphere(ctx,c2.x*W,c2.y*H,10,c2.q>0?'#ff3300':'#4488ff',c2.q>0?'+':'-');
+  }
+}
+
+// ════════════════════════════════════════════════
+// FARADAY CAGE ANIMATION
+// ════════════════════════════════════════════════
+var fActive=false,fT=0,fPhase=0;
+function toggleFaraday(){
+  fActive=!fActive;
+  var btn=document.getElementById('fBtn'),st=document.getElementById('fStatus');
+  if(fActive){
+    btn.classList.add('on');btn.textContent='⚡ DESLIGAR CAMPO EXTERNO';
+    st.textContent='CAMPO EXTERNO ATIVO — BLINDAGEM EM ACAO!';st.style.color='var(--ey)';
+  } else {
+    btn.classList.remove('on');btn.textContent='⚡ APLICAR CAMPO ELETRICO EXTERNO';
+    st.textContent='GAIOLA EM REPOUSO — SEM CAMPO EXTERNO';st.style.color='var(--eb)';
+    fT=0;
+  }
+}
+function animFaraday(){
+  fT++;fPhase=(fPhase+1)%100;
+  var cv=document.getElementById('fCanvas');
+  if(!cv){requestAnimationFrame(animFaraday);return;}
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  ctx.fillStyle='#02040c';ctx.fillRect(0,0,W,H);
+  var cx=W/2,cy=H/2,cW=300,cH=210,cX=cx-150,cY=cy-105,gS=25;
+
+  // External animated field lines
+  if(fActive){
+    var scroll=(fPhase/100)*gS;
+    var alpha=Math.min(1,fT/50);
+    for(var fy=cY+13;fy<=cY+cH;fy+=gS){
+      // left side
+      ctx.save();ctx.globalAlpha=alpha;ctx.shadowColor='#00ccff';ctx.shadowBlur=8;
+      ctx.strokeStyle='rgba(0,204,255,.8)';ctx.lineWidth=2;
+      ctx.setLineDash([16,10]);ctx.lineDashOffset=-scroll;
+      ctx.beginPath();ctx.moveTo(12,fy);ctx.lineTo(cX-2,fy);ctx.stroke();
+      ctx.setLineDash([]);ctx.restore();
+      gArrow(ctx,cX-55,fy,cX-4,fy,'rgba(0,204,255,.8)',2,8);
+      // right side
+      ctx.save();ctx.globalAlpha=alpha;ctx.shadowColor='#00ccff';ctx.shadowBlur=8;
+      ctx.strokeStyle='rgba(0,204,255,.8)';ctx.lineWidth=2;
+      ctx.setLineDash([16,10]);ctx.lineDashOffset=-scroll;
+      ctx.beginPath();ctx.moveTo(cX+cW+2,fy);ctx.lineTo(W-12,fy);ctx.stroke();
+      ctx.setLineDash([]);ctx.restore();
+      gArrow(ctx,cX+cW+4,fy,cX+cW+55,fy,'rgba(0,204,255,.8)',2,8);
+    }
+    // E0 labels
+    ctx.save();ctx.globalAlpha=Math.min(1,fT/50);
+    ctx.shadowColor='#00ccff';ctx.shadowBlur=12;
+    ctx.font='bold 13px Orbitron,monospace';ctx.fillStyle='#00ccff';ctx.textAlign='center';
+    ctx.fillText('E₀  →',70,cY-16);ctx.fillText('E₀  →',W-70,cY-16);
+    ctx.restore();
+  }
+
+  // Interior blackout when field active
+  if(fActive){
+    var bAlpha=Math.min(.9,fT/40*.9);
+    ctx.fillStyle='rgba(0,0,10,'+bAlpha+')';
+    ctx.fillRect(cX+2,cY+2,cW-4,cH-4);
+    ctx.save();ctx.globalAlpha=Math.min(1,fT/45);
+    ctx.shadowColor='#fff';ctx.shadowBlur=22;
+    ctx.font='bold 28px Orbitron,monospace';ctx.fillStyle='#fff';ctx.textAlign='center';
+    ctx.fillText('E = 0',cx-36,cy+6);
+    ctx.shadowBlur=8;ctx.font='10px Share Tech Mono,monospace';ctx.fillStyle='rgba(255,255,255,.5)';
+    ctx.fillText('CAMPO INTERNO NULO',cx-36,cy+24);
+    ctx.restore();
+  }
+
+  // Wire mesh cage
+  ctx.save();
+  ctx.shadowColor='#ffcc00';ctx.shadowBlur=fActive?16:7;ctx.strokeStyle='#ffcc00';ctx.lineWidth=2;
+  for(var fx=cX;fx<=cX+cW+1;fx+=gS){ctx.beginPath();ctx.moveTo(fx,cY);ctx.lineTo(fx,cY+cH);ctx.stroke();}
+  for(var fy2=cY;fy2<=cY+cH+1;fy2+=gS){ctx.beginPath();ctx.moveTo(cX,fy2);ctx.lineTo(cX+cW,fy2);ctx.stroke();}
+  ctx.restore();
+
+  // Surface charges
+  if(fActive){
+    var cAlpha=Math.min(1,fT/35);
+    var pulse=.75+.25*Math.sin(fT*.09);
+    for(var sy=cY+12;sy<cY+cH;sy+=gS){
+      // negative on LEFT
+      ctx.save();ctx.globalAlpha=cAlpha;ctx.shadowColor='#4488ff';ctx.shadowBlur=10;
+      ctx.beginPath();ctx.arc(cX,sy,6*pulse,0,Math.PI*2);ctx.fillStyle='#4488ff';ctx.fill();
+      ctx.strokeStyle='#fff';ctx.lineWidth=.8;ctx.stroke();
+      ctx.font='9px Orbitron,monospace';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText('-',cX,sy+3);
+      ctx.restore();
+      // positive on RIGHT
+      ctx.save();ctx.globalAlpha=cAlpha;ctx.shadowColor='#ff3300';ctx.shadowBlur=10;
+      ctx.beginPath();ctx.arc(cX+cW,sy,6*pulse,0,Math.PI*2);ctx.fillStyle='#ff3300';ctx.fill();
+      ctx.strokeStyle='#fff';ctx.lineWidth=.8;ctx.stroke();
+      ctx.font='9px Orbitron,monospace';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText('+',cX+cW,sy+3);
+      ctx.restore();
+    }
+    var la=Math.min(1,fT/35);
+    ctx.save();ctx.globalAlpha=la;
+    lbl(ctx,cX-34,cy,'- - -','#4488ff',13);lbl(ctx,cX+cW+36,cy,'+ + +','#ff3300',13);
+    ctx.restore();
+  }
+
+  // Person inside
+  var px2=cx+52,pyp=cy+20;
+  var pc=fActive?'#00ff88':'#00ccff';
+  ctx.save();ctx.shadowColor=pc;ctx.shadowBlur=fActive?18:8;ctx.strokeStyle=pc;ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.arc(px2,pyp-30,9,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(px2,pyp-21);ctx.lineTo(px2,pyp+10);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(px2-14,pyp-8);ctx.lineTo(px2+14,pyp-8);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(px2,pyp+10);ctx.lineTo(px2-9,pyp+28);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(px2,pyp+10);ctx.lineTo(px2+9,pyp+28);ctx.stroke();
+  if(fActive){
+    ctx.globalAlpha=Math.min(1,fT/35);
+    ctx.font='9px Share Tech Mono,monospace';ctx.fillStyle='#00ff88';ctx.textAlign='center';
+    ctx.fillText('PROTEGIDO',px2,pyp+42);
+  }
+  ctx.restore();
+
+  // Bottom status
+  ctx.font='10px Share Tech Mono,monospace';ctx.fillStyle='rgba(0,204,255,.35)';ctx.textAlign='left';
+  ctx.fillText(fActive?'STATUS: BLINDADO — E_interno = 0':'STATUS: EM REPOUSO',10,H-10);
+  requestAnimationFrame(animFaraday);
+}
+
+// ════════════════════════════════════════════════
+// LIGHTNING ANIMATION — FIX: correct geometry
+// ════════════════════════════════════════════════
+var ltT=0;
+function makeBolt(sx,sy,ex,ey,n,rough){
+  var pts=[[sx,sy]];
+  for(var i=1;i<n;i++){
+    var t=i/n;
+    var x=sx+(ex-sx)*t+(Math.random()-.5)*rough;
+    var y=sy+(ey-sy)*t+(Math.random()-.5)*rough*.25;
+    pts.push([x,y]);
+  }
+  pts.push([ex,ey]);return pts;
+}
+function animLightning(){
+  ltT++;
+  var cv=document.getElementById('ltCanvas');
+  if(!cv){requestAnimationFrame(animLightning);return;}
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bgFill(ctx,W,H);
+
+  // ── Cloud (top-left) ──
+  function drawCloud(cx,cy){
+    ctx.save();ctx.shadowColor='#aabbff';ctx.shadowBlur=18;
+    ctx.fillStyle='#161630';ctx.strokeStyle='rgba(160,176,255,.5)';ctx.lineWidth=2;
+    var bumps=[[0,0,44],[32,-14,34],[-32,-14,34],[52,6,28],[-52,6,28]];
+    bumps.forEach(function(b){
+      ctx.beginPath();ctx.arc(cx+b[0],cy+b[1],b[2],0,Math.PI*2);ctx.fill();ctx.stroke();
+    });
+    ctx.restore();
+  }
+  drawCloud(180,55);
+
+  // ── Ground ──
+  var gY=H-24;
+  ctx.fillStyle='rgba(0,204,255,.04)';ctx.fillRect(0,gY,W,H-gY);
+  ctx.strokeStyle='rgba(0,204,255,.35)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,gY);ctx.lineTo(W,gY);ctx.stroke();
+  for(var gx=0;gx<W;gx+=20){
+    ctx.strokeStyle='rgba(0,204,255,.12)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(gx,gY);ctx.lineTo(gx-8,gY+18);ctx.stroke();
+  }
+
+  // ── Building ──
+  var bX=420,bY=H-155,bW=120,bH=131;
+  ctx.fillStyle='#0a0f1a';ctx.strokeStyle='rgba(0,204,255,.28)';ctx.lineWidth=1.5;
+  ctx.fillRect(bX,bY,bW,bH);ctx.strokeRect(bX,bY,bW,bH);
+  // windows
+  ctx.fillStyle='rgba(255,238,100,.12)';
+  [[440,bY+16],[500,bY+16],[440,bY+54],[500,bY+54],[440,bY+92],[500,bY+92]].forEach(function(w){ctx.fillRect(w[0],w[1],18,13);});
+
+  // ── Lightning rod ──
+  var rodX=480,rodTipY=bY-38,rodBaseY=bY;
+  ctx.save();ctx.shadowColor='#ffee00';ctx.shadowBlur=14;ctx.strokeStyle='#ffee00';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(rodX,rodBaseY);ctx.lineTo(rodX,rodTipY);ctx.stroke();
+  ctx.beginPath();ctx.arc(rodX,rodTipY,4,0,Math.PI*2);ctx.fillStyle='#ffee00';ctx.fill();
+  // ground wire
+  ctx.strokeStyle='rgba(255,238,0,.4)';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(bX+bW,bY+50);ctx.lineTo(bX+bW,gY);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+  lbl(ctx,rodX+2,rodTipY-14,'PARA-RAIOS','#ffee00',9);
+  lbl(ctx,bX+bW+22,bY+70,'CABO','rgba(255,238,0,.5)',8,'left');
+  lbl(ctx,bX+bW+22,bY+82,'TERRA','rgba(255,238,0,.5)',8,'left');
+
+  // ── Lightning bolt (FIXED: goes from cloud bottom to rod tip) ──
+  // Cloud bottom ≈ (180, 95); Rod tip ≈ (rodX, rodTipY)
+  var strikeFrame=(ltT%36);
+  if(strikeFrame<22){
+    var tAnim=strikeFrame/22;
+    var alpha=tAnim<.3?tAnim/.3:(1-tAnim)/.7;
+    var bolt=makeBolt(195,95,rodX,rodTipY,10,55);
+    ctx.save();ctx.globalAlpha=alpha;
+    ctx.shadowColor='#ffff88';ctx.shadowBlur=24;ctx.strokeStyle='#ffff88';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(bolt[0][0],bolt[0][1]);
+    for(var bi=1;bi<bolt.length;bi++)ctx.lineTo(bolt[bi][0],bolt[bi][1]);
+    ctx.stroke();
+    // glow at tip
+    ctx.beginPath();ctx.arc(rodX,rodTipY,7+alpha*9,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,238,0,'+(alpha*.7)+')';ctx.fill();
+    ctx.restore();
+  }
+
+  lbl(ctx,180,H-10,'NUVEM CARREGADA','rgba(160,176,255,.55)',9);
+  lbl(ctx,560,H-10,'EDIFICIO PROTEGIDO','rgba(0,204,255,.45)',9);
+  requestAnimationFrame(animLightning);
+}
+
+// ════════════════════════════════════════════════
+// QUIZ
+// ════════════════════════════════════════════════
+var QA={q1:0,q2:0,q3:0,q4:0,q5:0,q6:0,q7:0,q8:0};
+var FB={
+  q1:{c:'CORRETO! Receber eletrons = carga negativa. q = n*e = 5e12 * 1,6e-19 = 8e-7 C → q = -8×10⁻⁷ C.',
+      w:'ERRADO. Receber eletrons = carga NEGATIVA. q = 5×10¹² × 1,6×10⁻¹⁹ = 8×10⁻⁷ C → q = -8×10⁻⁷ C.'},
+  q2:{c:'CORRETO! F = k*q²/r² = 9e9*(1,6e-19)²/(2e-10)² = 9e9*2,56e-38/4e-20 = 5,76×10⁻⁹ N.',
+      w:'ERRADO. F = k*q²/r² = 9×10⁹×(1,6×10⁻¹⁹)²/(2×10⁻¹⁰)² = 5,76×10⁻⁹ N.'},
+  q3:{c:'CORRETO! F ∝ 1/r². Triplicar r: F → F/3² = F/9. A força diminui 9 vezes.',
+      w:'ERRADO. F ∝ 1/r². Se r triplica, F cai para 1/9 do valor original.'},
+  q4:{c:'CORRETO! E = F/q₀ = 0,04/(2×10⁻⁶) = 2×10⁴ N/C.',
+      w:'ERRADO. E = F/q₀ = 0,04/2×10⁻⁶ = 2×10⁴ N/C. Divida F pela carga de prova.'},
+  q5:{c:'CORRETO! V = k*Q/r = 9e9*2e-6/0,3 = 18000/0,3 = 60000 = 6×10⁴ V.',
+      w:'ERRADO. V = k*Q/r = 9×10⁹×2×10⁻⁶/0,3 = 18000/0,3 = 6×10⁴ V.'},
+  q6:{c:'CORRETO! A carroceria metalica age como Gaiola de Faraday: cargas redistribuem-se na superficie, tornando o campo interno nulo.',
+      w:'ERRADO. O carro protege pela Gaiola de Faraday (carroceria metalica), nao pelos pneus ou vidro.'},
+  q7:{c:'CORRETO! Em equilibrio eletrostatico: cargas na SUPERFICIE, campo INTERNO = 0. Decorre da Lei de Gauss.',
+      w:'ERRADO. Em equilibrio eletrostatico: cargas na SUPERFICIE (nao no volume/centro) e campo INTERNO = 0.'},
+  q8:{c:'CORRETO! Por inducao com aterramento: o corpo adquire sinal OPOSTO ao indutor (cargas de mesmo sinal escoam pelo terra).',
+      w:'ERRADO. Por inducao: o corpo fica com sinal OPOSTO ao indutor, pois as cargas de mesmo sinal escoam pelo aterramento.'}
+};
+var answered=0;
+function ans(btn,qId,result){
+  var card=document.getElementById(qId);
+  card.querySelectorAll('.obt').forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('f_'+qId);
+  if(result==='correct'){btn.classList.add('correct');fb.textContent=FB[qId].c;fb.className='fb show ok';QA[qId]=1;}
+  else{btn.classList.add('wrong');fb.textContent=FB[qId].w;fb.className='fb show err';
+    card.querySelectorAll('.obt').forEach(function(b){if(b.getAttribute('onclick').indexOf("'correct'")>-1)b.classList.add('correct');});}
+  answered++;updateP();if(answered===8)showScore();
+}
+function updateP(){
+  document.getElementById('pBar').style.width=(answered/8*100)+'%';
+  document.getElementById('pTxt').textContent=answered+' / 8 respondidas';
+}
+function showScore(){
+  var sc=0;Object.values(QA).forEach(function(v){sc+=v;});
+  var p=document.getElementById('spanel');p.style.display='block';
+  document.getElementById('scv').textContent=sc+'/8';
+  var msgs=['Revise o conteudo e tente novamente!','Bom inicio! Releia as secoes com dificuldade.','Indo bem! Pratique os calculos.','Excelente dominio da eletrostatica!','Perfeito! Resultado impecavel!'];
+  var idx=sc<=2?0:sc<=4?1:sc<=5?2:sc<=7?3:4;
+  document.getElementById('scm').textContent=msgs[idx];
+  var cols=['#ff3300','#ffaa00','#ffee00','#00ff88','#00ccff'];
+  document.getElementById('scv').style.color=cols[idx];
+  document.getElementById('scv').style.textShadow='0 0 20px '+cols[idx];
+  p.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQ(){
+  Object.keys(QA).forEach(function(k){QA[k]=0;});answered=0;updateP();
+  document.getElementById('spanel').style.display='none';
+  ['q1','q2','q3','q4','q5','q6','q7','q8'].forEach(function(id){
+    document.getElementById(id).querySelectorAll('.obt').forEach(function(b){b.disabled=false;b.classList.remove('correct','wrong');});
+    var fb=document.getElementById('f_'+id);fb.className='fb';fb.textContent='';
+  });
+}
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+window.addEventListener('load',function(){
+  animCharges();
+  drawCoulomb();
+  drawFL();
+  setTimeout(drawPot,50);   // defer heavy potential map
+  animFaraday();
+  animLightning();
+});
+</script>
+</body>
+</html>

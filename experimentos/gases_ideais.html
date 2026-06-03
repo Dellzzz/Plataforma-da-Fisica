@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação Interativa - Lei dos Gases Ideais</title>
+    <style>
+        :root {
+            --bg-color: #0d0814;
+            --panel-bg: #150d22;
+            --panel-border: #bc13fe;
+            --neon-cyan: #00f3ff;
+            --neon-purple: #bc13fe;
+            --neon-pink: #ff007f;
+            --text-color: #e2dbec;
+            --muted-text: #8b7fa4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: linear-gradient(180deg, #1a0f2b 0%, var(--bg-color) 100%);
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
+            padding: 15px 20px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.15);
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-purple), 0 0 20px rgba(188, 19, 254, 0.5);
+            letter-spacing: 1px;
+        }
+
+        header p {
+            color: var(--neon-cyan);
+            font-size: 13px;
+            margin-top: 4px;
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.4);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 320px 1fr 340px;
+            gap: 15px;
+            padding: 15px;
+            flex: 1;
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 1100px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background-color: var(--panel-bg);
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .panel-title {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: var(--neon-cyan);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+            padding-bottom: 6px;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Controles / Sliders */
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-color);
+        }
+
+        .control-label span.val {
+            color: var(--neon-cyan);
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #2a1b40;
+            border-radius: 3px;
+            outline: none;
+            border: 1px solid rgba(188, 19, 254, 0.2);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--neon-cyan);
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--neon-cyan);
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        input[type="range"]:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Botões Modos Termodinâmicos */
+        .modes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        button {
+            background-color: #221236;
+            border: 1px solid var(--neon-purple);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: var(--neon-purple);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(188, 19, 254, 0.6);
+        }
+
+        button.active {
+            background-color: var(--neon-purple);
+            color: #fff;
+            box-shadow: 0 0 12px var(--neon-purple);
+            border-color: #fff;
+        }
+
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: #444;
+        }
+
+        .btn-danger {
+            border-color: var(--neon-pink);
+            background-color: #3d0522;
+        }
+        .btn-danger:hover:not(:disabled) {
+            background-color: var(--neon-pink);
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        /* Toggle switches */
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider-toggle {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #2a1b40;
+            border: 1px solid rgba(188, 19, 254, 0.4);
+            transition: .3s;
+            border-radius: 22px;
+        }
+
+        .slider-toggle:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-color);
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider-toggle {
+            background-color: var(--neon-purple);
+        }
+
+        input:checked + .slider-toggle:before {
+            transform: translateX(22px);
+            background-color: #fff;
+        }
+
+        /* Área Central do Recipiente */
+        .simulation-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #simCanvas {
+            background-color: #07030d;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            width: 100%;
+            max-width: 600px;
+            height: 520px;
+        }
+
+        /* Painel de Leituras em Tempo Real */
+        .readout-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .readout-card {
+            background-color: #1a0f2b;
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .readout-card .label {
+            font-size: 11px;
+            color: var(--muted-text);
+            text-transform: uppercase;
+        }
+
+        .readout-card .value {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+        
+        .readout-card.cyan-glow .value { color: var(--neon-cyan); text-shadow: 0 0 5px rgba(0,243,255,0.3); }
+        .readout-card.purple-glow .value { color: var(--neon-purple); text-shadow: 0 0 5px rgba(188,19,254,0.3); }
+        .readout-card.pink-glow .value { color: var(--neon-pink); text-shadow: 0 0 5px rgba(255,0,127,0.3); }
+
+        /* Gráficos */
+        .graphs-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            flex: 1;
+            max-height: 520px;
+            padding-right: 2px;
+        }
+
+        .graph-wrapper {
+            background-color: #0a0514;
+            border: 1px solid rgba(188, 19, 254, 0.2);
+            border-radius: 6px;
+            padding: 5px;
+            position: relative;
+        }
+
+        .graph-wrapper h4 {
+            font-size: 11px;
+            color: var(--muted-text);
+            margin-bottom: 3px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .graph-canvas {
+            background-color: #05020a;
+            display: block;
+            width: 100%;
+            height: 100px;
+            border-radius: 4px;
+        }
+
+        /* Rodapé Pedagógico */
+        footer {
+            background-color: #09050e;
+            border-top: 1px solid rgba(188, 19, 254, 0.15);
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted-text);
+            margin-top: auto;
+        }
+
+        /* Alertas visuais e overlay de explosão */
+        .explosion-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 0, 50, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+            z-index: 10;
+            display: none;
+        }
+
+        .explosion-title {
+            color: #fff;
+            font-size: 28px;
+            font-weight: 900;
+            text-shadow: 0 0 15px #ff0033, 0 0 30px #ff0033;
+            animation: pulse 0.5s infinite alternate;
+            text-transform: uppercase;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(0.95); opacity: 0.8; }
+            to { transform: scale(1.05); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Lei dos Gases Ideais – Termodinâmica Computacional</h1>
+        <p>Laboratório Virtual Interativo • PV = nRT</p>
+    </header>
+
+    <div class="dashboard">
+        <!-- PAINEL ESQUERDO: CONTROLES -->
+        <div class="panel">
+            <div class="panel-title">Parâmetros do Sistema</div>
+            
+            <!-- Slider Moléculas -->
+            <div class="control-group">
+                <div class="control-label">
+                    <span>Quantidade de matéria (n)</span>
+                    <span id="valN" class="val">100 mol</span>
+                </div>
+                <input type="range" id="sliderN" min="10" max="300" value="100">
+            </div>
+
+            <!-- Slider Volume -->
+            <div class="control-group">
+                <div class="control-label">
+                    <span>Volume do Recipiente (V)</span>
+                    <span id="valV" class="val">5.0 L</span>
+                </div>
+                <input type="range" id="sliderV" min="20" max="100" value="50" step="1">
+            </div>
+
+            <!-- Slider Temperatura -->
+            <div class="control-group">
+                <div class="control-label">
+                    <span>Temperatura (T)</span>
+                    <span id="valT" class="val">300 K</span>
+                </div>
+                <input type="range" id="sliderT" min="100" max="1000" value="300">
+            </div>
+
+            <!-- Slider Pressão Externa (Para modo Isobárico) -->
+            <div class="control-group" id="groupPext" style="opacity: 0.5;">
+                <div class="control-label">
+                    <span>Pressão Alvo / Externa (P)</span>
+                    <span id="valPext" class="val">Ajuste Livre</span>
+                </div>
+                <input type="range" id="sliderPext" min="500" max="6000" value="2500" disabled>
+            </div>
+
+            <div class="panel-title">Transformações Gasosas</div>
+            <div class="modes-grid">
+                <button id="modeIdeal" class="active">Livre / Ideal</button>
+                <button id="modeIsothermal">Isotérmica (T=Cte)</button>
+                <button id="modeIsobaric">Isobárica (P=Cte)</button>
+                <button id="modeIsovolumetric">Isovolumétrica (V=Cte)</button>
+            </div>
+
+            <div class="panel-title">Simulador & Ambiente</div>
+            <div class="toggle-container">
+                <span>Efeito de Gravidade</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggleGravity">
+                    <span class="slider-toggle"></span>
+                </label>
+            </div>
+
+            <div class="toggle-container">
+                <span>Câmera Lenta</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggleSlowMo">
+                    <span class="slider-toggle"></span>
+                </label>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <button id="btnPause" style="flex: 1; border-color: var(--neon-cyan)">Pausar</button>
+                <button id="btnReset" style="flex: 1;" class="btn-danger">Reiniciar</button>
+            </div>
+            
+            <button id="btnExplode" class="btn-danger" style="width: 100%;">Forçar Explosão 💥</button>
+        </div>
+
+        <!-- ÁREA CENTRAL: ANIMAÇÃO DO RECIPIENTE -->
+        <div class="simulation-container">
+            <canvas id="simCanvas" width="600" height="520"></canvas>
+            
+            <!-- Overlay de colapso/explosão -->
+            <div id="explosionOverlay" class="explosion-overlay">
+                <div class="explosion-title">⚠️ Panela Explodiu!</div>
+                <p style="margin: 10px 0 15px 0; font-size:13px; text-align:center;">A pressão limite suportada pelas paredes físicas foi excedida.</p>
+                <button id="btnRepair" style="border-color: var(--neon-cyan); padding: 10px 20px;">Consertar Recipiente</button>
+            </div>
+        </div>
+
+        <!-- PAINEL DIREITO: LEITURAS E GRÁFICOS -->
+        <div class="panel">
+            <div class="panel-title">Monitor de Variáveis (Tempo Real)</div>
+            <div class="readout-grid">
+                <div class="readout-card purple-glow">
+                    <div class="label">Pressão (P)</div>
+                    <div id="readoutP" class="value">0 Pa</div>
+                </div>
+                <div class="readout-card cyan-glow">
+                    <div class="label">Volume (V)</div>
+                    <div id="readoutV" class="value">5.0 L</div>
+                </div>
+                <div class="readout-card pink-glow">
+                    <div class="label">Temperatura (T)</div>
+                    <div id="readoutT" class="value">300 K</div>
+                </div>
+                <div class="readout-card">
+                    <div class="label">Vel. Média (Vrms)</div>
+                    <div id="readoutSpeed" class="value" style="color: #fff;">0 m/s</div>
+                </div>
+            </div>
+
+            <div class="panel-title">Gráficos de Estado Dinâmicos</div>
+            <div class="graphs-container">
+                <div class="graph-wrapper">
+                    <h4>Gráfico Pressão × Volume (P × V)</h4>
+                    <canvas id="canvasPV" class="graph-canvas" width="310" height="100"></canvas>
+                </div>
+                <div class="graph-wrapper">
+                    <h4>Gráfico Volume × Temperatura (V × T)</h4>
+                    <canvas id="canvasVT" class="graph-canvas" width="310" height="100"></canvas>
+                </div>
+                <div class="graph-wrapper">
+                    <h4>Gráfico Pressão × Temperatura (P × T)</h4>
+                    <canvas id="canvasPT" class="graph-canvas" width="310" height="100"></canvas>
+                </div>
+                <div class="graph-wrapper">
+                    <h4>Histograma de Velocidades de Maxwell-Boltzmann</h4>
+                    <canvas id="canvasHist" class="graph-canvas" width="310" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Desenvolvido para fins Educacionais • Demonstração Prática da Teoria Cinética dos Gases e Leis da Termodinâmica.
+    </footer>
+
+    <script>
+        /**
+         * CLASSE PARTICLE
+         * Representa cada molécula gasosa individual dentro do recipiente.
+         */
+        class Particle {
+            constructor(x, y, vx, vy, radius = 4.5) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.radius = radius;
+                this.mass = 1.0; // Massas iguais para simplificação do gás ideal
+            }
+
+            // Atualiza posição aplicando opcionalmente a aceleração da gravidade
+            update(dt, gravityOn) {
+                if (gravityOn) {
+                    this.vy += 0.15 * dt; // Pequena força gravitacional para criar gradiente
+                }
+                this.x += this.vx * dt;
+                this.y += this.vy * dt;
+            }
+
+            // Retorna a cor baseada no módulo da velocidade (Energia Cinética)
+            // Azul (Frio) -> Amarelo (Médio) -> Vermelho (Quente)
+            getColor() {
+                const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                if (speed < 2.5) return '#00f3ff'; // Frio (Cyan)
+                if (speed < 5.5) return '#ffea00'; // Médio (Amarelo)
+                return '#ff0055'; // Quente (Vermelho/Rosa neon)
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                const color = this.getColor();
+                ctx.fillStyle = color;
+                ctx.shadowBlur = 4;
+                ctx.shadowColor = color;
+                ctx.fill();
+                ctx.shadowBlur = 0; // reseta efeito borrão para performance
+            }
+        }
+
+        /**
+         * CLASSE CONTAINER
+         * Controla a geometria tridimensional/bidimensional e os limites móveis do pistão.
+         */
+        class Container {
+            constructor(x, y, width, maxHeight) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.maxHeight = maxHeight;
+                this.pistonY = y + maxHeight * 0.5; // inicia a 50% de volume
+            }
+
+            // Define a altura do pistão baseando-se na porcentagem de volume selecionada
+            setVolumePercentage(pct) {
+                // pct varia de 20 a 100
+                const heightFactor = pct / 100;
+                this.pistonY = (this.y + this.maxHeight) - (this.maxHeight * heightFactor);
+            }
+
+            getVolumeHeight() {
+                return (this.y + this.maxHeight) - this.pistonY;
+            }
+
+            getVolumeLiters() {
+                return parseFloat(((this.getVolumeHeight() / this.maxHeight) * 10).toFixed(2));
+            }
+
+            draw(ctx, vibrationIntensity = 0) {
+                ctx.save();
+                
+                // Leve vibração induzida pela pressão mecânica nas paredes do recipiente
+                if (vibrationIntensity > 0) {
+                    const dx = (Math.random() - 0.5) * Math.min(vibrationIntensity * 0.05, 5);
+                    const dy = (Math.random() - 0.5) * Math.min(vibrationIntensity * 0.05, 5);
+                    ctx.translate(dx, dy);
+                }
+
+                // Desenha parede externa do cilindro (Fundo, Esquerda, Direita)
+                ctx.strokeStyle = '#bc13fe';
+                ctx.lineWidth = 4;
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = '#bc13fe';
+                
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.pistonY - 20); // Extende um pouco acima para guia
+                ctx.lineTo(this.x, this.y + this.maxHeight);
+                ctx.lineTo(this.x + this.width, this.y + this.maxHeight);
+                ctx.lineTo(this.x + this.width, this.pistonY - 20);
+                ctx.stroke();
+
+                // Desenha o Pistão Móvel Superior
+                ctx.strokeStyle = '#00f3ff';
+                ctx.shadowColor = '#00f3ff';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.moveTo(this.x - 4, this.pistonY);
+                ctx.lineTo(this.x + this.width + 4, this.pistonY);
+                ctx.stroke();
+
+                // Haste central do pistão
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(this.x + this.width / 2, this.pistonY);
+                ctx.lineTo(this.x + this.width / 2, this.pistonY - 40);
+                ctx.stroke();
+
+                // Escala lateral de volume indicativa
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = 'rgba(139, 127, 164, 0.4)';
+                ctx.font = '10px sans-serif';
+                for (let i = 1; i <= 10; i++) {
+                    const hMarker = (this.y + this.maxHeight) - (this.maxHeight * (i / 10));
+                    ctx.fillRect(this.x - 15, hMarker, 8, 1);
+                    ctx.fillText(`${i}L`, this.x - 35, hMarker + 4);
+                }
+
+                ctx.restore();
+            }
+        }
+
+        /**
+         * CLASSE PHYSICSENGINE
+         * Resolve colisões moleculares elásticas perfeitas e calcula a pressão via força normal.
+         */
+        class PhysicsEngine {
+            constructor() {
+                this.collisionImpulses = [];
+                this.maxHistoryFrames = 60; // Janela móvel para média harmônica da pressão
+            }
+
+            process(particles, container, dt, gravityOn, isExploded) {
+                let totalImpulseThisFrame = 0;
+
+                const left = container.x;
+                const right = container.x + container.width;
+                const bottom = container.y + container.maxHeight;
+                const top = container.pistonY;
+
+                particles.forEach(p => {
+                    p.update(dt, gravityOn);
+
+                    if (!isExploded) {
+                        // Colisão com parede Esquerda
+                        if (p.x - p.radius < left) {
+                            p.x = left + p.radius;
+                            p.vx = -p.vx;
+                            totalImpulseThisFrame += Math.abs(2 * p.vx * p.mass);
+                        }
+                        // Colisão com parede Direita
+                        if (p.x + p.radius > right) {
+                            p.x = right - p.radius;
+                            p.vx = -p.vx;
+                            totalImpulseThisFrame += Math.abs(2 * p.vx * p.mass);
+                        }
+                        // Colisão com fundo (Base)
+                        if (p.y + p.radius > bottom) {
+                            p.y = bottom - p.radius;
+                            p.vy = -p.vy;
+                            totalImpulseThisFrame += Math.abs(2 * p.vy * p.mass);
+                        }
+                        // Colisão com o Pistão móvel
+                        if (p.y - p.radius < top) {
+                            p.y = top + p.radius;
+                            p.vy = -p.vy;
+                            totalImpulseThisFrame += Math.abs(2 * p.vy * p.mass);
+                        }
+                    } else {
+                        // Se explodiu, os limites somem e as partículas rebatem nas bordas externas do canvas
+                        if (p.x - p.radius < 0 || p.x + p.radius > 600) p.vx = -p.vx;
+                        if (p.y - p.radius < 0 || p.y + p.radius > 520) p.vy = -p.vy;
+                    }
+                });
+
+                // Detecção e Resolução de Colisões Interpartículas (Esferas Rígidas)
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const p1 = particles[i];
+                        const p2 = particles[j];
+
+                        const dx = p2.x - p1.x;
+                        const dy = p2.y - p1.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        const minDist = p1.radius + p2.radius;
+
+                        if (distance < minDist) {
+                            // Evita sobreposição física forçando separação geométrica
+                            const overlap = minDist - distance;
+                            const nx = dx / distance;
+                            const ny = dy / distance;
+
+                            p1.x -= nx * overlap * 0.5;
+                            p1.y -= ny * overlap * 0.5;
+                            p2.x += nx * overlap * 0.5;
+                            p2.y += ny * overlap * 0.5;
+
+                            // Troca de momento linear elástico bidimensional (Vetores Normais)
+                            const kx = p1.vx - p2.vx;
+                            const ky = p1.vy - p2.vy;
+                            const impulse = 2 * (nx * kx + ny * ky) / (p1.mass + p2.mass);
+
+                            p1.vx -= impulse * p2.mass * nx;
+                            p1.vy -= impulse * p2.mass * ny;
+                            p2.vx += impulse * p1.mass * nx;
+                            p2.vy += impulse * p1.mass * ny;
+                        }
+                    }
+                }
+
+                // Armazena impulsos mecânicos para cálculo estatístico da pressão macroscópica
+                this.collisionImpulses.push(totalImpulseThisFrame);
+                if (this.collisionImpulses.length > this.maxHistoryFrames) {
+                    this.collisionImpulses.shift();
+                }
+            }
+
+            // Calcula Pressão baseando-se na força média exercida pelo perímetro exposto
+            getCurrentPressure(container) {
+                if (this.collisionImpulses.length === 0) return 0;
+                const sumImpulses = this.collisionImpulses.reduce((a, b) => a + b, 0);
+                const avgImpulsePerFrame = sumImpulses / this.collisionImpulses.length;
+                
+                // Perímetro efetivo das paredes em contato com o gás
+                const perimeter = container.width + 2 * container.getVolumeHeight();
+                
+                // Escalonador matemático para converter colisões em Pascal de forma crível
+                const computedPressure = (avgImpulsePerFrame * 180) / (perimeter || 1);
+                return Math.round(computedPressure);
+            }
+        }
+
+        /**
+         * CLASSE GRAPHMANAGER
+         * Gerencia e renderiza gráficos cartesianos dinâmicos em canvas miniaturizados.
+         */
+        class GraphManager {
+            constructor() {
+                this.historyPV = [];
+                this.historyVT = [];
+                this.historyPT = [];
+                this.maxPoints = 80;
+            }
+
+            recordData(p, v, t) {
+                this.historyPV.push({ x: v, y: p });
+                this.historyVT.push({ x: t, y: v });
+                this.historyPT.push({ x: t, y: p });
+
+                if (this.historyPV.length > this.maxPoints) {
+                    this.historyPV.shift();
+                    this.historyVT.shift();
+                    this.historyPT.shift();
+                }
+            }
+
+            clear() {
+                this.historyPV = [];
+                this.historyVT = [];
+                this.historyPT = [];
+            }
+
+            drawPlot(canvasId, data, labelX, labelY, maxX, maxY) {
+                const canvas = document.getElementById(canvasId);
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Desenha grade de fundo sutil
+                ctx.strokeStyle = 'rgba(188, 19, 254, 0.08)';
+                ctx.lineWidth = 1;
+                for (let i = 30; i < canvas.width; i += 30) {
+                    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+                }
+                for (let j = 20; j < canvas.height; j += 20) {
+                    ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
+                }
+
+                if (data.length < 2) return;
+
+                // Plota a linha de dados com degradê/sombra neon
+                ctx.strokeStyle = '#00f3ff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+
+                data.forEach((point, index) => {
+                    // Mapeamento normalizado da coordenada cartesiana para pixels da tela
+                    const px = 15 + (point.x / maxX) * (canvas.width - 30);
+                    const py = canvas.height - 10 - (point.y / maxY) * (canvas.height - 20);
+
+                    if (index === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                });
+                ctx.stroke();
+            }
+
+            drawHistogram(canvasId, particles) {
+                const canvas = document.getElementById(canvasId);
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (particles.length === 0) return;
+
+                const speeds = particles.map(p => Math.sqrt(p.vx * p.vx + p.vy * p.vy));
+                const maxSpeedLimit = 12; 
+                const binCount = 12;
+                const bins = new Array(binCount).fill(0);
+
+                speeds.forEach(speed => {
+                    let idx = Math.floor((speed / maxSpeedLimit) * binCount);
+                    if (idx >= binCount) idx = binCount - 1;
+                    if (idx < 0) idx = 0;
+                    bins[idx]++;
+                });
+
+                const maxBinValue = Math.max(...bins, 1);
+                const binWidth = canvas.width / binCount;
+
+                bins.forEach((count, i) => {
+                    const h = (count / maxBinValue) * (canvas.height - 15);
+                    ctx.fillStyle = 'rgba(188, 19, 254, 0.4)';
+                    ctx.strokeStyle = '#bc13fe';
+                    ctx.lineWidth = 1;
+                    ctx.fillRect(i * binWidth, canvas.height - h, binWidth - 2, h);
+                    ctx.strokeRect(i * binWidth, canvas.height - h, binWidth - 2, h);
+                });
+            }
+        }
+
+        /**
+         * NÚCLEO E GERENCIAMENTO DO SIMULADOR (MAIN CONTROLLER)
+         */
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Instanciamento de Componentes
+        const container = new Container(100, 80, 400, 400);
+        const physics = new PhysicsEngine();
+        const graphManager = new GraphManager();
+
+        let particles = [];
+        let currentMode = 'ideal'; // ideal, isothermal, isobaric, isovolumetric
+        let isPaused = false;
+        let isExploded = false;
+        let targetPressureIsobaric = 2500;
+
+        // Elementos DOM
+        const sliderN = document.getElementById('sliderN');
+        const sliderV = document.getElementById('sliderV');
+        const sliderT = document.getElementById('sliderT');
+        const sliderPext = document.getElementById('sliderPext');
+        const groupPext = document.getElementById('groupPext');
+
+        const valN = document.getElementById('valN');
+        const valV = document.getElementById('valV');
+        const valT = document.getElementById('valT');
+        const valPext = document.getElementById('valPext');
+
+        const readoutP = document.getElementById('readoutP');
+        const readoutV = document.getElementById('readoutV');
+        const readoutT = document.getElementById('readoutT');
+        const readoutSpeed = document.getElementById('readoutSpeed');
+
+        const toggleGravity = document.getElementById('toggleGravity');
+        const toggleSlowMo = document.getElementById('toggleSlowMo');
+        const btnPause = document.getElementById('btnPause');
+        const btnReset = document.getElementById('btnReset');
+        const btnExplode = document.getElementById('btnExplode');
+        const btnRepair = document.getElementById('btnRepair');
+        const explosionOverlay = document.getElementById('explosionOverlay');
+
+        // Inicializa ou altera o número de partículas respeitando as condições de contorno
+        function syncParticleCount() {
+            const targetCount = parseInt(sliderN.value);
+            valN.innerText = `${targetCount} mol`;
+
+            if (particles.length < targetCount) {
+                // Adiciona novas partículas com velocidade proporcional à temperatura configurada
+                const currentTemp = parseInt(sliderT.value);
+                const speedScale = Math.sqrt(currentTemp / 15);
+
+                while (particles.length < targetCount) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = (0.3 + Math.random() * 0.7) * speedScale;
+                    
+                    // Sorteia dentro dos limites atuais do recipiente
+                    const margin = 15;
+                    const px = container.x + margin + Math.random() * (container.width - margin * 2);
+                    const py = container.pistonY + margin + Math.random() * (container.getVolumeHeight() - margin * 2);
+
+                    particles.push(new Particle(px, py, Math.cos(angle) * speed, Math.sin(angle) * speed));
+                }
+            } else if (particles.length > targetCount) {
+                particles.splice(targetCount);
+            }
+        }
+
+        // Ajusta as velocidades moleculares se a temperatura global mudar externa ou internamente
+        function applyTemperatureScale() {
+            const currentTemp = parseInt(sliderT.value);
+            valT.innerText = `${currentTemp} K`;
+            const desiredMeanSpeed = Math.sqrt(currentTemp / 15);
+
+            particles.forEach(p => {
+                const currentSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy) || 0.001;
+                // Ajusta proporcionalmente mantendo a direção vetorial intacta
+                p.vx = (p.vx / currentSpeed) * desiredMeanSpeed * (0.8 + Math.random() * 0.4);
+                p.vy = (p.vy / currentSpeed) * desiredMeanSpeed * (0.8 + Math.random() * 0.4);
+            });
+        }
+
+        // Atualiza interface visual e bloqueio de inputs baseado na lei física escolhida
+        function updateModeUI() {
+            // Remove ativação visual anterior
+            document.querySelectorAll('.modes-grid button').forEach(btn => btn.classList.remove('active'));
+            
+            sliderT.disabled = false;
+            sliderV.disabled = false;
+            sliderPext.disabled = true;
+            groupPext.style.opacity = "0.4";
+            valPext.innerText = "Ajuste Livre";
+
+            switch (currentMode) {
+                case 'ideal':
+                    document.getElementById('modeIdeal').classList.add('active');
+                    break;
+                case 'isothermal':
+                    document.getElementById('modeIsothermal').classList.add('active');
+                    sliderT.disabled = true; // Temperatura constante fixa
+                    break;
+                case 'isobaric':
+                    document.getElementById('modeIsobaric').classList.add('active');
+                    sliderV.disabled = true; // Volume flutuará dinamicamente para ajustar a pressão
+                    sliderPext.disabled = false;
+                    groupPext.style.opacity = "1";
+                    valPext.innerText = `${sliderPext.value} Pa`;
+                    targetPressureIsobaric = parseInt(sliderPext.value);
+                    break;
+                case 'isvolumetric':
+                    document.getElementById('modeIsovolumetric').classList.add('active');
+                    sliderV.disabled = true; // Volume rígido trancado
+                    break;
+            }
+        }
+
+        // Loop de Renderização Principal (Alvo: 60 FPS estável)
+        let lastTimeGraph = 0;
+        function loop(timestamp) {
+            let dt = toggleSlowMo.checked ? 0.25 : 1.0;
+
+            if (!isPaused) {
+                // Avança simulação da mecânica cineticoclástica
+                physics.process(particles, container, dt, toggleGravity.checked, isExploded);
+
+                // Captura a pressão gerada empiricamente pelas colisões
+                const dynamicP = physics.getCurrentPressure(container);
+                const currentV = container.getVolumeLiters();
+                const currentT = parseInt(sliderT.value);
+
+                // GESTÃO DOS PROCESSOS TERMODINÂMICOS (VÍNCULOS REAIS)
+                if (currentMode === 'isobaric' && !isExploded) {
+                    // Feedback loop dinâmico: Ajusta o volume gradualmente para aproximar da pressão desejada
+                    // Baseado na equação simplificada V = nRT / P
+                    const currentN = particles.length;
+                    const calculatedIdealVolume = (currentN * currentT * 0.16) / targetPressureIsobaric;
+                    
+                    // Clampa o volume computado nos limites físicos permitidos de design (20% a 100%)
+                    let targetVolPct = Math.max(20, Math.min(100, calculatedIdealVolume * 10));
+                    
+                    // Interpolação suave para o movimento do pistão não dar saltos abruptos
+                    let currentVolSliderVal = parseFloat(sliderV.value);
+                    currentVolSliderVal += (targetVolPct - currentVolSliderVal) * 0.05;
+                    sliderV.value = currentVolSliderVal;
+                    container.setVolumePercentage(currentVolSliderVal);
+                    valV.innerText = `${currentV.toFixed(1)} L`;
+                }
+
+                if (currentMode === 'isothermal' && !isExploded) {
+                    // Mantém temperatura (energia cinética) constante mesmo sob expansão/compressão
+                    // O motor elástico trata colisões internas, mas aplicamos um reajuste de calibração térmica termostática
+                    const desiredMeanSpeed = Math.sqrt(currentT / 15);
+                    particles.forEach(p => {
+                        const curS = Math.sqrt(p.vx*p.vx + p.vy*p.vy) || 0.1;
+                        if (Math.abs(curS - desiredMeanSpeed) > 1.5) {
+                            p.vx = (p.vx / curS) * desiredMeanSpeed;
+                            p.vy = (p.vy / curS) * desiredMeanSpeed;
+                        }
+                    });
+                }
+
+                // Cálculo macroscópico da velocidade quadrática média (Vrms) para fins estatísticos
+                let sumSquareSpeed = 0;
+                particles.forEach(p => {
+                    sumSquareSpeed += (p.vx * p.vx + p.vy * p.vy);
+                });
+                const vRms = Math.sqrt(sumSquareSpeed / particles.length) * 45; // Escala visual m/s
+
+                // Atualiza painel de monitoramento numérico na interface
+                readoutP.innerText = `${dynamicP} Pa`;
+                readoutV.innerText = `${currentV.toFixed(1)} L`;
+                readoutT.innerText = `${currentT} K`;
+                readoutSpeed.innerText = `${Math.round(vRms)} m/s`;
+
+                // Mecanismo de Segurança contra sobrecarga de Pressão (Explosão Crítica)
+                if (dynamicP > 50 && !isExploded) {
+                    triggerExplosion();
+                }
+
+                // Amostragem temporizada para não sobrecarregar desenho de gráficos em cada frame
+                if (timestamp - lastTimeGraph > 120) {
+                    graphManager.recordData(dynamicP, currentV, currentT);
+                    graphManager.drawPlot('canvasPV', graphManager.historyPV, 'V', 'P', 10, 7500);
+                    graphManager.drawPlot('canvasVT', graphManager.historyVT, 'T', 'V', 1000, 10);
+                    graphManager.drawPlot('canvasPT', graphManager.historyPT, 'T', 'P', 1000, 7500);
+                    graphManager.drawHistogram('canvasHist', particles);
+                    lastTimeGraph = timestamp;
+                }
+            }
+
+            // LIMPEZA E DESENHO DA CENA DO CANVAS PRINCIPAL
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (!isExploded) {
+                // Renderiza container íntegro
+                const currentP = physics.getCurrentPressure(container);
+                container.draw(ctx, currentP); // Passa pressão para modular vibração visual das paredes
+            } else {
+                // Efeito visual de ruínas/destruição se o invólucro falhar
+                ctx.save();
+                ctx.strokeStyle = 'rgba(255, 0, 85, 0.2)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 10]);
+                ctx.strokeRect(container.x, container.y, container.width, container.maxHeight);
+                ctx.restore();
+            }
+
+            // Desenha todas as moléculas de gás ativas
+            particles.forEach(p => p.draw(ctx));
+
+            requestAnimationFrame(loop);
+        }
+
+        // Ativa o estado físico caótico de explosão controlada
+        function triggerExplosion() {
+            isExploded = true;
+            explosionOverlay.style.display = 'flex';
+            // Ejeta partículas violentamente para o espaço simulado
+            particles.forEach(p => {
+                p.vx *= 4.5;
+                p.vy *= 4.5;
+            });
+        }
+
+        function repairContainer() {
+            isExploded = false;
+            explosionOverlay.style.display = 'none';
+            graphManager.clear();
+            sliderV.value = 50;
+            container.setVolumePercentage(50);
+            syncParticleCount();
+            applyTemperatureScale();
+        }
+
+        // EVENTOS E ASSINATURA DE CONTROLES INTERATIVOS
+        sliderN.addEventListener('input', syncParticleCount);
+        
+        sliderV.addEventListener('input', () => {
+            const volPct = parseInt(sliderV.value);
+            container.setVolumePercentage(volPct);
+            valV.innerText = `${container.getVolumeLiters().toFixed(1)} L`;
+        });
+
+        sliderT.addEventListener('input', applyTemperatureScale);
+
+        sliderPext.addEventListener('input', () => {
+            targetPressureIsobaric = parseInt(sliderPext.value);
+            valPext.innerText = `${targetPressureIsobaric} Pa`;
+        });
+
+        // Configuração de Modos de Operação
+        document.getElementById('modeIdeal').addEventListener('click', () => { currentMode = 'ideal'; updateModeUI(); });
+        document.getElementById('modeIsothermal').addEventListener('click', () => { currentMode = 'isothermal'; updateModeUI(); });
+        document.getElementById('modeIsobaric').addEventListener('click', () => { currentMode = 'isobaric'; updateModeUI(); });
+        document.getElementById('modeIsovolumetric').addEventListener('click', () => { 
+            currentMode = 'isvolumetric'; 
+            updateModeUI(); 
+        });
+
+        // Botões operacionais inferiores
+        btnPause.addEventListener('click', () => {
+            isPaused = !isPaused;
+            btnPause.innerText = isPaused ? 'Retomar' : 'Pausar';
+            btnPause.style.borderColor = isPaused ? 'var(--neon-pink)' : 'var(--neon-cyan)';
+        });
+
+        btnReset.addEventListener('click', () => {
+            repairContainer();
+            if(isPaused) btnPause.click();
+        });
+
+        btnExplode.addEventListener('click', () => {
+            if(!isExploded) triggerExplosion();
+        });
+
+        btnRepair.addEventListener('click', repairContainer);
+
+        // Inicialização Inicial do Sistema
+        syncParticleCount();
+        applyTemperatureScale();
+        updateModeUI();
+        container.setVolumePercentage(50);
+        
+        // Dispara o loop estável do motor gráfico
+        requestAnimationFrame(loop);
+    </script>
+</body>
+</html>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Foguete de Balão - 3ª Lei de Newton</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:
+    radial-gradient(circle at top,#37104f 0%, #12051f 45%, #05010d 100%);
+    color:white;
+    overflow-x:hidden;
+}
+
+/* FUNDO ANIMADO */
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+    linear-gradient(90deg,transparent 48%,rgba(255,255,255,0.03) 50%,transparent 52%),
+    linear-gradient(transparent 48%,rgba(255,255,255,0.03) 50%,transparent 52%);
+    background-size:50px 50px;
+    animation:gridMove 12s linear infinite;
+    pointer-events:none;
+}
+
+@keyframes gridMove{
+    from{transform:translateY(0);}
+    to{transform:translateY(50px);}
+}
+
+/* HEADER */
+
+header{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:40px;
+    position:relative;
+}
+
+.hero{
+    max-width:900px;
+    z-index:2;
+}
+
+.hero h1{
+    font-family:'Orbitron',sans-serif;
+    font-size:4rem;
+    color:#d58cff;
+    text-shadow:
+    0 0 10px #c94fff,
+    0 0 20px #c94fff,
+    0 0 40px #7a00ff;
+    margin-bottom:20px;
+    animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.02);}
+    100%{transform:scale(1);}
+}
+
+.hero p{
+    font-size:1.2rem;
+    line-height:1.8;
+    color:#ddd;
+}
+
+/* PARTÍCULAS */
+
+.particle{
+    position:absolute;
+    width:6px;
+    height:6px;
+    background:#cc7bff;
+    border-radius:50%;
+    box-shadow:0 0 10px #cc7bff;
+    animation:float 8s linear infinite;
+    opacity:0.6;
+}
+
+@keyframes float{
+    from{
+        transform:translateY(100vh) scale(0.5);
+    }
+    to{
+        transform:translateY(-120vh) scale(1.2);
+    }
+}
+
+/* CONTAINER */
+
+.container{
+    width:90%;
+    max-width:1200px;
+    margin:auto;
+    padding-bottom:80px;
+}
+
+/* CARDS */
+
+.card{
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.1);
+    backdrop-filter:blur(12px);
+    border-radius:24px;
+    padding:35px;
+    margin-bottom:40px;
+    box-shadow:
+    0 0 20px rgba(187,0,255,0.25);
+    transition:0.4s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+    box-shadow:
+    0 0 25px rgba(200,100,255,0.5);
+}
+
+.card h2{
+    font-family:'Orbitron',sans-serif;
+    color:#d58cff;
+    margin-bottom:20px;
+    font-size:2rem;
+}
+
+/* MATERIAIS */
+
+.materials{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:20px;
+}
+
+.material{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px;
+    padding:25px;
+    text-align:center;
+    transition:0.4s;
+}
+
+.material:hover{
+    transform:scale(1.05);
+    border-color:#d78cff;
+    box-shadow:0 0 20px #b84dff;
+}
+
+.material span{
+    font-size:3rem;
+    display:block;
+    margin-bottom:10px;
+}
+
+/* PASSOS */
+
+.steps{
+    display:flex;
+    flex-direction:column;
+    gap:25px;
+}
+
+.step{
+    display:flex;
+    gap:25px;
+    align-items:flex-start;
+    background:rgba(255,255,255,0.04);
+    padding:25px;
+    border-radius:20px;
+    border-left:5px solid #c86cff;
+    transition:0.4s;
+}
+
+.step:hover{
+    transform:translateX(8px);
+    background:rgba(255,255,255,0.08);
+}
+
+.number{
+    min-width:65px;
+    height:65px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:1.5rem;
+    font-weight:bold;
+    background:linear-gradient(135deg,#ff8cff,#7f2cff);
+    box-shadow:
+    0 0 15px #ca4dff;
+}
+
+/* SIMULAÇÃO */
+
+.simulation{
+    position:relative;
+    height:250px;
+    overflow:hidden;
+    border-radius:20px;
+    background:linear-gradient(to bottom,#180326,#090014);
+    margin-top:30px;
+}
+
+.string{
+    position:absolute;
+    top:120px;
+    left:50px;
+    right:50px;
+    height:4px;
+    background:#ffffff;
+    box-shadow:0 0 10px white;
+}
+
+.balloon{
+    position:absolute;
+    top:70px;
+    left:80px;
+    width:110px;
+    height:140px;
+    background:radial-gradient(circle at 30% 30%, #ff9cff, #8b00ff);
+    border-radius:50%;
+    animation:rocketMove 5s infinite ease-in-out;
+    box-shadow:
+    0 0 20px #d26cff;
+}
+
+.balloon::after{
+    content:"";
+    position:absolute;
+    bottom:-25px;
+    left:50%;
+    transform:translateX(-50%);
+    width:18px;
+    height:35px;
+    background:#f0d4ff;
+    border-radius:0 0 10px 10px;
+}
+
+.fire{
+    position:absolute;
+    bottom:-38px;
+    left:50%;
+    transform:translateX(-50%);
+    width:24px;
+    height:40px;
+    background:linear-gradient(to bottom,#00d0ff,#9efbff);
+    border-radius:50%;
+    filter:blur(1px);
+    animation:fireAnim 0.15s infinite alternate;
+}
+
+@keyframes fireAnim{
+    from{
+        transform:translateX(-50%) scaleY(1);
+        opacity:1;
+    }
+    to{
+        transform:translateX(-50%) scaleY(0.7);
+        opacity:0.6;
+    }
+}
+
+@keyframes rocketMove{
+    0%{
+        left:80px;
+    }
+
+    50%{
+        left:calc(100% - 200px);
+    }
+
+    100%{
+        left:80px;
+    }
+}
+
+/* EXPLICAÇÃO */
+
+.explanation{
+    line-height:2;
+    font-size:1.1rem;
+    color:#e4d8ff;
+}
+
+/* FOOTER */
+
+footer{
+    text-align:center;
+    padding:40px;
+    color:#aaa;
+    font-size:0.9rem;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:768px){
+
+.hero h1{
+    font-size:2.5rem;
+}
+
+.step{
+    flex-direction:column;
+    align-items:flex-start;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- PARTÍCULAS -->
+
+<div class="particle" style="left:10%; animation-duration:7s;"></div>
+<div class="particle" style="left:25%; animation-duration:10s;"></div>
+<div class="particle" style="left:40%; animation-duration:8s;"></div>
+<div class="particle" style="left:60%; animation-duration:12s;"></div>
+<div class="particle" style="left:75%; animation-duration:9s;"></div>
+<div class="particle" style="left:90%; animation-duration:11s;"></div>
+
+<header>
+    <div class="hero">
+        <h1>FOGUETE DE BALÃO</h1>
+        <p>
+            Explore a <strong>3ª Lei de Newton</strong> de forma visual e interativa!
+            Descubra como ação e reação fazem um simples balão se transformar
+            em um verdadeiro foguete experimental.
+        </p>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- MATERIAIS -->
+
+    <section class="card">
+        <h2>Materiais Necessários</h2>
+
+        <div class="materials">
+
+            <div class="material">
+                <span>🧵</span>
+                <h3>Barbante</h3>
+            </div>
+
+            <div class="material">
+                <span>🥤</span>
+                <h3>Canudinho</h3>
+            </div>
+
+            <div class="material">
+                <span>🎈</span>
+                <h3>Balão</h3>
+            </div>
+
+            <div class="material">
+                <span>🩹</span>
+                <h3>Fita</h3>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PASSO A PASSO -->
+
+    <section class="card">
+        <h2>Passo a Passo do Experimento</h2>
+
+        <div class="steps">
+
+            <div class="step">
+                <div class="number">1</div>
+
+                <div>
+                    <h3>Corte o barbante</h3>
+                    <p>
+                        Corte aproximadamente <strong>2 metros</strong> de barbante.
+                        Esse fio será o caminho do foguete.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="number">2</div>
+
+                <div>
+                    <h3>Passe o canudo</h3>
+                    <p>
+                        Passe o barbante por dentro do canudinho.
+                        O canudo permitirá o deslizamento do balão.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="number">3</div>
+
+                <div>
+                    <h3>Encha o balão</h3>
+                    <p>
+                        Encha o balão sem amarrá-lo e segure a saída de ar
+                        para impedir que o ar escape.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="number">4</div>
+
+                <div>
+                    <h3>Monte o foguete</h3>
+                    <p>
+                        Estique o barbante entre dois estudantes e prenda
+                        o balão cheio ao canudo usando fita adesiva.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="number">5</div>
+
+                <div>
+                    <h3>Lançamento!</h3>
+                    <p>
+                        Solte a saída de ar do balão e observe o foguete
+                        percorrendo o barbante.
+                    </p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="number">6</div>
+
+                <div>
+                    <h3>Teste diferentes quantidades de ar</h3>
+                    <p>
+                        Repita o experimento variando a quantidade de ar no balão
+                        e compare as diferenças no movimento.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SIMULAÇÃO -->
+
+        <div class="simulation">
+
+            <div class="string"></div>
+
+            <div class="balloon">
+                <div class="fire"></div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- EXPLICAÇÃO -->
+
+    <section class="card">
+        <h2>O que acontece?</h2>
+
+        <div class="explanation">
+
+            <p>
+                Quando o ar sai rapidamente do balão em uma direção,
+                o balão é impulsionado para a direção oposta.
+            </p>
+
+            <br>
+
+            <p>
+                Esse fenômeno demonstra a
+                <strong>Terceira Lei de Newton</strong>:
+            </p>
+
+            <br>
+
+            <div style="
+            text-align:center;
+            font-size:1.6rem;
+            color:#ffb3ff;
+            text-shadow:0 0 10px #d04dff;
+            font-family:'Orbitron',sans-serif;
+            ">
+                “Toda ação possui uma reação de mesma intensidade e direção,
+                mas em sentido contrário.”
+            </div>
+
+            <br>
+
+            <p>
+                Quanto maior a quantidade de ar liberada,
+                maior pode ser a força aplicada e mais rápido
+                o foguete se movimentará.
+            </p>
+
+        </div>
+    </section>
+
+</div>
+
+<footer>
+    Experimento Interativo • Física • 3ª Lei de Newton 🚀
+</footer>
+
+</body>
+</html>

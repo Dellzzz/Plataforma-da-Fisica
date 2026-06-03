@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Laboratório Temporal</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:'Poppins',sans-serif;
+
+    background:
+    radial-gradient(circle at top,
+    #37104f 0%,
+    #12051f 45%,
+    #05010d 100%);
+
+    color:white;
+
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+
+/* GRID */
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+
+    inset:0;
+
+    background:
+    linear-gradient(90deg,
+    transparent 48%,
+    rgba(255,255,255,0.03) 50%,
+    transparent 52%),
+
+    linear-gradient(
+    transparent 48%,
+    rgba(255,255,255,0.03) 50%,
+    transparent 52%);
+
+    background-size:50px 50px;
+
+    animation:gridMove 10s linear infinite;
+
+    pointer-events:none;
+}
+
+@keyframes gridMove{
+
+    from{
+        transform:translateY(0);
+    }
+
+    to{
+        transform:translateY(50px);
+    }
+}
+
+header{
+
+    text-align:center;
+
+    padding:35px 20px;
+}
+
+header h1{
+
+    font-family:'Orbitron',sans-serif;
+
+    font-size:3rem;
+
+    color:#d58cff;
+
+    text-shadow:
+    0 0 10px #c94fff,
+    0 0 25px #c94fff,
+    0 0 50px #7a00ff;
+}
+
+header p{
+
+    margin-top:10px;
+
+    color:#ddd;
+}
+
+/* ABAS */
+
+.tabs{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+    flex-wrap:wrap;
+
+    padding:0 20px 25px;
+}
+
+.tab-btn{
+
+    padding:14px 22px;
+
+    border:none;
+
+    border-radius:15px;
+
+    background:rgba(255,255,255,0.06);
+
+    color:white;
+
+    font-family:'Orbitron',sans-serif;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.tab-btn.active,
+.tab-btn:hover{
+
+    background:
+    linear-gradient(135deg,#d86cff,#7d2dff);
+
+    box-shadow:
+    0 0 20px #d86cff;
+
+    transform:translateY(-2px);
+}
+
+/* EXPERIMENTOS */
+
+.experiment{
+
+    display:none;
+
+    width:95%;
+
+    max-width:1400px;
+
+    margin:auto;
+
+    grid-template-columns:340px 1fr;
+
+    gap:25px;
+
+    padding-bottom:50px;
+}
+
+.experiment.active{
+
+    display:grid;
+}
+
+@media(max-width:1000px){
+
+    .experiment{
+
+        grid-template-columns:1fr;
+    }
+}
+
+.panel,
+.simulation{
+
+    background:rgba(255,255,255,0.05);
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    border-radius:25px;
+
+    backdrop-filter:blur(10px);
+
+    box-shadow:
+    0 0 25px rgba(183,0,255,0.2);
+}
+
+.panel{
+
+    padding:25px;
+}
+
+.panel h2{
+
+    font-family:'Orbitron',sans-serif;
+
+    color:#d58cff;
+
+    margin-bottom:25px;
+}
+
+.control{
+
+    margin-bottom:22px;
+}
+
+.control label{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    font-weight:600;
+}
+
+input[type=range]{
+
+    width:100%;
+
+    appearance:none;
+
+    height:8px;
+
+    border-radius:10px;
+
+    background:#4a1664;
+}
+
+input[type=range]::-webkit-slider-thumb{
+
+    appearance:none;
+
+    width:22px;
+
+    height:22px;
+
+    border-radius:50%;
+
+    background:#ff9dff;
+
+    box-shadow:
+    0 0 20px #d86cff;
+
+    cursor:pointer;
+}
+
+input[type=number]{
+
+    width:100%;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#2d0b45;
+
+    color:white;
+
+    font-size:1rem;
+}
+
+button.action{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:15px;
+
+    background:
+    linear-gradient(135deg,#d86cff,#7d2dff);
+
+    color:white;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    margin-top:10px;
+
+    transition:0.3s;
+}
+
+button.action:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+    0 0 20px #d86cff;
+}
+
+.results{
+
+    margin-top:25px;
+
+    background:rgba(255,255,255,0.04);
+
+    padding:20px;
+
+    border-radius:18px;
+
+    line-height:2;
+}
+
+.results span{
+
+    color:#ffb7ff;
+
+    font-weight:bold;
+}
+
+/* SIMULAÇÃO */
+
+.simulation{
+
+    position:relative;
+
+    overflow:hidden;
+
+    min-height:650px;
+}
+
+canvas{
+
+    width:100%;
+    height:100%;
+    display:block;
+}
+
+/* PARTÍCULAS */
+
+.particle{
+
+    position:absolute;
+
+    width:8px;
+
+    height:8px;
+
+    border-radius:50%;
+
+    pointer-events:none;
+
+    box-shadow:
+    0 0 15px #d86cff,
+    0 0 30px #d86cff;
+
+    animation:fadeOut 1s linear forwards;
+}
+
+@keyframes fadeOut{
+
+    from{
+        opacity:1;
+        transform:scale(1);
+    }
+
+    to{
+        opacity:0;
+        transform:scale(0.2);
+    }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+
+    <h1>LABORATÓRIO TEMPORAL</h1>
+
+    <p>
+        Simulações de MRU e MRUV
+    </p>
+	<div class="info" id="info">Prof. Jardel A. Leite</div>
+</header>
+
+<!-- ABAS -->
+
+<div class="tabs">
+
+    <button class="tab-btn active"
+    onclick="openTab(event,'mru')">
+        MRU
+    </button>
+
+    <button class="tab-btn"
+    onclick="openTab(event,'mruv')">
+        MRUV
+    </button>
+
+    <button class="tab-btn"
+    onclick="openTab(event,'queda')">
+        Queda Livre
+    </button>
+
+</div>
+
+<!-- ================= MRU ================= -->
+
+<section class="experiment active" id="mru">
+
+<div class="panel">
+
+    <h2>MRU</h2>
+
+    <div class="control">
+
+        <label>
+            Velocidade:
+            <span id="mruVelValue">40</span> m/s
+        </label>
+
+        <input type="range"
+        id="mruVel"
+        min="5"
+        max="100"
+        value="40">
+
+    </div>
+
+    <div class="control">
+
+        <label>
+            Tempo:
+            <span id="mruTimeLimitValue">10</span> s
+        </label>
+
+        <input type="range"
+        id="mruTimeLimit"
+        min="1"
+        max="20"
+        value="10">
+
+    </div>
+
+    <div class="control">
+
+        <label>
+            Distância calculada:
+        </label>
+
+        <input type="number"
+        id="mruGuess"
+        placeholder="Digite a distância">
+
+    </div>
+
+    <button class="action"
+    onclick="startMRU()">
+        Iniciar
+    </button>
+
+    <button class="action"
+    onclick="resetMRU()">
+        Resetar
+    </button>
+
+    <div class="results">
+
+        <p>
+            Distância:
+            <span id="mruDistance">
+                0 m
+            </span>
+        </p>
+
+        <p>
+            Tempo:
+            <span id="mruTime">
+                0 s
+            </span>
+        </p>
+
+        <p>
+            Resultado:
+            <span id="mruResult">
+                ---
+            </span>
+        </p>
+
+    </div>
+
+</div>
+
+<div class="simulation">
+
+    <canvas id="mruCanvas"></canvas>
+
+</div>
+
+</section>
+
+<!-- ================= MRUV ================= -->
+
+<section class="experiment" id="mruv">
+
+<div class="panel">
+
+    <h2>MRUV</h2>
+
+    <div class="control">
+
+        <label>
+            Velocidade Inicial:
+            <span id="mruvVelValue">15</span> m/s
+        </label>
+
+        <input type="range"
+        id="mruvVel"
+        min="0"
+        max="50"
+        value="15">
+
+    </div>
+
+    <div class="control">
+
+        <label>
+            Aceleração:
+            <span id="mruvAccValue">5</span> m/s²
+        </label>
+
+        <input type="range"
+        id="mruvAcc"
+        min="1"
+        max="20"
+        value="5">
+
+    </div>
+
+    <div class="control">
+
+        <label>
+            Tempo:
+            <span id="mruvTimeLimitValue">10</span> s
+        </label>
+
+        <input type="range"
+        id="mruvTimeLimit"
+        min="1"
+        max="20"
+        value="10">
+
+    </div>
+
+    <div class="control">
+
+        <label>
+            Velocidade calculada:
+        </label>
+
+        <input type="number"
+        id="mruvGuess"
+        placeholder="Digite a velocidade">
+
+    </div>
+
+    <button class="action"
+    onclick="startMRUV()">
+        Iniciar
+    </button>
+
+    <button class="action"
+    onclick="resetMRUV()">
+        Resetar
+    </button>
+
+    <div class="results">
+
+        <p>
+            Velocidade:
+            <span id="mruvVelocity">
+                0 m/s
+            </span>
+        </p>
+
+        <p>
+            Distância:
+            <span id="mruvDistance">
+                0 m
+            </span>
+        </p>
+
+        <p>
+            Resultado:
+            <span id="mruvResult">
+                ---
+            </span>
+        </p>
+
+    </div>
+
+</div>
+
+<div class="simulation">
+
+    <canvas id="mruvCanvas"></canvas>
+
+</div>
+
+</section>
+
+<!-- ================= QUEDA ================= -->
+
+<section class="experiment" id="queda">
+
+<div class="panel">
+
+    <h2>Queda Livre</h2>
+
+    <div class="control">
+
+        <label>
+            Altura:
+            <span id="fallHeightValue">80</span> m
+        </label>
+
+        <input type="range"
+        id="fallHeight"
+        min="20"
+        max="150"
+        value="80">
+
+    </div>
+
+    <button class="action"
+    onclick="startFall()">
+        Soltar
+    </button>
+
+    <button class="action"
+    onclick="resetFall()">
+        Resetar
+    </button>
+
+    <div class="results">
+
+        <p>
+            Velocidade:
+            <span id="fallVelocity">
+                0 m/s
+            </span>
+        </p>
+
+        <p>
+            Tempo:
+            <span id="fallTime">
+                0 s
+            </span>
+        </p>
+
+    </div>
+
+</div>
+
+<div class="simulation">
+
+    <canvas id="fallCanvas"></canvas>
+
+</div>
+
+</section>
+
+<script>
+
+/* ABAS */
+
+function openTab(event,id){
+
+    document
+    .querySelectorAll('.experiment')
+    .forEach(exp=>{
+
+        exp.classList.remove('active');
+    });
+
+    document
+    .querySelectorAll('.tab-btn')
+    .forEach(btn=>{
+
+        btn.classList.remove('active');
+    });
+
+    document
+    .getElementById(id)
+    .classList.add('active');
+
+    event.target.classList.add('active');
+}
+
+/* PARTÍCULAS */
+
+function createParticle(x,y){
+
+    const particle =
+    document.createElement('div');
+
+    particle.classList.add('particle');
+
+    particle.style.left = x+'px';
+
+    particle.style.top = y+'px';
+
+    particle.style.background =
+    `hsl(${Math.random()*60+260},100%,70%)`;
+
+    document.body.appendChild(particle);
+
+    setTimeout(()=>{
+
+        particle.remove();
+
+    },1000);
+}
+
+/* ALERTAS */
+
+function didacticAlert(value){
+
+    if(value > 15){
+
+        alert(
+        'Tempo muito alto para fins didáticos.');
+    }
+}
+
+/* ================= MRU ================= */
+
+const mruCanvas =
+document.getElementById('mruCanvas');
+
+const mruCtx =
+mruCanvas.getContext('2d');
+
+mruCanvas.width = 1000;
+mruCanvas.height = 650;
+
+let mruX = 100;
+let mruTime = 0;
+let mruAnimation;
+
+const mruVelInput =
+document.getElementById('mruVel');
+
+const mruTimeInput =
+document.getElementById('mruTimeLimit');
+
+mruVelInput.oninput = ()=>{
+
+    document.getElementById(
+    'mruVelValue').textContent =
+    mruVelInput.value;
+}
+
+mruTimeInput.oninput = ()=>{
+
+    document.getElementById(
+    'mruTimeLimitValue').textContent =
+    mruTimeInput.value;
+
+    didacticAlert(
+    parseFloat(mruTimeInput.value));
+}
+
+function drawMRU(){
+
+    mruCtx.clearRect(
+    0,0,
+    mruCanvas.width,
+    mruCanvas.height);
+
+    mruCtx.fillStyle =
+    '#2a073d';
+
+    mruCtx.fillRect(
+    0,500,
+    mruCanvas.width,150);
+
+    mruCtx.fillStyle =
+    '#d86cff';
+
+    mruCtx.shadowBlur = 25;
+
+    mruCtx.shadowColor =
+    '#d86cff';
+
+    mruCtx.fillRect(
+    mruX,420,
+    100,80);
+}
+
+function animateMRU(){
+
+    drawMRU();
+
+    const vel =
+    parseFloat(mruVelInput.value);
+
+    const maxTime =
+    parseFloat(mruTimeInput.value);
+
+    mruTime += 0.03;
+
+    const distance =
+    vel * mruTime;
+
+    mruX =
+    100 + distance*2;
+
+    document.getElementById(
+    'mruDistance').textContent =
+    distance.toFixed(1)+' m';
+
+    document.getElementById(
+    'mruTime').textContent =
+    mruTime.toFixed(1)+' s';
+
+    createParticle(
+    mruX+20,
+    450+Math.random()*40);
+
+    if(mruTime < maxTime){
+
+        mruAnimation =
+        requestAnimationFrame(
+        animateMRU);
+
+    }else{
+
+        const guess =
+        parseFloat(
+        document.getElementById(
+        'mruGuess').value);
+
+        const result =
+        document.getElementById(
+        'mruResult');
+
+        if(!isNaN(guess)){
+
+            const diff =
+            Math.abs(
+            guess-distance);
+
+            if(diff < 2){
+
+                result.innerHTML =
+                '✅ Correto';
+
+                result.style.color =
+                '#7dff66';
+
+            }else{
+
+                result.innerHTML =
+                '⚡ Reveja os cálculos';
+
+                result.style.color =
+                '#ffe066';
+            }
+        }
+    }
+}
+
+function startMRU(){
+
+    cancelAnimationFrame(
+    mruAnimation);
+
+    mruTime = 0;
+
+    animateMRU();
+}
+
+function resetMRU(){
+
+    cancelAnimationFrame(
+    mruAnimation);
+
+    mruTime = 0;
+
+    mruX = 100;
+
+    drawMRU();
+}
+
+/* ================= MRUV ================= */
+
+const mruvCanvas =
+document.getElementById('mruvCanvas');
+
+const mruvCtx =
+mruvCanvas.getContext('2d');
+
+mruvCanvas.width = 1000;
+mruvCanvas.height = 650;
+
+let mruvX = 100;
+let mruvVelocity = 0;
+let mruvTime = 0;
+let mruvAnimation;
+
+const mruvVelInput =
+document.getElementById('mruvVel');
+
+const mruvAccInput =
+document.getElementById('mruvAcc');
+
+const mruvTimeInput =
+document.getElementById('mruvTimeLimit');
+
+mruvVelInput.oninput = ()=>{
+
+    document.getElementById(
+    'mruvVelValue').textContent =
+    mruvVelInput.value;
+}
+
+mruvAccInput.oninput = ()=>{
+
+    document.getElementById(
+    'mruvAccValue').textContent =
+    mruvAccInput.value;
+}
+
+mruvTimeInput.oninput = ()=>{
+
+    document.getElementById(
+    'mruvTimeLimitValue').textContent =
+    mruvTimeInput.value;
+
+    didacticAlert(
+    parseFloat(mruvTimeInput.value));
+}
+
+function drawMRUV(){
+
+    mruvCtx.clearRect(
+    0,0,
+    mruvCanvas.width,
+    mruvCanvas.height);
+
+    mruvCtx.fillStyle =
+    '#1f0630';
+
+    mruvCtx.fillRect(
+    0,500,
+    mruvCanvas.width,150);
+
+    mruvCtx.fillStyle =
+    '#ffffff';
+
+    mruvCtx.shadowBlur = 30;
+
+    mruvCtx.shadowColor =
+    '#d86cff';
+
+    mruvCtx.fillRect(
+    mruvX,420,
+    100,80);
+}
+
+function animateMRUV(){
+
+    drawMRUV();
+
+    const v0 =
+    parseFloat(
+    mruvVelInput.value);
+
+    const acc =
+    parseFloat(
+    mruvAccInput.value);
+
+    const maxTime =
+    parseFloat(
+    mruvTimeInput.value);
+
+    mruvTime += 0.03;
+
+    mruvVelocity =
+    v0 + acc*mruvTime;
+
+    const distance =
+    v0*mruvTime +
+    0.5*acc*
+    mruvTime*mruvTime;
+
+    mruvX =
+    100 + distance*1.5;
+
+    document.getElementById(
+    'mruvVelocity').textContent =
+    mruvVelocity.toFixed(1)+' m/s';
+
+    document.getElementById(
+    'mruvDistance').textContent =
+    distance.toFixed(1)+' m';
+
+    createParticle(
+    mruvX+20,
+    450+Math.random()*40);
+
+    if(mruvTime < maxTime){
+
+        mruvAnimation =
+        requestAnimationFrame(
+        animateMRUV);
+
+    }else{
+
+        const guess =
+        parseFloat(
+        document.getElementById(
+        'mruvGuess').value);
+
+        const result =
+        document.getElementById(
+        'mruvResult');
+
+        if(!isNaN(guess)){
+
+            const diff =
+            Math.abs(
+            guess-mruvVelocity);
+
+            if(diff < 2){
+
+                result.innerHTML =
+                '✅ Correto';
+
+                result.style.color =
+                '#7dff66';
+
+            }else{
+
+                result.innerHTML =
+                '⚡ Reveja os cálculos';
+
+                result.style.color =
+                '#ffe066';
+            }
+        }
+    }
+}
+
+function startMRUV(){
+
+    cancelAnimationFrame(
+    mruvAnimation);
+
+    mruvTime = 0;
+
+    animateMRUV();
+}
+
+function resetMRUV(){
+
+    cancelAnimationFrame(
+    mruvAnimation);
+
+    mruvTime = 0;
+
+    mruvX = 100;
+
+    drawMRUV();
+}
+
+/* ================= QUEDA LIVRE ================= */
+
+const fallCanvas =
+document.getElementById('fallCanvas');
+
+const fallCtx =
+fallCanvas.getContext('2d');
+
+fallCanvas.width = 1000;
+fallCanvas.height = 650;
+
+const g = 9.8;
+
+const PIXELS_PER_METER = 3;
+
+let fallY = 80;
+let fallStartY = 80;
+let fallVelocity = 0;
+let fallTime = 0;
+let fallAnimation;
+
+const fallHeightInput =
+document.getElementById('fallHeight');
+
+fallHeightInput.oninput = ()=>{
+
+    document.getElementById(
+    'fallHeightValue').textContent =
+    fallHeightInput.value;
+}
+
+function drawFall(){
+
+    fallCtx.clearRect(
+    0,0,
+    fallCanvas.width,
+    fallCanvas.height);
+
+    fallCtx.fillStyle =
+    '#2a073d';
+
+    fallCtx.fillRect(
+    0,560,
+    fallCanvas.width,100);
+
+    fallCtx.beginPath();
+
+    fallCtx.arc(
+    500,
+    fallY,
+    30,
+    0,
+    Math.PI*2);
+
+    fallCtx.fillStyle =
+    '#d86cff';
+
+    fallCtx.shadowBlur = 35;
+
+    fallCtx.shadowColor =
+    '#d86cff';
+
+    fallCtx.fill();
+}
+
+function animateFall(){
+
+    drawFall();
+
+    const height =
+    parseFloat(
+    fallHeightInput.value);
+
+    fallTime += 0.03;
+
+    const realDistance =
+    0.5*g*
+    fallTime*
+    fallTime;
+
+    fallVelocity =
+    g*fallTime;
+
+    const visualDistance =
+    realDistance*
+    PIXELS_PER_METER;
+
+    fallY =
+    fallStartY +
+    visualDistance;
+
+    document.getElementById(
+    'fallVelocity').textContent =
+    fallVelocity.toFixed(1)+' m/s';
+
+    document.getElementById(
+    'fallTime').textContent =
+    fallTime.toFixed(1)+' s';
+
+    createParticle(
+    500+Math.random()*20,
+    fallY+20);
+
+    if(realDistance < height){
+
+        fallAnimation =
+        requestAnimationFrame(
+        animateFall);
+
+    }else{
+
+        fallVelocity =
+        Math.sqrt(
+        2*g*height);
+
+        document.getElementById(
+        'fallVelocity').textContent =
+        fallVelocity.toFixed(1)+' m/s';
+    }
+}
+
+function startFall(){
+
+    cancelAnimationFrame(
+    fallAnimation);
+
+    fallTime = 0;
+
+    fallVelocity = 0;
+
+    const height =
+    parseFloat(fallHeightInput.value);
+
+    fallStartY = 520 - (height * 3);
+
+    fallY = fallStartY;;
+
+    animateFall();
+}
+
+function resetFall(){
+
+    cancelAnimationFrame(
+    fallAnimation);
+
+    fallTime = 0;
+
+    fallVelocity = 0;
+
+    const height =
+    parseFloat(fallHeightInput.value);
+
+    fallStartY = 520 - (height * 3);
+
+    fallY = fallStartY;;
+
+    drawFall();
+}
+
+/* INICIAR */
+
+drawMRU();
+drawMRUV();
+drawFall();
+
+</script>
+</body>
+</html>

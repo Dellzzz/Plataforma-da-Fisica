@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ondulatória | Aula Interativa</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#00ff88;--pk:#ff2277;--gd:#ffbb00;--cy:#00ccff;--pr:#aa44ff;--wh:#e8ffe8;
+  --bg:#020a05;--pan:#030f06;--card:#051208;
+  --bg:rgba(0,255,136,.22);--bp:rgba(255,34,119,.2);--bgo:rgba(255,187,0,.2);
+  --dim:#1a7a3a;--txt:#b0e8c0;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#020a05;color:#b0e8c0;font-family:'Rajdhani',sans-serif;font-size:17px;line-height:1.7;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,136,.011) 2px,rgba(0,255,136,.011) 4px);pointer-events:none;z-index:9999}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.028) 1px,transparent 1px);background-size:58px 58px;animation:gm 20s linear infinite;z-index:0}
+@keyframes gm{0%{background-position:0 0}100%{background-position:58px 58px}}
+header{position:relative;z-index:10;text-align:center;padding:80px 20px 56px;border-bottom:1px solid rgba(0,255,136,.22)}
+.htag{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:10px;color:#00ff88;letter-spacing:4px;border:1px solid #00ff88;padding:4px 18px;margin-bottom:22px;animation:tp 2.4s ease-in-out infinite}
+@keyframes tp{0%,100%{box-shadow:0 0 4px #00ff88,inset 0 0 4px rgba(0,255,136,.1)}50%{box-shadow:0 0 22px #00ff88,0 0 60px rgba(0,255,136,.22),inset 0 0 14px rgba(0,255,136,.18)}}
+h1.title{font-family:'Orbitron',monospace;font-size:clamp(2rem,7vw,5rem);font-weight:900;letter-spacing:.07em;line-height:1;color:#fff;text-shadow:0 0 10px #00ff88,0 0 40px #00ff88,0 0 100px rgba(0,255,136,.35);animation:flk 9s linear infinite}
+@keyframes flk{0%,92%,100%{opacity:1}93%{opacity:.78}94.5%{opacity:1}96%{opacity:.62}97%{opacity:1}}
+.tsub{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:.95rem;color:#1a7a3a;letter-spacing:7px;text-transform:uppercase;margin-top:10px}
+.wave-deco{display:flex;justify-content:center;margin-top:20px}
+.wave-deco svg{filter:drop-shadow(0 0 8px #00ff88);animation:wdeco 3s ease-in-out infinite}
+@keyframes wdeco{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.6)}}
+nav{position:sticky;top:0;z-index:100;background:rgba(2,10,5,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,255,136,.16);display:flex;justify-content:center;gap:6px;padding:10px 18px;flex-wrap:wrap}
+nav a{font-family:'Orbitron',monospace;font-size:.57rem;letter-spacing:2px;color:#1a7a3a;text-decoration:none;padding:6px 13px;border:1px solid rgba(0,255,136,.17);transition:all .28s}
+nav a:hover{color:#00ff88;border-color:#00ff88;box-shadow:0 0 12px #00ff88,inset 0 0 8px rgba(0,255,136,.1);text-shadow:0 0 8px #00ff88}
+main{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:0 22px 80px}
+section{margin-top:78px}
+.sh{display:flex;align-items:center;gap:14px;margin-bottom:34px}
+.sn{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:#00ff88;opacity:.6}
+h2.st{font-family:'Orbitron',monospace;font-size:clamp(1.15rem,2.8vw,1.75rem);font-weight:700;color:#fff;letter-spacing:.05em}
+h2.st span{color:#00ff88;text-shadow:0 0 12px #00ff88}
+.sl{flex:1;height:1px;background:linear-gradient(90deg,#00ff88,transparent);opacity:.38}
+.card{background:#051208;border:1px solid rgba(0,255,136,.22);padding:28px 30px;margin-bottom:20px;position:relative;transition:all .28s}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:#00ff88;box-shadow:0 0 10px #00ff88}
+.card:hover{border-color:#00ff88;box-shadow:0 0 22px rgba(0,255,136,.1),inset 0 0 22px rgba(0,255,136,.03)}
+.card.pk::before{background:#ff2277;box-shadow:0 0 10px #ff2277}.card.pk{border-color:rgba(255,34,119,.2)}.card.pk:hover{border-color:#ff2277}
+.card.gd::before{background:#ffbb00;box-shadow:0 0 10px #ffbb00}.card.gd{border-color:rgba(255,187,0,.2)}.card.gd:hover{border-color:#ffbb00}
+.card.cy::before{background:#00ccff;box-shadow:0 0 10px #00ccff}.card.cy{border-color:rgba(0,204,255,.2)}.card.cy:hover{border-color:#00ccff}
+.card.pr::before{background:#aa44ff;box-shadow:0 0 10px #aa44ff}.card.pr{border-color:rgba(170,68,255,.2)}.card.pr:hover{border-color:#aa44ff}
+h3{font-family:'Orbitron',monospace;font-size:.88rem;color:#00ff88;text-shadow:0 0 8px #00ff88;margin-bottom:12px;letter-spacing:.05em}
+.card.pk h3{color:#ff2277;text-shadow:0 0 8px #ff2277}
+.card.gd h3{color:#ffbb00;text-shadow:0 0 8px #ffbb00}
+.card.cy h3{color:#00ccff;text-shadow:0 0 8px #00ccff}
+.card.pr h3{color:#aa44ff;text-shadow:0 0 8px #aa44ff}
+p{color:#b0e8c0;margin-bottom:10px}
+.law{background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.38);border-left:4px solid #00ff88;padding:16px 20px;margin:12px 0;font-family:'Share Tech Mono',monospace;font-size:.88rem;color:#00ff88;text-shadow:0 0 4px rgba(0,255,136,.3);line-height:1.9}
+.law.pk{background:rgba(255,34,119,.05);border-color:rgba(255,34,119,.38);border-left-color:#ff2277;color:#ff2277}
+.law.gd{background:rgba(255,187,0,.05);border-color:rgba(255,187,0,.38);border-left-color:#ffbb00;color:#ffbb00}
+.law.cy{background:rgba(0,204,255,.05);border-color:rgba(0,204,255,.38);border-left-color:#00ccff;color:#00ccff}
+.law.pr{background:rgba(170,68,255,.05);border-color:rgba(170,68,255,.38);border-left-color:#aa44ff;color:#aa44ff}
+.fhero{text-align:center;padding:30px 18px;margin:20px 0;background:#030f06;border:1px solid rgba(0,255,136,.28);position:relative;overflow:hidden}
+.fhero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,255,136,.07) 0%,transparent 70%)}
+.fhero .bf{font-family:'Orbitron',monospace;font-size:clamp(1.3rem,3.2vw,2.3rem);font-weight:700;color:#fff;text-shadow:0 0 14px #00ff88,0 0 35px rgba(0,255,136,.42);letter-spacing:.04em;line-height:1.35}
+.fhero .fl{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:#1a7a3a;letter-spacing:3px;margin-top:10px}
+.vis{background:#030f06;border:1px solid rgba(0,255,136,.22);padding:20px;margin:20px 0;overflow:hidden}
+.vis.pk{border-color:rgba(255,34,119,.2)}.vis.gd{border-color:rgba(255,187,0,.2);border-width:2px}
+.vis.cy{border-color:rgba(0,204,255,.2)}.vis.pr{border-color:rgba(170,68,255,.2)}
+.vtag{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:#1a7a3a;letter-spacing:3px;margin-bottom:14px;text-transform:uppercase;text-align:center}
+canvas{display:block;margin:0 auto;max-width:100%}
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:18px;margin:18px 0}
+table{width:100%;border-collapse:collapse;margin:14px 0}
+th{background:rgba(0,255,136,.09);color:#00ff88;font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:2px;padding:10px 13px;text-align:left;border:1px solid rgba(0,255,136,.18)}
+td{padding:10px 13px;border:1px solid rgba(0,255,136,.1);color:#b0e8c0;font-size:.92rem}
+tr:hover td{background:rgba(0,255,136,.03)}
+.ctrl-row{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;margin:14px 0}
+.ctrl{text-align:center}
+.ctrl label{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:#00ff88;display:block;margin-bottom:5px;letter-spacing:1px}
+input[type=range]{-webkit-appearance:none;width:180px;height:4px;background:rgba(0,255,136,.2);outline:none;border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:#00ff88;border-radius:50%;cursor:pointer;box-shadow:0 0 8px #00ff88}
+.ctrl-val{font-family:'Orbitron',monospace;font-size:1rem;color:#00ff88;text-shadow:0 0 8px #00ff88;margin-top:5px}
+.tabs{display:flex;gap:7px;justify-content:center;margin:12px 0;flex-wrap:wrap}
+.tab{font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:2px;color:#1a7a3a;padding:7px 16px;border:1px solid rgba(0,255,136,.2);background:transparent;cursor:pointer;transition:all .26s}
+.tab:hover{color:#00ff88;border-color:#00ff88}
+.tab.active{color:#020a05;background:#00ff88;border-color:#00ff88;box-shadow:0 0 14px #00ff88}
+.step{display:flex;gap:14px;align-items:flex-start;background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.12);padding:12px 16px;margin-bottom:8px}
+.sn2{font-family:'Orbitron',monospace;font-size:.75rem;color:#00ff88;min-width:22px}
+.tipo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:16px 0}
+.tipo-card{background:#030f06;border:1px solid rgba(0,255,136,.18);padding:20px;text-align:center;position:relative;transition:all .28s;overflow:hidden}
+.tipo-card:hover{border-color:#00ff88;box-shadow:0 0 20px rgba(0,255,136,.1)}
+.tipo-card .tc-icon{font-size:2.2rem;margin-bottom:10px;filter:drop-shadow(0 0 8px currentColor)}
+.tipo-card .tc-title{font-family:'Orbitron',monospace;font-size:.78rem;letter-spacing:2px;margin-bottom:6px}
+.tipo-card .tc-desc{font-size:.88rem;color:#1a7a3a}
+.fhint{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.fhi{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:#1a7a3a;display:flex;align-items:center;gap:6px}
+.fhd{width:10px;height:10px;border-radius:50%}
+.qc{background:#051208;border:1px solid rgba(0,255,136,.22);padding:24px 28px;margin-bottom:16px;transition:all .28s}
+.qc:hover{border-color:#00ff88}
+.qnum{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:#00ff88;letter-spacing:3px;margin-bottom:8px}
+.qtext{font-size:1rem;font-weight:600;color:#fff;margin-bottom:16px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.obt{background:rgba(0,0,0,.4);border:1px solid rgba(0,255,136,.22);color:#b0e8c0;padding:10px 15px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:.92rem;cursor:pointer;transition:all .24s;display:flex;align-items:flex-start;gap:11px}
+.obt:hover{border-color:#00ff88;background:rgba(0,255,136,.07);color:#fff}
+.obt.correct{border-color:#00ff88!important;background:rgba(0,255,136,.12)!important;color:#00ff88!important;box-shadow:0 0 12px rgba(0,255,136,.28)!important}
+.obt.wrong{border-color:#ff2277!important;background:rgba(255,34,119,.1)!important;color:#ff2277!important}
+.obt:disabled{cursor:not-allowed}
+.ol{font-family:'Orbitron',monospace;font-size:.58rem;color:#00ff88;min-width:17px;padding-top:2px}
+.fb{margin-top:11px;padding:10px 13px;font-family:'Share Tech Mono',monospace;font-size:.78rem;display:none;border-left:3px solid;line-height:1.6}
+.fb.show{display:block}
+.fb.ok{color:#00ff88;border-color:#00ff88;background:rgba(0,255,136,.05)}
+.fb.err{color:#ff2277;border-color:#ff2277;background:rgba(255,34,119,.05)}
+.sp{background:#051208;border:1px solid #00ff88;padding:26px;text-align:center;box-shadow:0 0 30px rgba(0,255,136,.12);margin-top:26px}
+.scl{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:#1a7a3a;letter-spacing:3px;margin-bottom:8px}
+.scv{font-family:'Orbitron',monospace;font-size:2.8rem;font-weight:900;color:#00ff88;text-shadow:0 0 20px #00ff88}
+.scm{color:#1a7a3a;margin-top:7px;font-size:.93rem}
+.rbtn{background:transparent;border:1px solid #00ff88;color:#00ff88;font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:2px;padding:9px 24px;cursor:pointer;margin-top:13px;transition:all .28s}
+.rbtn:hover{background:rgba(0,255,136,.1);box-shadow:0 0 14px #00ff88}
+.pw{height:4px;background:rgba(0,255,136,.1);margin-top:16px;border-radius:2px;overflow:hidden}
+.pf{height:100%;background:linear-gradient(90deg,#00ff88,#aa44ff);transition:width .5s ease;box-shadow:0 0 10px #00ff88}
+.ibox{background:linear-gradient(135deg,rgba(0,255,136,.04),rgba(170,68,255,.04));border:1px solid rgba(0,255,136,.2);padding:24px 28px;margin-top:32px;position:relative}
+.ibox::after{content:'∿';position:absolute;top:-14px;left:22px;font-size:1.4rem;color:#00ff88;text-shadow:0 0 10px #00ff88;background:#020a05;padding:0 8px}
+.dlbtn{display:inline-block;font-family:'Orbitron',monospace;font-size:.67rem;letter-spacing:3px;color:#00ff88;border:1px solid #00ff88;padding:13px 38px;text-decoration:none;transition:all .28s;box-shadow:0 0 10px rgba(0,255,136,.14)}
+.dlbtn:hover{background:rgba(0,255,136,.1);box-shadow:0 0 24px #00ff88}
+.hl{color:#00ff88;font-weight:600}.hlk{color:#ff2277;font-weight:600}
+.hlg{color:#ffbb00;font-weight:600}.hlc{color:#00ccff;font-weight:600}.hlp{color:#aa44ff;font-weight:600}
+footer{position:relative;z-index:10;text-align:center;padding:34px 20px;border-top:1px solid rgba(0,255,136,.22);font-family:'Share Tech Mono',monospace;font-size:.68rem;color:#1a7a3a;letter-spacing:2px}
+@media(max-width:600px){header{padding:46px 14px 34px}main{padding:0 13px 58px}.card{padding:16px 18px}.fhero .bf{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<header>
+  <div class="htag">MÓDULO 07 // ONDULATÓRIA // ENSINO MÉDIO</div>
+  <h1 class="title">ONDULATÓRIA</h1>
+  <p class="tsub">Tipos · Grandezas · Fenômenos · Simulações</p>
+  <div class="wave-deco">
+    <svg width="340" height="40" viewBox="0 0 340 40">
+      <path d="M0,20 Q21,2 42,20 Q63,38 84,20 Q105,2 126,20 Q147,38 168,20 Q189,2 210,20 Q231,38 252,20 Q273,2 294,20 Q315,38 336,20" stroke="#00ff88" stroke-width="2.5" fill="none" opacity="0.7"/>
+    </svg>
+  </div>
+</header>
+<nav>
+  <a href="#intro">∿ Intro</a>
+  <a href="#tipos">∿ Tipos</a>
+  <a href="#grandezas">∿ Grandezas</a>
+  <a href="#simulacao">∿ Simulação</a>
+  <a href="#fenomenos">∿ Fenômenos</a>
+  <a href="#interferencia">∿ Interferência</a>
+  <a href="#doppler">∿ Doppler</a>
+  <a href="#exercicios">∿ Exercícios</a>
+  <a href="#download">∿ PDF</a>
+</nav>
+<main>
+
+<!-- ── INTRO ── -->
+<section id="intro">
+  <div class="sh"><span class="sn">01</span><h2 class="st">O QUE É UMA <span>ONDA</span>?</h2><div class="sl"></div></div>
+  <div class="ibox">
+    <p>Uma <span class="hl">onda</span> é uma perturbação que se propaga no espaço e/ou no tempo, transportando <strong>energia sem transportar matéria</strong>. A matéria que serve de meio de propagação apenas oscila em torno de sua posição de equilíbrio — ela não viaja junto com a onda.</p>
+    <p>Exemplos estão em toda parte: ondas sonoras, ondas na água, ondas sísmicas, ondas de rádio, luz visível. Todas compartilham as mesmas grandezas e obedecem aos mesmos fenômenos fundamentais.</p>
+  </div>
+  <div class="igrid" style="margin-top:22px">
+    <div class="card"><h3>ENERGIA SEM MATÉRIA</h3><p>A onda transporta <span class="hl">energia</span>, não matéria. Uma boia no mar oscila para cima e para baixo quando uma onda passa — ela não vai junto com a onda. A água apenas transfere a perturbação.</p></div>
+    <div class="card gd"><h3>FONTE + MEIO + RECEPTOR</h3><p>Para uma onda mecânica existir, são necessários: uma <span class="hlg">fonte</span> (vibração inicial), um <span class="hlg">meio material</span> (que pode ser sólido, líquido ou gasoso) e opcionalmente um receptor. Ondas eletromagnéticas dispensam o meio material.</p></div>
+    <div class="card cy"><h3>GRANDEZAS UNIVERSAIS</h3><p>Toda onda possui <span class="hlc">amplitude, comprimento de onda, frequência, período e velocidade</span>. A relação fundamental v = λ·f vale para qualquer tipo de onda.</p></div>
+  </div>
+</section>
+
+<!-- ── TIPOS ── -->
+<section id="tipos">
+  <div class="sh"><span class="sn">02</span><h2 class="st">TIPOS DE <span>ONDAS</span></h2><div class="sl"></div></div>
+  <div class="card"><h3>CLASSIFICAÇÃO QUANTO À NATUREZA</h3>
+    <div class="igrid">
+      <div style="background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.2);padding:18px">
+        <p style="font-family:'Orbitron',monospace;font-size:.78rem;color:#00ff88;margin-bottom:8px">MECÂNICAS</p>
+        <p>Necessitam de um <span class="hl">meio material</span> para se propagar. Não se propagam no vácuo. Surgem de perturbações mecânicas no meio.</p>
+        <div class="law" style="font-size:.78rem;margin-top:8px">Exemplos: som, ondas em cordas,<br>ondas na água, ondas sísmicas</div>
+      </div>
+      <div style="background:rgba(255,34,119,.04);border:1px solid rgba(255,34,119,.2);padding:18px">
+        <p style="font-family:'Orbitron',monospace;font-size:.78rem;color:#ff2277;margin-bottom:8px">ELETROMAGNÉTICAS</p>
+        <p>Não necessitam de meio material — propagam-se no <span class="hlk">vácuo</span>. São geradas por cargas elétricas em movimento. Velocidade no vácuo: c = 3×10⁸ m/s.</p>
+        <div class="law pk" style="font-size:.78rem;margin-top:8px">Exemplos: luz, raio-X, micro-ondas,<br>ondas de rádio, infravermelho, UV</div>
+      </div>
+    </div>
+  </div>
+  <div class="card pk"><h3>CLASSIFICAÇÃO QUANTO À DIREÇÃO DE VIBRAÇÃO</h3>
+    <div class="igrid">
+      <div style="background:rgba(0,204,255,.04);border:1px solid rgba(0,204,255,.2);padding:18px">
+        <p style="font-family:'Orbitron',monospace;font-size:.78rem;color:#00ccff;margin-bottom:8px">TRANSVERSAIS</p>
+        <p>A vibração das partículas é <span class="hlc">perpendicular</span> à direção de propagação da onda. Formam cristas e vales.</p>
+        <div class="law cy" style="font-size:.78rem;margin-top:8px">Exemplos: ondas em cordas,<br>ondas na água, ondas de luz</div>
+      </div>
+      <div style="background:rgba(255,187,0,.04);border:1px solid rgba(255,187,0,.2);padding:18px">
+        <p style="font-family:'Orbitron',monospace;font-size:.78rem;color:#ffbb00;margin-bottom:8px">LONGITUDINAIS</p>
+        <p>A vibração das partículas é <span class="hlg">paralela</span> à direção de propagação. Formam compressões e rarefações.</p>
+        <div class="law gd" style="font-size:.78rem;margin-top:8px">Exemplos: ondas sonoras,<br>ondas sísmicas tipo P</div>
+      </div>
+    </div>
+  </div>
+  <div class="card gd"><h3>CLASSIFICAÇÃO QUANTO À PROPAGAÇÃO NO ESPAÇO</h3>
+    <div class="tipo-grid">
+      <div class="tipo-card"><div class="tc-icon" style="color:#00ff88">—</div><div class="tc-title" style="color:#00ff88">UNIDIMENSIONAL (1D)</div><div class="tc-desc">Propaga-se em uma única direção. Ex: onda em uma corda, onda em um trilho sonoro.</div></div>
+      <div class="tipo-card"><div class="tc-icon" style="color:#ff2277">⊕</div><div class="tc-title" style="color:#ff2277">BIDIMENSIONAL (2D)</div><div class="tc-desc">Propaga-se em uma superfície. Ex: ondas na superfície da água, ondas sísmicas superficiais.</div></div>
+      <div class="tipo-card"><div class="tc-icon" style="color:#ffbb00">◎</div><div class="tc-title" style="color:#ffbb00">TRIDIMENSIONAL (3D)</div><div class="tc-desc">Propaga-se em todas as direções do espaço. Ex: ondas sonoras no ar, ondas de rádio, luz.</div></div>
+    </div>
+  </div>
+
+  <!-- WAVE TYPE CANVAS -->
+  <div class="vis">
+    <p class="vtag">[ SIMULAÇÃO — TRANSVERSAL × LONGITUDINAL ]</p>
+    <div class="tabs" id="wtTabs">
+      <button class="tab active" onclick="setWT('t',this)">TRANSVERSAL</button>
+      <button class="tab" onclick="setWT('l',this)">LONGITUDINAL</button>
+    </div>
+    <canvas id="wtCanvas" width="700" height="220"></canvas>
+    <div class="fhint">
+      <div class="fhi"><div class="fhd" style="background:#00ff88;box-shadow:0 0 6px #00ff88"></div>Onda</div>
+      <div class="fhi"><div class="fhd" style="background:#ff2277;box-shadow:0 0 6px #ff2277"></div>Partículas do meio</div>
+      <div class="fhi" id="wtHint" style="color:rgba(0,204,255,.7)">Vibração perpendicular à propagação</div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>TIPO</th><th>VIBRAÇÃO</th><th>NECESSITA MEIO</th><th>PROPAGAÇÃO</th><th>EXEMPLOS</th></tr>
+    <tr><td>Mecânica Transversal</td><td>Perpendicular</td><td>Sim</td><td>Sólidos e superfícies</td><td>Corda, superfície da água</td></tr>
+    <tr><td>Mecânica Longitudinal</td><td>Paralela</td><td>Sim</td><td>Sólidos, líquidos e gases</td><td>Som, ondas sísmicas P</td></tr>
+    <tr><td>Eletromagnética</td><td>Perpendicular (E e B)</td><td>Não (propaga no vácuo)</td><td>Tridimensional</td><td>Luz, rádio, micro-ondas</td></tr>
+  </table>
+</section>
+
+<!-- ── GRANDEZAS ── -->
+<section id="grandezas">
+  <div class="sh"><span class="sn">03</span><h2 class="st">GRANDEZAS <span>ONDULATÓRIAS</span></h2><div class="sl"></div></div>
+  <div class="fhero">
+    <div class="bf">v = λ · f = λ / T</div>
+    <div class="fl">EQUAÇÃO FUNDAMENTAL DAS ONDAS  |  v [m/s]  λ [m]  f [Hz]  T [s]</div>
+  </div>
+  <div class="igrid">
+    <div class="card"><h3>AMPLITUDE (A)</h3><p>Deslocamento máximo da partícula em relação à posição de equilíbrio. Determina a <span class="hl">intensidade (energia)</span> da onda. Medida em metros. E ∝ A².</p></div>
+    <div class="card pk"><h3>COMPRIMENTO DE ONDA (λ)</h3><p>Distância entre dois pontos consecutivos em fase (ex: crista a crista). Determina a "escala espacial" da onda. <span class="hlk">λ = v/f = v·T</span></p></div>
+    <div class="card gd"><h3>FREQUÊNCIA (f) E PERÍODO (T)</h3><p>Frequência: número de oscilações por segundo [Hz]. Período: tempo de uma oscilação completa [s].</p>
+      <div class="law gd" style="font-size:.85rem">T = 1/f  |  f = 1/T<br>f [Hz = ciclos/s]  T [s]</div>
+    </div>
+    <div class="card cy"><h3>VELOCIDADE DE PROPAGAÇÃO (v)</h3><p>Velocidade com que a perturbação se move no meio. Depende das <span class="hlc">propriedades do meio</span> (elasticidade, densidade), não da fonte. v = λ·f</p></div>
+    <div class="card pr"><h3>FUNÇÃO DE ONDA</h3><p>Equação que descreve a posição de qualquer partícula do meio em qualquer instante t:</p>
+      <div class="law pr" style="font-size:.83rem">y(x,t) = A · sen(kx − ωt)<br>k = 2π/λ (número de onda)<br>ω = 2πf (freq. angular)</div>
+    </div>
+    <div class="card"><h3>INTENSIDADE SONORA</h3><p>Potência transportada por unidade de área perpendicular à propagação. Relaciona-se com a amplitude da onda.</p>
+      <div class="law" style="font-size:.83rem">I = P/A  [W/m²]<br>I ∝ A²<br>Nível: β = 10·log(I/I₀) [dB]</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SIMULAÇÃO PRINCIPAL ── -->
+<section id="simulacao">
+  <div class="sh"><span class="sn">04</span><h2 class="st">SIMULAÇÃO DA <span>ONDA</span></h2><div class="sl"></div></div>
+  <div class="vis gd" style="padding:24px">
+    <p class="vtag" style="color:#ffbb00;letter-spacing:4px">[ ★ GERADOR DE ONDAS INTERATIVO ★ ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>AMPLITUDE A (px)</label><input type="range" id="wA" min="10" max="80" value="50" oninput="updW()"><div class="ctrl-val" id="wAv">50</div></div>
+      <div class="ctrl"><label>FREQUÊNCIA f (Hz)</label><input type="range" id="wF" min="1" max="8" value="2" step="0.5" oninput="updW()"><div class="ctrl-val" id="wFv">2.0</div></div>
+      <div class="ctrl"><label>VELOCIDADE v (unid./s)</label><input type="range" id="wV" min="100" max="400" value="200" step="10" oninput="updW()"><div class="ctrl-val" id="wVv">200</div></div>
+    </div>
+    <canvas id="wCanvas" width="700" height="260"></canvas>
+    <div id="wInfo" style="display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:1px"></div>
+  </div>
+</section>
+
+<!-- ── FENÔMENOS ── -->
+<section id="fenomenos">
+  <div class="sh"><span class="sn">05</span><h2 class="st">FENÔMENOS <span>ONDULATÓRIOS</span></h2><div class="sl"></div></div>
+  <div class="igrid">
+    <div class="card"><h3>REFLEXÃO</h3><p>Quando a onda atinge uma superfície e <span class="hl">retorna ao mesmo meio</span>. O ângulo de incidência é igual ao de reflexão. A frequência e o comprimento de onda são conservados.</p>
+      <div class="law" style="font-size:.82rem">θᵢ = θᵣ  (lei da reflexão)<br>f e λ se conservam<br>v se conserva (mesmo meio)</div>
+    </div>
+    <div class="card pk"><h3>REFRAÇÃO</h3><p>Quando a onda passa de um meio para outro com <span class="hlk">velocidade diferente</span>, muda de direção. A frequência é conservada, mas λ e v mudam.</p>
+      <div class="law pk" style="font-size:.82rem">v₁/v₂ = λ₁/λ₂ = sen θ₁/sen θ₂<br>f conservada em ambos os meios<br>v e λ mudam ao mudar de meio</div>
+    </div>
+    <div class="card gd"><h3>DIFRAÇÃO</h3><p>Capacidade da onda de <span class="hlg">contornar obstáculos</span> ou se espalhar ao passar por aberturas. Mais pronunciada quando λ ≈ tamanho do obstáculo/abertura.</p>
+      <div class="law gd" style="font-size:.82rem">Difração máxima: λ ≈ d (abertura)<br>Quanto maior λ, maior a difração<br>Ex: som curva em esquinas, rádio contorna colinas</div>
+    </div>
+    <div class="card cy"><h3>RESSONÂNCIA</h3><p>Quando um corpo é submetido a vibrações com sua <span class="hlc">frequência natural</span>, absorve energia e vibra com grande amplitude. Fenômeno de grande importância prática.</p>
+      <div class="law cy" style="font-size:.82rem">f_forçante = f_natural → ressonância<br>Ex: copos de cristal, pontes, MRI<br>Pode ser destrutiva (ponte Tacoma, 1940)</div>
+    </div>
+  </div>
+
+  <!-- REFLECTION & REFRACTION CANVAS -->
+  <div class="vis pk">
+    <p class="vtag" style="color:#ff2277">[ REFLEXÃO E REFRAÇÃO — SELECIONE O FENÔMENO ]</p>
+    <div class="tabs" id="rrTabs">
+      <button class="tab active" onclick="setRR('refl',this)">REFLEXÃO</button>
+      <button class="tab" onclick="setRR('refr',this)">REFRAÇÃO</button>
+      <button class="tab" onclick="setRR('diff',this)">DIFRAÇÃO</button>
+    </div>
+    <canvas id="rrCanvas" width="700" height="300"></canvas>
+    <div id="rrInfo" style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:#1a7a3a;text-align:center;margin-top:6px">
+      Reflexão: θ incidência = θ reflexão | comprimento de onda conservado
+    </div>
+  </div>
+</section>
+
+<!-- ── INTERFERÊNCIA ── -->
+<section id="interferencia">
+  <div class="sh"><span class="sn">06</span><h2 class="st"><span>INTERFERÊNCIA</span></h2><div class="sl"></div></div>
+  <div class="card pr"><h3>SUPERPOSIÇÃO DE ONDAS</h3>
+    <p>Quando duas ou mais ondas se encontram no mesmo ponto, o deslocamento resultante é a <span class="hlp">soma algébrica</span> dos deslocamentos individuais (Princípio da Superposição). Após interagir, cada onda prossegue sem alteração.</p>
+    <div class="igrid">
+      <div style="background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.2);padding:16px">
+        <p style="font-family:'Orbitron',monospace;font-size:.72rem;color:#00ff88;margin-bottom:6px">INTERFERÊNCIA CONSTRUTIVA</p>
+        <p>Ondas em fase (Δr = nλ). As amplitudes se somam. Resultado: <span class="hl">amplitude máxima = A₁ + A₂</span>.</p>
+        <div class="law" style="font-size:.8rem">Δr = 0, λ, 2λ, 3λ, ... = nλ</div>
+      </div>
+      <div style="background:rgba(255,34,119,.04);border:1px solid rgba(255,34,119,.2);padding:16px">
+        <p style="font-family:'Orbitron',monospace;font-size:.72rem;color:#ff2277;margin-bottom:6px">INTERFERÊNCIA DESTRUTIVA</p>
+        <p>Ondas em oposição de fase (Δr = (n+½)λ). As amplitudes se cancelam. Resultado: <span class="hlk">amplitude mínima = |A₁ − A₂|</span>.</p>
+        <div class="law pk" style="font-size:.8rem">Δr = λ/2, 3λ/2, ... = (n+½)λ</div>
+      </div>
+    </div>
+  </div>
+  <div class="vis pr">
+    <p class="vtag" style="color:#aa44ff">[ PADRÃO DE INTERFERÊNCIA — DUAS FONTES ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>SEPARAÇÃO DAS FONTES (px)</label><input type="range" id="iSep" min="20" max="140" value="60" oninput="drawInterf()"><div class="ctrl-val" id="iSepV">60</div></div>
+      <div class="ctrl"><label>COMPRIMENTO DE ONDA λ (px)</label><input type="range" id="iLam" min="20" max="90" value="45" oninput="drawInterf()"><div class="ctrl-val" id="iLamV">45</div></div>
+    </div>
+    <canvas id="intCanvas" width="350" height="230" style="width:700px;height:460px;border:1px solid rgba(170,68,255,.2);image-rendering:pixelated"></canvas>
+    <div class="fhint" style="margin-top:8px">
+      <div class="fhi"><div class="fhd" style="background:#fff;box-shadow:0 0 6px #fff"></div>Interferência construtiva (máximos)</div>
+      <div class="fhi"><div class="fhd" style="background:#05090e"></div>Interferência destrutiva (mínimos)</div>
+      <div class="fhi"><div class="fhd" style="background:#ffbb00;box-shadow:0 0 6px #ffbb00"></div>Fontes S₁ e S₂</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── EFEITO DOPPLER ── -->
+<section id="doppler">
+  <div class="sh"><span class="sn">07</span><h2 class="st">EFEITO <span>DOPPLER</span></h2><div class="sl"></div></div>
+  <div class="card gd"><h3>O QUE É?</h3>
+    <p>Quando há movimento relativo entre a <span class="hlg">fonte</span> e o <span class="hlg">observador</span>, a frequência percebida difere da frequência emitida. Não é ilusão — a onda realmente tem λ diferente nas duas direções.</p>
+    <p>Clássico: ambulância — quando se aproxima, o som é mais agudo; quando se afasta, mais grave.</p>
+  </div>
+  <div class="fhero" style="border-color:rgba(255,187,0,.3)">
+    <div class="bf" style="text-shadow:0 0 14px #ffbb00,0 0 35px rgba(255,187,0,.42)">f' = f₀ · (v ± v_obs) / (v ∓ v_src)</div>
+    <div class="fl" style="color:#ffbb00">v = velocidade do som no meio  |  v_src = velocidade da fonte  |  v_obs = velocidade do observador<br>Sinal superior: fonte/obs se aproximando  |  Sinal inferior: fonte/obs se afastando</div>
+  </div>
+  <div class="vis gd">
+    <p class="vtag" style="color:#ffbb00">[ ANIMAÇÃO DO EFEITO DOPPLER ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>VELOCIDADE DA FONTE</label><input type="range" id="dV" min="0" max="7" value="3" step="0.5" oninput="document.getElementById('dVv').textContent=this.value"><div class="ctrl-val" id="dVv">3</div></div>
+    </div>
+    <canvas id="dCanvas" width="700" height="280"></canvas>
+    <div class="fhint" style="margin-top:8px">
+      <div class="fhi"><div class="fhd" style="background:#ffbb00;box-shadow:0 0 6px #ffbb00"></div>Fonte sonora (movendo-se →)</div>
+      <div class="fhi"><div class="fhd" style="background:#00ff88;box-shadow:0 0 6px #00ff88"></div>Frentes de onda</div>
+      <div class="fhi" style="color:#ff2277">← f' > f₀ (agudo)</div>
+      <div class="fhi" style="color:#00ccff">f' < f₀ (grave) →</div>
+    </div>
+  </div>
+  <div class="igrid">
+    <div class="card"><h3>FONTE ESTACIONÁRIA</h3><p>Frentes de onda são círculos concêntricos. <span class="hl">f' = f₀</span> para qualquer observador.</p>
+      <div class="law" style="font-size:.82rem">v_src = 0 → f' = f₀<br>λ igual em todas as direções</div>
+    </div>
+    <div class="card pk"><h3>FONTE SE APROXIMANDO</h3><p>Frentes de onda comprimidas à frente. Observador detecta <span class="hlk">f' > f₀</span> (som mais agudo).</p>
+      <div class="law pk" style="font-size:.82rem">f' = f₀ · v / (v − v_src)<br>λ' = λ₀ − v_src/f₀ < λ₀</div>
+    </div>
+    <div class="card cy"><h3>FONTE SE AFASTANDO</h3><p>Frentes de onda esticadas atrás. Observador detecta <span class="hlc">f' < f₀</span> (som mais grave).</p>
+      <div class="law cy" style="font-size:.82rem">f' = f₀ · v / (v + v_src)<br>λ' = λ₀ + v_src/f₀ > λ₀</div>
+    </div>
+    <div class="card gd"><h3>APLICAÇÕES DO DOPPLER</h3><p>✦ <span class="hlg">Radar de velocidade</span> (polícia rodoviária)<br>✦ <span class="hlg">Ultrassom Doppler</span> (cardiologia — fluxo sanguíneo)<br>✦ <span class="hlg">Astronomia</span> — redshift (afastamento de galáxias)<br>✦ <span class="hlg">Meteorologia</span> — radar Doppler de tempestades</p></div>
+  </div>
+</section>
+
+<!-- ── EXERCÍCIOS ── -->
+<section id="exercicios">
+  <div class="sh"><span class="sn">08</span><h2 class="st">EXERCÍCIOS DE <span>FIXAÇÃO</span></h2><div class="sl"></div></div>
+  <p style="color:#1a7a3a;font-family:'Share Tech Mono',monospace;font-size:.72rem;margin-bottom:22px;letter-spacing:2px">SELECIONE A ALTERNATIVA CORRETA</p>
+  <div class="pw"><div class="pf" id="pBar" style="width:0%"></div></div>
+  <p style="font-family:'Share Tech Mono',monospace;font-size:.67rem;color:#1a7a3a;text-align:right;margin:6px 0 24px" id="pTxt">0 / 8 respondidas</p>
+
+  <div class="qc" id="q1">
+    <div class="qnum">QUESTÃO 01 // CONCEITO FUNDAMENTAL</div>
+    <div class="qtext">Uma onda transporta, de um ponto a outro:</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">A</span>Matéria e energia</button>
+      <button class="obt" onclick="ans(this,'q1','correct')"><span class="ol">B</span>Energia, sem transportar matéria</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">C</span>Apenas matéria, sem energia</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">D</span>Nem matéria nem energia</button>
+    </div><div class="fb" id="f_q1"></div>
+  </div>
+
+  <div class="qc" id="q2">
+    <div class="qnum">QUESTÃO 02 // TIPOS DE ONDAS</div>
+    <div class="qtext">O som é uma onda mecânica longitudinal. Isso significa que:</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">A</span>Propaga-se no vácuo e vibra perpendicularmente</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">B</span>Propaga-se no vácuo e vibra paralelamente</button>
+      <button class="obt" onclick="ans(this,'q2','correct')"><span class="ol">C</span>Necessita de meio material e vibra paralelamente à propagação</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">D</span>Necessita de meio material e vibra perpendicularmente à propagação</button>
+    </div><div class="fb" id="f_q2"></div>
+  </div>
+
+  <div class="qc" id="q3">
+    <div class="qnum">QUESTÃO 03 // EQUAÇÃO FUNDAMENTAL</div>
+    <div class="qtext">Uma onda de frequência f = 440 Hz propaga-se com velocidade v = 340 m/s no ar. Qual é o seu comprimento de onda?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">A</span>149.600 m</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">B</span>1,29 m</button>
+      <button class="obt" onclick="ans(this,'q3','correct')"><span class="ol">C</span>≈ 0,77 m</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">D</span>0,44 m</button>
+    </div><div class="fb" id="f_q3"></div>
+  </div>
+
+  <div class="qc" id="q4">
+    <div class="qnum">QUESTÃO 04 // PERÍODO E FREQUÊNCIA</div>
+    <div class="qtext">Uma onda possui período T = 0,025 s. Qual é a sua frequência e o que isso representa?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">A</span>f = 0,025 Hz — uma oscilação a cada 40 s</button>
+      <button class="obt" onclick="ans(this,'q4','correct')"><span class="ol">B</span>f = 40 Hz — 40 oscilações por segundo</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">C</span>f = 400 Hz — 400 oscilações por segundo</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">D</span>f = 4 Hz — 4 oscilações por segundo</button>
+    </div><div class="fb" id="f_q4"></div>
+  </div>
+
+  <div class="qc" id="q5">
+    <div class="qnum">QUESTÃO 05 // FENÔMENOS — REFLEXÃO</div>
+    <div class="qtext">Quando uma onda é refletida, qual grandeza se conserva?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">A</span>Apenas a amplitude</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">B</span>Apenas a velocidade</button>
+      <button class="obt" onclick="ans(this,'q5','correct')"><span class="ol">C</span>Frequência, comprimento de onda e velocidade (mesmo meio)</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">D</span>Nenhuma grandeza se conserva</button>
+    </div><div class="fb" id="f_q5"></div>
+  </div>
+
+  <div class="qc" id="q6">
+    <div class="qnum">QUESTÃO 06 // INTERFERÊNCIA</div>
+    <div class="qtext">Duas ondas de mesma frequência e amplitude chegam ao ponto P com diferença de caminho Δr = 3λ/2. O que ocorre em P?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">A</span>Interferência construtiva — amplitude dobra</button>
+      <button class="obt" onclick="ans(this,'q6','correct')"><span class="ol">B</span>Interferência destrutiva — amplitude nula</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">C</span>As ondas se ignoram e passam sem interagir</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">D</span>Interferência construtiva parcial</button>
+    </div><div class="fb" id="f_q6"></div>
+  </div>
+
+  <div class="qc" id="q7">
+    <div class="qnum">QUESTÃO 07 // EFEITO DOPPLER</div>
+    <div class="qtext">Uma ambulância emite som de f₀ = 800 Hz e se aproxima de um observador parado com v_src = 34 m/s. Sendo v = 340 m/s, qual é a frequência percebida?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">A</span>720 Hz</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">B</span>800 Hz</button>
+      <button class="obt" onclick="ans(this,'q7','correct')"><span class="ol">C</span>≈ 889 Hz</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">D</span>1000 Hz</button>
+    </div><div class="fb" id="f_q7"></div>
+  </div>
+
+  <div class="qc" id="q8">
+    <div class="qnum">QUESTÃO 08 // INTEGRAÇÃO</div>
+    <div class="qtext">Sobre ondas eletromagnéticas, é CORRETO afirmar que:</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">A</span>São longitudinais e precisam de meio material</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">B</span>São transversais e precisam de meio material</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">C</span>São longitudinais e se propagam no vácuo</button>
+      <button class="obt" onclick="ans(this,'q8','correct')"><span class="ol">D</span>São transversais e se propagam no vácuo</button>
+    </div><div class="fb" id="f_q8"></div>
+  </div>
+
+  <div class="sp" id="spanel" style="display:none">
+    <div class="scl">RESULTADO FINAL</div>
+    <div class="scv" id="scv">0/8</div>
+    <div class="scm" id="scm"></div>
+    <button class="rbtn" onclick="resetQ()">REFAZER EXERCÍCIOS</button>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section id="download" style="margin-top:56px">
+  <div class="sh"><span class="sn">09</span><h2 class="st">BAIXAR <span>LISTA</span></h2><div class="sl"></div></div>
+  <div class="card" style="text-align:center;padding:36px 28px">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:#1a7a3a;letter-spacing:3px;margin-bottom:12px">8 QUESTÕES COM GABARITO E RESOLUÇÃO</div>
+    <div style="font-size:3.5rem;margin-bottom:12px;filter:drop-shadow(0 0 18px #00ff88)">∿</div>
+    <p style="margin-bottom:22px;color:#1a7a3a;font-size:.93rem">Lista completa em PDF com gabarito, resoluções e fórmulas de referência.</p>
+    <a id="dlBtn" download="lista-ondulatoria.pdf" class="dlbtn">BAIXAR LISTA DE EXERCÍCIOS (PDF)</a>
+  </div>
+</section>
+</main>
+<footer>
+  <div>ONDULATÓRIA — FÍSICA DO ENSINO MÉDIO</div>
+  <div style="margin-top:7px">TIPOS · GRANDEZAS · REFLEXÃO · REFRAÇÃO · DIFRAÇÃO · INTERFERÊNCIA · DOPPLER</div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function bg(ctx,W,H){ctx.fillStyle='#030f06';ctx.fillRect(0,0,W,H);}
+function ga(ctx,x1,y1,x2,y2,col,lw,blur){
+  lw=lw||2;blur=blur||12;
+  var a=Math.atan2(y2-y1,x2-x1),L=10;
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=blur;
+  ctx.strokeStyle=col;ctx.lineWidth=lw;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.fillStyle=col;ctx.beginPath();
+  ctx.moveTo(x2,y2);ctx.lineTo(x2-L*Math.cos(a-.42),y2-L*Math.sin(a-.42));
+  ctx.lineTo(x2-L*Math.cos(a+.42),y2-L*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+}
+function lbl(ctx,x,y,txt,col,sz,align){
+  sz=sz||12;align=align||'center';
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=7;ctx.fillStyle=col;
+  ctx.font=sz+'px Share Tech Mono,monospace';ctx.textAlign=align;ctx.fillText(txt,x,y);ctx.restore();
+}
+function dashedLine(ctx,x1,y1,x2,y2,col){
+  ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle=col;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+}
+
+// ═══════════════════════════════════════
+// WAVE TYPE CANVAS (transversal/longitudinal)
+// ═══════════════════════════════════════
+var wtMode='t', wtT=0;
+function setWT(m,btn){
+  wtMode=m;
+  document.querySelectorAll('#wtTabs .tab').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('wtHint').textContent=
+    m==='t'?'Vibração perpendicular à propagação':'Vibração paralela à propagação (compressões e rarefações)';
+}
+function animWT(){
+  wtT+=0.018;
+  var cv=document.getElementById('wtCanvas');if(!cv){requestAnimationFrame(animWT);return;}
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height,cy=H/2;
+  bg(ctx,W,H);
+  // propagation axis arrow
+  ga(ctx,20,cy,W-20,cy,'rgba(0,255,136,.18)',1.5,4);
+  lbl(ctx,W-30,cy-12,'propagação','rgba(0,255,136,.35)',9);
+
+  if(wtMode==='t'){
+    // Transverse: sine wave
+    var A=55,lambda=180,omega=2*Math.PI*1.5;
+    var k=2*Math.PI/lambda;
+    ctx.save();ctx.shadowColor='#00ff88';ctx.shadowBlur=16;ctx.strokeStyle='#00ff88';ctx.lineWidth=3;
+    ctx.beginPath();
+    for(var x=0;x<=W;x+=2){
+      var y=cy-A*Math.sin(k*x-omega*wtT);
+      x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.stroke();ctx.restore();
+    // particles
+    for(var i=0;i<7;i++){
+      var px=60+i*(W-120)/6;
+      var py=cy-A*Math.sin(k*px-omega*wtT);
+      ctx.save();ctx.shadowColor='#ff2277';ctx.shadowBlur=14;
+      ctx.beginPath();ctx.arc(px,py,7,0,Math.PI*2);ctx.fillStyle='#ff2277';ctx.fill();ctx.restore();
+      dashedLine(ctx,px,cy,px,py,'rgba(255,34,119,.35)');
+    }
+    // lambda label
+    var x0=60,x1b=60+lambda;
+    dashedLine(ctx,x0,cy+72,x1b,cy+72,'rgba(0,255,136,.4)');
+    dashedLine(ctx,x0,cy+60,x0,cy+84,'rgba(0,255,136,.4)');
+    dashedLine(ctx,x1b,cy+60,x1b,cy+84,'rgba(0,255,136,.4)');
+    lbl(ctx,(x0+x1b)/2,cy+68,'λ','#00ff88',13);
+    // A label
+    var xA=W/2+20, yWave=cy-A*Math.sin(k*(W/2+20)-omega*wtT);
+    dashedLine(ctx,xA+16,cy,xA+16,yWave,'rgba(255,187,0,.5)');
+    lbl(ctx,xA+30,cy-A/2,'A','#ffbb00',12);
+    lbl(ctx,W/2,H-14,'ONDA TRANSVERSAL — partícula vibra ↕ enquanto onda propaga →','rgba(0,255,136,.5)',9);
+  } else {
+    // Longitudinal: dots with compression/rarefaction
+    var nD=52,sp=W/nD;
+    var kL=2*Math.PI/(W/3.5),omL=2*Math.PI*1.5;
+    for(var i=0;i<nD;i++){
+      var x0L=(i+.5)*sp;
+      var disp=18*Math.sin(kL*x0L-omL*wtT);
+      var xD=x0L+disp;
+      var compression=kL*18*Math.cos(kL*x0L-omL*wtT);
+      var t2=(compression/(kL*18)+1)/2;
+      var rC=Math.floor(t2*0),gC=Math.floor(80+t2*175),bC=Math.floor(60+t2*70);
+      ctx.save();ctx.shadowColor='rgb('+rC+','+gC+','+bC+')';ctx.shadowBlur=8;
+      ctx.beginPath();ctx.arc(xD,cy,5,0,Math.PI*2);
+      ctx.fillStyle='rgb('+rC+','+gC+','+bC+')';ctx.fill();ctx.restore();
+    }
+    // compression/rarefaction labels
+    var xC=W/4,xR=3*W/4;
+    var dispC=18*Math.sin(kL*xC-omL*wtT);
+    if(Math.abs(dispC)>8){
+      lbl(ctx,xC,cy+45,'COMPRESSÃO','#00ff88',9);
+    }
+    lbl(ctx,xR,cy+45,'RAREFAÇÃO','#ff2277',9);
+    lbl(ctx,W/2,H-14,'ONDA LONGITUDINAL — partícula vibra ↔ enquanto onda propaga →','rgba(0,255,136,.5)',9);
+  }
+  requestAnimationFrame(animWT);
+}
+
+// ═══════════════════════════════════════
+// MAIN WAVE GENERATOR
+// ═══════════════════════════════════════
+var wT=0,wA=50,wF=2,wVel=200;
+function updW(){
+  wA=+document.getElementById('wA').value;
+  wF=+document.getElementById('wF').value;
+  wVel=+document.getElementById('wV').value;
+  document.getElementById('wAv').textContent=wA;
+  document.getElementById('wFv').textContent=wF.toFixed(1);
+  document.getElementById('wVv').textContent=wVel;
+}
+function animW(){
+  wT+=0.016;
+  var cv=document.getElementById('wCanvas');if(!cv){requestAnimationFrame(animW);return;}
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height,cy=H/2;
+  bg(ctx,W,H);
+  var lambda=wVel/wF;
+  var k=2*Math.PI/lambda;
+  var omega=2*Math.PI*wF;
+  var T=1/wF;
+
+  // equilibrium line
+  ctx.save();ctx.strokeStyle='rgba(0,255,136,.15)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+
+  // wave
+  ctx.save();ctx.shadowColor='#00ff88';ctx.shadowBlur=18;ctx.lineWidth=3;
+  var grad=ctx.createLinearGradient(0,0,W,0);
+  grad.addColorStop(0,'#00ff88');grad.addColorStop(.5,'#00ccff');grad.addColorStop(1,'#aa44ff');
+  ctx.strokeStyle=grad;
+  ctx.beginPath();
+  for(var x=0;x<=W;x+=2){
+    var y=cy-wA*Math.sin(k*x-omega*wT);
+    x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();ctx.restore();
+
+  // particles
+  var nP=6;
+  for(var i=0;i<nP;i++){
+    var px=50+i*(W-100)/(nP-1);
+    var py=cy-wA*Math.sin(k*px-omega*wT);
+    ctx.save();ctx.shadowColor='#ff2277';ctx.shadowBlur=14;
+    ctx.beginPath();ctx.arc(px,py,7,0,Math.PI*2);ctx.fillStyle='#ff2277';ctx.fill();ctx.restore();
+    dashedLine(ctx,px,cy,px,py,'rgba(255,34,119,.3)');
+  }
+
+  // wavelength annotation
+  var xA=40,xB=xA+lambda;
+  if(xB<W-20){
+    var yW=cy-wA*Math.sin(k*xA-omega*wT);
+    dashedLine(ctx,xA,cy+H*.28,xB,cy+H*.28,'rgba(0,255,136,.5)');
+    dashedLine(ctx,xA,cy+H*.22,xA,cy+H*.34,'rgba(0,255,136,.5)');
+    if(xB<W-10)dashedLine(ctx,xB,cy+H*.22,xB,cy+H*.34,'rgba(0,255,136,.5)');
+    lbl(ctx,(xA+Math.min(xB,W-10))/2,cy+H*.27,'λ = '+(lambda).toFixed(0)+' px','#00ff88',10);
+  }
+  // amplitude annotation
+  if(wA>15){
+    dashedLine(ctx,W-30,cy,W-30,cy-wA,'rgba(255,187,0,.5)');
+    lbl(ctx,W-54,cy-wA/2,'A='+wA,'#ffbb00',10);
+  }
+
+  // info bar
+  var info=document.getElementById('wInfo');
+  if(info){
+    info.innerHTML=
+      '<span style="color:#00ff88">λ = '+(lambda).toFixed(1)+' px</span>'+
+      '<span style="color:#ff2277">f = '+wF.toFixed(1)+' Hz</span>'+
+      '<span style="color:#ffbb00">T = '+(1/wF).toFixed(2)+' s</span>'+
+      '<span style="color:#00ccff">v = '+wVel+' u/s</span>'+
+      '<span style="color:#aa44ff">A = '+wA+' px</span>';
+  }
+  requestAnimationFrame(animW);
+}
+
+// ═══════════════════════════════════════
+// REFLECTION / REFRACTION / DIFFRACTION
+// ═══════════════════════════════════════
+var rrMode='refl', rrT=0;
+function setRR(m,btn){
+  rrMode=m;
+  document.querySelectorAll('#rrTabs .tab').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  var msgs={refl:'Reflexão: θᵢ = θᵣ | f, λ e v conservados | mesma velocidade (mesmo meio)',
+            refr:'Refração: onda muda direção ao mudar de meio | f conservada | v e λ mudam',
+            diff:'Difração: onda contorna obstáculos e aberturas | mais intensa quando λ ≈ abertura'};
+  document.getElementById('rrInfo').textContent=msgs[m];
+}
+function animRR(){
+  rrT+=0.016;
+  var cv=document.getElementById('rrCanvas');if(!cv){requestAnimationFrame(animRR);return;}
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  if(rrMode==='refl') drawRefl(ctx,W,H);
+  else if(rrMode==='refr') drawRefr(ctx,W,H);
+  else drawDiff(ctx,W,H);
+  requestAnimationFrame(animRR);
+}
+function drawRefl(ctx,W,H){
+  var wallX=W/2;
+  // wall
+  ctx.save();ctx.shadowColor='rgba(255,187,0,.5)';ctx.shadowBlur=10;
+  ctx.strokeStyle='#ffbb00';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(wallX,10);ctx.lineTo(wallX,H-10);ctx.stroke();
+  // hatching
+  ctx.strokeStyle='rgba(255,187,0,.25)';ctx.lineWidth=1;
+  for(var y=10;y<H;y+=18){ctx.beginPath();ctx.moveTo(wallX,y);ctx.lineTo(wallX+16,y-16);ctx.stroke();}
+  ctx.restore();
+  lbl(ctx,wallX+32,H/2,'PAREDE','#ffbb00',9);
+  // incident waves (moving right)
+  var lambda=80,kW=2*Math.PI/lambda,omega=2*Math.PI*1.2;
+  var scroll=(rrT*1.2*lambda)%(lambda);
+  // incident (left side, moving right)
+  ctx.save();ctx.shadowColor='#00ff88';ctx.shadowBlur=8;ctx.strokeStyle='#00ff88';ctx.lineWidth=2;
+  for(var x=-scroll;x<wallX;x+=lambda){
+    ctx.beginPath();ctx.moveTo(x,20);ctx.lineTo(x,H-20);ctx.stroke();
+    ga(ctx,x-8,H/2+20,x+14,H/2+20,'rgba(0,255,136,.5)',1.5,6);
+  }
+  ctx.restore();
+  lbl(ctx,wallX/2,16,'ONDA INCIDENTE','rgba(0,255,136,.6)',9);
+  // reflected waves (moving left, inverted scroll)
+  var scroll2=(rrT*1.2*lambda)%(lambda);
+  ctx.save();ctx.shadowColor='#ff2277';ctx.shadowBlur=8;ctx.strokeStyle='#ff2277';ctx.lineWidth=2;
+  for(var x=wallX+scroll2-lambda;x<wallX;x+=lambda){
+    if(x>0){
+      ctx.beginPath();ctx.moveTo(x,20);ctx.lineTo(x,H-20);ctx.stroke();
+      ga(ctx,x+8,H/2-20,x-14,H/2-20,'rgba(255,34,119,.5)',1.5,6);
+    }
+  }
+  ctx.restore();
+  lbl(ctx,wallX/2,H-12,'ONDA REFLETIDA (θᵣ = θᵢ)','rgba(255,34,119,.6)',9);
+  lbl(ctx,wallX/2-20,H/2,'θᵢ','rgba(0,255,136,.7)',11);
+  lbl(ctx,wallX/2+20,H/2,'θᵣ','rgba(255,34,119,.7)',11);
+}
+function drawRefr(ctx,W,H){
+  var boundX=W/2;
+  // medium 1 (left) - faster
+  ctx.fillStyle='rgba(0,255,136,.05)';ctx.fillRect(0,0,boundX,H);
+  // medium 2 (right) - slower
+  ctx.fillStyle='rgba(0,204,255,.07)';ctx.fillRect(boundX,0,W-boundX,H);
+  lbl(ctx,boundX/2,20,'MEIO 1 (v₁)','rgba(0,255,136,.6)',9);
+  lbl(ctx,boundX+boundX/2,20,'MEIO 2 (v₂ < v₁)','rgba(0,204,255,.6)',9);
+  // boundary
+  ctx.save();ctx.strokeStyle='rgba(255,255,255,.3)';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);
+  ctx.beginPath();ctx.moveTo(boundX,0);ctx.lineTo(boundX,H);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+
+  // normal
+  dashedLine(ctx,boundX,10,boundX,H-10,'rgba(255,255,255,.2)');
+
+  // incident wave rays (angled)
+  var theta1=40*Math.PI/180;
+  var theta2=Math.asin(Math.sin(theta1)*.6);
+  var lambda1=90, lambda2=lambda1*.6;
+  var scroll=(rrT*100)%lambda1;
+  var cx=boundX,cy2=H/2;
+  // draw incident parallel wavefronts (perpendicular to ray direction)
+  var rayDx=Math.sin(theta1),rayDy=Math.cos(theta1);
+  var perpDx=rayDy,perpDy=-rayDx;
+  ctx.save();ctx.shadowColor='#00ff88';ctx.shadowBlur=8;ctx.strokeStyle='#00ff88';ctx.lineWidth=2;
+  for(var d=-scroll-2*lambda1;d<200;d+=lambda1){
+    var ox=cx-d*rayDx,oy=cy2-d*rayDy;
+    var L=150;
+    var x1b=ox+L*perpDx,y1b=oy+L*perpDy;
+    var x2b=ox-L*perpDx,y2b=oy-L*perpDy;
+    // clip to left side
+    if(ox<boundX+5){ctx.beginPath();ctx.moveTo(x1b,y1b);ctx.lineTo(x2b,y2b);ctx.stroke();}
+  }
+  ctx.restore();
+  // incident ray arrow
+  ga(ctx,boundX-120,cy2-120*Math.cos(theta1)/Math.sin(theta1)*Math.tan(theta1),boundX,cy2,'rgba(0,255,136,.6)',2,8);
+
+  // refracted wavefronts
+  var ray2Dx=Math.sin(theta2),ray2Dy=Math.cos(theta2);
+  var perp2Dx=ray2Dy,perp2Dy=-ray2Dx;
+  ctx.save();ctx.shadowColor='#00ccff';ctx.shadowBlur=8;ctx.strokeStyle='#00ccff';ctx.lineWidth=2;
+  for(var d=-scroll-2*lambda2;d<300;d+=lambda2){
+    var ox=cx+d*ray2Dx,oy=cy2+d*ray2Dy;
+    var L2=140;
+    if(ox>boundX-5){
+      ctx.beginPath();ctx.moveTo(ox+L2*perp2Dx,oy+L2*perp2Dy);ctx.lineTo(ox-L2*perp2Dx,oy-L2*perp2Dy);ctx.stroke();
+    }
+  }
+  ctx.restore();
+  ga(ctx,boundX,cy2,boundX+120,cy2+120*Math.cos(theta2),'rgba(0,204,255,.6)',2,8);
+  // angles
+  lbl(ctx,boundX-40,cy2-28,'θ₁','rgba(0,255,136,.8)',12);
+  lbl(ctx,boundX+34,cy2+22,'θ₂','rgba(0,204,255,.8)',12);
+  lbl(ctx,W/2,H-12,'v₁/v₂ = sen θ₁ / sen θ₂ = λ₁/λ₂','rgba(255,255,255,.35)',9);
+}
+function drawDiff(ctx,W,H){
+  var wallX=W/2,gap=60,wallT=4;
+  var topY=H/2-gap/2,botY=H/2+gap/2;
+  // incoming parallel waves (left)
+  var lambda=60,scroll=(rrT*80)%lambda;
+  ctx.save();ctx.shadowColor='#00ff88';ctx.shadowBlur=6;ctx.strokeStyle='rgba(0,255,136,.7)';ctx.lineWidth=2;
+  for(var x=-scroll;x<wallX-wallT;x+=lambda){
+    ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();
+  }
+  ctx.restore();
+  ga(ctx,wallX-lambda-20,H/2,wallX-lambda+10,H/2,'rgba(0,255,136,.4)',1.5,6);
+  // wall
+  ctx.save();ctx.shadowColor='#ffbb00';ctx.shadowBlur=10;ctx.fillStyle='#0a1a0a';ctx.strokeStyle='#ffbb00';ctx.lineWidth=2;
+  ctx.fillRect(wallX-wallT/2,0,wallT,topY);ctx.strokeRect(wallX-wallT/2,0,wallT,topY);
+  ctx.fillRect(wallX-wallT/2,botY,wallT,H-botY);ctx.strokeRect(wallX-wallT/2,botY,wallT,H-botY);
+  ctx.restore();
+  // diffracted circular waves from slit
+  var nCirc=7;
+  for(var i=0;i<nCirc;i++){
+    var r=(i/nCirc*lambda*3+scroll);
+    var alpha=1-r/(lambda*3);
+    if(alpha<=0)continue;
+    ctx.save();ctx.globalAlpha=alpha*.7;ctx.shadowColor='#aa44ff';ctx.shadowBlur=8;
+    ctx.strokeStyle='#aa44ff';ctx.lineWidth=1.8;
+    ctx.beginPath();ctx.arc(wallX,H/2,r,-.75*Math.PI,.75*Math.PI);ctx.stroke();
+    ctx.restore();
+  }
+  lbl(ctx,(wallX)/2,H-14,'ONDAS PLANAS','rgba(0,255,136,.5)',9);
+  lbl(ctx,wallX+60,H/2-gap/2-12,'ABERTURA d ≈ λ','rgba(255,187,0,.6)',9);
+  lbl(ctx,wallX+120,H-14,'DIFRAÇÃO — ondas circulares','rgba(170,68,255,.6)',9);
+}
+
+// ═══════════════════════════════════════
+// INTERFERENCE PATTERN
+// ═══════════════════════════════════════
+function drawInterf(){
+  var sep=+document.getElementById('iSep').value;
+  var lam=+document.getElementById('iLam').value;
+  document.getElementById('iSepV').textContent=sep;
+  document.getElementById('iLamV').textContent=lam;
+  var cv=document.getElementById('intCanvas');
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  var x1=W/2-sep/4,y1=H/2,x2=W/2+sep/4,y2=H/2;
+  var k=2*Math.PI/(lam/2);
+  var img=ctx.createImageData(W,H);
+  for(var y=0;y<H;y++){
+    for(var x=0;x<W;x++){
+      var r1=Math.sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1));
+      var r2=Math.sqrt((x-x2)*(x-x2)+(y-y2)*(y-y2));
+      var amp=Math.cos(k*r1)+Math.cos(k*r2);
+      var t=(amp+2)/4;
+      var idx=(y*W+x)*4;
+      img.data[idx]=Math.floor(t*10);
+      img.data[idx+1]=Math.floor(t*200);
+      img.data[idx+2]=Math.floor(t*100);
+      img.data[idx+3]=255;
+    }
+  }
+  ctx.putImageData(img,0,0);
+  // sources
+  [x1,x2].forEach(function(sx){
+    ctx.save();ctx.shadowColor='#ffbb00';ctx.shadowBlur=12;
+    ctx.beginPath();ctx.arc(sx,H/2,5,0,Math.PI*2);ctx.fillStyle='#ffbb00';ctx.fill();ctx.restore();
+  });
+  lbl(ctx,x1-8,H/2+14,'S₁','#ffbb00',9);
+  lbl(ctx,x2+8,H/2+14,'S₂','#ffbb00',9);
+}
+
+// ═══════════════════════════════════════
+// DOPPLER ANIMATION
+// ═══════════════════════════════════════
+var dT=0,dWavefronts=[];
+function animDoppler(){
+  dT+=0.5;
+  var cv=document.getElementById('dCanvas');if(!cv){requestAnimationFrame(animDoppler);return;}
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height,cy=H/2;
+  bg(ctx,W,H);
+  var vSrc=+document.getElementById('dV').value;
+  var wSpeed=9, emitPeriod=22;
+  var srcX=((dT*vSrc)%(W+120))-60;
+  // emit new wavefront
+  if(Math.floor(dT)%emitPeriod===0&&dT%1<0.6){
+    dWavefronts.push({ox:srcX,oy:cy,r:0});
+  }
+  // background hint lines
+  ctx.save();ctx.strokeStyle='rgba(255,34,119,.2)';ctx.lineWidth=1;ctx.setLineDash([3,6]);
+  ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(W,cy);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  // update and draw wavefronts
+  dWavefronts=dWavefronts.filter(function(w){return w.r<W;});
+  dWavefronts.forEach(function(w){
+    w.r+=wSpeed;
+    var alpha=Math.max(0,1-w.r/W)*0.9;
+    ctx.save();ctx.globalAlpha=alpha;ctx.shadowColor='#00ff88';ctx.shadowBlur=10;
+    ctx.strokeStyle='#00ff88';ctx.lineWidth=1.8;
+    ctx.beginPath();ctx.arc(w.ox,w.oy,w.r,0,Math.PI*2);ctx.stroke();ctx.restore();
+  });
+  // source
+  ctx.save();ctx.shadowColor='#ffbb00';ctx.shadowBlur=22;
+  ctx.beginPath();ctx.arc(srcX,cy,13,0,Math.PI*2);ctx.fillStyle='#ffbb00';ctx.fill();
+  // velocity arrow
+  if(vSrc>0.5)ga(ctx,srcX,cy-22,srcX+32,cy-22,'#ffbb00',2,8);
+  ctx.restore();
+  lbl(ctx,srcX,cy+30,'FONTE','#ffbb00',9);
+  // observer labels
+  lbl(ctx,30,cy-18,'OBSERVADOR A','rgba(255,34,119,.7)',9);
+  lbl(ctx,30,cy+4,'f\' > f₀','#ff2277',11);
+  lbl(ctx,W-90,cy-18,'OBSERVADOR B','rgba(0,204,255,.7)',9);
+  lbl(ctx,W-78,cy+4,'f\' < f₀','#00ccff',11);
+  // compressed/expanded arrows
+  if(srcX>100&&srcX<W-100){
+    lbl(ctx,srcX/2,H-16,'λ comprimido (f alto)','rgba(255,34,119,.5)',9);
+    lbl(ctx,(srcX+W)/2,H-16,'λ expandido (f baixo)','rgba(0,204,255,.5)',9);
+  }
+  requestAnimationFrame(animDoppler);
+}
+
+// ═══════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════
+var QA={q1:0,q2:0,q3:0,q4:0,q5:0,q6:0,q7:0,q8:0};
+var FB={
+  q1:{c:'CORRETO! Ondas transportam ENERGIA, não matéria. As partículas do meio oscilam em torno da posição de equilíbrio sem se deslocar com a onda.',
+      w:'ERRADO. Ondas transportam ENERGIA sem transportar matéria. As partículas apenas oscilam — não viajam com a onda.'},
+  q2:{c:'CORRETO! Som = mecânica (precisa de meio) + longitudinal (vibração paralela à propagação, formando compressões e rarefações).',
+      w:'ERRADO. Som é mecânica (precisa de meio — não propaga no vácuo) e LONGITUDINAL (vibração paralela à propagação).'},
+  q3:{c:'CORRETO! λ = v/f = 340/440 ≈ 0,77 m.',
+      w:'ERRADO. Pela equação fundamental: λ = v/f = 340/440 ≈ 0,77 m.'},
+  q4:{c:'CORRETO! f = 1/T = 1/0,025 = 40 Hz. Significa 40 oscilações completas por segundo.',
+      w:'ERRADO. f = 1/T = 1/0,025 = 40 Hz. Período e frequência são inversos entre si.'},
+  q5:{c:'CORRETO! Na reflexão (mesmo meio), frequência, comprimento de onda e velocidade se conservam. Apenas a direção muda.',
+      w:'ERRADO. Na reflexão, como a onda permanece no mesmo meio, f, λ e v são conservados. Apenas a direção de propagação muda.'},
+  q6:{c:'CORRETO! Δr = 3λ/2 = (1+½)λ = (n+½)λ com n=1. É condição de interferência DESTRUTIVA. As ondas estão em oposição de fase e se cancelam.',
+      w:'ERRADO. Δr = 3λ/2 = (n+½)λ → condição de interferência DESTRUTIVA. Ondas chegam em oposição de fase → amplitude nula.'},
+  q7:{c:'CORRETO! Fonte se aproxima: f\' = f₀·v/(v−v_src) = 800×340/(340−34) = 800×340/306 ≈ 888,9 ≈ 889 Hz.',
+      w:'ERRADO. Fonte se aproximando: f\' = f₀·v/(v−v_src) = 800×340/(340−34) = 272000/306 ≈ 889 Hz.'},
+  q8:{c:'CORRETO! Ondas eletromagnéticas (luz, rádio, etc.) são TRANSVERSAIS (campo E e B oscilam perpendicularmente à propagação) e se propagam no VÁCUO.',
+      w:'ERRADO. Ondas eletromagnéticas são TRANSVERSAIS (E e B perpendiculares à propagação) e se propagam no VÁCUO (não precisam de meio material).'}
+};
+var answered=0;
+function ans(btn,qId,result){
+  var card=document.getElementById(qId);
+  card.querySelectorAll('.obt').forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('f_'+qId);
+  if(result==='correct'){btn.classList.add('correct');fb.textContent=FB[qId].c;fb.className='fb show ok';QA[qId]=1;}
+  else{btn.classList.add('wrong');fb.textContent=FB[qId].w;fb.className='fb show err';
+    card.querySelectorAll('.obt').forEach(function(b){if(b.getAttribute('onclick').indexOf("'correct'")>-1)b.classList.add('correct');});}
+  answered++;updateP();if(answered===8)showScore();
+}
+function updateP(){
+  document.getElementById('pBar').style.width=(answered/8*100)+'%';
+  document.getElementById('pTxt').textContent=answered+' / 8 respondidas';
+}
+function showScore(){
+  var sc=0;Object.values(QA).forEach(function(v){sc+=v;});
+  var p=document.getElementById('spanel');p.style.display='block';
+  document.getElementById('scv').textContent=sc+'/8';
+  var msgs=['Revise o conteudo e tente novamente!','Bom inicio! Releia as secoes com dificuldade.','Indo bem! Continue praticando.','Otimo dominio da ondulatoria!','Perfeito! Resultado impecavel!'];
+  var idx=sc<=2?0:sc<=4?1:sc<=5?2:sc<=7?3:4;
+  document.getElementById('scm').textContent=msgs[idx];
+  var cols=['#ff2277','#ffbb00','#ffbb00','#00ff88','#00ccff'];
+  document.getElementById('scv').style.color=cols[idx];
+  document.getElementById('scv').style.textShadow='0 0 20px '+cols[idx];
+  p.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQ(){
+  Object.keys(QA).forEach(function(k){QA[k]=0;});answered=0;updateP();
+  document.getElementById('spanel').style.display='none';
+  ['q1','q2','q3','q4','q5','q6','q7','q8'].forEach(function(id){
+    document.getElementById(id).querySelectorAll('.obt').forEach(function(b){b.disabled=false;b.classList.remove('correct','wrong');});
+    var fb=document.getElementById('f_'+id);fb.className='fb';fb.textContent='';
+  });
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+window.addEventListener('load',function(){
+  animWT();
+  animW();
+  animRR();
+  setTimeout(drawInterf,100);
+  animDoppler();
+});
+</script>
+</body>
+</html>

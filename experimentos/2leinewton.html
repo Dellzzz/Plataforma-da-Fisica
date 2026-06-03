@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>2ª Lei de Newton - Simulação Futurista</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+
+    background:
+    radial-gradient(circle at top,
+    #37104f 0%,
+    #12051f 45%,
+    #05010d 100%);
+
+    color:white;
+
+    overflow:hidden;
+    overflow-y:auto;
+}
+
+/* GRID */
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+
+    inset:0;
+
+    background:
+    linear-gradient(
+    90deg,
+    transparent 48%,
+    rgba(255,255,255,0.03) 50%,
+    transparent 52%),
+
+    linear-gradient(
+    transparent 48%,
+    rgba(255,255,255,0.03) 50%,
+    transparent 52%);
+
+    background-size:50px 50px;
+
+    animation:gridMove 10s linear infinite;
+}
+
+@keyframes gridMove{
+
+    from{
+        transform:translateY(0);
+    }
+
+    to{
+        transform:translateY(50px);
+    }
+
+}
+
+/* HEADER */
+
+header{
+
+    text-align:center;
+
+    padding:30px 20px 10px;
+}
+
+header h1{
+
+    font-family:'Orbitron',sans-serif;
+
+    font-size:3rem;
+
+    color:#d58cff;
+
+    text-shadow:
+    0 0 10px #c94fff,
+    0 0 25px #c94fff,
+    0 0 50px #7a00ff;
+}
+
+header p{
+
+    margin-top:10px;
+
+    color:#ddd;
+}
+
+/* CONTAINER */
+
+.container{
+
+    width:95%;
+
+    max-width:1450px;
+
+    margin:auto;
+
+    display:grid;
+
+    grid-template-columns:340px 1fr;
+
+    gap:25px;
+
+    padding:20px;
+}
+
+/* PAINEL */
+
+.panel{
+
+    background:rgba(255,255,255,0.05);
+
+    border:1px solid rgba(255,255,255,0.1);
+
+    border-radius:25px;
+
+    backdrop-filter:blur(12px);
+
+    padding:30px;
+
+    box-shadow:0 0 20px rgba(195,0,255,0.25);
+}
+
+.panel h2{
+
+    font-family:'Orbitron',sans-serif;
+
+    color:#d58cff;
+
+    margin-bottom:25px;
+}
+
+.control{
+
+    margin-bottom:25px;
+}
+
+.control label{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    font-weight:600;
+}
+
+.control input,
+.control select{
+
+    width:100%;
+}
+
+.control input[type=range]{
+
+    appearance:none;
+
+    height:8px;
+
+    border-radius:10px;
+
+    background:#4a1664;
+}
+
+.control input[type=range]::-webkit-slider-thumb{
+
+    appearance:none;
+
+    width:22px;
+    height:22px;
+
+    border-radius:50%;
+
+    background:#f08cff;
+
+    box-shadow:0 0 15px #d84dff;
+
+    cursor:pointer;
+}
+
+select{
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#2d0b45;
+
+    color:white;
+}
+
+button{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:15px;
+
+    cursor:pointer;
+
+    background:
+    linear-gradient(
+    135deg,
+    #e175ff,
+    #7f2cff);
+
+    color:white;
+
+    font-weight:bold;
+
+    transition:0.3s;
+
+    margin-top:10px;
+}
+
+button:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 0 20px #ca4dff;
+}
+
+/* RESULTADOS */
+
+.results{
+
+    margin-top:30px;
+
+    background:rgba(255,255,255,0.04);
+
+    border-radius:18px;
+
+    padding:20px;
+
+    line-height:2;
+}
+
+.results span{
+
+    color:#ffb9ff;
+
+    font-weight:bold;
+}
+
+/* CANVAS */
+
+.simulation{
+
+    background:rgba(255,255,255,0.05);
+
+    border:1px solid rgba(255,255,255,0.1);
+
+    border-radius:25px;
+
+    overflow:hidden;
+
+    backdrop-filter:blur(10px);
+
+    box-shadow:0 0 20px rgba(180,0,255,0.2);
+
+    position:relative;
+}
+
+canvas{
+
+    width:100%;
+
+    height:100%;
+
+    display:block;
+}
+
+/* PARTÍCULAS */
+
+.particle{
+
+    position:absolute;
+
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    pointer-events:none;
+
+    box-shadow:
+    0 0 15px #d86cff,
+    0 0 30px #d86cff;
+
+    animation:fadeOut 1s linear forwards;
+}
+
+@keyframes fadeOut{
+
+    from{
+        opacity:1;
+        transform:scale(1);
+    }
+
+    to{
+        opacity:0;
+        transform:scale(0.2);
+    }
+
+}
+
+/* RESPONSIVO */
+
+@media(max-width:1000px){
+
+.container{
+
+    grid-template-columns:1fr;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <h1>2ª LEI DE NEWTON</h1>
+
+    <p>
+        Explore força, atrito, massa e aceleração.
+    </p>
+	<div class="info" id="info">Prof. Jardel A. Leite</div>
+</header>
+
+<div class="container">
+
+    <!-- PAINEL -->
+
+    <div class="panel">
+
+        <h2>Controles</h2>
+
+        <div class="control">
+
+            <label>
+                Quantidade de blocos
+            </label>
+
+            <select id="blocks">
+
+                <option value="1">
+                    1 bloco
+                </option>
+
+                <option value="2">
+                    2 blocos
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="control">
+
+            <label>
+                Massa do Bloco 1:
+                <span id="mass1Value">
+                    10
+                </span> kg
+            </label>
+
+            <input
+            type="range"
+            id="mass1"
+            min="1"
+            max="50"
+            value="10">
+
+        </div>
+
+        <div
+        class="control"
+        id="block2Control"
+        style="display:none;">
+
+            <label>
+                Massa do Bloco 2:
+                <span id="mass2Value">
+                    10
+                </span> kg
+            </label>
+
+            <input
+            type="range"
+            id="mass2"
+            min="1"
+            max="50"
+            value="10">
+
+        </div>
+
+        <div class="control">
+
+            <label>
+                Força Aplicada:
+                <span id="forceValue">
+                    50
+                </span> N
+            </label>
+
+            <input
+            type="range"
+            id="force"
+            min="0"
+            max="300"
+            value="50">
+
+        </div>
+
+        <div class="control">
+
+            <label>
+                Atrito:
+                <span id="frictionValue">
+                    0.2
+                </span>
+            </label>
+
+            <input
+            type="range"
+            id="friction"
+            min="0"
+            max="1"
+            step="0.01"
+            value="0.2">
+
+        </div>
+
+        <button onclick="startSimulation()">
+            Iniciar
+        </button>
+
+        <button onclick="resetSimulation()">
+            Resetar
+        </button>
+
+        <!-- RESULTADOS -->
+
+        <div class="results">
+
+            <p>
+                Força Resultante:
+                <span id="netForce">
+                    0 N
+                </span>
+            </p>
+
+            <p>
+                Aceleração:
+                <span id="acceleration">
+                    0 m/s²
+                </span>
+            </p>
+
+            <p>
+                Massa Total:
+                <span id="massResult">
+                    0 kg
+                </span>
+            </p>
+
+            <hr style="
+            margin:20px 0;
+            border:1px solid rgba(255,255,255,0.08);
+            ">
+
+            <h3 style="
+            font-family:Orbitron;
+            color:#d58cff;
+            margin-bottom:15px;
+            ">
+                Modo Desafio
+            </h3>
+
+            <div class="control">
+
+                <label>
+                    Sua previsão da aceleração:
+                </label>
+
+                <input
+                type="number"
+                id="guessInput"
+                placeholder="Digite em m/s²"
+
+                style="
+                width:100%;
+                padding:12px;
+                border:none;
+                border-radius:12px;
+                background:#2d0b45;
+                color:white;
+                ">
+
+            </div>
+
+            <button onclick="checkAnswer()">
+                Verificar Resposta
+            </button>
+
+            <p style="
+            margin-top:15px;
+            line-height:1.7;
+            ">
+                Resultado:
+                <span id="challengeResult">
+                    ---
+                </span>
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- SIMULAÇÃO -->
+
+    <div class="simulation">
+
+        <canvas id="canvas"></canvas>
+
+    </div>
+
+</div>
+
+<script>
+
+const canvas =
+document.getElementById("canvas");
+
+const ctx =
+canvas.getContext("2d");
+
+canvas.width = 1000;
+canvas.height = 650;
+
+/* INPUTS */
+
+const blocksInput =
+document.getElementById("blocks");
+
+const mass1Input =
+document.getElementById("mass1");
+
+const mass2Input =
+document.getElementById("mass2");
+
+const forceInput =
+document.getElementById("force");
+
+const frictionInput =
+document.getElementById("friction");
+
+/* LABELS */
+
+const mass1Value =
+document.getElementById("mass1Value");
+
+const mass2Value =
+document.getElementById("mass2Value");
+
+const forceValue =
+document.getElementById("forceValue");
+
+const frictionValue =
+document.getElementById("frictionValue");
+
+/* EVENTOS */
+
+mass1Input.oninput =
+() => mass1Value.textContent =
+mass1Input.value;
+
+mass2Input.oninput =
+() => mass2Value.textContent =
+mass2Input.value;
+
+forceInput.oninput =
+() => forceValue.textContent =
+forceInput.value;
+
+frictionInput.oninput =
+() => frictionValue.textContent =
+frictionInput.value;
+
+blocksInput.onchange = () => {
+
+    if(blocksInput.value == "2"){
+
+        document.getElementById(
+        "block2Control").style.display =
+        "block";
+
+    }else{
+
+        document.getElementById(
+        "block2Control").style.display =
+        "none";
+
+    }
+
+};
+
+/* VARIÁVEIS */
+
+let position = 120;
+
+let velocity = 0;
+
+let animationId;
+
+/* INICIAR */
+
+function startSimulation(){
+
+    cancelAnimationFrame(animationId);
+
+    animate();
+
+}
+
+/* RESET */
+
+function resetSimulation(){
+
+    cancelAnimationFrame(animationId);
+
+    position = 120;
+
+    velocity = 0;
+
+    drawScene();
+
+}
+
+/* PARTÍCULAS */
+
+function createParticle(x,y){
+
+    const particle =
+    document.createElement("div");
+
+    particle.classList.add("particle");
+
+    particle.style.left =
+    x + "px";
+
+    particle.style.top =
+    y + "px";
+
+    particle.style.background =
+    `hsl(${Math.random()*60+260},
+    100%,70%)`;
+
+    document.body.appendChild(
+    particle);
+
+    setTimeout(()=>{
+
+        particle.remove();
+
+    },1000);
+
+}
+
+/* CENA */
+
+function drawScene(){
+
+    ctx.clearRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height);
+
+    /* GRID */
+
+    ctx.strokeStyle =
+    "rgba(255,255,255,0.05)";
+
+    for(let x=0;x<canvas.width;x+=50){
+
+        ctx.beginPath();
+
+        ctx.moveTo(x,0);
+
+        ctx.lineTo(x,canvas.height);
+
+        ctx.stroke();
+
+    }
+
+    for(let y=0;y<canvas.height;y+=50){
+
+        ctx.beginPath();
+
+        ctx.moveTo(0,y);
+
+        ctx.lineTo(canvas.width,y);
+
+        ctx.stroke();
+
+    }
+
+    /* COR DO ATRITO */
+
+    const friction =
+    parseFloat(frictionInput.value);
+
+    let floorColor;
+
+    if(friction < 0.25){
+
+        floorColor = "#00ff88";
+
+    }else if(friction < 0.5){
+
+        floorColor = "#e5ff00";
+
+    }else if(friction < 0.75){
+
+        floorColor = "#ff9900";
+
+    }else{
+
+        floorColor = "#ff2a2a";
+
+    }
+
+    const floorGradient =
+    ctx.createLinearGradient(
+    0,
+    470,
+    0,
+    650);
+
+    floorGradient.addColorStop(
+    0,
+    floorColor);
+
+    floorGradient.addColorStop(
+    1,
+    "#22002f");
+
+    ctx.fillStyle = floorGradient;
+
+    ctx.fillRect(
+    0,
+    470,
+    canvas.width,
+    180);
+
+    drawBlocks();
+
+}
+
+/* BLOCOS */
+
+function drawBlocks(){
+
+    const blockCount =
+    parseInt(blocksInput.value);
+
+    const masses = [
+
+        parseFloat(mass1Input.value),
+
+        parseFloat(mass2Input.value)
+
+    ];
+
+    const blockWidth = 120;
+
+    const blockHeight = 90;
+
+    for(let i=0;i<blockCount;i++){
+
+        const x =
+        position + i*125;
+
+        const y = 380;
+
+        const gradient =
+        ctx.createLinearGradient(
+        x,
+        y,
+        x+blockWidth,
+        y+blockHeight);
+
+        gradient.addColorStop(
+        0,
+        "#f2c6ff");
+
+        gradient.addColorStop(
+        1,
+        "#7f2cff");
+
+        ctx.fillStyle = gradient;
+
+        ctx.shadowBlur = 20;
+
+        ctx.shadowColor = "#d14dff";
+
+        ctx.fillRect(
+        x,
+        y,
+        blockWidth,
+        blockHeight);
+
+        ctx.strokeStyle =
+        "#f2a3ff";
+
+        ctx.lineWidth = 3;
+
+        ctx.strokeRect(
+        x,
+        y,
+        blockWidth,
+        blockHeight);
+
+        ctx.font =
+        "18px Orbitron";
+
+        ctx.fillStyle =
+        "white";
+
+        ctx.fillText(
+        masses[i] + " kg",
+        x + 25,
+        y + 50);
+
+    }
+
+    drawForces();
+
+}
+
+/* SETAS */
+
+function drawArrow(
+x1,y1,x2,y2,color,text){
+
+    ctx.beginPath();
+
+    ctx.moveTo(x1,y1);
+
+    ctx.lineTo(x2,y2);
+
+    ctx.strokeStyle = color;
+
+    ctx.lineWidth = 5;
+
+    ctx.shadowBlur = 15;
+
+    ctx.shadowColor = color;
+
+    ctx.stroke();
+
+    const angle =
+    Math.atan2(y2-y1,x2-x1);
+
+    ctx.beginPath();
+
+    ctx.moveTo(x2,y2);
+
+    ctx.lineTo(
+    x2-15*Math.cos(angle-0.3),
+    y2-15*Math.sin(angle-0.3));
+
+    ctx.lineTo(
+    x2-15*Math.cos(angle+0.3),
+    y2-15*Math.sin(angle+0.3));
+
+    ctx.closePath();
+
+    ctx.fillStyle = color;
+
+    ctx.fill();
+
+    ctx.font =
+    "18px Orbitron";
+
+    ctx.fillStyle =
+    "white";
+
+    ctx.fillText(
+    text,
+    (x1+x2)/2 - 20,
+    y1 - 15);
+
+}
+
+/* FORÇAS */
+
+function drawForces(){
+
+    const force =
+    parseFloat(forceInput.value);
+
+    const friction =
+    parseFloat(frictionInput.value);
+
+    const blockCount =
+    parseInt(blocksInput.value);
+
+    let totalMass =
+    parseFloat(mass1Input.value);
+
+    if(blockCount == 2){
+
+        totalMass +=
+        parseFloat(mass2Input.value);
+
+    }
+
+    const frictionForce =
+    friction * totalMass * 9.8;
+
+    /* ESCALA */
+
+    const scale = 0.7;
+
+    const appliedSize =
+    force * scale;
+
+    const frictionSize =
+    frictionForce * scale;
+
+    /* FORÇA */
+
+    drawArrow(
+    position+70,
+    320,
+    position+70+appliedSize,
+    320,
+    "#00e5ff",
+    "F");
+
+    /* ATRITO */
+
+    drawArrow(
+    position+70,
+    510,
+    position+70-frictionSize,
+    510,
+    "#ff5ef2",
+    "Fat");
+
+    /* PESO */
+
+    drawArrow(
+    position+60,
+    360,
+    position+60,
+    470,
+    "#ff9900",
+    "P");
+
+    /* NORMAL */
+
+    drawArrow(
+    position+100,
+    470,
+    position+100,
+    360,
+    "#7dff66",
+    "N");
+
+}
+
+/* DESAFIO */
+
+function checkAnswer(){
+
+    const guess =
+    parseFloat(
+    document.getElementById(
+    "guessInput").value);
+
+    const blockCount =
+    parseInt(blocksInput.value);
+
+    let totalMass =
+    parseFloat(mass1Input.value);
+
+    if(blockCount == 2){
+
+        totalMass +=
+        parseFloat(mass2Input.value);
+
+    }
+
+    const force =
+    parseFloat(forceInput.value);
+
+    const friction =
+    parseFloat(frictionInput.value);
+
+    const frictionForce =
+    friction * totalMass * 9.8;
+
+    let netForce =
+    force - frictionForce;
+
+    if(netForce < 0){
+
+        netForce = 0;
+
+    }
+
+    const realAcceleration =
+    netForce / totalMass;
+
+    const difference =
+    Math.abs(
+    guess - realAcceleration);
+
+    const result =
+    document.getElementById(
+    "challengeResult");
+
+    if(difference < 0.3){
+
+        result.innerHTML =
+        "✅ Excelente previsão!";
+
+        result.style.color =
+        "#7dff66";
+
+    }else if(difference < 1){
+
+        result.innerHTML =
+        "⚡ Quase lá!";
+
+        result.style.color =
+        "#ffe066";
+
+    }else{
+
+        result.innerHTML =
+        "❌ Tente novamente!";
+
+        result.style.color =
+        "#ff6b6b";
+
+    }
+
+}
+
+/* ANIMAÇÃO */
+
+function animate(){
+
+    drawScene();
+
+    const blockCount =
+    parseInt(blocksInput.value);
+
+    let totalMass =
+    parseFloat(mass1Input.value);
+
+    if(blockCount == 2){
+
+        totalMass +=
+        parseFloat(mass2Input.value);
+
+    }
+
+    const force =
+    parseFloat(forceInput.value);
+
+    const friction =
+    parseFloat(frictionInput.value);
+
+    const frictionForce =
+    friction * totalMass * 9.8;
+
+    let netForce =
+    force - frictionForce;
+
+    /* IMPEDIR VOLTAR */
+
+    if(netForce < 0){
+
+        netForce = 0;
+
+        velocity = 0;
+
+    }
+
+    const acceleration =
+    netForce / totalMass;
+
+    velocity += acceleration * 0.03;
+
+    position += velocity;
+
+    if(position > 700){
+
+        position = 700;
+
+        velocity = 0;
+
+    }
+
+    /* PARTÍCULAS */
+
+    if(velocity > 0.1){
+
+        for(let i=0;i<3;i++){
+
+            createParticle(
+
+            450 + Math.random()*200,
+
+            500 + Math.random()*50
+
+            );
+
+        }
+
+    }
+
+    /* RESULTADOS */
+
+    document.getElementById("netForce")
+    .textContent =
+    netForce.toFixed(1) + " N";
+
+    document.getElementById("acceleration")
+    .textContent =
+    acceleration.toFixed(2) + " m/s²";
+
+    document.getElementById("massResult")
+    .textContent =
+    totalMass.toFixed(1) + " kg";
+
+    animationId =
+    requestAnimationFrame(animate);
+	
+}
+
+/* INICIAR */
+
+drawScene();
+
+</script>
+
+</body>
+</html>

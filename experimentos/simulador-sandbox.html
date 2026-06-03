@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>PhysicsSim Pro - Eixos com Posição Absoluta</title>
+<script src="https://cdn.jsdelivr.net/npm/poly-decomp@0.3.0/build/decomp.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --neon:#bc13fe;--pink:#ff00ff;--cyan:#00eeff;--green:#44ff88;
+  --red:#ff5555;--orange:#ff9933;--gold:#ffcc00;--laser:#ff2200;
+  --bg:#05010a;--glass:rgba(5,1,10,0.91);--border:rgba(188,19,254,0.28);
+  --glow:0 0 32px rgba(188,19,254,0.18),0 8px 32px rgba(0,0,0,0.6);
+  --text:#d0c0d8;
+  --bh:40px;--bw:92px;--br:10px;--tbw:108px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{ width:100%;height:100%;overflow:hidden; background:var(--bg); font-family:'Poppins',sans-serif; color:var(--text); user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; touch-action:none; }
+#canvas{display:block;position:fixed;top:0;left:0;touch-action:none}
+#toolbar{ position:fixed;left:8px;top:50%;transform:translateY(-50%); z-index:200; display:flex;flex-direction:column;align-items:center;gap:3px; padding:10px 7px; background:var(--glass);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px); border:1px solid var(--border);border-radius:18px; box-shadow:var(--glow),inset 0 1px 0 rgba(255,255,255,0.04); max-height:calc(100vh - 24px); overflow-y:auto;scrollbar-width:none;width:var(--tbw); }
+#instr-panel{ position:fixed;right:8px;top:50%;transform:translateY(-50%); z-index:200; display:flex;flex-direction:column;align-items:center;gap:3px; padding:10px 7px; background:var(--glass);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px); border:1px solid var(--border);border-radius:18px; box-shadow:var(--glow),inset 0 1px 0 rgba(255,255,255,0.04); max-height:calc(100vh - 24px); overflow-y:auto;scrollbar-width:none;width:var(--tbw); }
+#instr-panel::-webkit-scrollbar{display:none}
+#instr-panel .tb-label{font-size:8.5px;letter-spacing:1px;color:var(--muted);margin:2px 0 1px;text-align:center}
+#topbar{ position:fixed;top:8px;left:50%;transform:translateX(-50%); z-index:201; display:flex;flex-direction:row;align-items:center;gap:4px; padding:6px 8px; background:var(--glass);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px); border:1px solid var(--border);border-radius:14px; box-shadow:var(--glow),inset 0 1px 0 rgba(255,255,255,0.04); max-width:calc(100vw - 16px); overflow-x:auto;scrollbar-width:none; }
+#topbar::-webkit-scrollbar{display:none}
+#topbar .tb-div{width:1px;height:30px;background:linear-gradient(180deg,transparent,var(--border),transparent);flex-shrink:0;margin:0 3px}
+#topbar .tool-btn{flex-shrink:0}
+#sel-material{ background:rgba(255,255,255,0.05);color:var(--fg);border:1px solid var(--border);border-radius:8px;padding:6px;font-family:inherit;font-size:13px;max-width:54px;flex-shrink:0; }
+#sel-material:disabled{opacity:0.35;cursor:not-allowed}
+#settings-panel{ position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:205; display:none;flex-direction:column;gap:8px;padding:14px 16px; background:var(--glass);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border:1px solid var(--border);border-radius:14px;box-shadow:var(--glow); min-width:240px;color:var(--fg);font-size:12px; }
+#settings-panel.open{display:flex}
+#settings-panel h4{margin:0;font-size:11px;letter-spacing:1px;color:var(--muted)}
+#settings-panel .set-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#toolbar::-webkit-scrollbar{display:none}
+.tb-label{ font-family:'Orbitron',monospace;font-size:6.5px; letter-spacing:1.5px;text-transform:uppercase; color:rgba(188,19,254,0.55);text-align:center;width:100%;padding:1px 0; }
+.tb-div{ width:60px;height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); flex-shrink:0;margin:2px 0; }
+.tool-btn,.ctrl-btn,.mat-btn{ position:relative; width:var(--bw);height:var(--bh); border-radius:var(--br); border:1px solid var(--border); background:rgba(188,19,254,0.06); color:var(--text);cursor:pointer; display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px; transition:background .14s,border-color .14s,box-shadow .14s,transform .1s; outline:none;flex-shrink:0; }
+.tool-btn svg,.ctrl-btn svg{pointer-events:none;flex-shrink:0}
+.btn-lbl{ font-family:'Poppins',sans-serif;font-size:7px;font-weight:500; letter-spacing:0.3px;text-transform:uppercase; opacity:0.78;pointer-events:none;line-height:1; }
+.tool-btn:hover,.ctrl-btn:hover,.mat-btn:hover{ background:rgba(188,19,254,0.16);border-color:var(--neon); box-shadow:0 0 14px rgba(188,19,254,0.32);transform:scale(1.04); }
+.tool-btn:active,.ctrl-btn:active,.mat-btn:active{transform:scale(0.93)}
+.tool-btn.active{background:rgba(255,0,255,0.14);border-color:var(--pink);color:var(--pink);box-shadow:0 0 18px rgba(255,0,255,0.32)}
+.tool-btn.active .btn-lbl{opacity:1}
+.tool-btn.active[data-tool="spring"]{border-color:var(--gold);color:var(--gold);box-shadow:0 0 18px rgba(255,204,0,0.32)}
+.tool-btn.active[data-tool="rope"]  {border-color:var(--orange);color:var(--orange);box-shadow:0 0 18px rgba(255,153,51,0.32)}
+.tool-btn.active[data-tool="pivot"] {border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 18px rgba(0,238,255,0.32)}
+.tool-btn.active[data-tool="motor"] {border-color:var(--green);color:var(--green);box-shadow:0 0 18px rgba(68,255,136,0.32)}
+.tool-btn.active[data-tool="pin"]   {border-color:var(--gold);color:var(--gold);box-shadow:0 0 18px rgba(255,204,0,0.32)}
+.tool-btn.active[data-tool="laser"] {border-color:var(--laser);color:var(--laser);box-shadow:0 0 18px rgba(255,34,0,0.40)}
+[data-tip]::after{ content:attr(data-tip); position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%); background:rgba(5,1,10,0.97);border:1px solid var(--border); color:var(--text);font-size:10px;padding:4px 10px;border-radius:7px; white-space:nowrap;pointer-events:none;opacity:0; transition:opacity .14s;font-family:'Poppins',sans-serif; backdrop-filter:blur(12px);z-index:300; }
+[data-tip]:hover::after{opacity:1}
+.mat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;width:100%}
+.mat-btn{height:24px;border-radius:7px;font-size:13px;flex-direction:row;gap:0}
+.mat-btn.active{border-color:var(--pink);background:rgba(255,0,255,0.12);box-shadow:0 0 8px rgba(255,0,255,0.28)}
+.material-select-container { width: 100%; margin-top: 4px; margin-bottom: 4px; }
+#material-select { width: 100%; background: rgba(5,1,10,0.95); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Poppins', sans-serif; font-size: 9px; padding: 6px 8px; cursor: pointer; text-align: center; backdrop-filter: blur(8px); }
+#material-select option { background: #0a0515; color: var(--text); }
+#material-select:hover { border-color: var(--neon); box-shadow: 0 0 8px rgba(188,19,254,0.3); }
+.ctrl-row{display:flex;gap:3px;width:100%}
+.ctrl-btn{width:calc(50% - 1.5px);height:36px;border-radius:8px;flex-direction:row;gap:4px;font-size:10px}
+.ctrl-btn.full{width:100%}
+#btn-play {border-color:rgba(68,255,136,0.3);color:var(--green)}
+#btn-pause{border-color:rgba(255,153,51,0.3);color:var(--orange)}
+#btn-reset{border-color:rgba(255,85,85,0.3);color:var(--red)}
+#btn-play:hover {border-color:var(--green);box-shadow:0 0 14px rgba(68,255,136,0.38)}
+#btn-pause:hover{border-color:var(--orange);box-shadow:0 0 14px rgba(255,153,51,0.38)}
+#btn-reset:hover{border-color:var(--red);box-shadow:0 0 14px rgba(255,85,85,0.38)}
+.grav-ctrl{display:flex;flex-direction:column;align-items:center;gap:3px;width:100%}
+.grav-ctrl label{font-family:'Orbitron',monospace;font-size:6px;letter-spacing:1px;color:rgba(188,19,254,0.5)}
+.grav-wrap{width:24px;height:60px;display:flex;align-items:center;justify-content:center}
+#gravity-slider{width:60px;accent-color:var(--neon);cursor:pointer;transform:rotate(-90deg);transform-origin:center}
+#gravity-val{font-family:'Orbitron',monospace;font-size:8px;color:var(--pink)}
+.time-ctrl{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;margin-top:4px}
+.time-ctrl label{font-family:'Orbitron',monospace;font-size:6px;letter-spacing:1px;color:rgba(188,19,254,0.5)}
+#time-scale{width:100%;accent-color:var(--cyan);cursor:pointer}
+#time-val{font-family:'Orbitron',monospace;font-size:7px;color:var(--cyan)}
+.fluid-ctrl{display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;margin-top:4px}
+.fluid-ctrl label{font-family:'Orbitron',monospace;font-size:6px;letter-spacing:1px;color:rgba(188,19,254,0.5)}
+#fluid-quality{width:100%;accent-color:var(--green);cursor:pointer}
+#fluid-val{font-family:'Orbitron',monospace;font-size:7px;color:var(--green)}
+#motor-panel{display:none;flex-direction:column;align-items:center;gap:3px;width:100%}
+.mot-wrap{width:24px;height:52px;display:flex;align-items:center;justify-content:center}
+#motor-speed-slider{width:52px;accent-color:var(--green);cursor:pointer;transform:rotate(-90deg);transform-origin:center}
+#btn-motor-dir{width:60px;height:22px;border-radius:6px;font-size:8px;font-family:'Orbitron',monospace;cursor:pointer;border:1px solid rgba(68,255,136,0.35);background:rgba(68,255,136,0.06);color:var(--green);}
+#btn-motor-dir:hover{background:rgba(68,255,136,0.16)}
+.motor-row { display: flex; gap: 4px; width: 100%; margin-top: 4px; }
+#btn-invert-rotation { width: 100%; height: 22px; border-radius: 6px; font-size: 7px; font-family: 'Orbitron', monospace; cursor: pointer; border: 1px solid rgba(255,68,136,0.35); background: rgba(255,68,136,0.06); color: #ff6688; }
+#btn-invert-rotation:hover { background: rgba(255,68,136,0.16); border-color: #ff6688; }
+#statusbar{ position:fixed;top:54px;left:50%;transform:translateX(-50%);z-index:200; display:flex;align-items:center;gap:12px;padding:5px 18px; background:var(--glass);backdrop-filter:blur(24px); border:1px solid var(--border);border-radius:40px; box-shadow:0 0 18px rgba(188,19,254,0.10); font-family:'Orbitron',monospace;font-size:8px;letter-spacing:1px;white-space:nowrap; }
+.sb-item{display:flex;align-items:center;gap:5px}
+.sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-dot.running{background:var(--green);box-shadow:0 0 6px var(--green)}
+.sb-dot.paused {background:var(--orange);box-shadow:0 0 6px var(--orange)}
+.sb-val{color:var(--pink);font-weight:600}
+.sb-sep{color:rgba(188,19,254,0.3)}
+#pause-overlay{display:none;position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:200;background:rgba(255,153,51,0.10);border:1px solid rgba(255,153,51,0.35);border-radius:30px;padding:4px 18px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:var(--orange);}
+body.paused #pause-overlay{display:block}
+#conn-hint{display:none;position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:200;background:rgba(255,204,0,0.10);border:1px solid rgba(255,204,0,0.38);border-radius:30px;padding:4px 18px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1.5px;color:var(--gold);}
+#conn-hint.visible{display:block}
+.undo-row{display:flex;gap:3px;width:100%;margin-top:4px}
+.undo-btn{width:calc(50% - 1.5px);height:28px;border-radius:6px;font-size:8px;font-family:'Orbitron',monospace;cursor:pointer;border:1px solid rgba(188,19,254,0.35);background:rgba(188,19,254,0.06);color:var(--neon);}
+.undo-btn:hover{background:rgba(188,19,254,0.16)}
+#keyhints{position:fixed;bottom:10px;right:12px;z-index:200;font-family:'Orbitron',monospace;font-size:7px;letter-spacing:0.8px;color:rgba(188,19,254,0.28);text-align:right;line-height:2.1;}
+body[data-tool="box"] #canvas{cursor:crosshair}
+body[data-tool="circle"] #canvas{cursor:crosshair}
+body[data-tool="freehand"] #canvas{cursor:crosshair}
+body[data-tool="move"] #canvas{cursor:grab}
+body[data-tool="select"] #canvas{cursor:pointer}
+body[data-tool="erase"] #canvas{cursor:cell}
+body[data-tool="spring"] #canvas{cursor:copy}
+body[data-tool="rope"] #canvas{cursor:copy}
+body[data-tool="pivot"] #canvas{cursor:copy}
+body[data-tool="ruler"] #canvas{cursor:crosshair}
+body[data-tool="speedometer"] #canvas{cursor:cell}
+body[data-tool="accelerometer"] #canvas{cursor:cell}
+body[data-tool="dynamometer"] #canvas{cursor:cell}
+body[data-tool="scale"] #canvas{cursor:cell}
+body[data-tool="protractor"] #canvas{cursor:crosshair}
+body[data-tool="tracker"] #canvas{cursor:cell}
+body[data-tool="motor"] #canvas{cursor:pointer}
+body[data-tool="pin"] #canvas{cursor:pointer}
+body[data-tool="laser"] #canvas{cursor:crosshair}
+body[data-tool="wheel"] #canvas{cursor:crosshair}
+body[data-tool="gear"] #canvas{cursor:crosshair}
+body[data-tool="pulley"] #canvas{cursor:crosshair}
+.selected-body{filter:drop-shadow(0 0 8px var(--gold));}
+@media (max-width:640px),(pointer:coarse){
+  :root{--bh:42px;--bw:42px;--tbw:auto}
+  /* ÍCONES com tamanho DETERMINÍSTICO (CSS vence o atributo do SVG, evitando que
+     o navegador móvel amplie ícones com viewBox dentro do flex). Largura travada
+     p/ ícones largos (carro) não esparramarem. */
+  .tool-btn svg{width:auto;height:18px;max-width:20px}
+  .ctrl-btn svg{width:auto;height:15px;max-width:17px}
+  .tool-btn,.ctrl-btn{width:42px;height:42px;flex-direction:column;padding:0}
+  .ctrl-btn.full{width:42px}
+  #toolbar{left:0;right:0;top:auto;bottom:0;transform:none;flex-direction:row;align-items:center;height:62px;max-height:62px;width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:7px 8px;padding-bottom:max(7px,env(safe-area-inset-bottom));border-radius:16px 16px 0 0;border-bottom:none;gap:4px;}
+  #instr-panel{left:0;right:0;top:0;bottom:auto;transform:none;flex-direction:row;align-items:center;height:54px;max-height:54px;width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:6px 8px;padding-top:max(6px,env(safe-area-inset-top));border-radius:0 0 16px 16px;border-top:none;gap:4px;}
+  #topbar{top:58px;left:0;right:0;transform:none;max-width:100%;border-radius:0;justify-content:flex-start;flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;gap:4px;}
+  #settings-panel{top:114px;max-height:calc(100vh - 200px);overflow-y:auto;-webkit-overflow-scrolling:touch;max-width:calc(100vw - 24px)}
+  .tb-label{display:none}
+  .tb-div{width:1px;height:30px;background:linear-gradient(180deg,transparent,var(--border),transparent);flex-shrink:0;margin:0 2px}
+  .btn-lbl{display:none}
+  .ctrl-row{flex-direction:row;gap:3px;width:auto}
+  .mat-grid{grid-template-columns:repeat(8,1fr);width:auto;gap:2px}
+  .mat-btn{width:36px;height:36px;font-size:14px}
+  .material-select-container{display:none}
+  .grav-ctrl{flex-direction:row;gap:4px;width:auto;align-items:center}
+  .grav-wrap{width:auto;height:auto}
+  #gravity-slider{width:54px;transform:none}
+  .time-ctrl,.fluid-ctrl{flex-direction:row;gap:4px;width:auto;align-items:center}
+  #time-scale{width:58px}#fluid-quality{width:58px}
+  .undo-row{flex-direction:row;width:auto;gap:3px}
+  .undo-btn{width:auto;min-width:42px;padding:0 9px;height:42px;font-size:9px}
+  #motor-panel{flex-direction:row;align-items:center;gap:4px;width:auto}
+  .mot-wrap{width:auto;height:auto}
+  #motor-torque-slider,#motor-speed-slider{width:48px;transform:none}
+  #btn-motor-dir{width:40px;height:22px;font-size:7px}
+  .motor-row{display:none}
+  #statusbar{top:106px;bottom:auto;font-size:7px;gap:5px;padding:4px 10px;border-radius:8px;max-width:calc(100vw - 16px);overflow-x:auto;white-space:nowrap}
+  #pause-overlay,#conn-hint{top:auto;bottom:72px}
+  #keyhints{display:none}
+  #lab-title{font-size:12px;max-width:46vw}
+}
+#forces-menu{ position:fixed; top:58px; right:10px; z-index:260; font-family:'Poppins',sans-serif; }
+#forces-menu-btn{ background:rgba(20,24,36,0.92); color:#ff8c8c; border:1px solid rgba(255,107,107,0.45); border-radius:9px; padding:7px 11px; font-family:'Orbitron',monospace; font-size:11px; font-weight:700; letter-spacing:1px; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,0.4); transition:all .15s; }
+#forces-menu-btn:hover{ border-color:#ff6b6b; color:#fff; }
+#forces-menu-btn.active{ background:rgba(255,107,107,0.18); border-color:#ff6b6b; color:#fff; box-shadow:0 0 12px rgba(255,107,107,0.4); }
+#forces-menu-panel{ display:none; margin-top:6px; background:rgba(14,17,26,0.96); border:1px solid rgba(255,255,255,0.12); border-radius:11px; padding:9px; min-width:212px; box-shadow:0 8px 28px rgba(0,0,0,0.55); backdrop-filter:blur(6px); }
+#forces-menu-panel.open{ display:block; }
+#tut-menu{ position:fixed; top:96px; right:10px; z-index:263; font-family:'Poppins',sans-serif; }
+#tut-menu-btn{ background:rgba(20,24,36,0.92); color:#7CFFB2; border:1px solid rgba(124,255,178,0.45); border-radius:9px; padding:7px 11px; font-family:'Orbitron',monospace; font-size:11px; font-weight:700; letter-spacing:1px; cursor:pointer; box-shadow:0 2px 10px rgba(0,0,0,0.4); transition:all .15s; }
+#tut-menu-btn:hover,#tut-menu-btn.active{ border-color:#7CFFB2; box-shadow:0 0 12px rgba(124,255,178,0.4); }
+#tut-menu-panel{ display:none; margin-top:6px; background:rgba(14,17,26,0.96); border:1px solid rgba(255,255,255,0.12); border-radius:11px; padding:9px; min-width:212px; box-shadow:0 8px 28px rgba(0,0,0,0.55); backdrop-filter:blur(6px); }
+#tut-menu-panel.open{ display:block; }
+#tut-menu-panel .tm-head{ font-family:'Orbitron',monospace; font-size:10px; color:#7df9ff; letter-spacing:.5px; margin-bottom:7px; text-align:center; }
+#tut-menu-panel .tm-opt{ display:block; width:100%; text-align:left; margin-top:5px; background:rgba(124,255,178,0.1); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:9px 10px; font-family:'Poppins',sans-serif; font-size:12.5px; cursor:pointer; }
+#tut-menu-panel .tm-opt:hover{ background:rgba(124,255,178,0.22); }
+#stopwatch{ display:none; position:fixed; z-index:262; top:58px; left:50%; transform:translateX(-50%); align-items:center; gap:9px; background:rgba(12,15,24,0.96); border:1px solid #7df9ff; border-radius:11px; padding:7px 11px; box-shadow:0 4px 18px rgba(0,0,0,0.5),0 0 14px rgba(125,249,255,0.22); backdrop-filter:blur(6px); }
+#stopwatch.open{ display:flex; }
+#sw-time{ font-family:'Orbitron',monospace; font-size:20px; font-weight:700; color:#7df9ff; letter-spacing:1px; min-width:96px; text-align:center; text-shadow:0 0 8px rgba(125,249,255,0.5); font-variant-numeric:tabular-nums; }
+#stopwatch .sw-btns{ display:flex; gap:5px; }
+#stopwatch button{ min-width:30px; height:28px; border:1px solid var(--border); background:rgba(125,249,255,0.1); color:#dfe6ee; border-radius:7px; font-size:13px; cursor:pointer; transition:background .14s; }
+#stopwatch button:hover{ background:rgba(125,249,255,0.25); }
+#stopwatch #sw-toggle.running{ color:#ffd166; border-color:rgba(255,209,102,0.55); }
+#stopwatch .sw-x{ color:#9aa7b3; }
+@media (max-width:640px),(pointer:coarse){ #stopwatch{ top:163px !important; bottom:auto !important; gap:7px; padding:6px 9px; } #stopwatch #sw-time{ font-size:17px; min-width:74px; } #stopwatch button{ min-width:28px; height:26px; } }
+/* menus de config recolhíveis (clicar no título suspende/expande) */
+#cannon-panel > .tb-label,#motor-panel > .tb-label,#spring-panel > .tb-label{ cursor:pointer; user-select:none; }
+#cannon-panel > .tb-label::after,#motor-panel > .tb-label::after,#spring-panel > .tb-label::after{ content:' ▾'; opacity:.65; }
+.cfg-collapsed > .tb-label::after{ content:' ▸'; }
+.cfg-collapsed > *:not(.tb-label){ display:none !important; }
+.cfg-collapsed{ width:auto !important; min-width:0 !important; max-width:none !important; padding:6px 12px !important; }
+.cfg-collapsed > .tb-label{ margin-bottom:0 !important; }
+#forces-menu .fm-head{ font-family:'Orbitron',monospace; font-size:9px; letter-spacing:1px; color:#7df9ff; text-transform:uppercase; margin:2px 2px 8px; opacity:.85; }
+#forces-menu .fm-row{ display:flex; align-items:center; gap:8px; padding:5px 6px; border-radius:7px; font-size:12.5px; color:#dfe6ee; cursor:pointer; }
+#forces-menu .fm-row:hover{ background:rgba(255,255,255,0.06); }
+#forces-menu .fm-row input{ accent-color:#4dd2ff; width:15px; height:15px; cursor:pointer; }
+#forces-menu .fm-sw{ width:13px; height:13px; border-radius:3px; flex-shrink:0; box-shadow:0 0 5px currentColor; }
+#forces-menu .fm-div{ height:1px; background:rgba(255,255,255,0.1); margin:6px 4px; }
+#forces-menu .fm-note{ font-size:10px; color:#8a94a3; margin:7px 4px 2px; line-height:1.35; }
+@media (max-width:760px){ #forces-menu{ top:132px; right:6px; } #forces-menu-btn{ font-size:10px; padding:6px 9px; } #forces-menu-panel{ min-width:184px; max-height:calc(100vh - 220px); overflow-y:auto; -webkit-overflow-scrolling:touch; } }
+#zoom-ctrl{ position:fixed; right:10px; bottom:14px; z-index:240; display:flex; gap:4px; background:rgba(14,17,26,0.9); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:4px; box-shadow:0 4px 16px rgba(0,0,0,0.42); backdrop-filter:blur(6px); }
+#zoom-ctrl button{ min-width:30px; height:30px; border:none; background:rgba(188,19,254,0.1); color:#dfe6ee; border-radius:7px; font-family:'Orbitron',monospace; font-size:14px; font-weight:700; cursor:pointer; transition:background .14s; }
+#zoom-ctrl button:hover{ background:rgba(188,19,254,0.28); color:#fff; }
+#zoom-ctrl #zoom-val{ min-width:54px; font-size:11px; }
+#m-sim,#m-undo{ display:none; }
+#m-sim button,#m-undo button{ min-width:33px; height:30px; border:none; background:rgba(188,19,254,0.12); color:#dfe6ee; border-radius:7px; font-family:'Orbitron',monospace; font-size:14px; font-weight:700; cursor:pointer; transition:background .14s; }
+#m-sim button:hover,#m-undo button:hover{ background:rgba(188,19,254,0.3); color:#fff; }
+#m-sim #m-play{ color:var(--green); } #m-sim #m-reset{ color:var(--gold); }
+#mtabs{ display:none; }
+@media (max-width:640px),(pointer:coarse){
+  #mtabs{ display:flex; position:fixed; top:0; left:0; right:0; height:42px; z-index:235; gap:6px; padding:6px 8px; padding-top:max(6px,env(safe-area-inset-top)); background:rgba(8,10,16,0.94); backdrop-filter:blur(8px); align-items:center; border-bottom:1px solid var(--border); }
+  #mtabs button{ flex:1; height:30px; border-radius:8px; border:1px solid var(--border); background:rgba(188,19,254,0.08); color:var(--text); font-family:'Orbitron',monospace; font-size:10px; font-weight:700; letter-spacing:.5px; }
+  #mtabs button.active{ background:rgba(188,19,254,0.24); border-color:var(--neon); color:#fff; box-shadow:0 0 10px rgba(188,19,254,0.4); }
+  /* As duas barras superiores ficam OCULTAS e abrem como menu suspenso */
+  #instr-panel,#topbar{ display:none !important; top:48px !important; bottom:auto !important; z-index:236 !important; background:rgba(10,12,20,0.97) !important; }
+  #instr-panel.mopen,#topbar.mopen{ display:flex !important; }
+  #statusbar{ top:46px !important; bottom:auto !important; }
+  #forces-menu{ top:120px !important; right:8px !important; }
+  #zoom-ctrl{ top:120px !important; left:8px !important; right:auto !important; bottom:auto !important; }
+  #pause-overlay,#conn-hint{ bottom:108px !important; }
+  /* barra de ferramentas de baixo um pouco mais alta; sem backdrop-filter (ele criava
+     containing-block que quebrava o position:fixed dos painéis de config) */
+  #toolbar{ height:70px !important; max-height:70px !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; background:rgba(10,12,20,0.95) !important; }
+  /* play/pause/reset flutuando ENTRE o zoom e as forças */
+  #m-sim{ display:flex !important; position:fixed; top:120px; left:calc(50% + 22px); transform:translateX(-50%); z-index:240; gap:4px; background:rgba(14,17,26,0.9); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:4px; box-shadow:0 4px 16px rgba(0,0,0,0.42); backdrop-filter:blur(6px); }
+  /* desfazer/refazer como setas ABAIXO do zoom */
+  #m-undo{ display:flex !important; position:fixed; top:160px; left:8px; z-index:240; gap:5px; background:rgba(14,17,26,0.9); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:4px; box-shadow:0 4px 16px rgba(0,0,0,0.42); backdrop-filter:blur(6px); }
+  /* controles originais saíram da barra de baixo (foram p/ cima) */
+  #toolbar .ctrl-row,#toolbar #btn-reset,#toolbar .undo-row{ display:none !important; }
+  /* tutoriais no mobile: botão entre as abas, painel suspenso abaixo do #mtabs */
+  #tut-menu{ top:48px !important; right:auto !important; left:50% !important; transform:translateX(-50%); z-index:245; }
+  #tut-menu-btn{ display:none; }
+  #tut-menu-panel{ margin-top:0; min-width:74vw; }
+  #mtab-tut{ flex:0 0 auto !important; padding:0 13px !important; font-size:15px !important; }
+  /* menus de config (canhão/motor/mola) flutuando ABAIXO das forças */
+  #cannon-panel,#motor-panel,#spring-panel{ position:fixed !important; top:160px !important; right:8px !important; left:auto !important; bottom:auto !important; z-index:250; width:156px !important; max-width:62vw; flex-direction:column !important; align-items:stretch !important; gap:8px !important; background:rgba(14,17,26,0.96); border:1px solid rgba(255,255,255,0.14); border-radius:11px; padding:12px 9px; box-shadow:0 8px 28px rgba(0,0,0,0.55); backdrop-filter:blur(6px); }
+  #cannon-panel .tb-div,#motor-panel .tb-div,#spring-panel .tb-div{ display:none !important; }
+  #cannon-panel .tb-label,#motor-panel .tb-label,#spring-panel .tb-label{ display:block !important; font-size:9px; letter-spacing:1px; color:#7df9ff; text-align:center; margin-bottom:2px; }
+  #motor-panel .motor-row{ display:flex !important; }
+  #motor-panel .mot-wrap{ width:100% !important; height:auto !important; }
+  #motor-torque-slider,#motor-speed-slider{ width:100% !important; }
+  #btn-motor-dir{ width:100% !important; height:24px !important; font-size:9px !important; }
+}
+#spring-panel{ display:none; flex-direction:column; gap:6px; }
+.springk-row{ display:flex; gap:4px; }
+.springk-btn{ flex:1; padding:7px 4px; border-radius:7px; border:1px solid var(--border); background:rgba(255,204,0,0.08); color:var(--text); font-family:'Orbitron',monospace; font-size:11px; font-weight:700; cursor:pointer; transition:all .14s; }
+.springk-btn:hover{ background:rgba(255,204,0,0.18); }
+.springk-btn.active{ background:rgba(255,204,0,0.28); border-color:var(--gold); color:#fff; box-shadow:0 0 8px rgba(255,204,0,0.4); }
+#toolbar .tb-label{ color:rgba(216,202,240,0.88); }
+#toolbar .btn-lbl{ color:#d6dce6; opacity:0.95; }
+#cannon-panel{display:none;flex-direction:column;align-items:stretch;gap:2px;width:100%}
+#motor-panel,#spring-panel,#cannon-panel{ position:fixed; left:calc(var(--tbw) + 16px); bottom:18px; top:auto; right:auto; z-index:205; width:140px; box-sizing:border-box; background:rgba(12,15,24,0.97); border:1px solid var(--border); border-radius:13px; padding:13px 11px; box-shadow:var(--glow),0 8px 26px rgba(0,0,0,0.5); }
+#motor-panel .tb-div,#spring-panel .tb-div,#cannon-panel .tb-div{ display:none; }
+#motor-panel .tb-label,#spring-panel .tb-label,#cannon-panel .tb-label{ display:block; font-size:9px; letter-spacing:1px; color:#7df9ff; text-align:center; margin-bottom:5px; }
+#cannon-panel .cn-slider,#motor-panel .mot-wrap,#motor-panel input[type=range]{ width:100%; box-sizing:border-box; }
+#cannon-panel .cn-row{display:flex;justify-content:space-between;align-items:center;font-size:8.5px;color:var(--muted);padding:0 1px}
+#cannon-panel .cn-row span{color:#7df9ff}
+#cannon-panel .cn-num{width:30px;background:rgba(125,249,255,0.08);border:1px solid rgba(125,249,255,0.35);border-radius:4px;color:#7df9ff;font-family:'Orbitron',monospace;font-size:9px;text-align:center;padding:1px 0;margin-right:1px}
+#cannon-panel .cn-num::-webkit-inner-spin-button{opacity:0.5}
+#cannon-panel .cn-slider{width:100%;margin:1px 0 3px}
+#btn-cannon-fire{width:100%;height:24px;border-radius:6px;font-size:9px;font-family:'Orbitron',monospace;cursor:pointer;border:1px solid rgba(125,249,255,0.45);background:rgba(125,249,255,0.08);color:#7df9ff;letter-spacing:0.5px;margin-top:3px}
+#btn-cannon-fire:hover{background:rgba(125,249,255,0.16)}
+#btn-cannon-track{width:100%;height:22px;border-radius:6px;font-size:8px;font-family:'Orbitron',monospace;cursor:pointer;border:1px solid rgba(124,255,178,0.35);background:rgba(124,255,178,0.06);color:#7CFFB2;letter-spacing:0.3px;margin-top:3px}
+#btn-cannon-track.active{background:rgba(124,255,178,0.22);box-shadow:0 0 10px rgba(124,255,178,0.4)}
+#btn-cannon-ground{width:100%;height:22px;border-radius:6px;font-size:8px;font-family:'Orbitron',monospace;cursor:pointer;border:1px solid rgba(125,249,255,0.3);background:rgba(125,249,255,0.05);color:#9fe8ff;letter-spacing:0.3px;margin-top:3px}
+#btn-cannon-ground.active{background:rgba(125,249,255,0.2);box-shadow:0 0 10px rgba(125,249,255,0.4);color:#7df9ff}
+#tut-panel{ display:none; position:fixed; left:50%; bottom:18px; transform:translateX(-50%); z-index:300; flex-direction:column; gap:7px; width:min(440px,92vw); background:rgba(12,15,24,0.97); border:1px solid var(--neon); border-radius:14px; padding:13px 15px; box-shadow:0 10px 36px rgba(0,0,0,0.6),0 0 18px rgba(188,19,254,0.25); backdrop-filter:blur(8px); font-family:'Poppins',sans-serif; }
+#tut-panel .tut-head{ display:flex; justify-content:space-between; align-items:center; font-family:'Orbitron',monospace; font-size:12px; color:#7df9ff; letter-spacing:.5px; }
+#tut-panel #tut-x{ background:none; border:none; color:#9aa7b3; font-size:15px; cursor:pointer; padding:2px 6px; line-height:1; }
+#tut-panel #tut-text{ font-size:13.5px; line-height:1.5; color:#e8edf3; }
+#tut-panel .tut-nav{ display:flex; justify-content:space-between; align-items:center; }
+#tut-panel .tut-nav > span{ font-size:10px; color:var(--muted); font-family:'Orbitron',monospace; }
+#tut-panel .tut-nav button{ background:rgba(188,19,254,0.14); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:7px 11px; font-family:'Orbitron',monospace; font-size:10px; font-weight:700; cursor:pointer; margin-left:6px; }
+#tut-panel .tut-nav button:hover{ background:rgba(188,19,254,0.28); }
+#tut-panel .tut-nav button:disabled{ opacity:.4; cursor:default; }
+#tut-arrow{ display:none; position:fixed; z-index:301; color:#ffcc00; font-size:24px; text-shadow:0 0 9px #ffcc00; pointer-events:none; animation:tutbounce .9s ease-in-out infinite; }
+@keyframes tutbounce{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(7px); } }
+.tut-glow{ animation:tutglow 1s ease-in-out infinite !important; border-color:#ffcc00 !important; }
+@keyframes tutglow{ 0%,100%{ box-shadow:0 0 0 0 rgba(255,204,0,0); } 50%{ box-shadow:0 0 0 4px rgba(255,204,0,0.7),0 0 16px rgba(255,204,0,0.55); } }
+@media (max-width:640px),(pointer:coarse){ #tut-panel{ bottom:84px; width:94vw; padding:11px 13px; } #tut-panel #tut-text{ font-size:12.5px; } }
+</style>
+</head>
+<body data-tool="box">
+<canvas id="canvas"></canvas>
+<div id="topbar">
+  <button class="tool-btn" data-tool="select" data-tip="Selecionar objeto" onclick="setTool('select')"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M4 3l11 5-4.5 1.6L9 14z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span class="btn-lbl">Seleção</span></button>
+  <div class="tb-div"></div>
+  <button class="tool-btn active" data-tool="box" data-tip="Caixa [1]" onclick="setTool('box')"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/></svg><span class="btn-lbl">Caixa</span></button>
+  <button class="tool-btn" data-tool="circle" data-tip="Círculo [2]" onclick="setTool('circle')"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/></svg><span class="btn-lbl">Círculo</span></button>
+  <button class="tool-btn" data-tool="freehand" data-tip="Polígono [3] — segure Shift p/ retas" onclick="setTool('freehand')"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3 17C5 10 8 5 10 3c2 3 6 9 7 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="3" cy="17" r="2" fill="currentColor"/><circle cx="17" cy="14" r="2" fill="currentColor"/></svg><span class="btn-lbl">Polígono</span></button>
+  <div class="tb-div"></div>
+  <button class="tool-btn" data-tool="move" data-tip="Mover [4] — pausado, reposiciona direto" onclick="setTool('move')"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2v16M2 10h16M10 2L7 5M10 2l3 3M10 18l-3-3M10 18l3-3M2 10l3-3M2 10l3 3M18 10l-3-3M18 10l-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="btn-lbl">Mover</span></button>
+  <button class="tool-btn" data-tool="erase" data-tip="Apagar [5]" onclick="setTool('erase')"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span class="btn-lbl">Apagar</span></button>
+  <button class="tool-btn" data-tool="pin" data-tip="Fixar no Ar [P]" onclick="setTool('pin')" style="color:var(--gold)"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 3v9M10 3L7 6M10 3l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="15" r="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 17.5h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="btn-lbl">Fixar</span></button>
+  <div class="tb-div"></div>
+  <select id="sel-material" title="Material do objeto selecionado" disabled onchange="mudarMaterialSelecionado(this.value)"><option value="">—</option><option value="wood">🪵</option><option value="metal">⚙️</option><option value="stone">🪨</option><option value="rubber">⬤</option><option value="ice">🧊</option><option value="glass">🔷</option><option value="fluid">💧</option><option value="mirror">🪞</option></select>
+  <div class="tb-div"></div>
+  <button class="tool-btn" id="btn-settings" data-tip="Configurações" onclick="toggleSettings()" style="color:#9aa7b3"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M10 1.5v2.5M10 16v2.5M18.5 10H16M4 10H1.5M15.8 4.2l-1.8 1.8M6 14l-1.8 1.8M15.8 15.8L14 14M6 6L4.2 4.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="btn-lbl">Config.</span></button>
+</div>
+<div id="settings-panel">
+  <h4>CONFIGURAÇÕES</h4>
+  <div class="set-row"><span>Escala</span><span id="set-scale">100</span><span style="color:var(--muted)">px/m</span></div>
+  <div class="set-row"><span>Gravidade (1g)</span><span style="color:#7CFFB2">9,8 m/s²</span></div>
+  <div class="set-row"><span>Passo de tempo</span><span style="color:#7CFFB2">1/60 s</span></div>
+  <div class="set-row"><span>Vetores</span><span id="set-vec">desligado</span></div>
+  <div class="set-row"><span>Atrito (selecionado)</span><span id="set-fric-val" style="color:#ffd166">—</span></div>
+  <div style="padding:1px 2px 4px"><input type="range" id="set-fric" min="0" max="1.5" step="0.05" value="0.6" style="width:100%" oninput="setFrictionSelected(+this.value)"></div>
+  <button class="ctrl-btn" style="width:100%;justify-content:center;margin-top:8px" onclick="toggleShortcuts()">⌨ Ver atalhos do teclado</button>
+  <div id="shortcuts-list" style="display:none;font-size:10px;color:var(--muted);line-height:1.9;border-top:1px solid var(--border);padding-top:8px">
+    <b style="color:var(--fg)">Ferramentas</b><br>
+    [1] Caixa · [2] Círculo · [3] Polígono<br>[4] Mover · [5] Apagar · [V] Seleção · [P] Fixar<br>
+    [W] Roda · [G] Engrenagem · [Y] Polia<br>[6] Mola · [7] Corda · [8] Eixo · [9] Motor · [L] Laser<br>
+    <b style="color:var(--fg)">Simulação</b><br>
+    [Espaço] Play/Pause · [R] Reset · [C] Demo Carro<br>[Esc] Cancela · [Ctrl+Z] Desfazer · [Ctrl+Y] Refazer<br>
+    <b style="color:var(--fg)">Seleção & Polígono</b><br>
+    [Shift]+clique: seleção múltipla · arraste: caixa de seleção<br>[Shift] no Polígono: vértices em linhas retas
+  </div>
+  <div style="font-size:10.5px;color:var(--muted);line-height:1.5">Mais opções em breve: salvar/carregar cenas, unidades, grade.</div>
+</div>
+<div id="toolbar">
+  <button class="ctrl-btn full" id="btn-launch" data-tip="Lançar projétil [F]" onclick="launchCannon()" style="border-color:rgba(125,249,255,0.5);color:#7df9ff;font-weight:600"><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><circle cx="6" cy="14" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M8 12L17 3M17 3h-4M17 3v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="btn-lbl">Lançar</span></button>
+  <div class="tb-div"></div>
+  <div class="tb-label">MECÂNICA</div>
+  <button class="tool-btn" data-tool="wheel" data-tip="Roda — arraste [W]" onclick="setTool('wheel')" style="color:var(--cyan)"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/><circle cx="10" cy="10" r="2" fill="currentColor"/><path d="M10 2v3M10 15v3M2 10h3M15 10h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span class="btn-lbl">Roda</span></button>
+  <button class="tool-btn" data-tool="gear" data-tip="Engrenagem — arraste [G]" onclick="setTool('gear')" style="color:var(--orange)"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 1.5l1.3 2 2.3-.6.4 2.4 2.2 1-1 2.2 1 2.2-2.2 1-.4 2.4-2.3-.6L10 18.5l-1.3-2-2.3.6-.4-2.4-2.2-1 1-2.2-1-2.2 2.2-1 .4-2.4 2.3.6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="10" cy="10" r="2.8" stroke="currentColor" stroke-width="1.4"/></svg><span class="btn-lbl">Engren.</span></button>
+  <button class="tool-btn" data-tool="pulley" data-tip="Polia — arraste [Y]" onclick="setTool('pulley')" style="color:var(--green)"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.8"/><circle cx="10" cy="10" r="4.5" stroke="currentColor" stroke-width="1.2" opacity=".6"/><circle cx="10" cy="10" r="1.6" fill="currentColor"/></svg><span class="btn-lbl">Polia</span></button>
+  <div class="tb-div"></div>
+  <div class="tb-label">CONECTORES</div>
+  <button class="tool-btn" data-tool="spring" data-tip="Mola (elástica) — 2 cliques [6]" onclick="setTool('spring')" style="color:var(--gold)"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M2 10l2-3 3 6 3-6 3 6 3-6 2 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="btn-lbl">Mola</span></button>
+  <button class="tool-btn" data-tool="rope" data-tip="Corda — desenhe o traçado [7]" onclick="setTool('rope')" style="color:var(--orange)"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M2 10C5 6 7 14 10 10s5-4 8 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span class="btn-lbl">Corda</span></button>
+  <button class="tool-btn" data-tool="pivot" data-tip="Eixo: 2 corpos = rótula · corpo+vazio = mancal fixo (gira no lugar) [8]" onclick="setTool('pivot')" style="color:var(--cyan)"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3.5" stroke="currentColor" stroke-width="1.8"/><path d="M10 2v5M10 13v5M2 10h5M13 10h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="btn-lbl">Eixo</span></button>
+  <button class="tool-btn" data-tool="motor" data-tip="Motor — clique em corpo [9]" onclick="setTool('motor')" style="color:var(--green)"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M10 3A7 7 0 1 0 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 1l-2 3h4z" fill="currentColor"/></svg><span class="btn-lbl">Motor</span></button>
+  <button class="tool-btn" data-tool="laser" data-tip="Laser com Óptica — arraste [L]" onclick="setTool('laser')" style="color:var(--laser)"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="4" cy="10" r="3" stroke="currentColor" stroke-width="1.6"/><line x1="7" y1="10" x2="19" y2="10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="13" y1="7" x2="19" y2="4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".6"/><line x1="13" y1="13" x2="19" y2="16" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".6"/></svg><span class="btn-lbl">Laser</span></button>
+  <button class="tool-btn" data-tool="cannon" data-tip="Canhão — clique p/ posicionar, ajuste ângulo/potência, depois Lançar [K]" onclick="setTool('cannon')" style="color:#7df9ff"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="5" cy="15" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M7 13L16 5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M16 5l-3-1M16 5l-1 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span class="btn-lbl">Canhão</span></button>
+  <div class="tb-div"></div>
+  <div class="tb-label">MATERIAL</div>
+  <div class="mat-grid">
+    <button class="mat-btn active" data-mat="wood" data-tip="Madeira (absorve)" onclick="setMaterial('wood')">🪵</button>
+    <button class="mat-btn" data-mat="metal" data-tip="Metal (reflete)" onclick="setMaterial('metal')">⚙️</button>
+    <button class="mat-btn" data-mat="stone" data-tip="Pedra (absorve)" onclick="setMaterial('stone')">🪨</button>
+    <button class="mat-btn" data-mat="rubber" data-tip="Borracha (absorve)" onclick="setMaterial('rubber')">⬤</button>
+    <button class="mat-btn" data-mat="ice" data-tip="Gelo (refrata pouco)" onclick="setMaterial('ice')">🧊</button>
+    <button class="mat-btn" data-mat="glass" data-tip="VIDRO (refrata + dispersão RGB)" onclick="setMaterial('glass')">🔷</button>
+    <button class="mat-btn" data-mat="fluid" data-tip="Fluido (absorve)" onclick="setMaterial('fluid')">💧</button>
+    <button class="mat-btn" data-mat="mirror" data-tip="ESPELHO (reflexão perfeita)" onclick="setMaterial('mirror')">🪞</button>
+  </div>
+  <div class="material-select-container"><select id="material-select" onchange="setMaterial(this.value)"><option value="wood">🪵 Madeira (absorve)</option><option value="metal">⚙️ Metal (reflete)</option><option value="stone">🪨 Pedra (absorve)</option><option value="rubber">⬤ Borracha (absorve)</option><option value="ice">🧊 Gelo (refrata pouco)</option><option value="glass">🔷 VIDRO (refrata + dispersão)</option><option value="fluid">💧 Fluido (absorve)</option><option value="mirror">🪞 ESPELHO (reflexão)</option></select></div>
+  <div class="tb-div"></div>
+  <div class="tb-label">SIMULAÇÃO</div>
+  <div class="ctrl-row"><button class="ctrl-btn" id="btn-play" data-tip="Play [Espaço]" onclick="setRunning(true)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polygon points="1,0 12,6 1,12" fill="currentColor"/></svg><span class="btn-lbl">Play</span></button><button class="ctrl-btn" id="btn-pause" data-tip="Pausar" onclick="setRunning(false)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="0" y="0" width="4" height="12" rx="1" fill="currentColor"/><rect x="8" y="0" width="4" height="12" rx="1" fill="currentColor"/></svg><span class="btn-lbl">Pausa</span></button></div>
+  <button class="ctrl-btn full" id="btn-reset" data-tip="Resetar [R]" onclick="resetWorld()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6A5 5 0 1 1 6 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M1 2v4h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="btn-lbl">Resetar</span></button>
+  <div class="undo-row"><button class="undo-btn" onclick="undo()" data-tip="Desfazer [Ctrl+Z]">↩ DESFAZER</button><button class="undo-btn" onclick="redo()" data-tip="Refazer [Ctrl+Y]">↪ REFAZER</button></div>
+  <div class="tb-div"></div>
+  <div class="tb-label">DEMO</div>
+  <button class="ctrl-btn full" id="btn-demo-car" data-tip="Monta um carro funcional [C]" onclick="demoCarro()" style="border-color:rgba(68,255,136,0.4);color:var(--green)"><svg width="14" height="14" viewBox="0 0 24 14" fill="none"><path d="M2 9h2l2-5h8l3 5h5v3h-2" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="7" cy="11" r="2.2" stroke="currentColor" stroke-width="1.4"/><circle cx="17" cy="11" r="2.2" stroke="currentColor" stroke-width="1.4"/></svg><span class="btn-lbl">Carro</span></button>
+  <button class="ctrl-btn full" id="btn-demo-gear" data-tip="Trem de engrenagens" onclick="demoEngrenagens()" style="border-color:rgba(255,153,51,0.4);color:var(--orange)"><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 1.5l1.3 2 2.3-.6.4 2.4 2.2 1-1 2.2 1 2.2-2.2 1-.4 2.4-2.3-.6L10 18.5l-1.3-2-2.3.6-.4-2.4-2.2-1 1-2.2-1-2.2 2.2-1 .4-2.4 2.3.6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="10" cy="10" r="2.8" stroke="currentColor" stroke-width="1.4"/></svg><span class="btn-lbl">Engren.</span></button>
+  <button class="ctrl-btn full" id="btn-demo-pulley" data-tip="Polia (Atwood)" onclick="demoPolia()" style="border-color:rgba(68,255,136,0.4);color:var(--green)"><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="5" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M7 5v9M13 5v7" stroke="currentColor" stroke-width="1.3"/><rect x="4.5" y="14" width="5" height="4" stroke="currentColor" stroke-width="1.3"/><rect x="11" y="12" width="4" height="3.4" stroke="currentColor" stroke-width="1.3"/></svg><span class="btn-lbl">Polia</span></button>
+  <div class="tb-div"></div>
+  <div class="grav-ctrl"><label>GRAV.</label><div class="grav-wrap"><input type="range" id="gravity-slider" min="-2" max="4" step="0.1" value="1" oninput="setGravity(+this.value)"></div><span id="gravity-val">1.0g</span></div>
+  <div class="time-ctrl"><label>VELOCIDADE</label><input type="range" id="time-scale" min="0.1" max="2" step="0.05" value="1" oninput="setTimeScale(+this.value)"><span id="time-val">1.0x</span></div>
+  <div class="fluid-ctrl"><label>FLUIDO</label><input type="range" id="fluid-quality" min="40" max="120" step="10" value="80" oninput="setFluidQuality(+this.value)"><span id="fluid-val">80 part.</span></div>
+</div>
+  <div id="motor-panel"><div class="tb-div"></div><div class="tb-label">MOTOR</div><div class="motor-row" style="font-size:8.5px;color:var(--muted);gap:4px"><span>Torque</span><span id="motor-torque-val" style="color:#44ff88">0.50</span></div><div class="mot-wrap"><input type="range" id="motor-torque-slider" min="0.05" max="1" step="0.05" value="0.5" oninput="setMotorTorque(+this.value)"></div><div class="motor-row" style="font-size:8.5px;color:var(--muted);gap:4px"><span>Vel. livre</span><span id="motor-speed-val" style="color:#44ff88">0.080</span></div><div class="mot-wrap"><input type="range" id="motor-speed-slider" min="0.01" max="0.25" step="0.005" value="0.08" oninput="setMotorFreeSpeed(+this.value)"></div><button id="btn-motor-dir" onclick="toggleMotorDir()">↻ CW</button></div>
+  <div id="spring-panel"><div class="tb-div"></div><div class="tb-label">MOLA · k (N/m)</div><div class="springk-row"><button class="springk-btn" data-k="100" onclick="setSpringK(100)">100</button><button class="springk-btn active" data-k="300" onclick="setSpringK(300)">300</button><button class="springk-btn" data-k="500" onclick="setSpringK(500)">500</button></div></div>
+  <div id="cannon-panel"><div class="tb-div"></div><div class="tb-label">CANHÃO</div><div class="cn-row"><span>Ângulo</span><span><input type="number" id="cannon-angle-num" class="cn-num" min="0" max="180" value="45" onchange="setCannonAngle(+this.value)">°</span></div><input class="cn-slider" type="range" id="cannon-angle-slider" min="0" max="180" step="1" value="45" oninput="setCannonAngle(+this.value)"><div class="cn-row"><span>Veloc.</span><span><input type="number" id="cannon-power-num" class="cn-num" min="1" max="40" value="12" onchange="setCannonPower(+this.value)"> m/s</span></div><input class="cn-slider" type="range" id="cannon-power-slider" min="2" max="40" step="1" value="12" oninput="setCannonPower(+this.value)"><button id="btn-cannon-ground" onclick="toggleCannonGround()">⊿ Saída: boca do cano</button><button id="btn-cannon-track" onclick="toggleCannonTrack()">📍 Régua: desligada</button><button id="btn-cannon-fire" onclick="launchCannon()">🚀 LANÇAR</button></div>
+<div id="pause-overlay">⏸  PAUSADO — MODO EDIÇÃO</div>
+<div id="mtabs">
+  <button id="mtab-tools" onclick="mobilePanel('tools')">▤ FERRAMENTAS</button>
+  <button id="mtab-tut" onclick="toggleTutMenu()" data-tip="Tutoriais">🎓 Tutoriais</button>
+  <button id="mtab-instr" onclick="mobilePanel('instr')">📐 MEDIDAS</button>
+</div>
+<div id="zoom-ctrl">
+  <button onclick="zoomOut()" data-tip="Reduzir [-]">−</button>
+  <button id="zoom-val" onclick="zoomReset()" data-tip="Voltar a 100% [0]">100%</button>
+  <button onclick="zoomIn()" data-tip="Ampliar [+]">+</button>
+</div>
+<div id="forces-menu">
+  <button id="forces-menu-btn" onclick="toggleForcesMenu()" data-tip="Escolher quais forças exibir no objeto selecionado">⬇ FORÇAS ▾</button>
+  <div id="forces-menu-panel">
+    <div class="fm-head">Exibir no objeto selecionado</div>
+    <label class="fm-row"><input type="checkbox" data-f="P" checked onchange="setForceFilter('P',this.checked)"><span class="fm-sw" style="background:#ffd166"></span>Peso (P)</label>
+    <label class="fm-row"><input type="checkbox" data-f="Pc" checked onchange="setForceFilter('Pc',this.checked)"><span class="fm-sw" style="background:#ffe9a8"></span>Componentes (Px, Py)</label>
+    <label class="fm-row"><input type="checkbox" data-f="N" checked onchange="setForceFilter('N',this.checked)"><span class="fm-sw" style="background:#4dd2ff"></span>Normal (N)</label>
+    <label class="fm-row"><input type="checkbox" data-f="Fat" checked onchange="setForceFilter('Fat',this.checked)"><span class="fm-sw" style="background:#ff8c42"></span>Atrito (Fat)</label>
+    <label class="fm-row"><input type="checkbox" data-f="T" checked onchange="setForceFilter('T',this.checked)"><span class="fm-sw" style="background:#ffb24d"></span>Tração (T)</label>
+    <label class="fm-row"><input type="checkbox" data-f="Fel" checked onchange="setForceFilter('Fel',this.checked)"><span class="fm-sw" style="background:#bc13fe"></span>Elástica (Fel)</label>
+    <label class="fm-row"><input type="checkbox" data-f="R" checked onchange="setForceFilter('R',this.checked)"><span class="fm-sw" style="background:#ff5555"></span>Resultante (R)</label>
+    <div class="fm-div"></div>
+    <label class="fm-row"><input type="checkbox" data-f="v" onchange="setForceFilter('v',this.checked)"><span class="fm-sw" style="background:#44ff88"></span>Velocidade (v)</label>
+    <label class="fm-row"><input type="checkbox" data-f="a" onchange="setForceFilter('a',this.checked)"><span class="fm-sw" style="background:#b388ff"></span>Aceleração (a)</label>
+    <div class="fm-note">Selecione um objeto com a ferramenta Seleção (V) para ver o diagrama.</div>
+  </div>
+</div>
+<div id="tut-menu">
+  <button id="tut-menu-btn" onclick="toggleTutMenu()" data-tip="Tutoriais guiados">🎓 TUTORIAIS ▾</button>
+  <div id="tut-menu-panel">
+    <div class="tm-head">Tutoriais guiados</div>
+    <button class="tm-opt" onclick="startTutorial('carro')">🚗 Montar um carro funcional</button>
+    <button class="tm-opt" onclick="startTutorial('engrenagens')">⚙️ Sistema de engrenagens</button>
+    <button class="tm-opt" onclick="startTutorial('ferramentas')">🧰 Conhecendo as ferramentas</button>
+  </div>
+</div>
+<div id="stopwatch">
+  <div id="sw-time">0.00s</div>
+  <div class="sw-btns">
+    <button id="sw-toggle" onclick="swToggle()" data-tip="Iniciar / pausar">▶</button>
+    <button onclick="swReset()" data-tip="Zerar">↺</button>
+    <button class="sw-x" onclick="toggleStopwatch()" data-tip="Fechar">✕</button>
+  </div>
+</div>
+<div id="m-sim">
+  <button id="m-play" onclick="setRunning(true)" data-tip="Play">▶</button>
+  <button onclick="setRunning(false)" data-tip="Pausar">⏸</button>
+  <button id="m-reset" onclick="resetWorld()" data-tip="Resetar">↺</button>
+</div>
+<div id="m-undo">
+  <button onclick="undo()" data-tip="Desfazer">↩</button>
+  <button onclick="redo()" data-tip="Refazer">↪</button>
+</div>
+<div id="instr-panel">
+  <div class="tb-label">TEMPO</div>
+  <button class="tool-btn" id="btn-stopwatch" data-tip="Cronômetro independente (segundos de simulação)" onclick="toggleStopwatch()" style="color:#7df9ff">⏱</button>
+  <button class="tool-btn" data-tip="Zerar o cronômetro" onclick="resetTimer()" style="color:#ffd166"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M10 11V7.5M10 11l2.5 1.5M8 2.5h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="btn-lbl">Zerar</span></button>
+  <div class="tb-div"></div>
+  <div class="tb-label">MEDIDAS</div>
+  <button class="tool-btn" data-tool="ruler" data-tip="Régua — arraste p/ medir distância" onclick="setTool('ruler')" style="color:#ffd166"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><rect x="1" y="6" width="18" height="8" rx="1.2" stroke="currentColor" stroke-width="1.6"/><path d="M5 6v3M9 6v4M13 6v3M17 6v4" stroke="currentColor" stroke-width="1.3"/></svg><span class="btn-lbl">Régua</span></button>
+  <button class="tool-btn" data-tool="dynamometer" data-tip="Dinamômetro — clique num corpo da corda" onclick="setTool('dynamometer')" style="color:#ff6b6b"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M10 10l4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M4 10h2M14 10h2M10 4v2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span class="btn-lbl">Dinam.</span></button>
+  <button class="tool-btn" data-tool="speedometer" data-tip="Velocímetro — clique num corpo" onclick="setTool('speedometer')" style="color:#4dd2ff"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3 14a7 7 0 0114 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M10 14l4-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="10" cy="14" r="1.3" fill="currentColor"/></svg><span class="btn-lbl">Veloc.</span></button>
+  <button class="tool-btn" data-tool="accelerometer" data-tip="Acelerômetro — clique num corpo" onclick="setTool('accelerometer')" style="color:#b388ff"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3 16L10 4l7 12" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 16l3-5 3 5" stroke="currentColor" stroke-width="1.2"/></svg><span class="btn-lbl">Aceler.</span></button>
+  <button class="tool-btn" data-tool="scale" data-tip="Balança — clique em 2 corpos p/ comparar" onclick="setTool('scale')" style="color:#7CFFB2"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 3v14M4 17h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 5L4 11h5M10 5l6 6h-5" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg><span class="btn-lbl">Balança</span></button>
+  <button class="tool-btn" data-tool="protractor" data-tip="Transferidor — clique no vértice e nos 2 braços p/ medir o ângulo [T]" onclick="setTool('protractor')" style="color:#ff9ff3"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M2 14a8 8 0 0116 0" stroke="currentColor" stroke-width="1.6"/><path d="M2 14h16" stroke="currentColor" stroke-width="1.6"/><path d="M10 14L15 7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="10" cy="14" r="1.4" fill="currentColor"/></svg><span class="btn-lbl">Transfer.</span></button>
+  <button class="tool-btn" data-tool="tracker" data-tip="Régua avançada — clique num corpo p/ medir trajetória, Δx e Δy [J]" onclick="setTool('tracker')" style="color:#7CFFB2"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3 16C6 16 7 5 11 5s4 8 6 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none" stroke-dasharray="1 3"/><circle cx="3" cy="16" r="1.6" fill="currentColor"/><circle cx="17" cy="13" r="1.6" fill="currentColor"/></svg><span class="btn-lbl">Trajet.</span></button>
+  <div class="tb-div"></div>
+  <div class="tb-label">VETORES</div>
+  <button class="tool-btn" id="btn-vectors" data-tip="Mostrar vetores velocidade/aceleração" onclick="toggleVectors()" style="color:#9aa7b3"><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M3 12h11M14 12l-3-2.5M14 12l-3 2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16l5-9" stroke="#ff8c42" stroke-width="1.6" stroke-linecap="round"/></svg><span class="btn-lbl">Vetores</span></button>
+</div>
+<div id="conn-hint">🔗 Clique no 1º corpo → Clique no 2º corpo</div>
+<div id="tut-panel">
+  <div class="tut-head"><span id="tut-title"></span><button id="tut-x" onclick="tutClose()">✕</button></div>
+  <div id="tut-text"></div>
+  <div class="tut-nav"><span id="tut-count"></span><div><button id="tut-prev" onclick="tutPrev()">◀ Anterior</button><button id="tut-next" onclick="tutNext()">Próximo ▶</button></div></div>
+</div>
+<div id="tut-arrow">▼</div>
+<div id="statusbar"><div class="sb-item"><div class="sb-dot running" id="sb-dot"></div><span id="sb-state">RODANDO</span></div><span class="sb-sep">|</span><div class="sb-item">OBJ:<span class="sb-val" id="sb-count">0</span></div><span class="sb-sep">|</span><div class="sb-item">TOOL:<span class="sb-val" id="sb-tool">CAIXA</span></div><span class="sb-sep">|</span><div class="sb-item">FPS:<span class="sb-val" id="sb-fps">60</span></div><span class="sb-sep">|</span><div class="sb-item">TEMPO:<span class="sb-val" id="sb-time">0.00s</span></div><span class="sb-sep">|</span><div class="sb-item">ENERGIA:<span class="sb-val" id="sb-energy">0</span></div></div>
+<script>
+'use strict';
+const { Engine, Render, Runner, Bodies, Body, Constraint, Composite, Mouse, MouseConstraint, Events, Query, Common } = Matter;
+if (window.decomp) Common.setDecomp(window.decomp);
+const isMobile = window.innerWidth <= 640 || window.matchMedia('(pointer:coarse)').matches;
+let W = window.innerWidth, H = window.innerHeight;
+function getRH() { return isMobile ? H - 76 : H; }
+const engine = Engine.create({ gravity: { x: 0, y: 1 } });
+// CALIBRAÇÃO FÍSICA: com passo fixo (1/60 s) e 100 px/m, a queda livre integra
+// a = g·scale·Δt²·(unidades). Com scale=0.00098 → exatamente 9,8 m/s² em 1.0g,
+// tornando o sistema de unidades COERENTE (v, a, P, F batem com a teoria).
+engine.gravity.scale = 0.00098;
+engine.positionIterations = 10;  // mais iterações = restrições rígidas estáveis
+engine.velocityIterations = 8;
+engine.constraintIterations = 6; // eixos/cordas rígidas convergem sem explodir
+const world = engine.world;
+engine.timing.isFixed = true; // reforça o passo fixo determinístico (Matter 0.19)
+const runner = Runner.create({ delta: 1000 / 60, isFixed: true }); // passo FIXO: estável sob lag/troca de aba (padrão Box2D/Rapier)
+const canvasEl = document.getElementById('canvas');
+const render = Render.create({ canvas: canvasEl, engine, options: { width: W, height: getRH(), background: '#05010a', wireframes: false } });
+let ground, wallL, wallR, ceiling;
+const ZOOM_MIN = 0.5, ZOOM_MAX = 1.5;     // faixa de zoom da câmera
+let BOX_X0 = 0, BOX_X1 = 0;               // limites laterais da caixa de colisão
+                                          // (fixos na extensão visível a 50%)
+function criarBordas() {
+  [ground,wallL,wallR,ceiling].filter(Boolean).forEach(b=>Composite.remove(world,b,true));
+  const T=60, RH=getRH();
+  // Margem lateral = a meia-tela extra que fica visível ao reduzir até ZOOM_MIN.
+  // Assim as paredes coincidem com as bordas do que se vê a 50% (nada escapa).
+  const MX = (W/2) * (1/ZOOM_MIN - 1);
+  BOX_X0 = -MX; BOX_X1 = W + MX;
+  const boxW = BOX_X1 - BOX_X0;
+  ground = Bodies.rectangle((BOX_X0+BOX_X1)/2, RH+T/2, boxW + T*2, T, { isStatic:true, label:'__ground__', friction:0.95, frictionStatic:1.1, restitution:0.05, render:{ fillStyle:'rgba(188,19,254,0.08)', strokeStyle:'#bc13fe', lineWidth:1.5 } });
+  wallL = Bodies.rectangle(BOX_X0 - T/2, RH/2, T, RH*4, { isStatic:true, label:'__wall__', friction:0.8, render:{visible:false} });
+  wallR = Bodies.rectangle(BOX_X1 + T/2, RH/2, T, RH*4, { isStatic:true, label:'__wall__', friction:0.8, render:{visible:false} });
+  ceiling = Bodies.rectangle((BOX_X0+BOX_X1)/2, -T/2, boxW + T*2, T, { isStatic:true, label:'__ceiling__', render:{visible:false} });
+  Composite.add(world, [ground,wallL,wallR,ceiling]);
+}
+criarBordas();
+const mouse = Mouse.create(render.canvas);
+const mouseConstraint = MouseConstraint.create(engine, { mouse, constraint: { stiffness:0.2, damping:0.1, render:{ visible:true, strokeStyle:'rgba(255,0,255,0.6)', lineWidth:1.5 } } });
+render.mouse = mouse;
+let mcAdded = false;
+// ─── ZOOM da área de experimentos (câmera de renderização: 75%–125%) ───
+// Usa render.bounds (câmera do Matter) centrado no meio da cena. O mesmo
+// transform é aplicado ao desenho customizado e ao mapeamento de toque/clique,
+// então o que se vê e o que se toca permanecem alinhados. Só afeta o canvas.
+let zoom = 1;
+let springK = 300;  // constante elástica selecionada (N/m) para novas molas
+function setSpringK(v){ springK=v; document.querySelectorAll('#spring-panel .springk-btn').forEach(b=>b.classList.toggle('active', +b.dataset.k===v)); }
+// Atrito do objeto selecionado (ex.: o plano inclinado). frictionStatic é posto
+// bem alto (o Matter usa o MAIOR dos dois no contato), permitindo segurar o bloco
+// quando o atrito supera a componente do peso paralela ao plano.
+function setFrictionSelected(v){
+  document.getElementById('set-fric-val').textContent = selectedBodies.length ? v.toFixed(2) : '—';
+  if(!selectedBodies.length) return;
+  selectedBodies.forEach(b=>{ if(b){ b.friction=v; b.frictionStatic=v*1.5+0.1; } });
+  saveToHistory();
+}
+// MOLA REAL (Lei de Hooke): aplica F = −k·deformação ao longo do eixo, com a
+// constante k em N/m de verdade. Por isso a mola se DEFORMA conforme a carga.
+function updateSprings(){
+  for(const uc of userConstraints){
+    if(uc.type!=='spring') continue;
+    const c=uc.constraint, k=uc.k||300, a=c.bodyA, b=c.bodyB;
+    const e=getConstraintEnds(c); let dx=e.bx-e.ax, dy=e.by-e.ay; const dist=Math.hypot(dx,dy)||1e-6;
+    const ux=dx/dist, uy=dy/dist;
+    const extM=(dist-(c.length||50))/PX_PER_M;                 // deformação em metros
+    const vax=a&&!a.isStatic?a.velocity.x:0, vay=a&&!a.isStatic?a.velocity.y:0;
+    const vbx=b&&!b.isStatic?b.velocity.x:0, vby=b&&!b.isStatic?b.velocity.y:0;
+    const vrel=((vbx-vax)*ux+(vby-vay)*uy)*SPEED_CAL;          // taxa de deformação (m/s)
+    const F_N=k*extM + 1.5*vrel;                               // Hooke + amortecimento leve
+    const Fm=F_N*N_TO_MATTERF;
+    if(a&&!a.isStatic) Body.applyForce(a,{x:e.ax,y:e.ay},{x:ux*Fm,y:uy*Fm});
+    if(b&&!b.isStatic) Body.applyForce(b,{x:e.bx,y:e.by},{x:-ux*Fm,y:-uy*Fm});
+  }
+}
+function applyZoom(){
+  const cx = W/2, cy = getRH()/2, hw = (W/2)/zoom, hh = (getRH()/2)/zoom;
+  render.options.hasBounds = true;
+  render.bounds.min.x = cx - hw; render.bounds.max.x = cx + hw;
+  render.bounds.min.y = cy - hh; render.bounds.max.y = cy + hh;
+  Mouse.setScale(mouse, { x: 1/zoom, y: 1/zoom });
+  Mouse.setOffset(mouse, { x: render.bounds.min.x, y: render.bounds.min.y });
+}
+function setZoom(z){ zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(z*100)/100)); applyZoom(); const el=document.getElementById('zoom-val'); if(el) el.textContent=Math.round(zoom*100)+'%'; }
+function zoomIn(){ setZoom(zoom+0.05); }
+function zoomOut(){ setZoom(zoom-0.05); }
+function zoomReset(){ setZoom(1); }
+let activeTool = 'box', activeMaterial = 'wood', isRunning = true;
+let userBodies = [], userConstraints = [];
+const motors = new Map(), pinnedBodies = new Set();
+let laserEmitters = [];
+// ─── CANHÃO de lançamento (oblíquo/horizontal) ───
+let cannon = null;            // {x,y} base do canhão
+let cannonAngle = 45;         // graus: 0=horizontal →, 90=↑, 180=horizontal ←
+let cannonPower = 12;         // velocidade de saída (m/s)
+let projectileTrails = [];    // [{pts:[{x,y}], opacity, color}] — silhuetas que desbotam
+let activeProjectile = null;  // {body, trail} sendo rastreado
+let cannonAutoTrack = false;  // acopla a régua avançada automaticamente em cada projétil
+let cannonGroundMode = false; // saída na altura da base (solo) — sem carreta; complementares iguais
+let altHeld = false;          // Alt: régua em linha reta
+let pulleyRopes = []; // cordas que passam por polias (física real de polia)
+let assemblyGroup = 0; // contador de grupos de colisão por montagem conectada
+let shiftHeld = false, polyClickPts = []; // modo de polígono com retas (Shift)
+let velJoints = []; // eixos por restrição de velocidade (junta estável roda↔bloco)
+let motorTorque = 0.5, motorFreeSpeed = 0.08, motorDirection = 1;
+const MOTOR_K = 5e-5; // calibração p/ rampas: torque-limiar ≈ sen(θ) → meio torque sobe 30°,
+                      // torque máx sobe ~45° (no atrito que permitir), 25° com folga. τ=torque·MOTOR_K·inércia
+let simTime = 0;            // cronômetro: tempo de simulação acumulado (s)
+let swElapsed = 0, swRunning = false;   // cronômetro independente (controle manual)
+let manualDrag = null;      // arrasto direto de objeto com a simulação pausada
+let selectedBodies = [];    // multisseleção (ferramenta Seleção)
+let isDrawing = false, isPointerDown = false, drawStartX=0, drawStartY=0, drawCurrX=0, drawCurrY=0, freehandPts = [], freehandHoldT=0, freehandLastSig=null, isPlacingLaser = false;
+const conn = { step:0, type:null, bodyA:null, bodyB:null, pointA:null, pointB:null };
+let fpsCount=0, fpsLast=performance.now(), fpsVal=60, fluidMaxParticles = 80, selectedBody = null;
+let historyStack = [], historyIndex = -1;
+function saveToHistory() { try { const state = { bodies: userBodies.map(body => ({ id: body.id, type: body.circleRadius ? 'circle' : 'poly', position: { x: body.position.x, y: body.position.y }, angle: body.angle, velocity: { x: body.velocity.x, y: body.velocity.y }, angularVelocity: body.angularVelocity, material: body._mat, radius: body.circleRadius, mech: body._isWheel?'wheel':body._isGear?'gear':body._isPulley?'pulley':null, teeth: body._teeth||null, vertices: body.vertices ? body.vertices.map(v => ({ x: v.x, y: v.y })) : null })), constraints: userConstraints.map(c => ({ type: c.type, k: c.k, length: c.constraint.length, bodyAId: c.constraint.bodyA?.id, bodyBId: c.constraint.bodyB?.id, pointA: c.constraint.pointA, pointB: c.constraint.pointB })), motors: Array.from(motors.keys()).map(body => body.id), pinned: Array.from(pinnedBodies).map(body => body.id), lasers: laserEmitters.map(l => ({ x: l.x, y: l.y, angle: l.angle })) }; historyStack = historyStack.slice(0, historyIndex + 1); historyStack.push(state); historyIndex++; if (historyStack.length > 50) { historyStack.shift(); historyIndex--; } } catch(e) { console.warn(e); } }
+function restoreState(state) { if (!state) return; Composite.allBodies(world).filter(b => (!b.isStatic || pinnedBodies.has(b)) && b !== (cannon&&cannon.body)).forEach(b => Composite.remove(world, b, true)); userConstraints.forEach(({constraint: c}) => Composite.remove(world, c, true)); userBodies = []; userConstraints = []; motors.clear(); pinnedBodies.clear(); laserEmitters = []; projectileTrails=[]; activeProjectile=null; limparCordasPolia(); limparInstrumentos(); limparJuntas(); const bodyMap = new Map(); state.bodies.forEach(bodyData => { let newBody; const props = getMatProps(bodyData.material); if (bodyData.material === 'glass' || bodyData.material === 'mirror') props.render.visible = false; if (bodyData.type === 'circle') { newBody = Bodies.circle(bodyData.position.x, bodyData.position.y, bodyData.radius, props); } else if (bodyData.vertices) { const cx = bodyData.vertices.reduce((s, p) => s + p.x, 0) / bodyData.vertices.length; const cy = bodyData.vertices.reduce((s, p) => s + p.y, 0) / bodyData.vertices.length; newBody = Bodies.fromVertices(cx, cy, bodyData.vertices, props, true); } else { newBody = Bodies.rectangle(bodyData.position.x, bodyData.position.y, 30, 30, props); } if (newBody) { newBody._mat = bodyData.material; if(bodyData.mech==='wheel'){newBody._isWheel=true;} else if(bodyData.mech==='gear'){newBody._isGear=true;newBody._teeth=bodyData.teeth||12;newBody.render.visible=false;} else if(bodyData.mech==='pulley'){newBody._isPulley=true;newBody.render.visible=false;} Body.setVelocity(newBody, bodyData.velocity); Body.setAngularVelocity(newBody, bodyData.angularVelocity); Composite.add(world, newBody); userBodies.push(newBody); bodyMap.set(bodyData.id, newBody); } }); state.constraints.forEach(conData => { const bodyA = bodyMap.get(conData.bodyAId); const bodyB = bodyMap.get(conData.bodyBId); if (bodyA && bodyB) { const cfg = { bodyA, pointA: conData.pointA, bodyB, pointB: conData.pointB, render: { visible: false } }; if (conData.type === 'spring') Object.assign(cfg, { stiffness: 0.00005, damping: 0, length: conData.length||50 }); else if (conData.type === 'rope') Object.assign(cfg, { stiffness: 0.0008, damping: 0.05, length: 80, maxLength: 200 }); else if (conData.type === 'pivot') Object.assign(cfg, { stiffness: 1, damping: 0.1, length: 0 }); const c = Constraint.create(cfg); Composite.add(world, c); userConstraints.push({ constraint: c, type: conData.type, k: conData.k }); } }); state.motors.forEach(bodyId => { const body = bodyMap.get(bodyId); if (body) motors.set(body, { torque: motorTorque, freeSpeed: motorFreeSpeed, direction: motorDirection, active: true }); }); state.pinned.forEach(bodyId => { const body = bodyMap.get(bodyId); if (body) { Body.setStatic(body, true); pinnedBodies.add(body); } }); laserEmitters = state.lasers || []; updateCounter(); }
+function undo() { if (historyIndex > 0) { historyIndex--; restoreState(historyStack[historyIndex]); } }
+function redo() { if (historyIndex < historyStack.length - 1) { historyIndex++; restoreState(historyStack[historyIndex]); } }
+const MATS = { wood: { density:0.50, friction:0.65, frictionStatic:0.78, restitution:0.30, frictionAir:0.012, fill:'rgba(139,95,43,0.44)', stroke:'#c8963e', lw:1.8 }, metal: { density:3.80, friction:0.28, frictionStatic:0.38, restitution:0.18, frictionAir:0.001, fill:'rgba(100,122,148,0.58)', stroke:'#8ab2d2', lw:1.8 }, stone: { density:5.00, friction:0.82, frictionStatic:0.94, restitution:0.07, frictionAir:0.001, fill:'rgba(76,78,85,0.62)', stroke:'#888a96', lw:1.8 }, rubber: { density:0.92, friction:1.10, frictionStatic:1.25, restitution:0.88, frictionAir:0.020, fill:'rgba(24,24,24,0.82)', stroke:'#545454', lw:1.8 }, ice: { density:0.72, friction:0.015, frictionStatic:0.02, restitution:0.38, frictionAir:0.001, fill:'rgba(175,222,255,0.30)', stroke:'#88d0ff', lw:1.8 }, glass: { density:1.50, friction:0.18, frictionStatic:0.22, restitution:0.12, frictionAir:0.001, fill:'rgba(170,228,255,0.12)', stroke:'#66ccff', lw:2.0 }, mirror: { density:2.50, friction:0.10, frictionStatic:0.14, restitution:0.20, frictionAir:0.001, fill:'rgba(200,220,240,0.55)', stroke:'#c8e0f0', lw:2.0 }, fluid: { density:0.38, friction:0.004, frictionStatic:0.004, restitution:0.04, frictionAir:0.008, fill:'rgba(12,85,228,0.50)', stroke:'#4499ee', lw:0.7 } };
+function getMatProps(key) { const m = MATS[key] || MATS.wood; return { density:m.density, friction:m.friction, frictionStatic:m.frictionStatic, restitution:m.restitution, frictionAir:m.frictionAir, render:{ fillStyle:m.fill, strokeStyle:m.stroke, lineWidth:m.lw } }; }
+// SANITIZADOR: rede de segurança definitiva. Se um corpo ficar com posição/
+// velocidade inválida (NaN/∞) ou for parar absurdamente longe, ele é devolvido à
+// última posição válida com velocidade zero — a cena nunca "morre" de vez.
+function sanitizeBodies() {
+  for (const b of userBodies) {
+    const p = b.position, v = b.velocity;
+    const bad = !isFinite(p.x) || !isFinite(p.y) || !isFinite(v.x) || !isFinite(v.y) || !isFinite(b.angle) || Math.abs(p.x) > 1e5 || Math.abs(p.y) > 1e5;
+    if (bad) {
+      const g = b._lastGood || { x: W/2, y: getRH()/2, angle: 0 };
+      Body.setPosition(b, { x: g.x, y: g.y });
+      Body.setAngle(b, g.angle || 0);
+      Body.setVelocity(b, { x: 0, y: 0 });
+      Body.setAngularVelocity(b, 0);
+    }
+  }
+}
+function storeLastGood() {
+  for (const b of userBodies) {
+    const p = b.position;
+    if (isFinite(p.x) && isFinite(p.y) && Math.abs(p.x) < 1e5 && Math.abs(p.y) < 1e5) b._lastGood = { x: p.x, y: p.y, angle: b.angle };
+  }
+}
+Events.on(engine, 'afterUpdate', () => { if (isRunning) { storeLastGood(); captureContactForces(); } });
+Events.on(engine, 'beforeUpdate', () => { if (!isRunning) return; sanitizeBodies(); simTime += 1/60; if(swRunning) swElapsed += 1/60; let totalKE = 0; userBodies.forEach(body => { const vx = body.velocity.x, vy = body.velocity.y; totalKE += 0.5 * body.mass * (vx*vx + vy*vy); }); document.getElementById('sb-energy').textContent = Math.round(totalKE); motors.forEach((m, body) => { if (!m.active || body.isStatic) return; body.isSleeping = false;
+    // MOTOR DE TORQUE com curva torque-velocidade (como motores reais):
+    //  • torque máximo quando parado (partida), caindo a zero na velocidade livre.
+    //  • τ = τmax · (1 − ω/ω_livre). Sob carga ω cai → τ sobe; se a carga exceder
+    //    o torque de partida, o motor TRAVA. A velocidade de regime emerge da física.
+    const wnl = m.direction * m.freeSpeed; if (wnl === 0) return;
+    const drive = Math.max(0, 1 - body.angularVelocity / wnl);   // fração da curva
+    body.torque += m.torque * MOTOR_K * body.inertia * m.direction * drive;
+  }); updateGears(); updateAxleJoints(); updatePulleys(); updateSprings();
+  // REDE DE SEGURANÇA: limita velocidades para nenhum corpo ser "lançado para
+  // fora da tela" caso uma restrição rígida tente explodir.
+  const VMAX = 45, WMAX = 1.5;
+  userBodies.forEach(b => { if (b.isStatic) return; const s = Math.hypot(b.velocity.x, b.velocity.y); if (s > VMAX) Body.setVelocity(b, { x: b.velocity.x/s*VMAX, y: b.velocity.y/s*VMAX }); if (Math.abs(b.angularVelocity) > WMAX) Body.setAngularVelocity(b, Math.sign(b.angularVelocity)*WMAX); });
+});
+
+// ═══════════ ENGRENAGENS — FÍSICA FIEL ═══════════
+// Modelo físico real: em duas engrenagens externas que se engrenam, as
+// velocidades TANGENCIAIS na linha de contato são iguais (sem deslizamento):
+//        ω₁·r₁ = -ω₂·r₂   →   C = ω₁·r₁ + ω₂·r₂ = 0
+// Em vez de IMPOR a velocidade (que ignora inércia e carga), resolvemos isso
+// como uma restrição de velocidade que CONSERVA O MOMENTO ANGULAR, ponderada
+// pelos momentos de inércia. Assim o torque se propaga pelo trem de
+// engrenagens, a inércia importa e a transmissão funciona nos dois sentidos.
+// A engrenagem motorizada participa com inércia REAL: o trem a carrega de volta.
+function updateGears() {
+  const gears = userBodies.filter(b => b._isGear && !b.isStatic);
+  if (gears.length < 2) return;
+
+  // Detecta pares engrenados (distância entre centros ≈ soma dos raios)
+  const pairs = [];
+  for (let i = 0; i < gears.length; i++) {
+    for (let j = i + 1; j < gears.length; j++) {
+      const a = gears[i], b = gears[j];
+      const d = Math.hypot(a.position.x - b.position.x, a.position.y - b.position.y);
+      const mesh = a.circleRadius + b.circleRadius;
+      if (d < mesh * 1.12 && d > mesh * 0.70) pairs.push([a, b]);
+    }
+  }
+  if (pairs.length === 0) return;
+
+  // Resolve a restrição iterativamente (estável para trens de engrenagens)
+  for (let iter = 0; iter < 8; iter++) {
+    for (const [a, b] of pairs) {
+      const ra = a.circleRadius, rb = b.circleRadius;
+      // Inércia inversa REAL para TODAS as engrenagens — inclusive a motorizada.
+      // Assim a carga do trem REFLETE de volta no motor: o torque entra pela
+      // engrenagem (body.torque), o trem resiste pela inércia, a curva torque-
+      // velocidade sente a carga, e a redução troca velocidade por torque sozinha.
+      const invIa = a.inverseInertia || 0;
+      const invIb = b.inverseInertia || 0;
+      const k = ra * ra * invIa + rb * rb * invIb;
+      if (k < 1e-12) continue; // ambas travadas: não há o que resolver
+      const C = a.angularVelocity * ra + b.angularVelocity * rb; // violação
+      const lambda = -C / k;
+      if (invIa > 0) { Body.setAngularVelocity(a, a.angularVelocity + lambda * ra * invIa); a.isSleeping = false; }
+      if (invIb > 0) { Body.setAngularVelocity(b, b.angularVelocity + lambda * rb * invIb); b.isSleeping = false; }
+    }
+  }
+}
+
+// ═══════════ EIXO POR JUNTA DE VELOCIDADE (roda↔bloco) ═══════════
+// Em vez de um Constraint posicional rígido (que oscila e explode sob carga),
+// este eixo mantém o ponto de ancoragem dos dois corpos com a MESMA velocidade,
+// resolvido por IMPULSO (como as engrenagens) — inerentemente estável. Um termo
+// suave de correção de posição (Baumgarte) puxa de volta qualquer deriva, sem a
+// rigidez que causava o caos. Para a roda (corpo circular) a âncora é o CENTRO,
+// então o giro fica totalmente livre (o motor atua sem o eixo brigar).
+function rotVec(v, ang){ const c=Math.cos(ang), s=Math.sin(ang); return { x: v.x*c - v.y*s, y: v.x*s + v.y*c }; }
+function criarJuntaEixo(a, rAlocal, b, rBlocal){ velJoints.push({ a, b, rA: rAlocal, rB: rBlocal }); }
+function updateAxleJoints(){
+  if (velJoints.length === 0) return;
+  const BAUM = 0.2; // intensidade da correção de posição (suave)
+  for (let iter = 0; iter < 6; iter++){
+    for (const j of velJoints){
+      const a = j.a, b = j.b;
+      const rA = rotVec(j.rA, a.angle), rB = rotVec(j.rB, b.angle);
+      const invMA = a.inverseMass, invIA = a.inverseInertia;
+      const invMB = b.inverseMass, invIB = b.inverseInertia;
+      // pontos de ancoragem no mundo
+      const pAx = a.position.x + rA.x, pAy = a.position.y + rA.y;
+      const pBx = b.position.x + rB.x, pBy = b.position.y + rB.y;
+      // velocidade relativa nas âncoras (B - A), incluindo rotação
+      const vAx = a.velocity.x - a.angularVelocity*rA.y, vAy = a.velocity.y + a.angularVelocity*rA.x;
+      const vBx = b.velocity.x - b.angularVelocity*rB.y, vBy = b.velocity.y + b.angularVelocity*rB.x;
+      let cdx = (vBx - vAx) + BAUM*(pBx - pAx); // + viés de posição (Baumgarte)
+      let cdy = (vBy - vAy) + BAUM*(pBy - pAy);
+      // matriz de massa efetiva 2x2
+      const k11 = invMA + invMB + invIA*rA.y*rA.y + invIB*rB.y*rB.y;
+      const k12 = -invIA*rA.x*rA.y - invIB*rB.x*rB.y;
+      const k22 = invMA + invMB + invIA*rA.x*rA.x + invIB*rB.x*rB.x;
+      const det = k11*k22 - k12*k12;
+      if (Math.abs(det) < 1e-12) continue;
+      // impulso P = -K⁻¹ · cdot
+      const px = -( k22*cdx - k12*cdy) / det;
+      const py = -(-k12*cdx + k11*cdy) / det;
+      if (invMA > 0 || invIA > 0){
+        Body.setVelocity(a, { x: a.velocity.x - invMA*px, y: a.velocity.y - invMA*py });
+        Body.setAngularVelocity(a, a.angularVelocity - invIA*(rA.x*py - rA.y*px));
+        a.isSleeping = false;
+      }
+      if (invMB > 0 || invIB > 0){
+        Body.setVelocity(b, { x: b.velocity.x + invMB*px, y: b.velocity.y + invMB*py });
+        Body.setAngularVelocity(b, b.angularVelocity + invIB*(rB.x*py - rB.y*px));
+        b.isSleeping = false;
+      }
+    }
+  }
+}
+function limparJuntas(){ velJoints.length = 0; }
+
+// ═══════════ POLIAS — FÍSICA FIEL ═══════════
+// Uma corda passa por uma ou mais polias: anchorA → polia₁ → … → anchorB.
+// Princípios físicos reproduzidos:
+//  • Corda inextensível: o comprimento TOTAL é conservado (soma dos trechos).
+//  • Tensão UNIFORME: um único escalar T atua igualmente em todos os trechos
+//    (polia ideal), o que produz naturalmente a VANTAGEM MECÂNICA — uma polia
+//    móvel sustentada por 2 trechos recebe 2T, exigindo metade da força.
+//  • A corda só TRACIONA (nunca empurra): se houver folga, T = 0.
+// A tensão é calculada como mola rígida sobre o excesso de comprimento, com
+// amortecimento, e escalada pela massa envolvida para segurar qualquer peso
+// com alongamento mínimo (≈ inextensível) sem explodir.
+function ropeAnchorWorld(a) { return a.body ? localToWorld(a.body, a.local) : { x: a.local.x, y: a.local.y }; }
+
+// ═══════════ POLIA — MODELO ROBUSTO DE SEGMENTOS ═══════════
+// A corda é dividida em N trechos reais (constraints do Matter): A→polia₁→…→B,
+// conectando ao CENTRO de cada polia. O solver estável do Matter aplica as
+// forças. A cada quadro só REDISTRIBUÍMOS o comprimento entre os trechos para
+// que a tensão (alongamento) seja IGUAL em todos — que é a definição de polia
+// ideal. Isso conserva o comprimento total e faz a vantagem mecânica emergir,
+// sem os "saltos" do ponto de contato móvel e sem instabilidade.
+function pulleyStops(pr) {
+  const stops = [pr.a];
+  for (const pl of pr.pulleys) stops.push({ body: pl, local: { x: 0, y: 0 } });
+  stops.push(pr.b);
+  return stops;
+}
+function stopWorld(s) { return s.body ? localToWorld(s.body, s.local) : { x: s.local.x, y: s.local.y }; }
+function montarCordaPolia(pr, total) {
+  const stops = pulleyStops(pr);
+  pr.segments = []; let sum = 0;
+  for (let i = 0; i < stops.length - 1; i++) {
+    const wa = stopWorld(stops[i]), wb = stopWorld(stops[i+1]);
+    const len = Math.hypot(wb.x - wa.x, wb.y - wa.y); sum += len;
+    pr.segments.push({ length: len }); // só p/ contagem/visual — a física é por IMPULSO (updatePulleys)
+  }
+  pr.total = (total != null && total > sum) ? total : sum;
+  pr.allowSlack = (total != null && total > sum * 1.15);
+  pr._slackPer = 0;
+  initRopeVisual(pr);
+}
+function removerCordaPolia(pr) { /* segmentos não são mais constraints do mundo; nada a remover */ }
+function limparCordasPolia() { pulleyRopes.forEach(removerCordaPolia); pulleyRopes.length = 0; }
+// CORDA POR IMPULSO: a corda é uma restrição de COMPRIMENTO TOTAL constante,
+// resolvida por impulso (igual à junta de velocidade do eixo). Propaga a tensão
+// integralmente pela corda, transmite toda a força à carga (vantagem mecânica
+// emerge), e só TRACIONA (nunca empurra → afrouxa sem resistir). Inextensível.
+function updatePulleys() {
+  const BAUM = 0.2, ITERS = 12;
+  _ropeForce.clear();
+  for (const pr of pulleyRopes) {
+    if (!pr.segments || pr.segments.length === 0) continue;
+    const stops = pulleyStops(pr);
+    const n = stops.length;
+    const W = stops.map(stopWorld);
+    const bodies = stops.map(s => s.body || null);
+    const r = stops.map((s, j) => bodies[j] ? { x: W[j].x - bodies[j].position.x, y: W[j].y - bodies[j].position.y } : { x: 0, y: 0 });
+    const invM = bodies.map(b => (b && !b.isStatic) ? b.inverseMass : 0);
+    const invI = bodies.map(b => (b && !b.isStatic) ? b.inverseInertia : 0);
+    const impAcc = bodies.map(() => ({ x: 0, y: 0 })); // impulso acumulado p/ Tração
+    // direções unitárias de cada trecho e comprimento total atual
+    let sumD = 0; const u = [];
+    for (let i = 0; i < n - 1; i++) { const dx = W[i+1].x - W[i].x, dy = W[i+1].y - W[i].y; const L = Math.hypot(dx, dy) || 1e-6; u.push({ x: dx/L, y: dy/L }); sumD += L; }
+    const C = sumD - pr.total;                         // erro de comprimento (>0 = esticada)
+    pr._slackPer = pr.allowSlack ? Math.max(0, (pr.total - sumD) / (n - 1)) : 0;
+    pr._taut = C > -0.5;
+    // Jacobiano por parada: J_j = u_{j-1} − u_j  (gradiente do comprimento total)
+    const J = [];
+    for (let j = 0; j < n; j++) { const ul = j > 0 ? u[j-1] : {x:0,y:0}; const ur = j < n-1 ? u[j] : {x:0,y:0}; J.push({ x: ul.x - ur.x, y: ul.y - ur.y }); }
+    // massa efetiva da restrição
+    let meff = 0;
+    for (let j = 0; j < n; j++) { if (invM[j] === 0 && invI[j] === 0) continue; const jj = J[j].x*J[j].x + J[j].y*J[j].y; const rc = r[j].x*J[j].y - r[j].y*J[j].x; meff += invM[j]*jj + invI[j]*rc*rc; }
+    if (meff < 1e-12) continue;
+    // iterações de impulso (Gauss-Seidel): zera a taxa de variação do comprimento
+    for (let it = 0; it < ITERS; it++) {
+      let cdot = 0;
+      for (let j = 0; j < n; j++) { const b = bodies[j]; if (!b) continue; const vpx = b.velocity.x - b.angularVelocity*r[j].y, vpy = b.velocity.y + b.angularVelocity*r[j].x; cdot += J[j].x*vpx + J[j].y*vpy; }
+      let lambda = -(cdot + BAUM * C) / meff;
+      lambda = Math.min(0, lambda);     // só TRAÇÃO (corda não empurra)
+      if (lambda === 0) break;          // sem tração → corda frouxa
+      for (let j = 0; j < n; j++) { const b = bodies[j]; if (!b || (invM[j] === 0 && invI[j] === 0)) continue; Body.setVelocity(b, { x: b.velocity.x + invM[j]*lambda*J[j].x, y: b.velocity.y + invM[j]*lambda*J[j].y }); Body.setAngularVelocity(b, b.angularVelocity + invI[j]*lambda*(r[j].x*J[j].y - r[j].y*J[j].x)); b.isSleeping = false; impAcc[j].x += lambda*J[j].x; impAcc[j].y += lambda*J[j].y; }
+    }
+    // Tração = impulso acumulado (Matter) × conversão p/ Newton
+    for (let j = 0; j < n; j++) { const b = bodies[j]; if (b && (impAcc[j].x || impAcc[j].y)) _accForce(_ropeForce, b, impAcc[j].x*IMPULSE_TO_N, impAcc[j].y*IMPULSE_TO_N); }
+    // Impede o PESO de entrar na roldana ao chegar no topo: distância mínima entre
+    // o corpo da ponta e a polia vizinha = raio da polia + raio do corpo.
+    [[0,1],[n-1,n-2]].forEach(([ei,pi])=>{
+      if(ei<0||pi<0||pi>=n) return;
+      const eb=bodies[ei], ps=stops[pi]; if(!eb||eb.isStatic||!(ps.body&&ps.body._isPulley)) return;
+      const pw=W[pi]; let dx=eb.position.x-pw.x, dy=eb.position.y-pw.y; const d=Math.hypot(dx,dy)||1e-6;
+      const minD=(ps.body.circleRadius||20)+(eb.circleRadius||16);
+      if(d<minD){ const ux=dx/d, uy=dy/d; Body.setPosition(eb,{x:pw.x+ux*minD,y:pw.y+uy*minD}); const vn=eb.velocity.x*ux+eb.velocity.y*uy; if(vn<0) Body.setVelocity(eb,{x:eb.velocity.x-vn*ux,y:eb.velocity.y-vn*uy}); }
+    });
+  }
+}
+
+// ─── CORDA COM FÍSICA REAL (cadeia Verlet) ───
+// Cada trecho vira uma cadeia de nós integrados por Verlet: pende sob gravidade,
+// balança e se estica. Os extremos são "presos" aos pontos de contato (âncora ou
+// borda da polia). O comprimento-alvo de cada trecho = distância reta + folga, de
+// modo que uma corda tensa fica reta (correto) e uma com sobra pende como corda.
+function initRopeVisual(pr) {
+  const stops = pulleyStops(pr), w = stops.map(stopWorld);
+  pr.vsegs = [];
+  for (let i = 0; i < w.length - 1; i++) {
+    const P0 = w[i], P1 = w[i+1];
+    const Li = Math.hypot(P1.x - P0.x, P1.y - P0.y);
+    const M = Math.max(2, Math.min(16, Math.round(Li / 16)));
+    const nodes = [];
+    for (let k = 0; k < M; k++) { const t = M > 1 ? k/(M-1) : 0; const x = P0.x+(P1.x-P0.x)*t, y = P0.y+(P1.y-P0.y)*t; nodes.push({ x, y, px: x, py: y }); }
+    pr.vsegs.push(nodes);
+  }
+}
+// Ponto de contato da corda em cada parada: âncoras ficam no ponto; POLIAS ficam
+// na BORDA (raio do sulco), no lado do ENROLAMENTO — oposto à corda (vizinhos).
+// Assim a corda contorna a roldana por fora, nunca passando pelo centro.
+function pulleyContactPoints(stops, w) {
+  const pts = w.map(p => ({ x: p.x, y: p.y }));
+  for (let i = 0; i < stops.length; i++) {
+    const s = stops[i]; if (!(s.body && s.body._isPulley)) continue;
+    const C = w[i], r = grooveR(s.body);
+    const prev = w[i-1], next = w[i+1];
+    let dx, dy;
+    if (prev && next) { dx = C.x - (prev.x+next.x)/2; dy = C.y - (prev.y+next.y)/2; }
+    else { const nb = prev || next; dx = C.x - nb.x; dy = C.y - nb.y; }
+    let L = Math.hypot(dx, dy); if (L < 1e-3) { dx = 0; dy = -1; L = 1; }
+    pts[i] = { x: C.x + dx/L*r, y: C.y + dy/L*r };
+  }
+  return pts;
+}
+// Ponto de TANGÊNCIA da corda vinda do ponto P sobre o círculo (C, r), do lado
+// do enrolamento (wrapDir). É onde a corda toca a borda — não o centro.
+function tangentPoint(C, r, P, wrapDir) {
+  const dx = P.x - C.x, dy = P.y - C.y, dist = Math.hypot(dx, dy);
+  if (dist <= r + 0.5) return { x: C.x + wrapDir.x*r, y: C.y + wrapDir.y*r };
+  const theta = Math.atan2(dy, dx), alpha = Math.acos(Math.min(1, r/dist));
+  const t1 = { x: C.x + r*Math.cos(theta+alpha), y: C.y + r*Math.sin(theta+alpha) };
+  const t2 = { x: C.x + r*Math.cos(theta-alpha), y: C.y + r*Math.sin(theta-alpha) };
+  const d1 = (t1.x-C.x)*wrapDir.x + (t1.y-C.y)*wrapDir.y;
+  const d2 = (t2.x-C.x)*wrapDir.x + (t2.y-C.y)*wrapDir.y;
+  return d1 >= d2 ? t1 : t2; // o que estiver do lado do enrolamento
+}
+function updateRopeVisual(pr) {
+  if (!pr.vsegs || pr.vsegs.length !== pr.segments.length) initRopeVisual(pr);
+  const stops = pulleyStops(pr), w = stops.map(stopWorld);
+  const slackPer = pr._slackPer || 0;
+  const grav = isRunning ? 0.55 : 0;
+  // Para cada polia: DOIS pontos tangentes (um para cada vizinho) + arco de contato
+  const Tprev = [], Tnext = []; pr._arcs = [];
+  for (let i = 0; i < stops.length; i++) {
+    const s = stops[i]; if (!(s.body && s.body._isPulley)) { Tprev[i]=Tnext[i]=null; continue; }
+    const C = w[i], r = grooveR(s.body);
+    const prev = w[i-1] || w[i+1], next = w[i+1] || w[i-1];
+    let wx = C.x-(prev.x+next.x)/2, wy = C.y-(prev.y+next.y)/2; let L = Math.hypot(wx,wy); if (L<1e-3){wx=0;wy=-1;L=1;} wx/=L; wy/=L;
+    const wd = { x: wx, y: wy };
+    Tprev[i] = tangentPoint(C, r, prev, wd);
+    Tnext[i] = tangentPoint(C, r, next, wd);
+    pr._arcs.push({ cx: C.x, cy: C.y, r, a0: Math.atan2(Tprev[i].y-C.y, Tprev[i].x-C.x), a1: Math.atan2(Tnext[i].y-C.y, Tnext[i].x-C.x) });
+  }
+  const segStart = i => { const s = stops[i];   return (s.body && s.body._isPulley) ? Tnext[i]   : w[i]; };
+  const segEnd   = i => { const s = stops[i+1]; return (s.body && s.body._isPulley) ? Tprev[i+1] : w[i+1]; };
+  for (let i = 0; i < pr.vsegs.length; i++) {
+    const P0 = segStart(i), P1 = segEnd(i);
+    const nodes = pr.vsegs[i], M = nodes.length;
+    const straight = Math.hypot(P1.x-P0.x, P1.y-P0.y);
+    const target = straight + slackPer;
+    const spacing = target / (M - 1);
+    for (let k = 1; k < M-1; k++) { const n = nodes[k]; const vx = (n.x-n.px)*0.95, vy = (n.y-n.py)*0.95; n.px = n.x; n.py = n.y; n.x += vx; n.y += vy + grav; }
+    for (let it = 0; it < 12; it++) {
+      nodes[0].x = P0.x; nodes[0].y = P0.y; nodes[M-1].x = P1.x; nodes[M-1].y = P1.y;
+      for (let k = 0; k < M-1; k++) {
+        const a = nodes[k], b = nodes[k+1];
+        let dx = b.x-a.x, dy = b.y-a.y; const dd = Math.hypot(dx,dy)||1; const diff = (dd-spacing)/dd;
+        const mx = dx*0.5*diff, my = dy*0.5*diff;
+        const aFix = (k===0), bFix = (k+1===M-1);
+        if (aFix && !bFix) { b.x -= mx*2; b.y -= my*2; }
+        else if (bFix && !aFix) { a.x += mx*2; a.y += my*2; }
+        else if (!aFix && !bFix) { a.x += mx; a.y += my; b.x -= mx; b.y -= my; }
+      }
+    }
+  }
+}
+// Cria a corda a partir do TRAÇADO DESENHADO: extremos viram âncoras (em corpo ou
+// ponto fixo), as polias próximas ao caminho viram passagens na ordem do traçado,
+// e o comprimento desenhado define o material (permitindo folga e polias móveis).
+function criarCordaDesenhada(pts) {
+  pts = simplifyPts(pts, 6);
+  if (pts.length < 2) return;
+  const A = pts[0], B = pts[pts.length-1];
+  const bodyA = bodyAtDynamic(A.x, A.y), bodyB = bodyAtDynamic(B.x, B.y);
+  const anchorA = bodyA ? { body: bodyA, local: worldToLocal(bodyA, A) } : { body: null, local: { x: A.x, y: A.y } };
+  const anchorB = bodyB ? { body: bodyB, local: worldToLocal(bodyB, B) } : { body: null, local: { x: B.x, y: B.y } };
+  // Polias próximas ao traçado, na ordem em que o traço passa por elas
+  const found = [];
+  userBodies.filter(b => b._isPulley).forEach(pl => {
+    let best = Infinity, bestI = -1;
+    for (let i = 0; i < pts.length; i++) { const dd = Math.hypot(pl.position.x-pts[i].x, pl.position.y-pts[i].y); if (dd < best) { best = dd; bestI = i; } }
+    if (best < pl.circleRadius + 30) found.push({ pl, i: bestI });
+  });
+  found.sort((a, b) => a.i - b.i);
+  const pulleys = found.map(f => f.pl);
+  // comprimento do traçado = material da corda
+  let drawnLen = 0; for (let i = 0; i < pts.length-1; i++) drawnLen += Math.hypot(pts[i+1].x-pts[i].x, pts[i+1].y-pts[i].y);
+  const pr = { a: anchorA, b: anchorB, pulleys };
+  montarCordaPolia(pr, drawnLen);
+  pulleyRopes.push(pr);
+  saveToHistory();
+}
+function worldToLocal(body, wp) { const dx=wp.x-body.position.x, dy=wp.y-body.position.y; const c=Math.cos(-body.angle), s=Math.sin(-body.angle); return { x:dx*c-dy*s, y:dx*s+dy*c }; }
+function localToWorld(body, lp) { const c=Math.cos(body.angle), s=Math.sin(body.angle); return { x:body.position.x+lp.x*c-lp.y*s, y:body.position.y+lp.x*s+lp.y*c }; }
+function getXY(e) { const r=canvasEl.getBoundingClientRect(); const px=(e.clientX-r.left)*(canvasEl.width/r.width), py=(e.clientY-r.top)*(canvasEl.height/r.height); return { x: render.bounds.min.x + px/zoom, y: render.bounds.min.y + py/zoom }; }
+function simplifyPts(pts, d=7) { if (pts.length<=2) return pts; const out=[pts[0]]; for (let i=1;i<pts.length;i++) { const a=out[out.length-1]; if (Math.hypot(pts[i].x-a.x,pts[i].y-a.y)>=d) out.push(pts[i]); } return out; }
+// ───────── RECONHECIMENTO DE FORMAS (mobile: desenhar e segurar 2s) ─────────
+function _pathLen(p){ let s=0; for(let i=1;i<p.length;i++) s+=Math.hypot(p[i].x-p[i-1].x,p[i].y-p[i-1].y); return s; }
+function _resampleClosed(pts,N){ const path=pts.slice(); path.push({x:pts[0].x,y:pts[0].y}); const total=_pathLen(path); if(total<=0) return pts.slice(0,N); const I=total/N, out=[{x:path[0].x,y:path[0].y}]; let D=0; for(let i=1;i<path.length&&out.length<N;i++){ let ax=path[i-1].x,ay=path[i-1].y; const bx=path[i].x,by=path[i].y; let d=Math.hypot(bx-ax,by-ay); while(D+d>=I&&out.length<N){ const t=(I-D)/d, qx=ax+t*(bx-ax), qy=ay+t*(by-ay); out.push({x:qx,y:qy}); ax=qx; ay=qy; d=Math.hypot(bx-ax,by-ay); D=0; } D+=d; } while(out.length<N) out.push({x:path[path.length-1].x,y:path[path.length-1].y}); return out; }
+function _smoothClosed(pts,passes){ let p=pts; for(let s=0;s<passes;s++){ const N=p.length,q=new Array(N); for(let i=0;i<N;i++){ const a=p[(i-1+N)%N],b=p[i],c=p[(i+1)%N]; q[i]={x:(a.x+2*b.x+c.x)/4,y:(a.y+2*b.y+c.y)/4}; } p=q; } return p; }
+function _angBetween(ax,ay,bx,by){ let d=Math.atan2(by,bx)-Math.atan2(ay,ax); while(d>Math.PI)d-=2*Math.PI; while(d<-Math.PI)d+=2*Math.PI; return Math.abs(d); }
+function _shapeStats(pts){ let minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9,cx=0,cy=0; for(const p of pts){ if(p.x<minx)minx=p.x; if(p.y<miny)miny=p.y; if(p.x>maxx)maxx=p.x; if(p.y>maxy)maxy=p.y; cx+=p.x; cy+=p.y; } cx/=pts.length; cy/=pts.length; let perim=0,a2=0; for(let i=0;i<pts.length;i++){ const j=(i+1)%pts.length; perim+=Math.hypot(pts[j].x-pts[i].x,pts[j].y-pts[i].y); a2+=pts[i].x*pts[j].y-pts[j].x*pts[i].y; } const area=Math.abs(a2)/2, bw=maxx-minx, bh=maxy-miny; return {minx,miny,maxx,maxy,cx,cy,perim,area,w:bw,h:bh,circ:perim>0?4*Math.PI*area/(perim*perim):0,fill:bw*bh>0?area/(bw*bh):0}; }
+function _cornersOf(res){ const N=res.length,k=3,TH=48*Math.PI/180,win=3,out=[],turn=new Array(N).fill(0); for(let i=0;i<N;i++){ const a=res[(i-k+N)%N],b=res[i],c=res[(i+k)%N]; turn[i]=_angBetween(b.x-a.x,b.y-a.y,c.x-b.x,c.y-b.y); } for(let i=0;i<N;i++){ if(turn[i]<TH) continue; let mx=true; for(let d=-win;d<=win;d++){ const j=(i+d+N)%N; if(turn[j]>turn[i]+1e-9){mx=false;break;} } if(mx) out.push({x:res[i].x,y:res[i].y}); } return out; }
+function _nearestRaw(c,raw){ let bd=1e18,bp=c; for(const p of raw){ const d=(p.x-c.x)**2+(p.y-c.y)**2; if(d<bd){bd=d;bp=p;} } return {x:bp.x,y:bp.y}; }
+function recognizeShape(raw){
+  const pts=raw.filter((p,i)=> i===0 || Math.hypot(p.x-raw[i-1].x,p.y-raw[i-1].y)>0.8);
+  if(pts.length<8) return null;
+  const bb=_shapeStats(pts); if(Math.hypot(bb.w,bb.h)<26) return null;
+  const res=_smoothClosed(_resampleClosed(pts,48),1);
+  const s=_shapeStats(res); const corners=_cornersOf(res); const nc=corners.length, fill=s.fill;
+  let type;
+  if(nc===3) type='triangle';
+  else if(nc===4) type='square';
+  else if(nc<=2) type = fill>0.90?'square' : (fill<0.62?'triangle':'circle');
+  else type = fill>0.88?'square' : (fill<0.60?'triangle' : (s.circ>0.62?'circle':'square'));
+  if(type==='circle'){ let mr=0; for(const p of res) mr+=Math.hypot(p.x-s.cx,p.y-s.cy); mr/=res.length; return {type:'circle',cx:s.cx,cy:s.cy,r:mr}; }
+  if(type==='square') return {type:'square',x1:bb.minx,y1:bb.miny,x2:bb.maxx,y2:bb.maxy};
+  const verts = corners.length===3 ? corners.map(c=>_nearestRaw(c,pts)) : [{x:(bb.minx+bb.maxx)/2,y:bb.miny},{x:bb.minx,y:bb.maxy},{x:bb.maxx,y:bb.maxy}];
+  return {type:'triangle',verts};
+}
+function snapFreehand(){
+  const sh=recognizeShape(freehandPts);
+  if(sh && sh.type==='circle') criarCirculo(sh.cx,sh.cy,sh.r);
+  else if(sh && sh.type==='square') criarCaixa(sh.x1,sh.y1,sh.x2,sh.y2);
+  else if(sh && sh.type==='triangle') criarPoligono(sh.verts);
+  else criarPoligono(freehandPts);
+  freehandPts=[]; isDrawing=false; freehandHoldT=0;
+}
+function checkFreehandHold(ctx){
+  if(!(isMobile && activeTool==='freehand' && isDrawing && isPointerDown && freehandHoldT && freehandPts.length>=8)) return;
+  const held=performance.now()-freehandHoldT, prog=Math.min(1,held/1500), lp=freehandPts[freehandPts.length-1];
+  const sh=recognizeShape(freehandPts);
+  if(sh){
+    ctx.save(); ctx.globalAlpha=0.3+prog*0.55; ctx.strokeStyle='#bc6bff'; ctx.lineWidth=2.6; ctx.setLineDash([7,5]); ctx.shadowBlur=11; ctx.shadowColor='#bc6bff'; ctx.beginPath();
+    if(sh.type==='circle') ctx.arc(sh.cx,sh.cy,sh.r,0,2*Math.PI);
+    else if(sh.type==='square') ctx.rect(sh.x1,sh.y1,sh.x2-sh.x1,sh.y2-sh.y1);
+    else { const v=sh.verts; ctx.moveTo(v[0].x,v[0].y); ctx.lineTo(v[1].x,v[1].y); ctx.lineTo(v[2].x,v[2].y); ctx.closePath(); }
+    ctx.stroke(); ctx.restore();
+  }
+  ctx.save(); ctx.shadowBlur=8; ctx.shadowColor='#7df9ff';
+  ctx.strokeStyle='rgba(125,249,255,0.25)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(lp.x,lp.y,20,0,2*Math.PI); ctx.stroke();
+  ctx.strokeStyle='#7df9ff'; ctx.lineWidth=3.5; ctx.beginPath(); ctx.arc(lp.x,lp.y,20,-Math.PI/2,-Math.PI/2+prog*2*Math.PI); ctx.stroke();
+  ctx.restore();
+  if(held>=1500) snapFreehand();
+}
+function bodyAt(x,y) { return Query.point(Composite.allBodies(world).filter(b=>!b.isStatic||pinnedBodies.has(b)),{x,y})[0]||null; }
+function bodyAtDynamic(x,y) { return Query.point(Composite.allBodies(world).filter(b=>!b.isStatic),{x,y})[0]||null; }
+function getConstraintEnds(c) { let ax,ay,bx,by; if(c.bodyA){const p=localToWorld(c.bodyA,c.pointA);ax=p.x;ay=p.y;}else{ax=c.pointA.x;ay=c.pointA.y;} if(c.bodyB){const p=localToWorld(c.bodyB,c.pointB);bx=p.x;by=p.y;}else{bx=c.pointB.x;by=c.pointB.y;} return {ax,ay,bx,by}; }
+function raySegHit(ox,oy,dx,dy,ax,ay,bx,by) { const sdx=bx-ax, sdy=by-ay; const det=dx*sdy-dy*sdx; if (Math.abs(det)<1e-10) return null; const t=((ax-ox)*sdy-(ay-oy)*sdx)/det; const u=((ax-ox)*dy-(ay-oy)*dx)/det; if (t>1e-3 && u>=0 && u<=1) { const len=Math.hypot(sdx,sdy); let nx=-sdy/len, ny=sdx/len; if (nx*dx+ny*dy>0){nx=-nx;ny=-ny;} return {t,nx,ny}; } return null; }
+function castRay(ox,oy,dx,dy, skipBody=null) { const bodies=Composite.allBodies(world).filter(b=>b!==skipBody && b.label!=='__wall__' && b.label!=='__ceiling__' && b.label!=='__ground__'); let bestT=Infinity, bestHit=null; bodies.forEach(body=>{ const verts=body.vertices; for (let i=0;i<verts.length;i++){ const v0=verts[i], v1=verts[(i+1)%verts.length]; const r=raySegHit(ox,oy,dx,dy,v0.x,v0.y,v1.x,v1.y); if (r && r.t<bestT){ bestT=r.t; bestHit={x:ox+dx*r.t, y:oy+dy*r.t, nx:r.nx, ny:r.ny, body, t:r.t}; } } }); return bestHit; }
+function reflectVec(dx,dy,nx,ny) { const dot=dx*nx+dy*ny; return {dx:dx-2*dot*nx, dy:dy-2*dot*ny}; }
+function refractVec(dx,dy,nx,ny,n1,n2) { const ratio=n1/n2; const cosI=-(dx*nx+dy*ny); const sin2T=ratio*ratio*(1-cosI*cosI); if (sin2T>1.0) return reflectVec(dx,dy,nx,ny); const cosT=Math.sqrt(1-sin2T); const rdx=ratio*dx+(ratio*cosI-cosT)*nx; const rdy=ratio*dy+(ratio*cosI-cosT)*ny; const len=Math.hypot(rdx,rdy)||1; return {dx:rdx/len, dy:rdy/len}; }
+function atravessarVidro(ox,oy,dx,dy,body,n2) { const verts=body.vertices; const hits=[]; for (let i=0;i<verts.length;i++){ const v0=verts[i], v1=verts[(i+1)%verts.length]; const r=raySegHit(ox,oy,dx,dy,v0.x,v0.y,v1.x,v1.y); if (r) hits.push({...r, x:ox+dx*r.t, y:oy+dy*r.t}); } hits.sort((a,b)=>a.t-b.t); if (hits.length===0) return null; const entry=hits[0]; const r1=refractVec(dx,dy,entry.nx,entry.ny,1.0,n2); const ix=entry.x+r1.dx*0.8, iy=entry.y+r1.dy*0.8; const exitHits=[]; for (let i=0;i<verts.length;i++){ const v0=verts[i], v1=verts[(i+1)%verts.length]; const r=raySegHit(ix,iy,r1.dx,r1.dy,v0.x,v0.y,v1.x,v1.y); if (r) exitHits.push({...r, x:ix+r1.dx*r.t, y:iy+r1.dy*r.t}); } exitHits.sort((a,b)=>a.t-b.t); if (exitHits.length===0) return null; const exit=exitHits[0]; const r2=refractVec(r1.dx,r1.dy,exit.nx,exit.ny,n2,1.0); return { entryX:entry.x, entryY:entry.y, insideDx:r1.dx, insideDy:r1.dy, exitX:exit.x, exitY:exit.y, outDx:r2.dx, outDy:r2.dy }; }
+function traceLaserRay(startX,startY,angle,glassN=1.50) { const segs=[]; let ox=startX, oy=startY; let dx=Math.cos(angle), dy=Math.sin(angle); let skipBody=null; const MAX=Math.hypot(W,getRH())*2; for (let bounce=0;bounce<14;bounce++){ const hit=castRay(ox,oy,dx,dy,skipBody); if (!hit||hit.t>MAX){ segs.push({x1:ox,y1:oy,x2:ox+dx*MAX,y2:oy+dy*MAX,inside:false}); break; } segs.push({x1:ox,y1:oy,x2:hit.x,y2:hit.y,inside:false}); const mat=hit.body._mat; const isStaticBorder=(hit.body.isStatic && !pinnedBodies.has(hit.body)); if (isStaticBorder && hit.body.label==='__ground__'){ break; } if (mat==='metal' || mat==='mirror') { const r=reflectVec(dx,dy,hit.nx,hit.ny); ox=hit.x+hit.nx*0.5; oy=hit.y+hit.ny*0.5; dx=r.dx; dy=r.dy; skipBody=null; } else if (mat==='glass') { const through=atravessarVidro(ox,oy,dx,dy,hit.body,glassN); if (!through){break;} segs.push({x1:hit.x,y1:hit.y,x2:through.exitX,y2:through.exitY,inside:true}); ox=through.exitX+through.outDx*0.5; oy=through.exitY+through.outDy*0.5; dx=through.outDx; dy=through.outDy; skipBody=hit.body; } else { break; } } return segs; }
+function handleSpringRopeClick(x, y) { if (conn.step === 0) { const hit = bodyAtDynamic(x, y); if (!hit) return; conn.bodyA = hit; const worldPoint = { x, y }; conn.pointA = hit ? worldToLocal(hit, worldPoint) : worldPoint; conn.step = 1; conn.type = activeTool; document.getElementById('conn-hint').classList.add('visible'); return; } const hit = bodyAtDynamic(x, y); const worldPoint = { x, y }; const localB = hit ? worldToLocal(hit, worldPoint) : worldPoint;
+  // MOLA (a CORDA agora é desenhada por arrasto livre, ver criarCordaDesenhada)
+  const dist = Math.hypot(x - (conn.bodyA ? conn.bodyA.position.x : x), y - (conn.bodyA ? conn.bodyA.position.y : y)); const cfg = { bodyA: conn.bodyA, pointA: conn.pointA, bodyB: hit, pointB: localB, render: { visible: false } }; const isSpring = conn.type==='spring'; if(isSpring){ Object.assign(cfg, { stiffness: 0.00005, damping: 0, length: Math.max(12, dist) }); } else { Object.assign(cfg, { stiffness: 0.005, damping: 0.06, length: Math.max(12, dist) }); } const c = Constraint.create(cfg); Composite.add(world, c); userConstraints.push({ constraint: c, type: conn.type, k: isSpring?springK:undefined }); conn.step = 0; document.getElementById('conn-hint').classList.remove('visible'); saveToHistory(); }
+function desabilitarColisaoEntreCorpos(a, b) {
+  // Propaga UM grupo negativo por toda a montagem conectada. Corpos no mesmo
+  // grupo negativo nunca colidem entre si. Assim um chassi com VÁRIAS rodas
+  // (vários eixos) mantém todas no mesmo grupo — sem o bug de a 2ª conexão
+  // reabrir a colisão da 1ª.
+  const ga = (a.collisionFilter && a.collisionFilter.group < 0) ? a.collisionFilter.group : 0;
+  const gb = (b.collisionFilter && b.collisionFilter.group < 0) ? b.collisionFilter.group : 0;
+  let g = ga || gb;
+  if (!g) g = -(++assemblyGroup);
+  a.collisionFilter = Object.assign({ category: 0x0001, mask: 0xFFFFFFFF }, a.collisionFilter || {}, { group: g });
+  b.collisionFilter = Object.assign({ category: 0x0001, mask: 0xFFFFFFFF }, b.collisionFilter || {}, { group: g });
+}
+
+// ═══════════ SISTEMA DE EIXOS CORRIGIDO - POSIÇÃO ABSOLUTA ═══════════
+// ARMAZENA O PONTO EM COORDENADAS ABSOLUTAS (MUNDO) NA CRIAÇÃO
+// DEPOIS CONVERTE PARA LOCAL DO CORPO PARA O CONSTRAINT
+
+const pivotPoints = new Map(); // Armazena { bodyId: [{point: {x,y}, constraint}] }
+
+function handlePivotClick(x, y) {
+  if (conn.step === 0) {
+    const hit = bodyAtDynamic(x, y);
+    if (!hit) return;
+    conn.bodyA = hit;
+    // ARMAZENA EM COORDENADAS ABSOLUTAS (MUNDO) na hora do clique!
+    conn.pointA_abs = { x: x, y: y };
+    console.log(`EIXO: Ponto ABSOLUTO do corpo A: (${x.toFixed(1)}, ${y.toFixed(1)})`);
+    if (!hit.circleRadius) {
+      console.log(`  Corpo A é quadrado. Posição do corpo: (${hit.position.x.toFixed(1)}, ${hit.position.y.toFixed(1)})`);
+    }
+    conn.step = 1;
+    conn.type = 'pivot';
+    document.getElementById('conn-hint').classList.add('visible');
+    return;
+  }
+  const hit = bodyAtDynamic(x, y);
+  // ── MANCAL FIXO: 2º clique no VAZIO (ou no mesmo corpo) ancora o corpo A no
+  //    mundo, fixando-o no lugar mas LIVRE PARA GIRAR. É o suporte ideal para
+  //    engrenagens/rodas (segura a peça e permite motor), estável sob gravidade.
+  if (!hit || hit === conn.bodyA) {
+    const A = conn.bodyA;
+    const anchorWorld = A.circleRadius ? { x: A.position.x, y: A.position.y } : { x: conn.pointA_abs.x, y: conn.pointA_abs.y };
+    const localA = worldToLocal(A, anchorWorld);
+    const c = Constraint.create({ pointA: anchorWorld, bodyB: A, pointB: localA, length: 0, stiffness: 1, damping: 0.1, render: { visible: false } });
+    c.plugin = { isPivot: true, anchor: true };
+    Composite.add(world, c); userConstraints.push({ constraint: c, type: 'pivot' });
+    conn.step = 0; document.getElementById('conn-hint').classList.remove('visible'); saveToHistory();
+    console.log('✅ MANCAL FIXO criado (gira livre, fixo no lugar).');
+    return;
+  }
+  conn.bodyB = hit;
+  conn.pointB_abs = { x: x, y: y };
+
+  // ═══ EIXO ENTRE DOIS CORPOS: JUNTA DE VELOCIDADE (estável, sem explosão) ═══
+  // Mantém a âncora dos dois corpos com a mesma velocidade, resolvida por impulso
+  // + correção suave de posição. Para corpos circulares o pivô é o CENTRO, então
+  // a peça gira livre. Resolve o caos do antigo pino posicional e permite vários
+  // eixos no mesmo bloco (ex.: chassi com 2 rodas).
+  let pivotWorld;
+  if (conn.bodyB.circleRadius)      pivotWorld = { x: conn.bodyB.position.x, y: conn.bodyB.position.y };
+  else if (conn.bodyA.circleRadius) pivotWorld = { x: conn.bodyA.position.x, y: conn.bodyA.position.y };
+  else                              pivotWorld = conn.pointA_abs;
+  const localA = worldToLocal(conn.bodyA, pivotWorld);
+  const localB = worldToLocal(conn.bodyB, pivotWorld);
+
+  desabilitarColisaoEntreCorpos(conn.bodyA, conn.bodyB);
+  criarJuntaEixo(conn.bodyA, localA, conn.bodyB, localB);
+
+  conn.step = 0;
+  document.getElementById('conn-hint').classList.remove('visible');
+  saveToHistory();
+  console.log('✅ EIXO (junta de velocidade) criado — estável.');
+}
+function handleConnectorClick(x, y) { if (activeTool === 'pivot') { handlePivotClick(x, y); } else { handleSpringRopeClick(x, y); } }
+const MIN_SZ = isMobile ? 12 : 6;
+function registerBody(body) { Composite.add(world,body); userBodies.push(body); updateCounter(); saveToHistory(); }
+function criarCaixa(x1,y1,x2,y2) { const w=Math.abs(x2-x1), h=Math.abs(y2-y1); if (w<MIN_SZ||h<MIN_SZ) return; if (activeMaterial==='fluid'){ criarFluido(Math.min(x1,x2),Math.min(y1,y2),w,h); return; } const props=getMatProps(activeMaterial); if (activeMaterial==='glass'||activeMaterial==='mirror') props.render.visible=false; const body=Bodies.rectangle((x1+x2)/2,(y1+y2)/2,w,h,{...props,label:`box_${activeMaterial}`}); body._mat=activeMaterial; registerBody(body); }
+function criarCirculo(cx,cy,r) { if (r<MIN_SZ) return; if (activeMaterial==='fluid'){ criarFluido(cx-r,cy-r,r*2,r*2); return; } const props=getMatProps(activeMaterial); if (activeMaterial==='glass'||activeMaterial==='mirror') props.render.visible=false; const body=Bodies.circle(cx,cy,r,{...props,label:`circ_${activeMaterial}`}); body._mat=activeMaterial; registerBody(body); }
+function criarPoligono(pts) { const sp=simplifyPts(pts,8); if (sp.length<3) return; const cx=sp.reduce((s,p)=>s+p.x,0)/sp.length; const cy=sp.reduce((s,p)=>s+p.y,0)/sp.length; try { const props=getMatProps(activeMaterial); if (activeMaterial==='glass'||activeMaterial==='mirror') props.render.visible=false; const body=Bodies.fromVertices(cx,cy,sp,{...props,label:`poly_${activeMaterial}`},true); if (!body) return; body._mat=activeMaterial; registerBody(body); } catch(_){} }
+// ═══════════ PEÇAS MECÂNICAS ═══════════
+// RODA: círculo comum marcado isWheel. Centro usado automaticamente para eixos.
+function criarRoda(cx,cy,r) {
+  if (r<MIN_SZ) return;
+  const props=getMatProps(activeMaterial);
+  const body=Bodies.circle(cx,cy,r,{...props,label:`wheel_${activeMaterial}`});
+  body._mat=activeMaterial; body._isWheel=true;
+  registerBody(body);
+}
+// ENGRENAGEM: fisicamente um círculo; visualmente dentada. Transmite por contato.
+function criarEngrenagem(cx,cy,r) {
+  if (r<MIN_SZ) return;
+  const props=getMatProps(activeMaterial);
+  // Engrenagens preferem material metálico p/ comportamento rígido — mas respeita escolha
+  const body=Bodies.circle(cx,cy,r,{...props,label:`gear_${activeMaterial}`});
+  body._mat=activeMaterial; body._isGear=true;
+  body._teeth=Math.max(8, Math.round(r/3.5)); // nº de dentes proporcional ao raio
+  body.render.visible=false; // desenhada manualmente
+  registerBody(body);
+}
+// POLIA: igual a uma roda (gira livre); cordas podem se prender a ela.
+function criarPolia(cx,cy,r) {
+  if (r<MIN_SZ) return;
+  const props=getMatProps(activeMaterial);
+  const body=Bodies.circle(cx,cy,r,{...props,label:`pulley_${activeMaterial}`});
+  body._mat=activeMaterial; body._isPulley=true;
+  body.render.visible=false; // desenhada manualmente
+  // A roldana é um GUIA da corda: não colide com nada (a corda passa por cima
+  // da borda). Isso evita que os pesos esbarrem no corpo da roldana.
+  // A roldana não colide com pesos/corda (eles passam livres), mas COLIDE com
+  // outras polias (categoria 0x0002 + máscara 0x0002) — assim numa talha a polia
+  // móvel não atravessa a fixa.
+  body.collisionFilter = { group: 0, category: 0x0002, mask: 0x0002 };
+  registerBody(body);
+}
+function criarFluido(bx,by,bw,bh) { const r=5, step=r*2.25, made=[]; const maxParticles = fluidMaxParticles; outer: for (let px=bx+r;px<bx+bw-r;px+=step){ for (let py=by+r;py<by+bh-r;py+=step){ if (made.length>=maxParticles) break outer; const body=Bodies.circle(px,py,r,{ ...getMatProps('fluid'), label:'fluid_particle', render:{ fillStyle:'rgba(68,153,255,0.5)', strokeStyle:'#55aaff', lineWidth:0.6 } }); body._mat='fluid'; made.push(body); } } made.forEach(b=>registerBody(b)); }
+function handlePinClick(x,y) { const hit=bodyAt(x,y); if (!hit) return; if (motors.has(hit) && !pinnedBodies.has(hit)) { alert("⚠️ Remova o motor antes de fixar este corpo."); return; } if (pinnedBodies.has(hit)){ Body.setStatic(hit,false); pinnedBodies.delete(hit); } else { Body.setStatic(hit,true); pinnedBodies.add(hit); } saveToHistory(); }
+function handleMotorClick(x,y) { const hit=bodyAtDynamic(x,y); if (!hit) return; if (motors.has(hit)) motors.delete(hit); else motors.set(hit,{torque:motorTorque,freeSpeed:motorFreeSpeed,direction:motorDirection,active:true}); saveToHistory(); }
+function setMotorTorque(v){ motorTorque=v; motors.forEach(m=>m.torque=v); const el=document.getElementById('motor-torque-val'); if(el) el.textContent=v.toFixed(2); }
+function setMotorFreeSpeed(v){ motorFreeSpeed=v; motors.forEach(m=>m.freeSpeed=v); const el=document.getElementById('motor-speed-val'); if(el) el.textContent=v.toFixed(3); }
+function toggleMotorDir(){ motorDirection*=-1; motors.forEach(m=>m.direction=motorDirection); document.getElementById('btn-motor-dir').textContent=motorDirection>0?'↻ CW':'↺ CCW'; }
+function invertRotation() { toggleMotorDir(); }
+function handleLaserDown(x,y){ isPlacingLaser=true; drawStartX=x; drawStartY=y; isDrawing=true; }
+function handleLaserUp(x,y){ if (!isDrawing||!isPlacingLaser){ isDrawing=false; isPlacingLaser=false; return; } isDrawing=false; isPlacingLaser=false; const dist=Math.hypot(x-drawStartX,y-drawStartY); if (dist<8) return; const angle=Math.atan2(y-drawStartY,x-drawStartX); laserEmitters.push({x:drawStartX,y:drawStartY,angle}); saveToHistory(); }
+// ── CANHÃO ──
+function setCannonAngle(v){ v=Math.max(0,Math.min(180,Math.round(v))); cannonAngle=v; const s=document.getElementById('cannon-angle-slider'), n=document.getElementById('cannon-angle-num'); if(s)s.value=v; if(n)n.value=v; }
+function setCannonPower(v){ v=Math.max(1,Math.min(40,Math.round(v))); cannonPower=v; const s=document.getElementById('cannon-power-slider'), n=document.getElementById('cannon-power-num'); if(s)s.value=Math.min(40,v); if(n)n.value=v; }
+function buildCannonStand(x,y){ let body; if(cannonGroundMode){ body=Bodies.circle(x, y, 3, { isStatic:true, isSensor:true, render:{visible:false}, label:'cannon_base' }); } else { body=Bodies.trapezoid(x, y+18, 62, 30, 0.3, { density:3.0, friction:0.95, frictionStatic:1.2, restitution:0.08, render:{visible:false}, label:'cannon_stand' }); } body._isCannon=true; Composite.add(world, body); return body; }
+function removeCannon(){ if(cannon&&cannon.body){ Composite.remove(world, cannon.body, true); } cannon=null; }
+function placeCannon(x,y){ removeCannon(); const body=buildCannonStand(x,y); cannon={ body, pivotLocal:{ x: x-body.position.x, y: y-body.position.y }, ground: cannonGroundMode }; }
+function toggleCannonGround(){ cannonGroundMode=!cannonGroundMode; const btn=document.getElementById('btn-cannon-ground'); if(btn){ btn.classList.toggle('active',cannonGroundMode); btn.textContent = cannonGroundMode ? '⊾ Saída: base (solo)' : '⊿ Saída: boca do cano'; } if(cannon){ const piv=cannonGeom().pivot; placeCannon(piv.x, piv.y); } }
+// posição/direção atuais do canhão (segue posição E inclinação do corpo dinâmico)
+function cannonGeom(){ const b=cannon.body, ph=b.angle, c=b.position, pl=cannon.pivotLocal||{x:0,y:-20}; const cs=Math.cos(ph), sn=Math.sin(ph); const pivot={ x:c.x+pl.x*cs-pl.y*sn, y:c.y+pl.x*sn+pl.y*cs }; const a=cannonAngle*Math.PI/180, ux=Math.cos(a), uy=-Math.sin(a); const dir={ x:ux*cs-uy*sn, y:ux*sn+uy*cs }; return { b, ph, c, pivot, dir }; }
+function cannonHitAt(x,y){ if(!(cannon&&cannon.body)) return false; const g=cannonGeom(); const dx=g.dir.x*52, dy=g.dir.y*52, L2=dx*dx+dy*dy; let t=L2?((x-g.pivot.x)*dx+(y-g.pivot.y)*dy)/L2:0; t=Math.max(0,Math.min(1,t)); const px=g.pivot.x+dx*t, py=g.pivot.y+dy*t; if(Math.hypot(x-px,y-py)<18) return true; if(Math.hypot(g.pivot.x-x,g.pivot.y-y)<26) return true; if(Math.hypot(cannon.body.position.x-x,cannon.body.position.y-y)<46) return true; return false; }
+function launchCannon(){
+  if(!cannon){ placeCannon(BOX_X0+(BOX_X1-BOX_X0)*0.18, getRH()-120); }            // canhão padrão se não posicionado
+  projectileTrails.forEach(t=>t.opacity-=0.25);                                  // desbota silhuetas anteriores (−25%)
+  projectileTrails = projectileTrails.filter(t=>t.opacity>0.01);
+  const mat = (activeMaterial==='fluid') ? 'wood' : activeMaterial;              // fluido não vira projétil
+  const trail={ pts:[], opacity:1, color:(MATS[mat]||MATS.wood).stroke };
+  projectileTrails.push(trail);
+  const g=cannonGeom(), r=12;
+  const bux=Math.sin(g.ph), buy=-Math.cos(g.ph);                                 // "cima" do corpo (independe do ângulo de mira)
+  const mx=g.pivot.x+bux*15, my=g.pivot.y+buy*15;                                // ponto de saída FIXO — mesmo para todo ângulo
+  const props=getMatProps(mat); props.frictionAir=0;                            // vácuo → parábola ideal (complementares iguais)
+  if(mat==='glass'||mat==='mirror') props.render.visible=false;
+  const ball=Bodies.circle(mx,my,r,{...props,label:`proj_${mat}`}); ball._mat=mat;
+  const vpx=cannonPower/SPEED_CAL;                                               // m/s → px/passo
+  Body.setVelocity(ball,{x:g.dir.x*vpx, y:g.dir.y*vpx});
+  registerBody(ball);
+  // recuo (3ª lei): só no modo carreta (corpo dinâmico)
+  if(!cannon.body.isStatic){
+  const J=ball.mass*vpx*0.7, mC=cannon.body.mass||1, dvc=Math.min(5, J/mC), cv=cannon.body.velocity;
+  Body.setVelocity(cannon.body, { x:cv.x-g.dir.x*dvc, y:cv.y-g.dir.y*dvc });
+  const rx=g.pivot.x-cannon.body.position.x, ry=g.pivot.y-cannon.body.position.y;
+  let dw=(ry*g.dir.x - rx*g.dir.y)*J/(cannon.body.inertia||1); dw=Math.max(-0.07,Math.min(0.07,dw));
+  Body.setAngularVelocity(cannon.body, cannon.body.angularVelocity+dw);
+  }
+  activeProjectile={ body:ball, trail };
+  if(cannonAutoTrack){ instruments=instruments.filter(i=>!(i.type==='tracker'&&i.auto)); attachTracker(ball, true); }  // régua automática no projétil
+  if(!isRunning) setRunning(true);
+}
+function toggleCannonTrack(){ cannonAutoTrack=!cannonAutoTrack; const b=document.getElementById('btn-cannon-track'); if(b){ b.classList.toggle('active',cannonAutoTrack); b.textContent = cannonAutoTrack ? '📍 Régua: LIGADA' : '📍 Régua: desligada'; } }
+function traceProjectile(){
+  if(!activeProjectile) return;
+  if(userBodies.indexOf(activeProjectile.body)<0){ activeProjectile=null; return; } // projétil removido
+  if(!isRunning) return;
+  const p=activeProjectile.body.position, t=activeProjectile.trail, last=t.pts[t.pts.length-1];
+  if(!last || Math.hypot(p.x-last.x,p.y-last.y)>2.5){ t.pts.push({x:p.x,y:p.y}); if(t.pts.length>700) t.pts.shift(); }
+}
+function drawTrails(ctx){
+  projectileTrails.forEach(t=>{
+    if(t.pts.length<2) return;
+    ctx.save(); ctx.globalAlpha=Math.max(0,Math.min(1,t.opacity)); ctx.strokeStyle=t.color; ctx.lineWidth=2; ctx.lineCap='round'; ctx.shadowBlur=8*t.opacity; ctx.shadowColor=t.color; ctx.setLineDash([1,5]);
+    ctx.beginPath(); ctx.moveTo(t.pts[0].x,t.pts[0].y); for(let i=1;i<t.pts.length;i++) ctx.lineTo(t.pts[i].x,t.pts[i].y); ctx.stroke(); ctx.setLineDash([]);
+    ctx.restore();
+  });
+}
+function drawCannon(ctx){
+  if(!cannon||!cannon.body) return;
+  const g=cannonGeom(), b=cannon.body, ph=g.ph, c=g.c;
+  if(cannon.ground){
+    // ── modo solo: sem carreta, só uma base mínima no chão ──
+    ctx.save();
+    ctx.strokeStyle='#8aa0c0'; ctx.lineWidth=2; ctx.shadowBlur=5; ctx.shadowColor='#4dd2ff';
+    ctx.beginPath(); ctx.moveTo(g.pivot.x-15, g.pivot.y+3); ctx.lineTo(g.pivot.x+15, g.pivot.y+3); ctx.stroke();   // linha do solo
+    ctx.fillStyle='rgba(96,110,134,0.5)'; ctx.beginPath(); ctx.arc(g.pivot.x, g.pivot.y, 8, 0, Math.PI*2); ctx.fill(); ctx.stroke();  // breech
+    ctx.restore();
+  } else {
+    // ── modo carreta = polígono físico real (segue tombamento/deslize) ──
+    ctx.save();
+    ctx.fillStyle='rgba(96,110,134,0.42)'; ctx.strokeStyle='#8aa0c0'; ctx.lineWidth=2; ctx.shadowBlur=7; ctx.shadowColor='#4dd2ff';
+    ctx.beginPath(); b.vertices.forEach((v,i)=> i?ctx.lineTo(v.x,v.y):ctx.moveTo(v.x,v.y)); ctx.closePath(); ctx.fill(); ctx.stroke();
+    const wx=c.x-Math.sin(ph)*4, wy=c.y+Math.cos(ph)*4;
+    ctx.fillStyle='rgba(40,48,64,0.75)'; ctx.strokeStyle='#9fb2d0'; ctx.lineWidth=2; ctx.shadowBlur=5;
+    ctx.beginPath(); ctx.arc(wx,wy,9,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.lineWidth=1; ctx.beginPath(); for(let i=0;i<6;i++){const rr=ph+i*Math.PI/3; ctx.moveTo(wx,wy); ctx.lineTo(wx+Math.cos(rr)*8,wy+Math.sin(rr)*8);} ctx.stroke();
+    ctx.restore();
+  }
+  // ── cano (do pivô na direção da mira, já girada pela inclinação) ──
+  ctx.save(); ctx.lineCap='round'; ctx.shadowBlur=9; ctx.shadowColor='#4dd2ff';
+  ctx.strokeStyle='#4dd2ff'; ctx.lineWidth=16; ctx.beginPath(); ctx.moveTo(g.pivot.x+g.dir.x*3, g.pivot.y+g.dir.y*3); ctx.lineTo(g.pivot.x+g.dir.x*48, g.pivot.y+g.dir.y*48); ctx.stroke();
+  ctx.shadowBlur=0; ctx.strokeStyle='rgba(15,24,38,0.55)'; ctx.lineWidth=10; ctx.beginPath(); ctx.moveTo(g.pivot.x+g.dir.x*6, g.pivot.y+g.dir.y*6); ctx.lineTo(g.pivot.x+g.dir.x*46, g.pivot.y+g.dir.y*46); ctx.stroke();
+  ctx.restore();
+  // pivô
+  ctx.save(); ctx.fillStyle='#4dd2ff'; ctx.shadowBlur=8; ctx.shadowColor='#4dd2ff'; ctx.beginPath(); ctx.arc(g.pivot.x,g.pivot.y,5,0,Math.PI*2); ctx.fill(); ctx.restore();
+  // ── mira tracejada + rótulo ──
+  ctx.save(); ctx.strokeStyle='rgba(77,210,255,0.5)'; ctx.lineWidth=1.4; ctx.setLineDash([4,6]); ctx.shadowBlur=6; ctx.shadowColor='#4dd2ff';
+  ctx.beginPath(); ctx.moveTo(g.pivot.x+g.dir.x*54, g.pivot.y+g.dir.y*54); ctx.lineTo(g.pivot.x+g.dir.x*108, g.pivot.y+g.dir.y*108); ctx.stroke(); ctx.setLineDash([]);
+  ctx.font='bold 11px Orbitron,monospace'; ctx.fillStyle='#7df9ff'; ctx.textAlign='left'; ctx.fillText(`${cannonAngle}° · ${cannonPower} m/s`, g.pivot.x+14, g.pivot.y-22);
+  ctx.restore();
+}
+// Régua padrão: Alt = trava em reta (eixo dominante); Shift = arredonda ao 0,5 m mais próximo
+function rulerAdjust(sx,sy,ex,ey){
+  let x=ex,y=ey;
+  if(altHeld){ if(Math.abs(ex-sx)>=Math.abs(ey-sy)) y=sy; else x=sx; }
+  if(shiftHeld){ const dx=x-sx, dy=y-sy, d=Math.hypot(dx,dy); if(d>1){ const rp=Math.round((d/PX_PER_M)/0.5)*0.5*PX_PER_M; x=sx+dx/d*rp; y=sy+dy/d*rp; } }
+  return {x,y};
+}
+function apagarEm(x,y) { if (apagarInstrumentosEm(x,y)) return; if (cannon && cannon.body && Math.hypot(cannon.body.position.x-x, cannon.body.position.y-y)<42){ removeCannon(); return; } const lIdx=laserEmitters.findIndex(l=>Math.hypot(l.x-x,l.y-y)<22); if (lIdx>=0){ laserEmitters.splice(lIdx,1); saveToHistory(); return; } Query.point(Composite.allBodies(world),{x,y}).forEach(b=>{ if (b.isStatic && !pinnedBodies.has(b)) return; const root=(b.parent&&b.parent!==b)?b.parent:b; userConstraints=userConstraints.filter(({constraint:c})=>{ if ([c.bodyA,c.bodyB].includes(root)||[c.bodyA,c.bodyB].includes(b)){ Composite.remove(world,c,true); return false; } return true; }); motors.delete(root); motors.delete(b); pinnedBodies.delete(root); pinnedBodies.delete(b); pulleyRopes=pulleyRopes.filter(pr=>{ const keep = pr.a.body!==root&&pr.a.body!==b&&pr.b.body!==root&&pr.b.body!==b&&!pr.pulleys.includes(root)&&!pr.pulleys.includes(b); if(!keep) removerCordaPolia(pr); return keep; }); velJoints=velJoints.filter(j=> j.a!==root&&j.a!==b&&j.b!==root&&j.b!==b); Composite.remove(world,root,true); userBodies=userBodies.filter(ub=>ub!==root&&ub!==b); updateCounter(); }); saveToHistory(); }
+const TOOL_LABELS={ box:'CAIXA',circle:'CÍRCULO',freehand:'POLÍGONO',move:'MOVER',erase:'APAGAR',select:'SELEÇÃO', wheel:'RODA',gear:'ENGRENAGEM',pulley:'POLIA', spring:'MOLA',rope:'CORDA',pivot:'EIXO',motor:'MOTOR',pin:'FIXAR',laser:'LASER', cannon:'CANHÃO', ruler:'RÉGUA',dynamometer:'DINAMÔMETRO',speedometer:'VELOCÍMETRO',accelerometer:'ACELERÔMETRO',scale:'BALANÇA', protractor:'TRANSFERIDOR', tracker:'RÉGUA AVANÇADA' };
+function setTool(t){ activeTool=t; if(t==='move'&&!mcAdded){Composite.add(world,mouseConstraint);mcAdded=true;} else if(t!=='move'&&mcAdded){Composite.remove(world,mouseConstraint);mcAdded=false;} if(!['spring','rope','pivot'].includes(t)){conn.step=0;document.getElementById('conn-hint').classList.remove('visible');} document.getElementById('motor-panel').style.display=t==='motor'?'flex':'none'; document.getElementById('spring-panel').style.display=t==='spring'?'flex':'none'; document.getElementById('cannon-panel').style.display=t==='cannon'?'flex':'none'; document.body.dataset.tool=t; document.querySelectorAll('.tool-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.tool===t)); document.getElementById('sb-tool').textContent=TOOL_LABELS[t]||t; isDrawing=false; freehandPts=[]; freehandHoldT=0; polyClickPts=[]; isPlacingLaser=false; protractorPts=[]; if(t!=='move'&&t!=='select'){ selectedBodies=[]; selectedBody=null; } if(t!=='scale') scalePending=null; updateSelectionUI(); document.getElementById('btn-vectors').classList.toggle('active',vectorsOn); }
+function setMaterial(m){ activeMaterial=m; document.querySelectorAll('.mat-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.mat===m)); const select = document.getElementById('material-select'); if (select) select.value = m; }
+// Muda o material de TODOS os objetos selecionados (barra superior)
+function mudarMaterialSelecionado(mat){
+  if(selectedBodies.length===0 || !mat || !MATS[mat]) return;
+  const m=MATS[mat];
+  selectedBodies.forEach(b=>{
+    b._mat=mat;
+    try{ Body.setDensity(b, m.density); }catch(_){}
+    b.friction=m.friction; b.frictionStatic=m.frictionStatic; b.restitution=m.restitution; b.frictionAir=m.frictionAir;
+    const hide=(mat==='glass'||mat==='mirror'||b._isGear||b._isPulley);
+    b.render.fillStyle=m.fill; b.render.strokeStyle=m.stroke; b.render.lineWidth=m.lw; b.render.visible=!hide;
+  });
+  saveToHistory();
+}
+// ── Multisseleção ──
+function clearSelection(){ selectedBodies=[]; selectedBody=null; updateSelectionUI(); }
+function selectSingle(b, additive){
+  if(!b){ if(!additive) clearSelection(); return; }
+  if(additive){ const i=selectedBodies.indexOf(b); if(i>=0) selectedBodies.splice(i,1); else selectedBodies.push(b); }
+  else { selectedBodies=[b]; }
+  selectedBody = selectedBodies[selectedBodies.length-1] || null;
+  updateSelectionUI();
+}
+function selectInRect(x0,y0,x1,y1, additive){
+  const minx=Math.min(x0,x1), maxx=Math.max(x0,x1), miny=Math.min(y0,y1), maxy=Math.max(y0,y1);
+  const inside = userBodies.filter(b=>{ const p=b.position; return p.x>=minx&&p.x<=maxx&&p.y>=miny&&p.y<=maxy; });
+  if(additive){ inside.forEach(b=>{ if(selectedBodies.indexOf(b)<0) selectedBodies.push(b); }); }
+  else { selectedBodies = inside; }
+  selectedBody = selectedBodies[selectedBodies.length-1] || null;
+  updateSelectionUI();
+}
+function updateSelectionUI(){ const sel=document.getElementById('sel-material'); if(!sel) return; if(selectedBodies.length>0){ sel.disabled=false; const mats=new Set(selectedBodies.map(b=>b._mat)); sel.value = mats.size===1 ? (selectedBodies[0]._mat||'') : ''; } else { sel.disabled=true; sel.value=''; } }
+function resetTimer(){ simTime=0; document.getElementById('sb-time').textContent=fmtTime(0); }
+function toggleStopwatch(){ const el=document.getElementById('stopwatch'); const open=el.classList.toggle('open'); const b=document.getElementById('btn-stopwatch'); if(b) b.classList.toggle('active',open); }
+function swToggle(){ swRunning=!swRunning; const b=document.getElementById('sw-toggle'); b.textContent=swRunning?'⏸':'▶'; b.classList.toggle('running',swRunning); }
+function swReset(){ swElapsed=0; swRunning=false; const b=document.getElementById('sw-toggle'); b.textContent='▶'; b.classList.remove('running'); document.getElementById('sw-time').textContent=fmtTime(0); }
+function toggleShortcuts(){ const el=document.getElementById('shortcuts-list'); el.style.display = el.style.display==='none' ? 'block' : 'none'; }
+function toggleSettings(){ const p=document.getElementById('settings-panel'); const open=p.classList.toggle('open'); document.getElementById('btn-settings').classList.toggle('active',open); if(open){ document.getElementById('set-scale').textContent=PX_PER_M; document.getElementById('set-vec').textContent=vectorsOn?'ligado':'desligado'; } }
+function setRunning(run){ isRunning=run; runner.enabled=run; document.getElementById('sb-dot').className='sb-dot '+(run?'running':'paused'); document.getElementById('sb-state').textContent=run?'RODANDO':'PAUSADO'; document.body.classList.toggle('paused',!run); }
+function setGravity(v){ engine.gravity.y=v; document.getElementById('gravity-val').textContent=v.toFixed(1)+'g'; }
+function setTimeScale(v){ engine.timing.timeScale = v; document.getElementById('time-val').textContent = v.toFixed(2)+'x'; }
+function setFluidQuality(v){ fluidMaxParticles = v; document.getElementById('fluid-val').textContent = v+' part.'; }
+function resetWorld(){ Composite.allBodies(world).filter(b=>!b.isStatic||pinnedBodies.has(b)).forEach(b=>Composite.remove(world,b,true)); userConstraints.forEach(({constraint:c})=>Composite.remove(world,c,true)); userBodies=[]; userConstraints=[]; motors.clear(); pinnedBodies.clear(); laserEmitters=[]; projectileTrails=[]; activeProjectile=null; removeCannon(); limparCordasPolia(); limparInstrumentos(); limparJuntas(); conn.step=0; isDrawing=false; freehandPts=[]; selectedBodies=[]; selectedBody=null; simTime=0; manualDrag=null; document.getElementById('conn-hint').classList.remove('visible'); updateCounter(); saveToHistory(); }
+function updateCounter(){ document.getElementById('sb-count').textContent=userBodies.length; }
+
+// ═══════════════════════════════════════════════════════════
+//  DEMO: CARRO FUNCIONAL  (exemplo replicável)
+//  Receita: 1 chassis (metal) + 2 rodas (borracha) + 2 eixos no
+//  centro das rodas + 2 motores. Tudo no mesmo grupo de colisão
+//  para o chassis não bater nas rodas.
+// ═══════════════════════════════════════════════════════════
+// ═══════════ DEMO: TREM DE ENGRENAGENS ═══════════
+function demoEngrenagens(){
+  Composite.allBodies(world).filter(b=>!b.isStatic||pinnedBodies.has(b)).forEach(b=>Composite.remove(world,b,true));
+  userConstraints.forEach(({constraint:c})=>Composite.remove(world,c,true));
+  userBodies=[]; userConstraints=[]; motors.clear(); pinnedBodies.clear(); laserEmitters=[]; projectileTrails=[]; activeProjectile=null; removeCannon(); limparCordasPolia(); limparInstrumentos(); limparJuntas(); conn.step=0;
+  document.getElementById('conn-hint').classList.remove('visible');
+  // Engrenagens em MANCAIS FIXOS (eixo no centro) — funcionam mesmo COM gravidade
+  engine.gravity.y=1; const gs=document.getElementById('gravity-slider'); if(gs) gs.value=1; document.getElementById('gravity-val').textContent='1.0g';
+
+  const cy=getRH()*0.45, radii=[46,30,46,30];
+  let px=W*0.30, prevR=0; const gears=[];
+  for(let i=0;i<radii.length;i++){
+    const r=radii[i];
+    if(i>0) px += prevR + r;            // centros espaçados pela soma dos raios → engrenam
+    const g=Bodies.circle(px,cy,r,{...getMatProps('metal'),label:'gear_metal'});
+    g._mat='metal'; g._isGear=true; g._teeth=Math.max(8,Math.round(r/3.5)); g.render.visible=false;
+    Composite.add(world,g); userBodies.push(g); gears.push(g);
+    // Eixo fixo no centro (ponto de mundo) — segura no lugar, gira livre
+    const axle=Constraint.create({ pointA:{x:px,y:cy}, bodyB:g, pointB:{x:0,y:0}, length:0, stiffness:1, render:{visible:false} });
+    Composite.add(world,axle); userConstraints.push({constraint:axle,type:'pivot'});
+    prevR=r;
+  }
+  motors.set(gears[0],{torque:1.0,freeSpeed:0.08,direction:1,active:true}); // motoriza a 1ª (torque alto: o trem agora carrega o motor) // motoriza a 1ª
+  updateCounter(); saveToHistory(); setRunning(true);
+  console.log('%c⚙️ DEMO ENGRENAGENS','color:#ff9933;font-weight:bold');
+  console.log('Trem de 4 engrenagens em eixos fixos; a 1ª é motorizada. Sentidos alternam e a razão ω₁r₁=-ω₂r₂ é respeitada (conserva momento angular).');
+}
+// ═══════════ DEMO: POLIA (máquina de Atwood) ═══════════
+function demoPolia(){
+  Composite.allBodies(world).filter(b=>!b.isStatic||pinnedBodies.has(b)).forEach(b=>Composite.remove(world,b,true));
+  userConstraints.forEach(({constraint:c})=>Composite.remove(world,c,true));
+  userBodies=[]; userConstraints=[]; motors.clear(); pinnedBodies.clear(); laserEmitters=[]; projectileTrails=[]; activeProjectile=null; removeCannon(); limparCordasPolia(); limparInstrumentos(); limparJuntas(); conn.step=0;
+  document.getElementById('conn-hint').classList.remove('visible');
+  engine.gravity.y=1; const gs=document.getElementById('gravity-slider'); if(gs) gs.value=1; document.getElementById('gravity-val').textContent='1.0g';
+
+  const cx=W*0.5, topY=getRH()*0.16;
+  // Polia FIXA no topo. É um GUIA: não colide com nada (a corda passa pela borda)
+  const F=Bodies.circle(cx,topY,28,{...getMatProps('metal'),label:'pulley_metal'});
+  F._mat='metal'; F._isPulley=true; F.render.visible=false;
+  F.collisionFilter={ group:0, category:0x0002, mask:0x0002 };
+  Composite.add(world,F); userBodies.push(F); Body.setStatic(F,true); pinnedBodies.add(F);
+
+  // Dois pesos do MESMO material (metal), tamanhos diferentes → razão de massa
+  // modesta (~1.6), para o movimento ser suave e bem visível. O maior desce.
+  const WL=Bodies.rectangle(cx-70, topY+175, 56,56, {...getMatProps('metal'),label:'box_metal'}); WL._mat='metal';
+  const WR=Bodies.rectangle(cx+70, topY+175, 44,44, {...getMatProps('metal'),label:'box_metal'}); WR._mat='metal';
+  [WL,WR].forEach(b=>{Composite.add(world,b);userBodies.push(b);});
+
+  // Corda inextensível sobre a polia: topo de WL → polia F → topo de WR.
+  // Modelo de segmentos: dois trechos reais que deslizam comprimento entre si.
+  const anchorA={body:WL, local:{x:0,y:-28}};
+  const anchorB={body:WR, local:{x:0,y:-22}};
+  const pr={a:anchorA,b:anchorB,pulleys:[F]};
+  montarCordaPolia(pr);
+  pulleyRopes.push(pr);
+
+  updateCounter(); saveToHistory(); setRunning(true);
+  console.log('%c⊙ DEMO POLIA (máquina de Atwood)','color:#44ff88;font-weight:bold');
+  console.log('A pedra (pesada) desce e ergue a madeira (leve). A corda desliza pela polia: o que um lado encurta, o outro alonga (comprimento total conservado).');
+}
+function demoCarro() {
+  // 1) Limpa o mundo
+  Composite.allBodies(world).filter(b=>!b.isStatic||pinnedBodies.has(b)).forEach(b=>Composite.remove(world,b,true));
+  userConstraints.forEach(({constraint:c})=>Composite.remove(world,c,true));
+  userBodies=[]; userConstraints=[]; motors.clear(); pinnedBodies.clear(); laserEmitters=[]; projectileTrails=[]; activeProjectile=null; removeCannon();
+  conn.step=0; document.getElementById('conn-hint').classList.remove('visible');
+
+  // Garante gravidade normal para o carro assentar no chão
+  engine.gravity.y = 1;
+  const gs=document.getElementById('gravity-slider'); if(gs) gs.value=1;
+  document.getElementById('gravity-val').textContent='1.0g';
+
+  // Grupo de colisão NEGATIVO: corpos no mesmo grupo nunca colidem entre si,
+  // mas colidem normalmente com o chão e outros objetos.
+  const grupoCarro = -Math.abs((Date.now() % 90000)) - 1;
+
+  const cx = W * 0.28;          // começa à esquerda, com pista livre à direita
+  const cy = getRH() * 0.45;
+  const chassisW = 150, chassisH = 24;
+  const wheelR = 28;
+  const offX = 52;              // afastamento horizontal das rodas
+  const offY = 22;              // altura das rodas abaixo do centro do chassis
+
+  const propsChassis = getMatProps('metal');   // chassis rígido e pesado
+  const propsRoda    = getMatProps('rubber');  // borracha = máxima aderência
+
+  // 2) CHASSIS (caixa de metal)
+  const chassis = Bodies.rectangle(cx, cy, chassisW, chassisH, {
+    ...propsChassis, label:'box_metal',
+    collisionFilter:{ group: grupoCarro }
+  });
+  chassis._mat = 'metal';
+
+  // 3) RODAS (círculos de borracha marcados como roda)
+  const mkRoda = (px, py) => {
+    const w = Bodies.circle(px, py, wheelR, {
+      ...propsRoda, label:'wheel_rubber',
+      collisionFilter:{ group: grupoCarro }
+    });
+    w._mat = 'rubber'; w._isWheel = true;
+    return w;
+  };
+  const rodaTras   = mkRoda(cx - offX, cy + offY);
+  const rodaFrente = mkRoda(cx + offX, cy + offY);
+
+  [chassis, rodaTras, rodaFrente].forEach(b => { Composite.add(world, b); userBodies.push(b); });
+
+  // 4) EIXOS — junta de velocidade ligando o CENTRO de cada roda a um ponto do
+  //    chassi. Estável mesmo com as duas rodas no mesmo bloco.
+  const fazerEixo = (roda, localX) => {
+    desabilitarColisaoEntreCorpos(chassis, roda);
+    criarJuntaEixo(chassis, { x: localX, y: offY }, roda, { x: 0, y: 0 });
+  };
+  fazerEixo(rodaTras,  -offX);
+  fazerEixo(rodaFrente, offX);
+
+  // 5) MOTORES — ambas as rodas no MESMO sentido (tração nas duas).
+  //    direction:1 (horário) faz o carro andar para a DIREITA.
+  motors.set(rodaTras,   { torque: 1.0, freeSpeed: 0.13, direction: 1, active: true });
+  motors.set(rodaFrente, { torque: 1.0, freeSpeed: 0.13, direction: 1, active: true });
+
+  updateCounter();
+  saveToHistory();
+  setRunning(true);
+  console.log('%c🚗 DEMO CARRO montada!','color:#44ff88;font-weight:bold');
+  console.log('Receita: Chassis(metal) + 2 Rodas(borracha) + 2 Eixos(no centro) + 2 Motores.');
+  console.log('Use [Espaço] para pausar/continuar. Edite as peças para experimentar!');
+}
+function handleDown(x,y){ drawStartX=drawCurrX=x; drawStartY=drawCurrY=y; switch(activeTool){ case 'select': isDrawing=true; break; case 'box': case 'circle': case 'wheel': case 'gear': case 'pulley': isDrawing=true; break; case 'freehand': if(shiftHeld){ polyClickPts.push({x,y}); } else { isDrawing=true; freehandPts=[{x,y}]; freehandHoldT=performance.now(); freehandLastSig={x,y}; } break; case 'rope': isDrawing=true; freehandPts=[{x,y}]; break; case 'ruler': isDrawing=true; break; case 'speedometer': instrAddBodyTool('speedometer',x,y); break; case 'accelerometer': instrAddBodyTool('accelerometer',x,y); break; case 'dynamometer': instrAddBodyTool('dynamometer',x,y); break; case 'scale': instrAddScale(x,y); break; case 'protractor': protractorClick(x,y); break; case 'tracker': instrAddTracker(x,y); break; case 'erase': apagarEm(x,y); break; case 'spring': case 'pivot': handleConnectorClick(x,y); break; case 'motor': handleMotorClick(x,y); break; case 'pin': handlePinClick(x,y); break; case 'laser': handleLaserDown(x,y); break; case 'cannon': placeCannon(x,y); break; } }
+function handleMove(x,y){ drawCurrX=x; drawCurrY=y; if(manualDrag){ if(manualDrag.cannon){ if(cannon&&cannon.body){ Body.setPosition(cannon.body,{x:x-manualDrag.offx,y:y-manualDrag.offy}); Body.setVelocity(cannon.body,{x:0,y:0}); Body.setAngularVelocity(cannon.body,0); cannon.body._lastGood={x:cannon.body.position.x,y:cannon.body.position.y,angle:cannon.body.angle}; } return; } const b=manualDrag.body; Body.setPosition(b,{x:x-manualDrag.offx,y:y-manualDrag.offy}); Body.setVelocity(b,{x:0,y:0}); Body.setAngularVelocity(b,0); b.isSleeping=false; b._lastGood={x:b.position.x,y:b.position.y,angle:b.angle}; return; } if(activeTool==='erase'&&isPointerDown) apagarEm(x,y); if(isDrawing&&(activeTool==='freehand'||activeTool==='rope')){ freehandPts.push({x,y}); if(activeTool==='freehand'&&freehandLastSig&&Math.hypot(x-freehandLastSig.x,y-freehandLastSig.y)>4){ freehandLastSig={x,y}; freehandHoldT=performance.now(); } } }
+function handleUp(x,y){ if(manualDrag){ manualDrag=null; saveToHistory(); return; } if(activeTool==='laser'){ handleLaserUp(x,y); return; } if(!isDrawing) return; isDrawing=false; const rr=Math.hypot(x-drawStartX,y-drawStartY); switch(activeTool){ case 'select': { if(rr<6){ selectSingle(bodyAtDynamic(x,y), shiftHeld); } else { selectInRect(drawStartX,drawStartY,x,y, shiftHeld); } break; } case 'box': criarCaixa(drawStartX,drawStartY,x,y); break; case 'circle': criarCirculo(drawStartX,drawStartY,rr); break; case 'wheel': criarRoda(drawStartX,drawStartY,rr); break; case 'gear': criarEngrenagem(drawStartX,drawStartY,rr); break; case 'pulley': criarPolia(drawStartX,drawStartY,rr); break; case 'freehand': criarPoligono(freehandPts); freehandPts=[]; break; case 'rope': criarCordaDesenhada(freehandPts); freehandPts=[]; break; case 'ruler': { const adj=rulerAdjust(drawStartX,drawStartY,x,y); instrAddRuler({x:drawStartX,y:drawStartY},{x:adj.x,y:adj.y}); break; } } }
+canvasEl.addEventListener('mousedown',e=>{ altHeld=e.altKey; shiftHeld=e.shiftKey; if(activeTool==='move'){ if(!isRunning){ const{x,y}=getXY(e); if(cannon&&cannon.body&&cannonHitAt(x,y)){ const cb=cannon.body.position; manualDrag={cannon:true, offx:x-cb.x, offy:y-cb.y}; return; } const b=bodyAtDynamic(x,y); if(b && (!b.isStatic||pinnedBodies.has(b))){ manualDrag={body:b, offx:x-b.position.x, offy:y-b.position.y}; selectSingle(b,false); } } return; } e.preventDefault();isPointerDown=true;const{x,y}=getXY(e);handleDown(x,y);});
+canvasEl.addEventListener('mousemove',e=>{altHeld=e.altKey; shiftHeld=e.shiftKey; const{x,y}=getXY(e);handleMove(x,y);});
+canvasEl.addEventListener('mouseup',e=>{altHeld=e.altKey; shiftHeld=e.shiftKey; isPointerDown=false;const{x,y}=getXY(e);handleUp(x,y);});
+canvasEl.addEventListener('mouseleave',()=>{if(manualDrag){manualDrag=null;saveToHistory();}if(isDrawing&&activeTool==='freehand'&&freehandPts.length>=3)criarPoligono(freehandPts);if(isDrawing&&activeTool==='rope'&&freehandPts.length>=2)criarCordaDesenhada(freehandPts);isDrawing=false;freehandPts=[];isPointerDown=false;isPlacingLaser=false;});
+canvasEl.addEventListener('contextmenu',e=>e.preventDefault());
+function t2m(e,type){e.preventDefault();const t=e.touches.length?e.touches[0]:e.changedTouches[0];canvasEl.dispatchEvent(new MouseEvent(type,{bubbles:true,cancelable:true,clientX:t.clientX,clientY:t.clientY}));}
+canvasEl.addEventListener('touchstart',e=>t2m(e,'mousedown'),{passive:false});
+canvasEl.addEventListener('touchmove', e=>t2m(e,'mousemove'),{passive:false});
+canvasEl.addEventListener('touchend',  e=>t2m(e,'mouseup'),  {passive:false});
+function drawSpring(ctx,ax,ay,bx,by){ const dx=bx-ax,dy=by-ay,len=Math.hypot(dx,dy); if(len<4)return; const nx=dx/len,ny=dy/len,px=-ny,py=nx; const segs=12,amp=6,mg=14,us=Math.max(0,len-mg*2); ctx.beginPath(); ctx.moveTo(ax+nx*mg,ay+ny*mg); for(let i=0;i<=segs;i++){const t=i/segs,sd=i%2?amp:-amp;ctx.lineTo(ax+nx*(mg+us*t)+px*sd,ay+ny*(mg+us*t)+py*sd);} ctx.lineTo(bx-nx*mg,by-ny*mg); ctx.stroke(); }
+function drawRope(ctx,ax,ay,bx,by){ const len=Math.hypot(bx-ax,by-ay); const sag = Math.min(15, len * 0.12); const sx=(ax+bx)/2 + (by-ay)*0.08; const sy=(ay+by)/2 + sag; ctx.beginPath(); ctx.moveTo(ax,ay); ctx.quadraticCurveTo(sx,sy,bx,by); ctx.stroke(); }
+// Desenha a corda-polia: cada trecho vai até a BORDA da polia no lado que
+// encara o vizinho (estável, sem saltos). A física passa pelo centro; o desenho
+// só mostra a corda tocando a roldana por fora.
+function drawAxleJoints(ctx){
+  velJoints.forEach(j=>{
+    const rA=rotVec(j.rA,j.a.angle);
+    const x=j.a.position.x+rA.x, y=j.a.position.y+rA.y;
+    ctx.save(); ctx.strokeStyle='#00eeff'; ctx.fillStyle='rgba(0,238,255,0.25)'; ctx.lineWidth=1.6; ctx.shadowBlur=6; ctx.shadowColor='#00eeff';
+    ctx.beginPath(); ctx.arc(x,y,4.5,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(x,y,1.6,0,Math.PI*2); ctx.fillStyle='#00eeff'; ctx.fill();
+    ctx.restore();
+  });
+}
+function drawPulleyRopes(ctx){
+  pulleyRopes.forEach(pr=>{
+    updateRopeVisual(pr); // integra a cadeia Verlet a cada quadro
+    const taut = pr._taut;
+    ctx.save();
+    ctx.strokeStyle = taut ? '#ffb24d' : '#c89a5e';
+    ctx.lineWidth = 3; ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.shadowBlur = 5; ctx.shadowColor='#a06a30';
+    (pr.vsegs||[]).forEach(nodes=>{
+      if (nodes.length < 2) return;
+      ctx.beginPath(); ctx.moveTo(nodes[0].x, nodes[0].y);
+      for (let k=1;k<nodes.length-1;k++){ const a=nodes[k], b=nodes[k+1]; ctx.quadraticCurveTo(a.x, a.y, (a.x+b.x)/2, (a.y+b.y)/2); }
+      const last=nodes[nodes.length-1]; ctx.lineTo(last.x, last.y); ctx.stroke();
+    });
+    // Arco de contato: a corda contorna a borda da polia entre os dois tangentes
+    (pr._arcs||[]).forEach(arc=>{
+      let delta = arc.a1 - arc.a0;
+      while (delta >  Math.PI) delta -= 2*Math.PI;
+      while (delta < -Math.PI) delta += 2*Math.PI;
+      ctx.beginPath(); ctx.arc(arc.cx, arc.cy, arc.r, arc.a0, arc.a0+delta, delta < 0); ctx.stroke();
+    });
+    ctx.restore();
+  });
+}
+function drawPivot(ctx,ax,ay,bx,by){ ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by); ctx.stroke(); [{x:ax,y:ay},{x:bx,y:by}].forEach(p=>{ ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);ctx.fillStyle='rgba(0,238,255,0.3)';ctx.fill();ctx.stroke(); ctx.beginPath();ctx.moveTo(p.x-5,p.y);ctx.lineTo(p.x+5,p.y);ctx.moveTo(p.x,p.y-5);ctx.lineTo(p.x,p.y+5);ctx.stroke(); }); }
+function drawMotorIndicator(ctx,body){ const{x,y}=body.position, m=motors.get(body); const t=isRunning?performance.now()/280*m.direction:0; const r=Math.min((body.circleRadius||16)*0.65,26); ctx.save();ctx.translate(x,y);ctx.rotate(t); ctx.strokeStyle='#44ff88';ctx.lineWidth=2.5;ctx.shadowBlur=14;ctx.shadowColor='#44ff88'; ctx.beginPath();ctx.arc(0,0,r,-Math.PI*0.78,Math.PI*0.78);ctx.stroke(); ctx.fillStyle='#44ff88';ctx.shadowBlur=8; ctx.beginPath();ctx.moveTo(r,-5);ctx.lineTo(r+6,0);ctx.lineTo(r,5);ctx.closePath();ctx.fill(); ctx.restore(); }
+function drawPinIndicator(ctx,body){ const{x,y}=body.position; ctx.save();ctx.translate(x,y); ctx.fillStyle='rgba(255,204,0,0.9)';ctx.strokeStyle='#ffdd44';ctx.lineWidth=1.2; ctx.shadowBlur=10;ctx.shadowColor='#ffcc00'; ctx.beginPath();ctx.moveTo(0,-14);ctx.lineTo(0,0);ctx.strokeStyle='#ffcc00';ctx.lineWidth=2;ctx.stroke(); ctx.beginPath();ctx.arc(0,-17,4,0,Math.PI*2);ctx.fill();ctx.stroke(); ctx.beginPath();ctx.moveTo(-8,1);ctx.lineTo(8,1);ctx.lineWidth=2.5;ctx.stroke(); ctx.restore(); }
+function drawGlassBody(ctx,body){ const t=performance.now()*0.001; const alpha=0.12+Math.abs(Math.sin(t*1.2+body.id*0.4))*0.07; const isM=body._mat==='mirror'; ctx.save(); ctx.fillStyle=isM?`rgba(200,220,238,${alpha+0.25})`:`rgba(170,228,255,${alpha})`; ctx.strokeStyle=isM?'#c8e0ef':'#66ccff'; ctx.lineWidth=2;ctx.shadowBlur=isM?12:8;ctx.shadowColor=isM?'#aaccdd':'#66ccff'; ctx.beginPath(); body.vertices.forEach((v,i)=>i===0?ctx.moveTo(v.x,v.y):ctx.lineTo(v.x,v.y)); ctx.closePath();ctx.fill();ctx.stroke(); if(isM){ const b=body.bounds; const mx=(b.min.x+b.max.x)/2, my=(b.min.y+b.max.y)/2; const a=body.angle, hl=Math.min(b.max.x-b.min.x,b.max.y-b.min.y)*0.35; ctx.strokeStyle='rgba(255,255,255,0.55)';ctx.lineWidth=1.5;ctx.shadowBlur=6; ctx.beginPath(); ctx.moveTo(mx+Math.cos(a-0.6)*hl, my+Math.sin(a-0.6)*hl); ctx.lineTo(mx+Math.cos(a+0.6)*hl, my+Math.sin(a+0.6)*hl); ctx.stroke(); } ctx.restore(); }
+// ═══════════ DESENHO DAS PEÇAS MECÂNICAS ═══════════
+function drawGear(ctx,body){
+  const{x,y}=body.position, r=body.circleRadius, teeth=body._teeth||12, a=body.angle;
+  const m=MATS[body._mat]||MATS.metal;
+  const rOut=r, rIn=r*0.80;
+  ctx.save(); ctx.translate(x,y); ctx.rotate(a);
+  ctx.fillStyle=m.fill; ctx.strokeStyle=m.stroke; ctx.lineWidth=1.5;
+  ctx.shadowBlur=6; ctx.shadowColor=m.stroke;
+  ctx.beginPath();
+  for(let i=0;i<teeth;i++){
+    const a0=(i/teeth)*Math.PI*2, a1=((i+0.28)/teeth)*Math.PI*2;
+    const a2=((i+0.5)/teeth)*Math.PI*2, a3=((i+0.78)/teeth)*Math.PI*2;
+    ctx.lineTo(Math.cos(a0)*rOut,Math.sin(a0)*rOut);
+    ctx.lineTo(Math.cos(a1)*rOut,Math.sin(a1)*rOut);
+    ctx.lineTo(Math.cos(a2)*rIn,Math.sin(a2)*rIn);
+    ctx.lineTo(Math.cos(a3)*rIn,Math.sin(a3)*rIn);
+  }
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.shadowBlur=0;
+  // Furo central + marcador de rotação
+  ctx.beginPath(); ctx.arc(0,0,r*0.22,0,Math.PI*2); ctx.fillStyle=m.stroke; ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.45)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(rIn*0.95,0); ctx.stroke();
+  ctx.restore();
+}
+function drawPulley(ctx,body){
+  const{x,y}=body.position, r=body.circleRadius, a=body.angle;
+  const m=MATS[body._mat]||MATS.metal;
+  ctx.save(); ctx.translate(x,y);
+  // Disco externo (flange)
+  ctx.fillStyle=m.fill; ctx.strokeStyle=m.stroke; ctx.lineWidth=2;
+  ctx.shadowBlur=6; ctx.shadowColor=m.stroke;
+  ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.shadowBlur=0;
+  // Sulco da corda em RAIO MAIOR (como roldana real): canal fundo perto da borda
+  ctx.strokeStyle='rgba(0,0,0,0.45)'; ctx.lineWidth=Math.max(3,r*0.16);
+  ctx.beginPath(); ctx.arc(0,0,r*0.88,0,Math.PI*2); ctx.stroke();
+  // brilho interno do canal
+  ctx.strokeStyle=m.stroke; ctx.globalAlpha=0.5; ctx.lineWidth=Math.max(1,r*0.05);
+  ctx.beginPath(); ctx.arc(0,0,r*0.88,0,Math.PI*2); ctx.stroke(); ctx.globalAlpha=1;
+  // Eixo central + marcador de rotação
+  ctx.rotate(a);
+  ctx.fillStyle=m.stroke; ctx.beginPath(); ctx.arc(0,0,r*0.16,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(r*0.55,0); ctx.stroke();
+  ctx.restore();
+}
+function grooveR(pl){ return pl.circleRadius * 0.88; } // raio do sulco onde a corda assenta
+
+// ═══════════════════════════════════════════════════════════
+//  INSTRUMENTOS DE MEDIDA + VETORES
+//  Unidades calibradas (sim → SI), consistentes entre si para ensino.
+//  A calibração absoluta pode ser ajustada nestas constantes.
+// ═══════════════════════════════════════════════════════════
+const PX_PER_M = 100;            // escala de comprimento: 100 px = 1 m
+// Sistema de unidades COERENTE, derivado do passo fixo (60 passos/s):
+//  • body.velocity é px/passo → m/s = px/passo · (60 passos/s) / (100 px/m) = ×0,6
+//  • aceleração: m/s² = Δv(px/passo) · 60 · 0,6 = ×36  (= SPEED_CAL·60)
+//  • massa: kg = body.mass · KG_CAL, calibrado p/ densidades reais
+//    (metal 1m² → ~157 kg, igual a uma chapa de aço de 2 cm — confere)
+const SPEED_CAL = 60 / PX_PER_M; // = 0,6  (px/passo → m/s)
+const ACC_CAL = SPEED_CAL * 60;  // = 36   (Δv/passo → m/s²)
+const KG_CAL = 0.004;            // body.mass (sim) → kg
+// impulso do Matter → Newton calibrado. Derivado: F = J·invM·SPEED_CAL·60·m_kg/...
+// = J·KG_CAL·SPEED_CAL·60. Validado: a Normal de um corpo em repouso = seu Peso.
+const IMPULSE_TO_N = KG_CAL * SPEED_CAL * 60;  // = 0,144
+// Newton (calibrado) → força do Matter: F_matter = F_N/(KG_CAL·Δt²·ACC_CAL) = F_N·0,025
+// (validado: bate com a força da gravidade body.force = m·g·scale). Usado na mola.
+const N_TO_MATTERF = 1 / (KG_CAL * (1000/60)*(1000/60) * ACC_CAL);
+let instruments = [];
+let vectorsOn = false;
+const _contactN = new Map();   // corpo → força Normal (N)
+const _contactF = new Map();   // corpo → força de Atrito (N)
+const _ropeForce = new Map();  // corpo → força de Tração da corda (N)
+function _accForce(map, body, x, y){ if(!body) return; const e=map.get(body)||{x:0,y:0}; e.x+=x; e.y+=y; map.set(body,e); }
+// CAPTURA HONESTA: percorre os pares de contato resolvidos pelo Matter e extrai
+// os impulsos normal (→ Normal) e tangencial (→ Atrito), convertendo p/ Newton.
+function captureContactForces(){
+  _contactN.clear(); _contactF.clear();
+  const list = (engine.pairs && engine.pairs.list) ? engine.pairs.list : [];
+  for(const pair of list){
+    if(!pair.isActive || pair.isSensor) continue;
+    const col = pair.collision; if(!col) continue;
+    const n = col.normal, t = col.tangent; if(!n || !t) continue;
+    const cs = pair.contacts || []; const cc = pair.contactCount || cs.length;
+    let nI=0, tI=0;
+    for(let k=0;k<cc;k++){ const c=cs[k]; if(!c) continue; nI += c.normalImpulse||0; tI += c.tangentImpulse||0; }
+    if(nI===0 && tI===0) continue;
+    const A = col.parentA || pair.bodyA, B = col.parentB || pair.bodyB;
+    const fNx = n.x*nI*IMPULSE_TO_N, fNy = n.y*nI*IMPULSE_TO_N; // Normal
+    const fTx = t.x*tI*IMPULSE_TO_N, fTy = t.y*tI*IMPULSE_TO_N; // Atrito
+    _accForce(_contactN, B, fNx, fNy);  _accForce(_contactN, A, -fNx, -fNy);
+    _accForce(_contactF, B, fTx, fTy);  _accForce(_contactF, A, -fTx, -fTy);
+  }
+}
+let scalePending = null;
+const _prevVel = new Map();
+const _accSmooth = new Map();
+function gDisplay(){ return 9.8 * (engine.gravity.y || 0); }
+function bodyKg(b){ return b.mass * KG_CAL; }
+function bodySpeedMps(b){ return Math.hypot(b.velocity.x, b.velocity.y) * SPEED_CAL; }
+function bodyAccel(b){ const a=_accSmooth.get(b); return a?{x:a.x,y:a.y}:{x:0,y:0}; }
+function instrAlive(b){ return b && userBodies.indexOf(b)>=0; }
+function updateKinematics(){
+  userBodies.forEach(b=>{
+    const pv=_prevVel.get(b)||{x:b.velocity.x,y:b.velocity.y};
+    const axRaw=(b.velocity.x-pv.x)*ACC_CAL, ayRaw=(b.velocity.y-pv.y)*ACC_CAL;
+    const sm=_accSmooth.get(b)||{x:0,y:0};
+    sm.x += (axRaw-sm.x)*0.2; sm.y += (ayRaw-sm.y)*0.2;
+    _accSmooth.set(b,sm); _prevVel.set(b,{x:b.velocity.x,y:b.velocity.y});
+  });
+}
+function toggleVectors(){ vectorsOn=!vectorsOn; document.getElementById('btn-vectors').classList.toggle('active',vectorsOn); }
+function instrAddBodyTool(type,x,y){ const b=bodyAtDynamic(x,y); if(!b) return; instruments=instruments.filter(i=>!(i.type===type && i.body===b)); instruments.push({type, body:b}); }
+function instrAddScale(x,y){ const b=bodyAtDynamic(x,y); if(!b) return; if(!scalePending) scalePending=b; else if(scalePending!==b){ instruments.push({type:'scale', bodyA:scalePending, bodyB:b}); scalePending=null; } }
+function instrAddRuler(A,B){ if(Math.hypot(B.x-A.x,B.y-A.y)<8) return; const ba=bodyAtDynamic(A.x,A.y), bb=bodyAtDynamic(B.x,B.y); instruments.push({type:'ruler', a: ba?{body:ba,local:worldToLocal(ba,A)}:{point:{x:A.x,y:A.y}}, b: bb?{body:bb,local:worldToLocal(bb,B)}:{point:{x:B.x,y:B.y}} }); }
+// ── TRANSFERIDOR INTELIGENTE (3 pontos: vértice + 2 braços) ──
+let protractorPts = [];
+function snapVertexNear(x,y){ let best=null,bd=12; Composite.allBodies(world).forEach(b=>{ const parts=(b.parts&&b.parts.length>1)?b.parts.slice(1):[b]; parts.forEach(part=>part.vertices.forEach(v=>{ const d=Math.hypot(v.x-x,v.y-y); if(d<bd){bd=d;best={x:v.x,y:v.y};} })); }); return best||{x,y}; }
+function protractorSnapDir(o,p){ const dx=p.x-o.x,dy=p.y-o.y,len=Math.hypot(dx,dy); if(len<2) return p; let ang=Math.atan2(dy,dx); const deg=ang*180/Math.PI; for(const s of [0,90,180,-90,-180]){ if(Math.abs(deg-s)<4){ ang=s*Math.PI/180; break; } } return {x:o.x+Math.cos(ang)*len, y:o.y+Math.sin(ang)*len}; }
+function protractorClick(x,y){ let p=snapVertexNear(x,y); if(protractorPts.length>=1) p=protractorSnapDir(protractorPts[0],p); protractorPts.push(p); if(protractorPts.length===3){ instruments.push({type:'protractor', o:{x:protractorPts[0].x,y:protractorPts[0].y}, a:{x:protractorPts[1].x,y:protractorPts[1].y}, b:{x:protractorPts[2].x,y:protractorPts[2].y}}); protractorPts=[]; } }
+function protractorReadout(O,A,B){ const a1=Math.atan2(A.y-O.y,A.x-O.x), a2=Math.atan2(B.y-O.y,B.x-O.x); let d=a2-a1; while(d<=-Math.PI)d+=2*Math.PI; while(d>Math.PI)d-=2*Math.PI; const fh=(P)=>{ let h=Math.abs(Math.atan2(-(P.y-O.y),P.x-O.x)*180/Math.PI); return h>90?180-h:h; }; return { a1, d, between:Math.abs(d)*180/Math.PI, h1:fh(A), h2:fh(B) }; }
+// ── RÉGUA AVANÇADA (tracker acoplado: trajetória + deslocamentos) ──
+function attachTracker(b, auto){ if(!b) return; instruments=instruments.filter(i=>!(i.type==='tracker' && i.body===b)); instruments.push({type:'tracker', body:b, pts:[{x:b.position.x,y:b.position.y}], sx:b.position.x, sy:b.position.y, apex:{x:b.position.x,y:b.position.y}, auto:!!auto}); }
+function instrAddTracker(x,y){ attachTracker(bodyAtDynamic(x,y), false); }
+function instrPointWorld(end){ return end.body ? localToWorld(end.body,end.local) : {x:end.point.x,y:end.point.y}; }
+function limparInstrumentos(){ instruments.length=0; scalePending=null; _prevVel.clear(); _accSmooth.clear(); }
+function apagarInstrumentosEm(x,y){ const before=instruments.length; instruments=instruments.filter(ins=>{ let pts=[]; if(ins.type==='ruler'){pts=[instrPointWorld(ins.a),instrPointWorld(ins.b)];} else if(ins.type==='scale'){pts=[ins.bodyA.position,ins.bodyB.position];} else if(ins.type==='protractor'){pts=[ins.o,ins.a,ins.b];} else {pts=[ins.body.position];} return !pts.some(p=>Math.hypot(p.x-x,p.y-y)<22); }); return instruments.length!==before; }
+function hudCard(ctx,x,y,lines,color,voff){
+  voff=voff||0;
+  ctx.save(); ctx.font='11px Orbitron,monospace'; ctx.textAlign='left';
+  let w=0; lines.forEach(l=>{ w=Math.max(w, ctx.measureText(l.t).width); }); w+=16; const h=lines.length*15+8;
+  let cx=x+14, cy=y-h-10-voff; if(cx+w>W) cx=x-w-14; if(cy<2) cy=y+14+voff;
+  ctx.strokeStyle=color; ctx.globalAlpha=0.45; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(cx+w/2,cy+h/2); ctx.stroke(); ctx.globalAlpha=1;
+  ctx.fillStyle='rgba(10,12,20,0.85)'; ctx.strokeStyle=color; ctx.lineWidth=1.2; ctx.shadowBlur=10; ctx.shadowColor=color;
+  ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(cx,cy,w,h,6); else ctx.rect(cx,cy,w,h); ctx.fill(); ctx.stroke(); ctx.shadowBlur=0;
+  lines.forEach((l,i)=>{ ctx.fillStyle=l.c||color; ctx.fillText(l.t, cx+8, cy+16+i*15); });
+  ctx.restore();
+  return h;
+}
+function drawVecArrow(ctx,x1,y1,x2,y2,color){
+  ctx.save(); ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=2.5; ctx.shadowBlur=6; ctx.shadowColor=color; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const ang=Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-Math.cos(ang-0.4)*8, y2-Math.sin(ang-0.4)*8); ctx.lineTo(x2-Math.cos(ang+0.4)*8, y2-Math.sin(ang+0.4)*8); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function drawInstruments(ctx){
+  instruments = instruments.filter(ins=> ins.type==='ruler' ? (instrAlive(ins.a.body)||!ins.a.body)&&(instrAlive(ins.b.body)||!ins.b.body) : ins.type==='scale' ? instrAlive(ins.bodyA)&&instrAlive(ins.bodyB) : ins.type==='protractor' ? true : instrAlive(ins.body));
+  const _hudStack = new Map();  // empilha cartões do MESMO corpo p/ não se sobreporem
+  instruments.forEach(ins=>{
+    if(ins.type==='ruler'){
+      const A=instrPointWorld(ins.a), B=instrPointWorld(ins.b);
+      const dpx=Math.hypot(B.x-A.x,B.y-A.y), dm=dpx/PX_PER_M;
+      ctx.save(); ctx.strokeStyle='#ffd166'; ctx.lineWidth=2; ctx.shadowBlur=6; ctx.shadowColor='#ffd166'; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+      const nx=-(B.y-A.y)/(dpx||1), ny=(B.x-A.x)/(dpx||1), n=Math.floor(dm/0.5);
+      for(let i=0;i<=n;i++){ const t=(i*0.5*PX_PER_M)/dpx; const px=A.x+(B.x-A.x)*t, py=A.y+(B.y-A.y)*t; const len=(i%2===0)?7:4; ctx.beginPath(); ctx.moveTo(px-nx*len,py-ny*len); ctx.lineTo(px+nx*len,py+ny*len); ctx.stroke(); }
+      [A,B].forEach(p=>{ctx.fillStyle='#ffd166';ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,Math.PI*2);ctx.fill();});
+      ctx.restore();
+      hudCard(ctx,(A.x+B.x)/2,(A.y+B.y)/2,[{t:`${dm.toFixed(2)} m`},{t:`${Math.round(dpx)} px`,c:'#9aa7b3'}],'#ffd166');
+    }
+    else if(ins.type==='protractor'){
+      const O=ins.o, A=ins.a, B=ins.b, R=protractorReadout(O,A,B);
+      ctx.save(); ctx.strokeStyle='#ff9ff3'; ctx.lineWidth=2; ctx.shadowBlur=6; ctx.shadowColor='#ff9ff3'; ctx.lineCap='round';
+      ctx.beginPath(); ctx.moveTo(O.x,O.y); ctx.lineTo(A.x,A.y); ctx.moveTo(O.x,O.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+      ctx.beginPath(); ctx.arc(O.x,O.y,30,R.a1,R.a1+R.d,R.d<0); ctx.stroke();
+      ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(O.x,O.y,4,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#ff9ff3'; [A,B].forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,Math.PI*2);ctx.fill();});
+      ctx.restore();
+      hudCard(ctx, O.x, O.y, [{t:`θ = ${R.between.toFixed(1)}°`},{t:`c/ horiz.: ${R.h1.toFixed(0)}° · ${R.h2.toFixed(0)}°`,c:'#9aa7b3'}], '#ff9ff3');
+    }
+    else if(ins.type==='tracker'){
+      const b=ins.body, p=b.position;
+      if(isRunning){ const last=ins.pts[ins.pts.length-1]; if(!last||Math.hypot(p.x-last.x,p.y-last.y)>2.5){ ins.pts.push({x:p.x,y:p.y}); if(ins.pts.length>1200) ins.pts.shift(); } if(!ins.apex || p.y<ins.apex.y){ ins.apex={x:p.x,y:p.y}; } }
+      ctx.save();
+      // trajetória percorrida
+      ctx.strokeStyle='#7CFFB2'; ctx.lineWidth=2; ctx.shadowBlur=6; ctx.shadowColor='#7CFFB2'; ctx.lineCap='round'; ctx.lineJoin='round';
+      ctx.beginPath(); ins.pts.forEach((q,i)=>i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y)); ctx.stroke();
+      ctx.shadowBlur=0;
+      // catetos de deslocamento (Δx horizontal, Δy vertical)
+      ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(124,255,178,0.55)'; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.moveTo(ins.sx,ins.sy); ctx.lineTo(p.x,ins.sy); ctx.lineTo(p.x,p.y); ctx.stroke(); ctx.setLineDash([]);
+      // resultante (início → atual)
+      ctx.strokeStyle='#7CFFB2'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(ins.sx,ins.sy); ctx.lineTo(p.x,p.y); ctx.stroke();
+      // marcadores
+      ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(ins.sx,ins.sy,4,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#7CFFB2'; ctx.beginPath(); ctx.arc(p.x,p.y,3.5,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      // altura máxima: do ápice até a superfície (chão)
+      const floorY=getRH(), hmax=(floorY-ins.apex.y)/PX_PER_M;
+      if(hmax>0.02){
+        ctx.save(); ctx.strokeStyle='#ffd166'; ctx.lineWidth=1.4; ctx.setLineDash([5,4]); ctx.shadowBlur=4; ctx.shadowColor='#ffd166';
+        ctx.beginPath(); ctx.moveTo(ins.apex.x,ins.apex.y); ctx.lineTo(ins.apex.x,floorY); ctx.stroke(); ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(ins.apex.x-11,ins.apex.y); ctx.lineTo(ins.apex.x+11,ins.apex.y); ctx.stroke();   // marca do ápice
+        ctx.beginPath(); ctx.moveTo(ins.apex.x-7,floorY); ctx.lineTo(ins.apex.x+7,floorY); ctx.stroke();             // marca no chão
+        ctx.fillStyle='#ffd166'; ctx.font='bold 10px Orbitron,monospace'; ctx.shadowBlur=3; ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.textAlign='left';
+        ctx.fillText(`h_máx = ${hmax.toFixed(2)} m`, ins.apex.x+13, (ins.apex.y+floorY)/2);
+        ctx.restore();
+      }
+      let plen=0; for(let i=1;i<ins.pts.length;i++) plen+=Math.hypot(ins.pts[i].x-ins.pts[i-1].x, ins.pts[i].y-ins.pts[i-1].y);
+      const dx=(p.x-ins.sx)/PX_PER_M, dy=(ins.sy-p.y)/PX_PER_M;
+      const vo=_hudStack.get(b)||0; const hh=hudCard(ctx, p.x, p.y, [{t:`Δx = ${dx.toFixed(2)} m`},{t:`Δy = ${dy.toFixed(2)} m`},{t:`h_máx = ${hmax.toFixed(2)} m`,c:'#ffd166'},{t:`traj.: ${(plen/PX_PER_M).toFixed(2)} m`,c:'#9aa7b3'}], '#7CFFB2', vo); _hudStack.set(b,vo+hh+6);
+    }
+    else if(ins.type==='speedometer'){
+      const b=ins.body,p=b.position; const vpx=Math.hypot(b.velocity.x,b.velocity.y), vmps=bodySpeedMps(b);
+      ctx.save(); ctx.strokeStyle='#4dd2ff'; ctx.lineWidth=1.5; ctx.shadowBlur=6; ctx.shadowColor='#4dd2ff'; ctx.beginPath(); ctx.arc(p.x,p.y,(b.circleRadius||18)*0.5+4,0,Math.PI*2); ctx.stroke(); ctx.restore();
+      if(vpx>0.08){
+        const L=Math.min(90,14+vmps*7), ux=b.velocity.x/vpx, uy=b.velocity.y/vpx, tx=p.x+ux*L, ty=p.y+uy*L;
+        drawVecArrow(ctx,p.x,p.y,tx,p.y,'#44ff88');   // vx — componente horizontal
+        drawVecArrow(ctx,tx,p.y,tx,ty,'#ff8c42');     // vy — componente vertical
+        drawVecArrow(ctx,p.x,p.y,tx,ty,'#4dd2ff');    // v — resultante
+        ctx.save(); ctx.font='bold 9px Orbitron,monospace'; ctx.shadowBlur=3; ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.textAlign='left';
+        ctx.fillStyle='#44ff88'; ctx.fillText('vx',(p.x+tx)/2-5, p.y+(uy>=0?13:-5));
+        ctx.fillStyle='#ff8c42'; ctx.fillText('vy', tx+(ux>=0?5:-17),(p.y+ty)/2);
+        ctx.restore();
+      }
+      const vx=b.velocity.x*SPEED_CAL, vy=-b.velocity.y*SPEED_CAL;
+      const vo=_hudStack.get(b)||0; const hh=hudCard(ctx,p.x,p.y,[{t:`|v| = ${vmps.toFixed(2)} m/s`},{t:`vx = ${vx.toFixed(2)} m/s`,c:'#44ff88'},{t:`vy = ${vy.toFixed(2)} m/s`,c:'#ff8c42'}],'#4dd2ff',vo); _hudStack.set(b,vo+hh+6);
+    }
+    else if(ins.type==='accelerometer'){
+      const b=ins.body,p=b.position,a=bodyAccel(b); const vo=_hudStack.get(b)||0; const hh=hudCard(ctx,p.x,p.y,[{t:`${Math.hypot(a.x,a.y).toFixed(2)} m/s²`}],'#b388ff',vo); _hudStack.set(b,vo+hh+6);
+    }
+    else if(ins.type==='dynamometer'){
+      const b=ins.body,p=b.position,a=bodyAccel(b),g=gDisplay();
+      const fx=bodyKg(b)*a.x, fy=bodyKg(b)*(a.y-g); const F=Math.hypot(fx,fy);
+      const vo=_hudStack.get(b)||0; const hh=hudCard(ctx,p.x,p.y,[{t:`${F.toFixed(2)} N`},{t:'tração/suporte',c:'#9aa7b3'}],'#ff6b6b',vo); _hudStack.set(b,vo+hh+6);
+    }
+    else if(ins.type==='scale'){
+      const A=ins.bodyA,B=ins.bodyB,g=gDisplay(); const ma=bodyKg(A),mb=bodyKg(B);
+      ctx.save();ctx.strokeStyle='#7CFFB2';ctx.lineWidth=1.2;ctx.globalAlpha=0.55;ctx.setLineDash([4,4]); ctx.beginPath();ctx.moveTo(A.position.x,A.position.y);ctx.lineTo(B.position.x,B.position.y);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+      hudCard(ctx,(A.position.x+B.position.x)/2,Math.min(A.position.y,B.position.y),[{t:'BALANÇA'},{t:`A: ${ma.toFixed(2)} kg · ${(ma*g).toFixed(1)} N`,c:'#4dd2ff'},{t:`B: ${mb.toFixed(2)} kg · ${(mb*g).toFixed(1)} N`,c:'#ffd166'},{t: ma>mb?`A é ${(ma/mb).toFixed(2)}× mais pesado`:mb>ma?`B é ${(mb/ma).toFixed(2)}× mais pesado`:'massas iguais', c:'#7CFFB2'}],'#7CFFB2');
+    }
+  });
+  if(scalePending && instrAlive(scalePending)){ const p=scalePending.position; ctx.save();ctx.strokeStyle='#7CFFB2';ctx.lineWidth=2;ctx.setLineDash([4,4]);ctx.shadowBlur=8;ctx.shadowColor='#7CFFB2'; ctx.beginPath();ctx.arc(p.x,p.y,(scalePending.circleRadius||20)+6,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.restore(); }
+}
+function drawVectors(ctx){
+  if(!vectorsOn) return;
+  userBodies.forEach(b=>{ if(b.isStatic) return; const p=b.position;
+    const vmps=bodySpeedMps(b);
+    if(vmps>0.05){ const L=Math.hypot(b.velocity.x,b.velocity.y)||1; const ux=b.velocity.x/L, uy=b.velocity.y/L; const len=Math.min(80, 10+vmps*7); const ox=p.x-uy*12, oy=p.y+ux*12; drawVecArrow(ctx,ox,oy,ox+ux*len,oy+uy*len,'#44ff88'); }
+    const a=bodyAccel(b),am=Math.hypot(a.x,a.y);
+    if(am>0.15){ const ux=a.x/am, uy=a.y/am; const len=Math.min(64, 8+am*3); const ox=p.x+uy*12, oy=p.y-ux*12; drawVecArrow(ctx,ox,oy,ox+ux*len,oy+uy*len,'#ff8c42'); }
+  });
+}
+// ═══════════ DIAGRAMA DE FORÇAS (corpo livre) ═══════════
+const FORCE_COLORS = { P:'#ffd166', Pc:'#ffe9a8', N:'#4dd2ff', Fat:'#ff8c42', T:'#ffb24d', Fel:'#bc13fe', R:'#ff5555', v:'#44ff88', a:'#b388ff' };
+// Filtro de forças visíveis (controlado pelo menu suspenso superior direito)
+const forceFilter = { P:true, Pc:true, N:true, Fat:true, T:true, Fel:true, R:true, v:false, a:false };
+function setForceFilter(k,v){ forceFilter[k]=v; }
+function toggleForcesMenu(){ const p=document.getElementById('forces-menu-panel'); const open=p.classList.toggle('open'); document.getElementById('forces-menu-btn').classList.toggle('active',open); if(open) closeTutMenu(); }
+// No celular, as barras do topo (instrumentos) e de ferramentas do topo abrem
+// como menu suspenso; abrir uma fecha a outra (mutuamente exclusivas).
+let mobileOpen = null;
+function mobilePanel(which){
+  mobileOpen = (mobileOpen === which) ? null : which;
+  const tb=document.getElementById('topbar'), ip=document.getElementById('instr-panel');
+  tb.classList.toggle('mopen', mobileOpen==='tools');
+  ip.classList.toggle('mopen', mobileOpen==='instr');
+  document.getElementById('mtab-tools').classList.toggle('active', mobileOpen==='tools');
+  document.getElementById('mtab-instr').classList.toggle('active', mobileOpen==='instr');
+  if(mobileOpen) closeTutMenu();
+}
+function closeTutMenu(){ const p=document.getElementById('tut-menu-panel'); if(p) p.classList.remove('open'); const b=document.getElementById('tut-menu-btn'); if(b) b.classList.remove('active'); const mb=document.getElementById('mtab-tut'); if(mb) mb.classList.remove('active'); }
+function closeMobilePanels(){ mobileOpen=null; const tb=document.getElementById('topbar'), ip=document.getElementById('instr-panel'); if(tb) tb.classList.remove('mopen'); if(ip) ip.classList.remove('mopen'); const a=document.getElementById('mtab-tools'),b=document.getElementById('mtab-instr'); if(a)a.classList.remove('active'); if(b)b.classList.remove('active'); }
+function ensureMobilePanel(which){ mobileOpen=which; const tb=document.getElementById('topbar'), ip=document.getElementById('instr-panel'); if(tb) tb.classList.toggle('mopen',which==='tools'); if(ip) ip.classList.toggle('mopen',which==='instr'); const a=document.getElementById('mtab-tools'),b=document.getElementById('mtab-instr'); if(a)a.classList.toggle('active',which==='tools'); if(b)b.classList.toggle('active',which==='instr'); }
+function bodyHasSpring(b){ return userConstraints.some(c=>c.type==='spring' && (c.constraint.bodyA===b||c.constraint.bodyB===b)); }
+// ───────── TUTORIAIS GUIADOS ─────────
+const TUTORIALS = {
+  carro: { titulo:'🚗 Carro funcional', steps:[
+    { text:'1. Chassi: escolha a ferramenta Caixa e desenhe um retângulo — será a base do carro.', sel:'[data-tool="box"]', ghosts:[{t:'rect',x:0,y:-22,w:130,h:34,lbl:'chassi'}] },
+    { text:'2. Rodas: com a ferramenta Roda, arraste para criar duas rodas sob as pontas do chassi.', sel:'[data-tool="wheel"]', ghosts:[{t:'rect',x:0,y:-22,w:130,h:34},{t:'circle',x:-48,y:24,r:24,lbl:'roda'},{t:'circle',x:48,y:24,r:24,lbl:'roda'}] },
+    { text:'3. Eixos: com a ferramenta Eixo, clique numa roda e depois no chassi. Vira uma rótula que deixa a roda girar. Repita na outra roda.', sel:'[data-tool="pivot"]', ghosts:[{t:'rect',x:0,y:-22,w:130,h:34},{t:'circle',x:-48,y:24,r:24},{t:'circle',x:48,y:24,r:24},{t:'dot',x:-48,y:24},{t:'dot',x:48,y:24}] },
+    { text:'4. Motor: com a ferramenta Motor, clique em UMA das rodas para motorizá-la.', sel:'[data-tool="motor"]', ghosts:[{t:'rect',x:0,y:-22,w:130,h:34},{t:'circle',x:-48,y:24,r:24},{t:'circle',x:48,y:24,r:24},{t:'motor',x:-48,y:24}] },
+    { text:'5. Acelere! Ajuste o torque no menu do Motor e toque em Play. O carro deve andar.', sel:'#btn-play,#m-play', ghosts:[{t:'rect',x:0,y:-22,w:130,h:34},{t:'circle',x:-48,y:24,r:24},{t:'circle',x:48,y:24,r:24},{t:'motor',x:-48,y:24},{t:'arrowR',x:78,y:-20}] },
+  ]},
+  engrenagens: { titulo:'⚙️ Sistema de engrenagens', steps:[
+    { text:'1. Primeira engrenagem: escolha a ferramenta Engrenagem e arraste para criar uma.', sel:'[data-tool="gear"]', ghosts:[{t:'gear',x:-36,y:0,r:42,lbl:'1ª'}] },
+    { text:'2. Segunda engrenagem: crie outra encostando os dentes na primeira (devem quase se tocar).', sel:'[data-tool="gear"]', ghosts:[{t:'gear',x:-36,y:0,r:42},{t:'gear',x:46,y:0,r:34,lbl:'2ª'}] },
+    { text:'3. Mancais fixos: com a ferramenta Eixo, clique numa engrenagem e depois no vazio. Ela passa a girar presa no centro. Repita na outra.', sel:'[data-tool="pivot"]', ghosts:[{t:'gear',x:-36,y:0,r:42},{t:'gear',x:46,y:0,r:34},{t:'dot',x:-36,y:0},{t:'dot',x:46,y:0}] },
+    { text:'4. Motor: com a ferramenta Motor, clique em uma das engrenagens.', sel:'[data-tool="motor"]', ghosts:[{t:'gear',x:-36,y:0,r:42},{t:'gear',x:46,y:0,r:34},{t:'motor',x:-36,y:0}] },
+    { text:'5. Play! A engrenagem motorizada gira a outra no sentido oposto.', sel:'#btn-play,#m-play', ghosts:[{t:'gear',x:-36,y:0,r:42},{t:'gear',x:46,y:0,r:34},{t:'spin',x:-36,y:0,r:42},{t:'spin',x:46,y:0,r:34,ccw:true}] },
+  ]},
+  ferramentas: { titulo:'🧰 Conhecendo as ferramentas', steps:[
+    { text:'Caixa, Círculo e Desenho livre criam corpos físicos: arraste na tela para desenhá-los. Eles caem e colidem segundo a física.', sel:'[data-tool="box"]', mp:'tools', ghosts:[] },
+    { text:'Mover: com a simulação pausada, arraste qualquer corpo — ou o próprio canhão — para reposicioná-lo.', sel:'[data-tool="move"]', mp:'tools', ghosts:[] },
+    { text:'Apagar: toque num corpo, mola, laser ou canhão para removê-lo.', sel:'[data-tool="erase"]', mp:'tools', ghosts:[] },
+    { text:'Fixar: prega um corpo no lugar — ele fica estático e serve de apoio, rampa ou parede.', sel:'[data-tool="pin"]', mp:'tools', ghosts:[] },
+    { text:'Roda, Engrenagem e Polia: peças mecânicas. Rodas rolam, engrenagens transmitem rotação e polias redirecionam cordas.', sel:'[data-tool="wheel"]', ghosts:[] },
+    { text:'Eixo: clique em dois corpos para uni-los por uma rótula (giro livre), ou num corpo e no vazio para fixar o centro (mancal).', sel:'[data-tool="pivot"]', ghosts:[] },
+    { text:'Mola: liga dois pontos com força elástica (Lei de Hooke) — quanto mais estica, mais puxa de volta.', sel:'[data-tool="spring"]', ghosts:[] },
+    { text:'Corda: vínculo flexível que não estica além do limite — boa para pêndulos e içamentos.', sel:'[data-tool="rope"]', ghosts:[] },
+    { text:'Motor: clique numa roda ou engrenagem para girá-la; ajuste torque e velocidade livre no menu do motor.', sel:'[data-tool="motor"]', ghosts:[] },
+    { text:'Laser: emite um feixe que reflete em espelhos e refrata no vidro — ótimo para óptica.', sel:'[data-tool="laser"]', ghosts:[] },
+    { text:'Canhão: lança projéteis com ângulo e velocidade ajustáveis; ideal para estudar lançamento oblíquo.', sel:'[data-tool="cannon"]', ghosts:[] },
+    { text:'Régua e Transferidor: medem distância (em metros) e ângulos, encaixando nos vértices dos corpos.', sel:'[data-tool="ruler"]', mp:'instr', ghosts:[] },
+    { text:'Velocímetro, Acelerômetro e Dinamômetro: clique num corpo para ler velocidade, aceleração e força em tempo real.', sel:'[data-tool="speedometer"]', mp:'instr', ghosts:[] },
+    { text:'Régua avançada: acompanha um corpo e mostra a trajetória, Δx, Δy e a altura máxima — perfeita com o canhão.', sel:'[data-tool="tracker"]', mp:'instr', ghosts:[] },
+  ]},
+};
+let tutorial = null;
+function startTutorial(key){ if(!TUTORIALS[key]) return; tutorial={ key, steps:TUTORIALS[key].steps, i:0 }; setRunning(false); const sp=document.getElementById('settings-panel'); if(sp) sp.classList.remove('open'); const tp=document.getElementById('tut-menu-panel'); if(tp) tp.classList.remove('open'); const tb=document.getElementById('tut-menu-btn'); if(tb) tb.classList.remove('active'); const mb=document.getElementById('mtab-tut'); if(mb) mb.classList.remove('active'); document.getElementById('tut-panel').style.display='flex'; tutRender(); }
+function toggleTutMenu(){ const p=document.getElementById('tut-menu-panel'); const open=p.classList.toggle('open'); const b=document.getElementById('tut-menu-btn'); if(b) b.classList.toggle('active',open); const mb=document.getElementById('mtab-tut'); if(mb) mb.classList.toggle('active',open); if(open){ const fp=document.getElementById('forces-menu-panel'); if(fp){ fp.classList.remove('open'); document.getElementById('forces-menu-btn').classList.remove('active'); } closeMobilePanels(); } }
+document.addEventListener('click', (e)=>{ const t=e.target; if(t&&t.matches&&t.matches('#cannon-panel>.tb-label,#motor-panel>.tb-label,#spring-panel>.tb-label')) t.parentElement.classList.toggle('cfg-collapsed'); });
+function tutNext(){ if(!tutorial) return; if(tutorial.i<tutorial.steps.length-1){ tutorial.i++; tutRender(); } else tutClose(); }
+function tutPrev(){ if(!tutorial) return; if(tutorial.i>0){ tutorial.i--; tutRender(); } }
+function tutClose(){ tutorial=null; document.getElementById('tut-panel').style.display='none'; document.getElementById('tut-arrow').style.display='none'; document.querySelectorAll('.tut-glow').forEach(e=>e.classList.remove('tut-glow')); }
+function tutVisibleTarget(sel){ return [...document.querySelectorAll(sel)].find(e=>e.offsetParent!==null) || null; }
+function tutRender(){
+  const st=tutorial.steps[tutorial.i];
+  document.getElementById('tut-title').textContent=TUTORIALS[tutorial.key].titulo;
+  document.getElementById('tut-text').textContent=st.text;
+  document.getElementById('tut-count').textContent=`Passo ${tutorial.i+1} de ${tutorial.steps.length}`;
+  document.getElementById('tut-prev').disabled=tutorial.i===0;
+  document.getElementById('tut-next').textContent=(tutorial.i===tutorial.steps.length-1)?'Concluir ✓':'Próximo ▶';
+  if(isMobile && tutorial.key==='ferramentas'){ if(st.mp) ensureMobilePanel(st.mp); else closeMobilePanels(); }
+  document.querySelectorAll('.tut-glow').forEach(e=>e.classList.remove('tut-glow'));
+  const arrow=document.getElementById('tut-arrow'), tgt=tutVisibleTarget(st.sel);
+  if(tgt){ tgt.classList.add('tut-glow'); const r=tgt.getBoundingClientRect(); arrow.style.display='block'; arrow.style.left=(r.left+r.width/2-11)+'px'; arrow.style.top=Math.max(2,r.top-30)+'px'; }
+  else arrow.style.display='none';
+}
+function drawTutGhosts(ctx, ghosts){
+  if(!ghosts) return;
+  const b=render.bounds, cx=b.min.x+(b.max.x-b.min.x)*0.42, cy=b.min.y+(b.max.y-b.min.y)*0.40;
+  ctx.save(); ctx.font='bold 11px Orbitron,monospace'; ctx.textAlign='center';
+  ghosts.forEach(g=>{
+    const x=cx+(g.x||0), y=cy+(g.y||0), col=g.lbl?'#bc6bff':'#7df9ff';
+    ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=2; ctx.shadowBlur=8; ctx.shadowColor=col; ctx.globalAlpha=0.9; ctx.setLineDash([6,5]);
+    if(g.t==='rect') ctx.strokeRect(x-g.w/2,y-g.h/2,g.w,g.h);
+    else if(g.t==='circle'||g.t==='gear'){ ctx.beginPath(); ctx.arc(x,y,g.r,0,Math.PI*2); ctx.stroke(); if(g.t==='gear'){ ctx.setLineDash([]); for(let i=0;i<10;i++){ const a=i*Math.PI/5; ctx.beginPath(); ctx.moveTo(x+Math.cos(a)*g.r,y+Math.sin(a)*g.r); ctx.lineTo(x+Math.cos(a)*(g.r+6),y+Math.sin(a)*(g.r+6)); ctx.stroke(); } } }
+    else if(g.t==='dot'){ ctx.setLineDash([]); ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill(); }
+    else if(g.t==='motor'){ ctx.setLineDash([]); ctx.strokeStyle='#44ff88'; ctx.fillStyle='#44ff88'; ctx.shadowColor='#44ff88'; ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.stroke(); ctx.fillText('M',x,y+4); }
+    else if(g.t==='arrowR'){ ctx.setLineDash([]); ctx.strokeStyle='#44ff88'; ctx.shadowColor='#44ff88'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+34,y); ctx.lineTo(x+26,y-7); ctx.moveTo(x+34,y); ctx.lineTo(x+26,y+7); ctx.stroke(); }
+    else if(g.t==='spin'){ ctx.setLineDash([]); ctx.strokeStyle='#ffcc00'; ctx.shadowColor='#ffcc00'; ctx.lineWidth=2; const s=g.ccw?-1:1; ctx.beginPath(); ctx.arc(x,y,g.r*0.5,-0.6,2.0); ctx.stroke(); const ex=x+Math.cos(2.0)*g.r*0.5, ey=y+Math.sin(2.0)*g.r*0.5; ctx.beginPath(); ctx.moveTo(ex,ey); ctx.lineTo(ex-6*s,ey-2); ctx.moveTo(ex,ey); ctx.lineTo(ex-2*s,ey+6); ctx.stroke(); }
+    if(g.lbl){ ctx.setLineDash([]); ctx.shadowBlur=3; ctx.shadowColor='#000'; ctx.fillStyle='#fff'; ctx.fillText(g.lbl, x, y-(g.r?g.r+9:(g.h?g.h/2+13:13))); }
+  });
+  ctx.restore();
+}
+function drawForceArrow(ctx, x, y, fx, fy, color, label, unit){
+  const F = Math.hypot(fx,fy); if(F < 0.3) return;
+  const len = Math.min(120, 12 + F*3.0); const ux=fx/F, uy=fy/F;
+  drawVecArrow(ctx, x, y, x+ux*len, y+uy*len, color);
+  ctx.save(); ctx.font='bold 10.5px Orbitron,monospace'; ctx.fillStyle=color; ctx.shadowBlur=4; ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.textAlign='left';
+  ctx.fillText(`${label} ${F.toFixed(1)}${unit||'N'}`, x+ux*len+4, y+uy*len+3); ctx.restore();
+}
+function drawKinArrow(ctx, x, y, vx, vy, mag, color, label, unit, side){
+  if(mag < 0.05) return; const L=Math.hypot(vx,vy)||1; const len=Math.min(90, 12+mag*7); const ux=vx/L, uy=vy/L;
+  const s=side||0, perpx=-uy, perpy=ux;
+  const ox=x+perpx*12*s, oy=y+perpy*12*s;                       // seta deslocada ⟂ (v e a não se cruzam)
+  drawVecArrow(ctx, ox, oy, ox+ux*len, oy+uy*len, color);
+  const lx=ox+ux*len+perpx*10*s+4, ly=oy+uy*len+perpy*10*s+3;   // rótulo empurrado mais para o lado
+  ctx.save(); ctx.font='bold 10.5px Orbitron,monospace'; ctx.fillStyle=color; ctx.shadowBlur=4; ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.textAlign='left';
+  ctx.fillText(`${label} ${mag.toFixed(1)}${unit}`, lx, ly); ctx.restore();
+}
+function drawForces(ctx){
+  if(selectedBodies.length === 0) return;          // SÓ nos objetos selecionados
+  const F = forceFilter;
+  const targets = selectedBodies.filter(b => b && !b.isStatic && instrAlive(b));
+  const g = gDisplay();
+  targets.forEach(b=>{
+    const p=b.position, m=bodyKg(b);
+    const P={x:0,y:m*g};
+    const N=_contactN.get(b)||{x:0,y:0};
+    const Fat=_contactF.get(b)||{x:0,y:0};
+    const T=_ropeForce.get(b)||{x:0,y:0};
+    const a=bodyAccel(b); const R={x:m*a.x, y:m*a.y};
+    const Fel={ x:R.x-(P.x+N.x+Fat.x+T.x), y:R.y-(P.y+N.y+Fat.y+T.y) }; // 2ª lei: resíduo = elástica/outras
+    // componentes do Peso relativas à superfície (quando há Normal): Px ∥, Py ⟂
+    if(F.Pc){ const nMag=Math.hypot(N.x,N.y);
+      if(nMag>0.3){ const nx=N.x/nMag, ny=N.y/nMag; const pPerp=P.x*nx+P.y*ny; const PyV={x:nx*pPerp,y:ny*pPerp}; const PxV={x:P.x-PyV.x,y:P.y-PyV.y};
+        drawForceArrow(ctx,p.x,p.y,PxV.x,PxV.y,FORCE_COLORS.Pc,'Px'); drawForceArrow(ctx,p.x,p.y,PyV.x,PyV.y,FORCE_COLORS.Pc,'Py'); } }
+    if(F.P)   drawForceArrow(ctx,p.x,p.y,P.x,P.y,FORCE_COLORS.P,'P');
+    if(F.N)   drawForceArrow(ctx,p.x,p.y,N.x,N.y,FORCE_COLORS.N,'N');
+    if(F.Fat) drawForceArrow(ctx,p.x,p.y,Fat.x,Fat.y,FORCE_COLORS.Fat,'Fat');
+    if(F.T)   drawForceArrow(ctx,p.x,p.y,T.x,T.y,FORCE_COLORS.T,'T');
+    if(F.Fel && bodyHasSpring(b)) drawForceArrow(ctx,p.x,p.y,Fel.x,Fel.y,FORCE_COLORS.Fel,'Fel');
+    if(F.R)   drawForceArrow(ctx,p.x,p.y,R.x,R.y,FORCE_COLORS.R,'R');
+    if(F.v)   drawKinArrow(ctx,p.x,p.y,b.velocity.x,b.velocity.y,bodySpeedMps(b),FORCE_COLORS.v,'v','m/s',1);
+    if(F.a)   drawKinArrow(ctx,p.x,p.y,a.x,a.y,Math.hypot(a.x,a.y),FORCE_COLORS.a,'a','m/s²',-1);
+  });
+}
+function drawWheelSpoke(ctx,body){
+  const{x,y}=body.position, r=body.circleRadius, a=body.angle;
+  ctx.save(); ctx.translate(x,y); ctx.rotate(a);
+  ctx.strokeStyle='rgba(255,255,255,0.42)'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(r*0.82,0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-r*0.82,0); ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,0.30)'; ctx.beginPath(); ctx.arc(0,0,r*0.16,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+function drawLaserBeams(ctx){ const channels = [{n:1.48, color:'#ff2200', alpha:1.00, width:2.2},{n:1.51, color:'#00ee44', alpha:0.55, width:1.4},{n:1.54, color:'#3388ff', alpha:0.55, width:1.4}]; laserEmitters.forEach(laser=>{ const mainSegs = traceLaserRay(laser.x, laser.y, laser.angle, 1.50); const hasGlass = mainSegs.some(s=>s.inside); channels.forEach(({n,color,alpha,width},ci)=>{ const segs = hasGlass ? traceLaserRay(laser.x, laser.y, laser.angle, n) : mainSegs; ctx.save(); ctx.globalAlpha = (ci===0) ? alpha : (hasGlass ? alpha : 0); segs.forEach(seg=>{ ctx.strokeStyle = color; ctx.lineWidth = seg.inside ? (width * 0.7) : width; ctx.shadowBlur = seg.inside ? 6 : 16; ctx.shadowColor = color; ctx.beginPath(); ctx.moveTo(seg.x1, seg.y1); ctx.lineTo(seg.x2, seg.y2); ctx.stroke(); }); ctx.restore(); }); ctx.save(); ctx.translate(laser.x, laser.y); ctx.rotate(laser.angle); ctx.fillStyle = '#ff3300'; ctx.strokeStyle = '#ff8866'; ctx.lineWidth = 1.5; ctx.shadowBlur = 18; ctx.shadowColor = '#ff2200'; ctx.beginPath(); ctx.moveTo(-12, -7); ctx.lineTo(6, 0); ctx.lineTo(-12, 7); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.fillStyle = 'rgba(255,200,0,0.9)'; ctx.beginPath(); ctx.arc(6, 0, 3.5, 0, Math.PI*2); ctx.fill(); ctx.restore(); }); }
+Events.on(render,'afterRender',()=>{ const ctx=render.context, RH=getRH(); ctx.save(); ctx.setTransform(zoom,0,0,zoom,-render.bounds.min.x*zoom,-render.bounds.min.y*zoom); ctx.save();ctx.strokeStyle='rgba(188,19,254,0.026)';ctx.lineWidth=0.5; const _gx0=Math.floor(BOX_X0/30)*30; for(let gx=_gx0;gx<=BOX_X1;gx+=30){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,RH);ctx.stroke();} for(let gy=0;gy<=RH;gy+=30){ctx.beginPath();ctx.moveTo(BOX_X0,gy);ctx.lineTo(BOX_X1,gy);ctx.stroke();} ctx.restore(); ctx.save();ctx.strokeStyle='rgba(188,19,254,0.52)';ctx.lineWidth=1.5;ctx.shadowBlur=14;ctx.shadowColor='#bc13fe'; ctx.beginPath();ctx.moveTo(BOX_X0,RH);ctx.lineTo(BOX_X1,RH);ctx.stroke(); ctx.globalAlpha=0.5; ctx.beginPath();ctx.moveTo(BOX_X0,0);ctx.lineTo(BOX_X0,RH);ctx.stroke(); ctx.beginPath();ctx.moveTo(BOX_X1,0);ctx.lineTo(BOX_X1,RH);ctx.stroke(); ctx.restore(); Composite.allBodies(world).filter(b=>b._mat==='glass'||b._mat==='mirror').forEach(b=>drawGlassBody(ctx,b)); userBodies.forEach(b=>{ if(b._isGear) drawGear(ctx,b); else if(b._isPulley) drawPulley(ctx,b); else if(b._isWheel) drawWheelSpoke(ctx,b); }); ctx.save(); userConstraints.forEach(({constraint:c,type})=>{ let{ax,ay,bx,by}=getConstraintEnds(c); ctx.shadowBlur=0; if(type==='spring'){ ctx.strokeStyle='#ffcc00';ctx.lineWidth=1.8;ctx.shadowBlur=9;ctx.shadowColor='#ffcc00'; drawSpring(ctx,ax,ay,bx,by); } else if(type==='rope'){ ctx.strokeStyle='#cc8844';ctx.lineWidth=2.2;ctx.shadowBlur=5;ctx.shadowColor='#cc8844'; ctx.setLineDash([5,4]); drawRope(ctx,ax,ay,bx,by); ctx.setLineDash([]); } else if(type==='pivot'){ ctx.strokeStyle='rgba(0,238,255,0.8)';ctx.fillStyle='rgba(0,238,255,0.2)';ctx.lineWidth=2; ctx.shadowBlur=8;ctx.shadowColor='#00eeff'; drawPivot(ctx,ax,ay,bx,by); } ctx.shadowBlur=0; }); ctx.restore(); drawPulleyRopes(ctx); drawAxleJoints(ctx); traceProjectile(); drawTrails(ctx); drawCannon(ctx); if(tutorial) drawTutGhosts(ctx, tutorial.steps[tutorial.i].ghosts); checkFreehandHold(ctx); updateKinematics(); drawVectors(ctx); drawForces(ctx); drawInstruments(ctx); motors.forEach((_,body)=>{ctx.save();drawMotorIndicator(ctx,body);ctx.restore();}); pinnedBodies.forEach(body=>{ctx.save();drawPinIndicator(ctx,body);ctx.restore();}); if ((activeTool === 'move' || activeTool === 'select') && selectedBodies.length) { ctx.save();ctx.strokeStyle='#ffaa44';ctx.lineWidth=3;ctx.shadowBlur=12;ctx.shadowColor='#ffaa44';ctx.setLineDash([6,8]); selectedBodies.forEach(b=>{ ctx.beginPath();b.vertices.forEach((v,i)=> i===0 ? ctx.moveTo(v.x,v.y) : ctx.lineTo(v.x,v.y)); ctx.closePath();ctx.stroke(); });ctx.setLineDash([]);ctx.restore(); }
+if (activeTool === 'select' && isDrawing) { const mx=Math.min(drawStartX,drawCurrX), my=Math.min(drawStartY,drawCurrY), mw=Math.abs(drawCurrX-drawStartX), mh=Math.abs(drawCurrY-drawStartY); ctx.save();ctx.strokeStyle='#ffaa44';ctx.fillStyle='rgba(255,170,68,0.08)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);ctx.shadowBlur=8;ctx.shadowColor='#ffaa44'; ctx.beginPath();ctx.rect(mx,my,mw,mh);ctx.fill();ctx.stroke();ctx.setLineDash([]);ctx.restore(); } drawLaserBeams(ctx); if(activeTool==='laser'&&isDrawing){ const angle=Math.atan2(drawCurrY-drawStartY,drawCurrX-drawStartX); ctx.save();ctx.strokeStyle='rgba(255,80,0,0.5)';ctx.lineWidth=1.5;ctx.setLineDash([8,5]); ctx.shadowBlur=8;ctx.shadowColor='#ff3300'; ctx.beginPath();ctx.moveTo(drawStartX,drawStartY);ctx.lineTo(drawCurrX,drawCurrY);ctx.stroke(); ctx.setLineDash([]);ctx.translate(drawStartX,drawStartY);ctx.rotate(angle); ctx.fillStyle='rgba(255,80,0,0.7)'; ctx.beginPath();ctx.moveTo(-10,-5);ctx.lineTo(5,0);ctx.lineTo(-10,5);ctx.closePath();ctx.fill(); ctx.restore(); } if(conn.step===1 && (activeTool==='spring'||activeTool==='rope'||activeTool==='pivot')){ let ax,ay; if(conn.bodyA && conn.pointA_abs){ ax = conn.pointA_abs.x; ay = conn.pointA_abs.y; } else if(conn.bodyA){ const wp=localToWorld(conn.bodyA,conn.pointA||{x:0,y:0}); ax=wp.x; ay=wp.y; } else{ ax=conn.worldA?.x||drawCurrX; ay=conn.worldA?.y||drawCurrY; } const col=activeTool==='spring'?'#ffcc00':activeTool==='rope'?'#cc8844':'#00eeff'; ctx.save();ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=1.5;ctx.setLineDash([6,4]); ctx.shadowBlur=10;ctx.shadowColor=col;ctx.globalAlpha=0.72; ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(drawCurrX,drawCurrY);ctx.stroke(); ctx.setLineDash([]);ctx.globalAlpha=1;ctx.shadowBlur=12; ctx.beginPath();ctx.arc(ax,ay,6,0,Math.PI*2);ctx.fill();ctx.restore(); } if(activeTool==='erase'){ laserEmitters.forEach(l=>{if(Math.hypot(l.x-drawCurrX,l.y-drawCurrY)<25){ ctx.save();ctx.strokeStyle='#ff5555';ctx.lineWidth=2;ctx.shadowBlur=12;ctx.shadowColor='#ff5555'; ctx.beginPath();ctx.arc(l.x,l.y,14,0,Math.PI*2);ctx.stroke();ctx.restore(); }}); Query.point(Composite.allBodies(world),{x:drawCurrX,y:drawCurrY}).filter(b=>!b.isStatic||pinnedBodies.has(b)).forEach(b=>{ ctx.save();ctx.strokeStyle='#ff5555';ctx.lineWidth=2.5;ctx.shadowBlur=16;ctx.shadowColor='#ff5555'; ctx.beginPath();b.vertices.forEach((v,i)=>i===0?ctx.moveTo(v.x,v.y):ctx.lineTo(v.x,v.y)); ctx.closePath();ctx.stroke();ctx.restore(); }); } if(isDrawing&&!isPlacingLaser){ if(activeTool==='box'){ const pw=drawCurrX-drawStartX,ph=drawCurrY-drawStartY; ctx.save();ctx.strokeStyle='#ff00ff';ctx.fillStyle='rgba(255,0,255,0.06)'; ctx.lineWidth=1.5;ctx.shadowBlur=14;ctx.shadowColor='#ff00ff';ctx.setLineDash([6,4]); ctx.beginPath();ctx.rect(drawStartX,drawStartY,pw,ph);ctx.fill();ctx.stroke(); ctx.setLineDash([]);ctx.shadowBlur=0; ctx.font='11px Orbitron,monospace';ctx.fillStyle='rgba(255,0,255,0.85)';ctx.textAlign='left'; ctx.fillText(`${Math.abs(Math.round(pw))}×${Math.abs(Math.round(ph))}`,drawStartX+4,drawStartY-6); ctx.restore(); } if(activeTool==='circle'||activeTool==='wheel'||activeTool==='gear'||activeTool==='pulley'){ const r=Math.hypot(drawCurrX-drawStartX,drawCurrY-drawStartY); const col=activeTool==='gear'?'#ff9933':activeTool==='pulley'?'#44ff88':'#00eeff'; ctx.save();ctx.strokeStyle=col;ctx.fillStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1.5;ctx.shadowBlur=14;ctx.shadowColor=col;ctx.setLineDash([6,4]); ctx.beginPath();ctx.arc(drawStartX,drawStartY,r,0,Math.PI*2);ctx.fill();ctx.stroke(); if(activeTool==='pulley'){ ctx.setLineDash([3,5]); ctx.beginPath();ctx.arc(drawStartX,drawStartY,r*0.88,0,Math.PI*2);ctx.stroke(); } ctx.setLineDash([]);ctx.lineWidth=1; ctx.beginPath();ctx.moveTo(drawStartX,drawStartY);ctx.lineTo(drawCurrX,drawCurrY);ctx.stroke(); ctx.shadowBlur=0;ctx.font='11px Orbitron,monospace';ctx.fillStyle=col;ctx.textAlign='left'; ctx.fillText(`r=${Math.round(r)}`,drawStartX+4,drawStartY-6); ctx.restore(); } if(activeTool==='freehand'&&freehandPts.length>=2){ ctx.save();ctx.strokeStyle='#44ff88';ctx.fillStyle='rgba(68,255,136,0.06)'; ctx.lineWidth=2;ctx.shadowBlur=10;ctx.shadowColor='#44ff88'; ctx.beginPath();ctx.moveTo(freehandPts[0].x,freehandPts[0].y); freehandPts.slice(1).forEach(p=>ctx.lineTo(p.x,p.y));ctx.stroke(); const last=freehandPts[freehandPts.length-1]; ctx.setLineDash([5,4]);ctx.lineWidth=1;ctx.shadowBlur=0; ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(freehandPts[0].x,freehandPts[0].y);ctx.stroke();ctx.setLineDash([]); ctx.fillStyle='#44ff88';ctx.shadowBlur=8;ctx.beginPath();ctx.arc(freehandPts[0].x,freehandPts[0].y,5,0,Math.PI*2);ctx.fill(); ctx.restore(); } } if(isDrawing&&activeTool==='rope'&&freehandPts.length>=2){ ctx.save();ctx.strokeStyle='#ffb24d';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.shadowBlur=6;ctx.shadowColor='#a06a30';ctx.setLineDash([2,7]); ctx.beginPath();ctx.moveTo(freehandPts[0].x,freehandPts[0].y); for(let i=1;i<freehandPts.length;i++)ctx.lineTo(freehandPts[i].x,freehandPts[i].y); ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#ffb24d';ctx.shadowBlur=8;ctx.beginPath();ctx.arc(freehandPts[0].x,freehandPts[0].y,4,0,Math.PI*2);ctx.fill();ctx.restore(); } if(isDrawing&&activeTool==='ruler'){ const ra=rulerAdjust(drawStartX,drawStartY,drawCurrX,drawCurrY); const ex=ra.x,ey=ra.y; const dpx=Math.hypot(ex-drawStartX,ey-drawStartY); ctx.save();ctx.strokeStyle='#ffd166';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.shadowBlur=6;ctx.shadowColor='#ffd166';ctx.lineCap='round'; ctx.beginPath();ctx.moveTo(drawStartX,drawStartY);ctx.lineTo(ex,ey);ctx.stroke();ctx.setLineDash([]); ctx.fillStyle='#ffd166';ctx.font='11px Orbitron,monospace';ctx.fillText(`${(dpx/PX_PER_M).toFixed(2)} m${altHeld?' ⟂':''}${shiftHeld?' ⌁':''}`,(drawStartX+ex)/2+6,(drawStartY+ey)/2-6);ctx.restore(); } if(activeTool==='protractor'&&protractorPts.length>0){ const O=protractorPts[0]; const cur=protractorSnapDir(O,snapVertexNear(drawCurrX,drawCurrY)); ctx.save();ctx.strokeStyle='#ff9ff3';ctx.lineWidth=2;ctx.setLineDash([5,4]);ctx.shadowBlur=5;ctx.shadowColor='#ff9ff3';ctx.lineCap='round'; for(let i=1;i<protractorPts.length;i++){ctx.beginPath();ctx.moveTo(O.x,O.y);ctx.lineTo(protractorPts[i].x,protractorPts[i].y);ctx.stroke();} ctx.beginPath();ctx.moveTo(O.x,O.y);ctx.lineTo(cur.x,cur.y);ctx.stroke();ctx.setLineDash([]); protractorPts.forEach(p=>{ctx.fillStyle='#ff9ff3';ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,Math.PI*2);ctx.fill();}); if(protractorPts.length>=2){const R=protractorReadout(O,protractorPts[1],cur);ctx.fillStyle='#ff9ff3';ctx.font='bold 11px Orbitron,monospace';ctx.fillText(`${R.between.toFixed(1)}°`,O.x+14,O.y-10);} ctx.restore(); } if(activeTool==='freehand'&&polyClickPts.length>=1){ ctx.save();ctx.strokeStyle='#44ff88';ctx.fillStyle='rgba(68,255,136,0.06)';ctx.lineWidth=2;ctx.shadowBlur=8;ctx.shadowColor='#44ff88';ctx.lineJoin='round'; ctx.beginPath();ctx.moveTo(polyClickPts[0].x,polyClickPts[0].y); for(let i=1;i<polyClickPts.length;i++)ctx.lineTo(polyClickPts[i].x,polyClickPts[i].y); ctx.lineTo(drawCurrX,drawCurrY); ctx.stroke(); ctx.setLineDash([5,4]);ctx.lineWidth=1;ctx.shadowBlur=0; ctx.beginPath();ctx.moveTo(drawCurrX,drawCurrY);ctx.lineTo(polyClickPts[0].x,polyClickPts[0].y);ctx.stroke();ctx.setLineDash([]); ctx.fillStyle='#44ff88';ctx.shadowBlur=8; polyClickPts.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();}); ctx.font='10px Orbitron,monospace';ctx.fillStyle='rgba(68,255,136,0.9)';ctx.shadowBlur=0; ctx.fillText('Shift: clique p/ vértices · solte p/ fechar',polyClickPts[0].x+8,polyClickPts[0].y-8); ctx.restore(); } fpsCount++; const now=performance.now(); document.getElementById('sb-time').textContent=fmtTime(simTime); const _sw=document.getElementById('sw-time'); if(_sw) _sw.textContent=fmtTime(swElapsed); if(now-fpsLast>=1000){fpsVal=fpsCount;fpsCount=0;fpsLast=now;document.getElementById('sb-fps').textContent=fpsVal;} ctx.restore(); });
+function fmtTime(t){ if(t<60) return t.toFixed(2)+'s'; const m=Math.floor(t/60), s=t-m*60; return m+':'+(s<10?'0':'')+s.toFixed(2); }
+document.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT') return; if(e.key==='Shift'){ shiftHeld=true; if(activeTool==='freehand'){ isDrawing=false; freehandPts=[]; } return; } if(e.key==='Alt'){ altHeld=true; return; } if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); return; } if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); return; } switch(e.key){ case '1':setTool('box');break; case '2':setTool('circle');break; case '3':setTool('freehand');break; case '4':setTool('move');break; case '5':setTool('erase');break; case '6':setTool('spring');break; case '7':setTool('rope');break; case '8':setTool('pivot');break; case '9':setTool('motor');break; case 'v':case 'V':setTool('select');break; case 'w':case 'W':setTool('wheel');break; case 'g':case 'G':setTool('gear');break; case 'y':case 'Y':setTool('pulley');break; case 'c':case 'C':demoCarro();break; case 'p':case 'P':setTool('pin');break; case 'l':case 'L':setTool('laser');break; case 'k':case 'K':setTool('cannon');break; case 'f':case 'F':launchCannon();break; case 't':case 'T':setTool('protractor');break; case 'j':case 'J':setTool('tracker');break; case ' ':e.preventDefault();setRunning(!isRunning);break; case 'r':case 'R':resetWorld();break; case '+':case '=':zoomIn();break; case '-':case '_':zoomOut();break; case '0':zoomReset();break; case 'Escape':isDrawing=false;freehandPts=[];polyClickPts=[];isPlacingLaser=false;protractorPts=[];conn.step=0;clearSelection();document.getElementById('conn-hint').classList.remove('visible');break; } });
+document.addEventListener('keyup',e=>{ if(e.key==='Alt'){ altHeld=false; } if(e.key==='Shift'){ shiftHeld=false; if(activeTool==='freehand' && polyClickPts.length>=3){ criarPoligono(polyClickPts); } polyClickPts=[]; } });
+window.addEventListener('resize',()=>{ W=window.innerWidth;H=window.innerHeight; const rh=getRH(); render.canvas.width=W;render.canvas.height=rh; render.options.width=W;render.options.height=rh; criarBordas(); applyZoom(); });
+canvasEl.width=W; canvasEl.height=getRH();
+Render.run(render); Runner.run(runner,engine);
+setTool('box'); setRunning(true); setZoom(1);
+saveToHistory();
+console.info('%c[PhysicsSim Pro - EIXOS COM POSIÇÃO ABSOLUTA!]','color:#00eeff;font-weight:bold;font-size:14px');
+console.info('🔧 CORREÇÃO FUNDAMENTAL:');
+console.info('   1. O ponto do eixo é ARMAZENADO em COORDENADAS ABSOLUTAS (x,y da tela) no momento do clique');
+console.info('   2. Apenas na CRIAÇÃO do eixo, o ponto é convertido para coordenadas LOCAIS do corpo');
+console.info('   3. Isso garante que a posição do eixo seja SEMPRE onde você clicou, independentemente do tamanho do corpo');
+console.info('');
+console.info('✅ Agora múltiplos eixos no mesmo corpo mantêm a posição exata onde você clicou!');
+</script>
+</body>
+</html>

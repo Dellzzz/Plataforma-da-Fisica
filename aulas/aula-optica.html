@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ÓPTICA | Aula Interativa</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --neon-cyan: #00f5ff;
+    --neon-purple: #bf00ff;
+    --neon-pink: #ff006e;
+    --neon-green: #39ff14;
+    --neon-yellow: #ffff00;
+    --neon-orange: #ff6200;
+    --bg-dark: #020408;
+    --bg-panel: #050d15;
+    --bg-card: #081420;
+    --border-glow: rgba(0,245,255,0.3);
+    --text-main: #c8e8f0;
+    --text-dim: #5a8a99;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── SCANLINES OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,245,255,0.015) 2px,
+      rgba(0,245,255,0.015) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── ANIMATED BACKGROUND ── */
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridMove 20s linear infinite;
+    z-index: 0;
+  }
+  @keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 60px 60px; }
+  }
+
+  /* ── HERO ── */
+  header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 80px 20px 60px;
+    border-bottom: 1px solid var(--border-glow);
+  }
+
+  .header-badge {
+    display: inline-block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--neon-cyan);
+    letter-spacing: 4px;
+    border: 1px solid var(--neon-cyan);
+    padding: 4px 16px;
+    margin-bottom: 24px;
+    animation: pulse-border 2s ease-in-out infinite;
+  }
+  @keyframes pulse-border {
+    0%,100% { box-shadow: 0 0 4px var(--neon-cyan), inset 0 0 4px rgba(0,245,255,0.1); }
+    50% { box-shadow: 0 0 16px var(--neon-cyan), 0 0 40px rgba(0,245,255,0.3), inset 0 0 10px rgba(0,245,255,0.2); }
+  }
+
+  h1.title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(2.5rem, 8vw, 5.5rem);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    color: #fff;
+    text-shadow:
+      0 0 10px var(--neon-cyan),
+      0 0 30px var(--neon-cyan),
+      0 0 80px rgba(0,245,255,0.4);
+    animation: flicker 6s linear infinite;
+  }
+  @keyframes flicker {
+    0%,95%,100% { opacity: 1; }
+    96% { opacity: 0.85; }
+    97% { opacity: 1; }
+    98% { opacity: 0.7; }
+    99% { opacity: 1; }
+  }
+
+  .subtitle {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 300;
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-top: 12px;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(2,4,8,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,245,255,0.2);
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    flex-wrap: wrap;
+  }
+
+  nav a {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 6px 18px;
+    border: 1px solid rgba(0,245,255,0.2);
+    transition: all 0.3s;
+  }
+  nav a:hover {
+    color: var(--neon-cyan);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 12px var(--neon-cyan), inset 0 0 8px rgba(0,245,255,0.1);
+    text-shadow: 0 0 8px var(--neon-cyan);
+  }
+
+  /* ── LAYOUT ── */
+  main {
+    position: relative;
+    z-index: 10;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── SECTION ── */
+  section {
+    margin-top: 80px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .section-number {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--neon-cyan);
+    opacity: 0.6;
+  }
+
+  h2.section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.3rem, 3vw, 1.9rem);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.05em;
+  }
+
+  h2.section-title span {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 12px var(--neon-cyan);
+  }
+
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--neon-cyan), transparent);
+    opacity: 0.4;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-glow);
+    padding: 32px;
+    margin-bottom: 24px;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--neon-cyan);
+    box-shadow: 0 0 10px var(--neon-cyan);
+  }
+  .card:hover {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 20px rgba(0,245,255,0.1), inset 0 0 20px rgba(0,245,255,0.03);
+  }
+
+  .card.purple::before { background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); }
+  .card.purple { border-color: rgba(191,0,255,0.3); }
+  .card.purple:hover { border-color: var(--neon-purple); box-shadow: 0 0 20px rgba(191,0,255,0.1); }
+
+  .card.pink::before { background: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
+  .card.pink { border-color: rgba(255,0,110,0.3); }
+
+  .card.green::before { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+  .card.green { border-color: rgba(57,255,20,0.3); }
+
+  h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px var(--neon-cyan);
+    margin-bottom: 14px;
+    letter-spacing: 0.05em;
+  }
+  .card.purple h3 { color: var(--neon-purple); text-shadow: 0 0 8px var(--neon-purple); }
+  .card.pink h3 { color: var(--neon-pink); text-shadow: 0 0 8px var(--neon-pink); }
+  .card.green h3 { color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green); }
+
+  p { color: var(--text-main); margin-bottom: 12px; }
+
+  /* ── LAW BOX ── */
+  .law-box {
+    background: rgba(0,245,255,0.05);
+    border: 1px solid rgba(0,245,255,0.5);
+    border-left: 4px solid var(--neon-cyan);
+    padding: 20px 24px;
+    margin: 20px 0;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 4px rgba(0,245,255,0.4);
+    box-shadow: 0 0 20px rgba(0,245,255,0.08);
+  }
+  .law-box.purple {
+    background: rgba(191,0,255,0.05);
+    border-color: rgba(191,0,255,0.5);
+    border-left-color: var(--neon-purple);
+    color: var(--neon-purple);
+    text-shadow: 0 0 4px rgba(191,0,255,0.4);
+    box-shadow: 0 0 20px rgba(191,0,255,0.08);
+  }
+
+  .formula {
+    display: inline-block;
+    background: rgba(0,0,0,0.5);
+    padding: 4px 12px;
+    border-radius: 2px;
+    font-size: 1.05rem;
+    font-weight: bold;
+  }
+
+  /* ── CANVAS / SVG VISUALS ── */
+  .visual-container {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-glow);
+    padding: 24px;
+    margin: 24px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .visual-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+
+  /* ── CANVAS ANIMATIONS ── */
+  canvas {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    border: 1px solid rgba(0,245,255,0.1);
+  }
+
+  /* ── SPECTRUM BAR ── */
+  .spectrum-bar {
+    height: 48px;
+    border-radius: 4px;
+    background: linear-gradient(90deg,
+      #8B00FF, #4400ff, #0000FF, #00a2ff, #00FF00, #FFFF00, #FF7F00, #FF0000
+    );
+    box-shadow:
+      0 0 20px rgba(139,0,255,0.4),
+      0 0 40px rgba(0,162,255,0.2),
+      0 0 20px rgba(255,0,0,0.3);
+    margin: 12px 0;
+    position: relative;
+  }
+  .spectrum-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    padding: 0 4px;
+    margin-top: 6px;
+  }
+
+  /* ── COLOR GRID ── */
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .color-cell {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 16px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: default;
+  }
+  .color-cell:hover { transform: translateY(-4px); }
+  .color-dot {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    box-shadow: 0 0 20px currentColor;
+  }
+  .color-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .color-nm {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  /* ── EXERCISES ── */
+  .quiz-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(191,0,255,0.3);
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+  }
+  .quiz-card:hover { border-color: var(--neon-purple); }
+
+  .question-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--neon-purple);
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+  }
+  .question-text {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 20px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .opt-btn {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(191,0,255,0.3);
+    color: var(--text-main);
+    padding: 12px 18px;
+    text-align: left;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .opt-btn:hover {
+    border-color: var(--neon-purple);
+    background: rgba(191,0,255,0.08);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(191,0,255,0.2);
+  }
+  .opt-btn.correct {
+    border-color: var(--neon-green) !important;
+    background: rgba(57,255,20,0.1) !important;
+    color: var(--neon-green) !important;
+    box-shadow: 0 0 12px rgba(57,255,20,0.3) !important;
+  }
+  .opt-btn.wrong {
+    border-color: var(--neon-pink) !important;
+    background: rgba(255,0,110,0.1) !important;
+    color: var(--neon-pink) !important;
+  }
+  .opt-btn:disabled { cursor: not-allowed; }
+
+  .opt-letter {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    color: var(--neon-purple);
+    min-width: 20px;
+  }
+
+  .feedback {
+    margin-top: 14px;
+    padding: 12px 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    display: none;
+    border-left: 3px solid;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct-msg { color: var(--neon-green); border-color: var(--neon-green); background: rgba(57,255,20,0.05); }
+  .feedback.wrong-msg { color: var(--neon-pink); border-color: var(--neon-pink); background: rgba(255,0,110,0.05); }
+
+  /* ── SCORE ── */
+  .score-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--neon-cyan);
+    padding: 28px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0,245,255,0.1);
+    margin-top: 32px;
+  }
+  .score-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+  .score-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 20px var(--neon-cyan);
+  }
+  .score-msg {
+    font-size: 1rem;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-family: 'Rajdhani', sans-serif;
+  }
+  th {
+    background: rgba(0,245,255,0.08);
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    padding: 12px 16px;
+    text-align: left;
+    border: 1px solid rgba(0,245,255,0.2);
+  }
+  td {
+    padding: 10px 16px;
+    border: 1px solid rgba(0,245,255,0.1);
+    color: var(--text-main);
+    font-size: 0.95rem;
+  }
+  tr:hover td { background: rgba(0,245,255,0.03); }
+
+  /* ── HIGHLIGHT ── */
+  .hl { color: var(--neon-cyan); font-weight: 600; }
+  .hl-p { color: var(--neon-purple); font-weight: 600; }
+  .hl-g { color: var(--neon-green); font-weight: 600; }
+
+  /* ── INFO GRID ── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--border-glow);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+
+  /* ── INTRO BOX ── */
+  .intro-box {
+    background: linear-gradient(135deg, rgba(0,245,255,0.04), rgba(191,0,255,0.04));
+    border: 1px solid rgba(0,245,255,0.2);
+    padding: 28px 32px;
+    margin-top: 40px;
+    position: relative;
+  }
+  .intro-box::after {
+    content: '◈';
+    position: absolute;
+    top: -12px; left: 24px;
+    font-size: 1.2rem;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px var(--neon-cyan);
+    background: var(--bg-dark);
+    padding: 0 8px;
+  }
+
+  /* ── RESET BTN ── */
+  .reset-btn {
+    background: transparent;
+    border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    padding: 10px 28px;
+    cursor: pointer;
+    margin-top: 16px;
+    transition: all 0.3s;
+  }
+  .reset-btn:hover {
+    background: rgba(0,245,255,0.1);
+    box-shadow: 0 0 16px var(--neon-cyan);
+  }
+
+  /* ── ANGLE DEMO ── */
+  .angle-demo {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .angle-control {
+    text-align: center;
+  }
+  .angle-control label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--neon-cyan);
+    display: block;
+    margin-bottom: 8px;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 200px;
+    height: 4px;
+    background: rgba(0,245,255,0.2);
+    outline: none;
+    border-radius: 2px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    background: var(--neon-cyan);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--neon-cyan);
+  }
+  .angle-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px var(--neon-cyan);
+    margin-top: 8px;
+  }
+
+  /* ── SNELL CALC ── */
+  .snell-calc {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
+    align-items: end;
+  }
+  @media(max-width: 600px) { .snell-calc { grid-template-columns: 1fr; } }
+  .calc-field label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .calc-field input, .calc-field select {
+    width: 100%;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(0,245,255,0.3);
+    color: var(--neon-cyan);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1rem;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  .calc-field input:focus, .calc-field select:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 10px rgba(0,245,255,0.2);
+  }
+  .calc-field select option { background: var(--bg-dark); }
+  .calc-result {
+    background: rgba(0,245,255,0.05);
+    border: 1px solid rgba(0,245,255,0.3);
+    padding: 16px;
+    text-align: center;
+    grid-column: 1 / -1;
+  }
+  .calc-result-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .calc-result-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 2rem;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 16px var(--neon-cyan);
+  }
+
+  /* progress */
+  .progress-bar-wrap {
+    height: 4px;
+    background: rgba(0,245,255,0.1);
+    margin-top: 20px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px var(--neon-cyan);
+  }
+
+  @media(max-width:600px){
+    header { padding: 50px 16px 40px; }
+    main { padding: 0 16px 60px; }
+    .card { padding: 20px; }
+    .snell-calc { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+
+<header>
+  <div class="header-badge">MÓDULO 03 // FÍSICA // NÍVEL MÉDIO</div>
+  <h1 class="title">ÓPTICA</h1>
+  <p class="subtitle">Reflexão · Refração · Cores da Luz</p>
+</header>
+
+<nav>
+  <a href="#reflexao">◈ Reflexão</a>
+  <a href="#refracao">◈ Refração</a>
+  <a href="#cores">◈ Cores da Luz</a>
+  <a href="#tabela">◈ Tabela</a>
+  <a href="#exercicios">◈ Exercícios</a>
+  <a href="#download">◈ Download PDF</a>
+</nav>
+
+<main>
+
+  <div class="intro-box">
+    <p>A <span class="hl">Óptica</span> é o ramo da Física que estuda a <span class="hl">luz</span> e os fenômenos a ela associados. A luz visível é uma forma de radiação eletromagnética que o olho humano consegue detectar, com comprimentos de onda entre aproximadamente <span class="hl">380 nm</span> (violeta) e <span class="hl">780 nm</span> (vermelho). No vácuo, a luz se propaga à velocidade de <span class="hl">c = 3 × 10⁸ m/s</span>.</p>
+  </div>
+
+  <!-- ══════════════════ REFLEXÃO ══════════════════ -->
+  <section id="reflexao">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <h2 class="section-title"><span>REFLEXÃO</span> DA LUZ</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="card">
+      <h3>O QUE É REFLEXÃO?</h3>
+      <p>A <span class="hl">reflexão</span> ocorre quando um raio de luz atinge uma superfície e <strong>retorna ao mesmo meio</strong> de origem. Pode ser <span class="hl">regular</span> (espelhos polidos) ou <span class="hl">difusa</span> (superfícies rugosas como papel).</p>
+      <p>É graças à reflexão difusa que podemos enxergar objetos que não emitem luz própria.</p>
+    </div>
+
+    <div class="visual-container">
+      <p class="visual-label">[ SIMULAÇÃO INTERATIVA — REFLEXÃO ]</p>
+      <div class="angle-demo">
+        <div class="angle-control">
+          <label>ÂNGULO DE INCIDÊNCIA</label>
+          <input type="range" id="reflAngle" min="5" max="85" value="45" oninput="drawReflection()">
+          <div class="angle-value" id="reflAngleVal">45°</div>
+        </div>
+      </div>
+      <canvas id="reflCanvas" width="700" height="300"></canvas>
+      <p style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);margin-top:8px;">
+        ▸ Arraste o controle para mudar o ângulo de incidência
+      </p>
+    </div>
+
+    <div class="info-grid">
+      <div class="card">
+        <h3>1ª LEI DA REFLEXÃO</h3>
+        <div class="law-box">
+          O raio incidente (RI), a normal (N) e o raio refletido (RR) são coplanares — estão no mesmo plano.
+        </div>
+        <p>Os três elementos sempre pertencem a um único plano geométrico.</p>
+      </div>
+      <div class="card">
+        <h3>2ª LEI DA REFLEXÃO</h3>
+        <div class="law-box">
+          θᵢ = θᵣ<br>
+          O ângulo de incidência é igual ao ângulo de reflexão.
+        </div>
+        <p>Ambos os ângulos são medidos em relação à <span class="hl">normal</span> à superfície no ponto de incidência.</p>
+      </div>
+    </div>
+
+    <div class="card purple">
+      <h3>TIPOS DE REFLEXÃO</h3>
+      <table>
+        <tr>
+          <th>TIPO</th>
+          <th>SUPERFÍCIE</th>
+          <th>RESULTADO</th>
+          <th>EXEMPLO</th>
+        </tr>
+        <tr>
+          <td>Regular (especular)</td>
+          <td>Lisa e polida</td>
+          <td>Raios paralelos refletem paralelamente → imagem nítida</td>
+          <td>Espelho plano, superfície de água calma</td>
+        </tr>
+        <tr>
+          <td>Difusa (irregular)</td>
+          <td>Rugosa e irregular</td>
+          <td>Raios espalham-se em várias direções → sem imagem nítida</td>
+          <td>Papel, paredes, madeira</td>
+        </tr>
+        <tr>
+          <td>Mista</td>
+          <td>Polida parcialmente</td>
+          <td>Combinação de regular e difusa</td>
+          <td>Superfície pintada fosca</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card green">
+      <h3>EXEMPLO PRÁTICO — ESPELHO PLANO</h3>
+      <p>Em um espelho plano, a imagem formada é:</p>
+      <p>✦ <span class="hl-g">Virtual</span> — formada atrás do espelho<br>
+         ✦ <span class="hl-g">Direita</span> — não há inversão vertical<br>
+         ✦ <span class="hl-g">Simétrica</span> — mesma distância objeto/espelho e imagem/espelho<br>
+         ✦ <span class="hl-g">Lateralmente invertida</span> — esquerda e direita trocam</p>
+      <div class="law-box" style="background:rgba(57,255,20,0.05);border-color:rgba(57,255,20,0.5);border-left-color:var(--neon-green);color:var(--neon-green);">
+        d_objeto = d_imagem (em relação ao espelho)
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════ REFRAÇÃO ══════════════════ -->
+  <section id="refracao">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <h2 class="section-title"><span>REFRAÇÃO</span> DA LUZ</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="card purple">
+      <h3>O QUE É REFRAÇÃO?</h3>
+      <p>A <span class="hl-p">refração</span> ocorre quando a luz passa de um meio para outro com <strong>índice de refração diferente</strong>, sofrendo uma mudança na sua velocidade de propagação e, consequentemente, na sua direção.</p>
+      <p>Exemplos clássicos: uma colher parecendo "torta" na água, o arco-íris, as lentes de óculos e as miragnes no deserto.</p>
+    </div>
+
+    <div class="visual-container">
+      <p class="visual-label">[ SIMULAÇÃO INTERATIVA — REFRAÇÃO ]</p>
+      <div class="angle-demo">
+        <div class="angle-control">
+          <label>ÂNGULO DE INCIDÊNCIA</label>
+          <input type="range" id="refrAngle" min="5" max="85" value="45" oninput="drawRefraction()">
+          <div class="angle-value" id="refrAngleVal">45°</div>
+        </div>
+      </div>
+      <canvas id="refrCanvas" width="700" height="320"></canvas>
+      <p style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);margin-top:8px;">
+        ▸ Simulação: Ar (n=1.0) → Vidro (n=1.5) | A linha tracejada é a normal
+      </p>
+    </div>
+
+    <div class="info-grid">
+      <div class="card">
+        <h3>1ª LEI DA REFRAÇÃO</h3>
+        <div class="law-box">
+          RI, N e RR são coplanares no ponto de incidência.
+        </div>
+        <p>O raio incidente, a normal e o raio refratado estão no mesmo plano.</p>
+      </div>
+      <div class="card">
+        <h3>2ª LEI — LEI DE SNELL-DESCARTES</h3>
+        <div class="law-box purple">
+          n₁ · sen(θ₁) = n₂ · sen(θ₂)
+        </div>
+        <p>Onde <span class="hl-p">n₁</span> e <span class="hl-p">n₂</span> são os índices de refração dos meios 1 e 2, e <span class="hl-p">θ₁</span>, <span class="hl-p">θ₂</span> os ângulos com a normal.</p>
+      </div>
+    </div>
+
+    <div class="card purple">
+      <h3>ÍNDICE DE REFRAÇÃO (n)</h3>
+      <p>O índice de refração de um meio é a razão entre a velocidade da luz no vácuo (c) e a velocidade naquele meio (v):</p>
+      <div class="law-box purple">
+        n = c / v &nbsp;&nbsp;|&nbsp;&nbsp; c = 3 × 10⁸ m/s
+      </div>
+      <p>Quanto maior o índice de refração, <span class="hl-p">mais lenta</span> a luz se propaga no meio e <span class="hl-p">maior a deflexão</span> do raio.</p>
+    </div>
+
+    <!-- CALCULADORA SNELL -->
+    <div class="visual-container">
+      <p class="visual-label">[ CALCULADORA — LEI DE SNELL-DESCARTES ]</p>
+      <div class="snell-calc">
+        <div class="calc-field">
+          <label>MEIO 1 (n₁)</label>
+          <select id="n1Select" onchange="calcSnell()">
+            <option value="1.0">Vácuo / Ar — n = 1.000</option>
+            <option value="1.33">Água — n = 1.333</option>
+            <option value="1.5" selected>Vidro — n = 1.500</option>
+            <option value="1.9">Vidro denso — n = 1.900</option>
+            <option value="2.42">Diamante — n = 2.420</option>
+          </select>
+        </div>
+        <div class="calc-field">
+          <label>MEIO 2 (n₂)</label>
+          <select id="n2Select" onchange="calcSnell()">
+            <option value="1.0" selected>Vácuo / Ar — n = 1.000</option>
+            <option value="1.33">Água — n = 1.333</option>
+            <option value="1.5">Vidro — n = 1.500</option>
+            <option value="1.9">Vidro denso — n = 1.900</option>
+            <option value="2.42">Diamante — n = 2.420</option>
+          </select>
+        </div>
+        <div class="calc-field">
+          <label>ÂNGULO DE INCIDÊNCIA (θ₁)</label>
+          <input type="number" id="snellAngle" value="30" min="1" max="89" oninput="calcSnell()">
+        </div>
+        <div class="calc-field" style="display:flex;align-items:center;justify-content:center;">
+          <div>
+            <div class="calc-result-label">n₁ · sen(θ₁) = n₂ · sen(θ₂)</div>
+          </div>
+        </div>
+        <div class="calc-result">
+          <div class="calc-result-label">ÂNGULO DE REFRAÇÃO (θ₂)</div>
+          <div class="calc-result-value" id="snellResult">—</div>
+          <div id="snellStatus" style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);margin-top:4px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>REFLEXÃO TOTAL INTERNA</h3>
+      <p>Quando a luz vai de um meio <span class="hl">mais denso</span> para um <span class="hl">menos denso</span> (ex: vidro → ar), existe um <span class="hl">ângulo limite (θ_L)</span> acima do qual toda a luz é refletida de volta, sem haver refração. Esse fenômeno é chamado de <strong>reflexão total interna</strong>.</p>
+      <div class="law-box">
+        sen(θ_L) = n₂ / n₁ &nbsp;(onde n₁ > n₂)
+      </div>
+      <p>Aplicações: <span class="hl">fibra óptica</span> (telecomunicações e medicina), diamantes lapidados (brilho), prismas de periscópio.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════ CORES ══════════════════ -->
+  <section id="cores">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <h2 class="section-title"><span>CORES</span> DA LUZ</h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="card pink">
+      <h3>LUZ BRANCA E DISPERSÃO</h3>
+      <p>A <span class="hl" style="color:var(--neon-pink)">luz branca</span> é uma composição de todas as cores visíveis. Ao atravessar um <strong>prisma</strong> ou gota d'água, ela é <span class="hl" style="color:var(--neon-pink)">dispersada</span>: cada cor (frequência) refrata em ângulo diferente, separando o espectro visível.</p>
+      <p>Esse fenômeno ocorre pois o índice de refração do vidro varia com o comprimento de onda — o violeta desacelera mais do que o vermelho.</p>
+    </div>
+
+    <div class="visual-container">
+      <p class="visual-label">[ ESPECTRO VISÍVEL DA LUZ ]</p>
+      <div class="spectrum-bar"></div>
+      <div class="spectrum-labels">
+        <span>400 nm</span>
+        <span>450 nm</span>
+        <span>500 nm</span>
+        <span>550 nm</span>
+        <span>600 nm</span>
+        <span>650 nm</span>
+        <span>700 nm</span>
+      </div>
+      <canvas id="prismCanvas" width="700" height="260" style="margin-top:24px;"></canvas>
+      <p style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);margin-top:8px;">
+        ▸ Dispersão da luz branca em prisma triangular
+      </p>
+    </div>
+
+    <p style="text-align:center;font-family:'Orbitron',monospace;font-size:0.8rem;color:var(--text-dim);letter-spacing:3px;margin:30px 0 16px;">AS SETE CORES DO ESPECTRO VISÍVEL</p>
+    <div class="color-grid">
+      <div class="color-cell" style="border-color:rgba(139,0,255,0.4)">
+        <div class="color-dot" style="background:#8B00FF;color:#8B00FF;"></div>
+        <div class="color-name" style="color:#8B00FF;">VIOLETA</div>
+        <div class="color-nm">380 – 450 nm</div>
+      </div>
+      <div class="color-cell" style="border-color:rgba(68,0,255,0.4)">
+        <div class="color-dot" style="background:#4400ff;color:#4400ff;"></div>
+        <div class="color-name" style="color:#7070ff;">ANIL (ÍNDIGO)</div>
+        <div class="color-nm">450 – 475 nm</div>
+      </div>
+      <div class="color-cell" style="border-color:rgba(0,0,255,0.4)">
+        <div class="color-dot" style="background:#0055ff;color:#0055ff;"></div>
+        <div class="color-name" style="color:#4488ff;">AZUL</div>
+        <div class="color-nm">475 – 495 nm</div>
+      </div>
+      <div class="color-cell" style="border-color:rgba(0,200,50,0.4)">
+        <div class="color-dot" style="background:#00c832;color:#00c832;"></div>
+        <div class="color-name" style="color:#39ff14;">VERDE</div>
+        <div class="color-nm">495 – 570 nm</div>
+      </div>
+      <div class="color-cell" style="border-color:rgba(255,220,0,0.4)">
+        <div class="color-dot" style="background:#ffd000;color:#ffd000;"></div>
+        <div class="color-name" style="color:#ffff00;">AMARELO</div>
+        <div class="color-nm">570 – 590 nm</div>
+      </div>
+      <div class="color-cell" style="border-color:rgba(255,140,0,0.4)">
+        <div class="color-dot" style="background:#ff8c00;color:#ff8c00;"></div>
+        <div class="color-name" style="color:#ff8c00;">LARANJA</div>
+        <div class="color-nm">590 – 625 nm</div>
+      </div>
+      <div class="color-cell" style="border-color:rgba(255,0,0,0.4)">
+        <div class="color-dot" style="background:#ff2200;color:#ff2200;"></div>
+        <div class="color-name" style="color:#ff4444;">VERMELHO</div>
+        <div class="color-nm">625 – 780 nm</div>
+      </div>
+    </div>
+
+    <div class="info-grid" style="margin-top:28px;">
+      <div class="card">
+        <h3>CORES PRIMÁRIAS DA LUZ</h3>
+        <p>As cores primárias da <span class="hl">luz</span> (sistema aditivo) são:</p>
+        <p>✦ <span style="color:red;text-shadow:0 0 6px red;">Vermelho (R)</span><br>
+           ✦ <span style="color:#00dd00;text-shadow:0 0 6px #00dd00;">Verde (G)</span><br>
+           ✦ <span style="color:#4488ff;text-shadow:0 0 6px #4488ff;">Azul (B)</span></p>
+        <div class="law-box">
+          R + G + B = Luz BRANCA<br>
+          R + G = Amarelo<br>
+          R + B = Magenta<br>
+          G + B = Ciano
+        </div>
+      </div>
+      <div class="card purple">
+        <h3>CORES PRIMÁRIAS DE PIGMENTO</h3>
+        <p>Para <span class="hl-p">pigmentos/tintas</span> (sistema subtrativo):</p>
+        <p>✦ <span style="color:#ff2266;text-shadow:0 0 6px #ff2266;">Magenta</span><br>
+           ✦ <span style="color:#ffff00;text-shadow:0 0 6px #ffff00;">Amarelo</span><br>
+           ✦ <span style="color:#00eeff;text-shadow:0 0 6px #00eeff;">Ciano</span></p>
+        <div class="law-box purple">
+          M + A + C = Preto (ideal)<br>
+          M + A = Vermelho<br>
+          M + C = Azul<br>
+          A + C = Verde
+        </div>
+      </div>
+    </div>
+
+    <div class="card pink">
+      <h3>POR QUE OS OBJETOS TÊM COR?</h3>
+      <p>Um objeto absorve certas frequências de luz e <span class="hl" style="color:var(--neon-pink)">reflete outras</span>. A cor que enxergamos é justamente a que foi refletida e chegou ao nosso olho:</p>
+      <p>✦ Uma folha parece <strong>verde</strong> porque absorve as demais frequências e reflete apenas o verde.<br>
+         ✦ Um objeto <strong>preto</strong> absorve (quase) todas as frequências — reflete pouca luz.<br>
+         ✦ Um objeto <strong>branco</strong> reflete (quase) todas as frequências simultaneamente.<br>
+         ✦ Sob luz <strong>monocromática</strong> (ex: sódio amarelo), uma maçã vermelha pode parecer preta, pois não há frequência vermelha para refletir.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════ TABELA ══════════════════ -->
+  <section id="tabela">
+    <div class="section-header">
+      <span class="section-number">04</span>
+      <h2 class="section-title">TABELA DE <span>REFERÊNCIA</span></h2>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="card">
+      <h3>ÍNDICES DE REFRAÇÃO — MEIOS COMUNS</h3>
+      <table>
+        <tr><th>MEIO</th><th>n (ÍNDICE)</th><th>v (m/s)</th><th>OBSERVAÇÃO</th></tr>
+        <tr><td>Vácuo</td><td>1,000</td><td>3,00 × 10⁸</td><td>Referência universal</td></tr>
+        <tr><td>Ar (aprox.)</td><td>1,0003</td><td>≈ 3,00 × 10⁸</td><td>Praticamente igual ao vácuo</td></tr>
+        <tr><td>Água (20°C)</td><td>1,333</td><td>2,25 × 10⁸</td><td>Varia com temperatura</td></tr>
+        <tr><td>Vidro (coroa)</td><td>1,52</td><td>1,97 × 10⁸</td><td>Óculos comuns</td></tr>
+        <tr><td>Vidro (flint)</td><td>1,62</td><td>1,85 × 10⁸</td><td>Mais denso que coroa</td></tr>
+        <tr><td>Quartzo</td><td>1,46</td><td>2,05 × 10⁸</td><td>Fibra óptica</td></tr>
+        <tr><td>Diamante</td><td>2,42</td><td>1,24 × 10⁸</td><td>Maior brilho por reflexão total</td></tr>
+      </table>
+    </div>
+
+    <div class="card purple">
+      <h3>RESUMO DOS FENÔMENOS</h3>
+      <table>
+        <tr><th>FENÔMENO</th><th>CAUSA</th><th>LEI PRINCIPAL</th><th>APLICAÇÃO</th></tr>
+        <tr><td>Reflexão regular</td><td>Superfície polida</td><td>θᵢ = θᵣ</td><td>Espelhos, telescópios</td></tr>
+        <tr><td>Reflexão difusa</td><td>Superfície rugosa</td><td>θᵢ = θᵣ (local)</td><td>Leitura, visibilidade</td></tr>
+        <tr><td>Refração</td><td>Mudança de meio</td><td>Snell: n₁senθ₁ = n₂senθ₂</td><td>Lentes, prismas, óculos</td></tr>
+        <tr><td>Refl. total interna</td><td>θ ≥ θ_L (denso→raro)</td><td>sen(θ_L) = n₂/n₁</td><td>Fibra óptica, diamante</td></tr>
+        <tr><td>Dispersão</td><td>n varia com λ</td><td>—</td><td>Arco-íris, prisma</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════ EXERCÍCIOS ══════════════════ -->
+  <section id="exercicios">
+    <div class="section-header">
+      <span class="section-number">05</span>
+      <h2 class="section-title">EXERCÍCIOS DE <span>FIXAÇÃO</span></h2>
+      <div class="section-line"></div>
+    </div>
+
+    <p style="color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:0.78rem;margin-bottom:28px;letter-spacing:2px;">
+      ▸ SELECIONE A ALTERNATIVA CORRETA EM CADA QUESTÃO
+    </p>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+    </div>
+    <p style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text-dim);text-align:right;margin-top:6px;margin-bottom:28px;" id="progressText">0 / 8 respondidas</p>
+
+    <!-- Q1 -->
+    <div class="quiz-card" id="q1">
+      <div class="question-num">QUESTÃO 01 // REFLEXÃO</div>
+      <div class="question-text">Um raio de luz incide sobre um espelho plano com ângulo de 30° em relação à superfície do espelho. Qual é o ângulo de reflexão (medido em relação à normal)?</div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q1','wrong')"><span class="opt-letter">A</span> 30°</button>
+        <button class="opt-btn" onclick="answer(this,'q1','correct')"><span class="opt-letter">B</span> 60°</button>
+        <button class="opt-btn" onclick="answer(this,'q1','wrong')"><span class="opt-letter">C</span> 90°</button>
+        <button class="opt-btn" onclick="answer(this,'q1','wrong')"><span class="opt-letter">D</span> 45°</button>
+      </div>
+      <div class="feedback" id="f_q1"></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-card" id="q2">
+      <div class="question-num">QUESTÃO 02 // REFLEXÃO</div>
+      <div class="question-text">Em qual tipo de reflexão os raios refletidos se dispersam em várias direções, permitindo que um objeto seja visto de diferentes ângulos?</div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q2','wrong')"><span class="opt-letter">A</span> Reflexão regular (especular)</button>
+        <button class="opt-btn" onclick="answer(this,'q2','correct')"><span class="opt-letter">B</span> Reflexão difusa (irregular)</button>
+        <button class="opt-btn" onclick="answer(this,'q2','wrong')"><span class="opt-letter">C</span> Reflexão total interna</button>
+        <button class="opt-btn" onclick="answer(this,'q2','wrong')"><span class="opt-letter">D</span> Reflexão polarizada</button>
+      </div>
+      <div class="feedback" id="f_q2"></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-card" id="q3">
+      <div class="question-num">QUESTÃO 03 // REFRAÇÃO</div>
+      <div class="question-text">Um raio de luz passa do ar (n₁ = 1,0) para um vidro (n₂ = 1,5) com ângulo de incidência de 30°. Qual é o ângulo de refração? (sen 30° = 0,5)</div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q3','wrong')"><span class="opt-letter">A</span> 30°</button>
+        <button class="opt-btn" onclick="answer(this,'q3','wrong')"><span class="opt-letter">B</span> 45°</button>
+        <button class="opt-btn" onclick="answer(this,'q3','correct')"><span class="opt-letter">C</span> ≈ 19,5° (sen θ₂ ≈ 0,333)</button>
+        <button class="opt-btn" onclick="answer(this,'q3','wrong')"><span class="opt-letter">D</span> 60°</button>
+      </div>
+      <div class="feedback" id="f_q3"></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-card" id="q4">
+      <div class="question-num">QUESTÃO 04 // REFRAÇÃO</div>
+      <div class="question-text">Quando a luz passa de um meio menos refringente (ar) para um meio mais refringente (água), o raio refratado:</div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q4','correct')"><span class="opt-letter">A</span> Se aproxima da normal</button>
+        <button class="opt-btn" onclick="answer(this,'q4','wrong')"><span class="opt-letter">B</span> Se afasta da normal</button>
+        <button class="opt-btn" onclick="answer(this,'q4','wrong')"><span class="opt-letter">C</span> Continua na mesma direção</button>
+        <button class="opt-btn" onclick="answer(this,'q4','wrong')"><span class="opt-letter">D</span> É completamente refletido</button>
+      </div>
+      <div class="feedback" id="f_q4"></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-card" id="q5">
+      <div class="question-num">QUESTÃO 05 // REFLEXÃO TOTAL</div>
+      <div class="question-text">A reflexão total interna é usada na fibra óptica para transmitir dados. Para que ocorra, a luz deve ir de um meio:</div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q5','wrong')"><span class="opt-letter">A</span> Menos denso para mais denso, em qualquer ângulo</button>
+        <button class="opt-btn" onclick="answer(this,'q5','wrong')"><span class="opt-letter">B</span> Mais denso para menos denso, com ângulo menor que o limite</button>
+        <button class="opt-btn" onclick="answer(this,'q5','correct')"><span class="opt-letter">C</span> Mais denso para menos denso, com ângulo maior ou igual ao limite</button>
+        <button class="opt-btn" onclick="answer(this,'q5','wrong')"><span class="opt-letter">D</span> Menos denso para menos denso, em qualquer ângulo</button>
+      </div>
+      <div class="feedback" id="f_q5"></div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="quiz-card" id="q6">
+      <div class="question-num">QUESTÃO 06 // CORES DA LUZ</div>
+      <div class="question-text">Uma camisa azul é observada sob uma luz monocromática vermelha. Qual será sua aparência?</div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q6','wrong')"><span class="opt-letter">A</span> Azul, pois a cor da camisa não muda</button>
+        <button class="opt-btn" onclick="answer(this,'q6','wrong')"><span class="opt-letter">B</span> Roxa, pela mistura das cores</button>
+        <button class="opt-btn" onclick="answer(this,'q6','correct')"><span class="opt-letter">C</span> Preta (ou muito escura), pois não há luz azul para refletir</button>
+        <button class="opt-btn" onclick="answer(this,'q6','wrong')"><span class="opt-letter">D</span> Vermelha, absorvendo a cor da fonte</button>
+      </div>
+      <div class="feedback" id="f_q6"></div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="quiz-card" id="q7">
+      <div class="question-num">QUESTÃO 07 // DISPERSÃO</div>
+      <div class="question-text">O arco-íris é formado porque:</div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q7','wrong')"><span class="opt-letter">A</span> As gotas de chuva refletem apenas certas cores da luz solar</button>
+        <button class="opt-btn" onclick="answer(this,'q7','correct')"><span class="opt-letter">B</span> A luz branca sofre refração e reflexão interna nas gotas, separando as cores por dispersão</button>
+        <button class="opt-btn" onclick="answer(this,'q7','wrong')"><span class="opt-letter">C</span> A atmosfera filtra diferentes frequências em diferentes alturas</button>
+        <button class="opt-btn" onclick="answer(this,'q7','wrong')"><span class="opt-letter">D</span> A luz vermelha é mais rápida que a violeta no vácuo</button>
+      </div>
+      <div class="feedback" id="f_q7"></div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="quiz-card" id="q8">
+      <div class="question-num">QUESTÃO 08 // SÍNTESE</div>
+      <div class="question-text">Misturando luz vermelha, luz verde e luz azul com a mesma intensidade, obtemos:</div>
+      <div class="options">
+        <button class="opt-btn" onclick="answer(this,'q8','wrong')"><span class="opt-letter">A</span> Luz preta</button>
+        <button class="opt-btn" onclick="answer(this,'q8','wrong')"><span class="opt-letter">B</span> Luz amarela</button>
+        <button class="opt-btn" onclick="answer(this,'q8','wrong')"><span class="opt-letter">C</span> Luz magenta</button>
+        <button class="opt-btn" onclick="answer(this,'q8','correct')"><span class="opt-letter">D</span> Luz branca</button>
+      </div>
+      <div class="feedback" id="f_q8"></div>
+    </div>
+
+    <!-- SCORE -->
+    <div class="score-panel" id="scorePanel" style="display:none">
+      <div class="score-label">RESULTADO FINAL</div>
+      <div class="score-value" id="scoreValue">0/8</div>
+      <div class="score-msg" id="scoreMsg"></div>
+      <button class="reset-btn" onclick="resetQuiz()">↺ REFAZER EXERCÍCIOS</button>
+    </div>
+
+  </section>
+
+
+  <!-- ══════════════════ DOWNLOAD ══════════════════ -->
+  <section id="download" style="margin-top:60px;">
+    <div class="section-header">
+      <span class="section-number">06</span>
+      <h2 class="section-title">BAIXAR <span>LISTA</span></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="card" style="text-align:center;padding:40px 32px;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--text-dim);letter-spacing:3px;margin-bottom:16px;">
+        ◈ ARQUIVO PDF — 8 QUESTÕES COM GABARITO
+      </div>
+      <div style="font-size:4rem;margin-bottom:16px;filter:drop-shadow(0 0 12px var(--neon-cyan));">⬇</div>
+      <p style="margin-bottom:28px;color:var(--text-dim);font-size:0.95rem;">
+        Baixe a lista completa com todas as questões, gabarito e dicas de resolução em PDF.
+      </p>
+      <a id="downloadBtn"
+         download="lista-exercicios-optica.pdf"
+         style="display:inline-block;font-family:'Orbitron',monospace;font-size:0.72rem;
+                letter-spacing:3px;color:var(--neon-cyan);border:1px solid var(--neon-cyan);
+                padding:14px 40px;text-decoration:none;transition:all 0.3s;
+                box-shadow:0 0 10px rgba(0,245,255,0.15);"
+         onmouseover="this.style.background='rgba(0,245,255,0.1)';this.style.boxShadow='0 0 24px var(--neon-cyan)'"
+         onmouseout="this.style.background='transparent';this.style.boxShadow='0 0 10px rgba(0,245,255,0.15)'">
+        ↓ BAIXAR LISTA DE EXERCÍCIOS (PDF)
+      </a>
+      <div style="margin-top:20px;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--text-dim);">
+        ÓPTICA · REFLEXÃO · REFRAÇÃO · CORES DA LUZ · 8 QUESTÕES
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Inject base64 PDF into download link
+    (function(){
+      var b64 = "JVBERi0xLjQKJZOMi54gUmVwb3J0TGFiIEdlbmVyYXRlZCBQREYgZG9jdW1lbnQgKG9wZW5zb3VyY2UpCjEgMCBvYmoKPDwKL0YxIDIgMCBSIC9GMiAzIDAgUiAvRjMgNCAwIFIgL0Y0IDUgMCBSIC9GNSA2IDAgUiAvRjYgOCAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL0Jhc2VGb250IC9IZWx2ZXRpY2EgL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcgL05hbWUgL0YxIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKMyAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYS1Cb2xkIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GMiAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0Jhc2VGb250IC9aYXBmRGluZ2JhdHMgL05hbWUgL0YzIC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKNSAwIG9iago8PAovQmFzZUZvbnQgL0hlbHZldGljYS1PYmxpcXVlIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GNCAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjYgMCBvYmoKPDwKL0Jhc2VGb250IC9TeW1ib2wgL05hbWUgL0Y1IC9TdWJ0eXBlIC9UeXBlMSAvVHlwZSAvRm9udAo+PgplbmRvYmoKNyAwIG9iago8PAovQ29udGVudHMgMTUgMCBSIC9NZWRpYUJveCBbIDAgMCA1OTUuMjc1NiA4NDEuODg5OCBdIC9QYXJlbnQgMTQgMCBSIC9SZXNvdXJjZXMgPDwKL0ZvbnQgMSAwIFIgL1Byb2NTZXQgWyAvUERGIC9UZXh0IC9JbWFnZUIgL0ltYWdlQyAvSW1hZ2VJIF0KPj4gL1JvdGF0ZSAwIC9UcmFucyA8PAoKPj4gCiAgL1R5cGUgL1BhZ2UKPj4KZW5kb2JqCjggMCBvYmoKPDwKL0Jhc2VGb250IC9Db3VyaWVyIC9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nIC9OYW1lIC9GNiAvU3VidHlwZSAvVHlwZTEgL1R5cGUgL0ZvbnQKPj4KZW5kb2JqCjkgMCBvYmoKPDwKL0NvbnRlbnRzIDE2IDAgUiAvTWVkaWFCb3ggWyAwIDAgNTk1LjI3NTYgODQxLjg4OTggXSAvUGFyZW50IDE0IDAgUiAvUmVzb3VyY2VzIDw8Ci9Gb250IDEgMCBSIC9Qcm9jU2V0IFsgL1BERiAvVGV4dCAvSW1hZ2VCIC9JbWFnZUMgL0ltYWdlSSBdCj4+IC9Sb3RhdGUgMCAvVHJhbnMgPDwKCj4+IAogIC9UeXBlIC9QYWdlCj4+CmVuZG9iagoxMCAwIG9iago8PAovQ29udGVudHMgMTcgMCBSIC9NZWRpYUJveCBbIDAgMCA1OTUuMjc1NiA4NDEuODg5OCBdIC9QYXJlbnQgMTQgMCBSIC9SZXNvdXJjZXMgPDwKL0ZvbnQgMSAwIFIgL1Byb2NTZXQgWyAvUERGIC9UZXh0IC9JbWFnZUIgL0ltYWdlQyAvSW1hZ2VJIF0KPj4gL1JvdGF0ZSAwIC9UcmFucyA8PAoKPj4gCiAgL1R5cGUgL1BhZ2UKPj4KZW5kb2JqCjExIDAgb2JqCjw8Ci9Db250ZW50cyAxOCAwIFIgL01lZGlhQm94IFsgMCAwIDU5NS4yNzU2IDg0MS44ODk4IF0gL1BhcmVudCAxNCAwIFIgL1Jlc291cmNlcyA8PAovRm9udCAxIDAgUiAvUHJvY1NldCBbIC9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUkgXQo+PiAvUm90YXRlIDAgL1RyYW5zIDw8Cgo+PiAKICAvVHlwZSAvUGFnZQo+PgplbmRvYmoKMTIgMCBvYmoKPDwKL1BhZ2VNb2RlIC9Vc2VOb25lIC9QYWdlcyAxNCAwIFIgL1R5cGUgL0NhdGFsb2cKPj4KZW5kb2JqCjEzIDAgb2JqCjw8Ci9BdXRob3IgKFwoYW5vbnltb3VzXCkpIC9DcmVhdGlvbkRhdGUgKEQ6MjAyNjA1MjMxNDI3NDYrMDAnMDAnKSAvQ3JlYXRvciAoXCh1bnNwZWNpZmllZFwpKSAvS2V5d29yZHMgKCkgL01vZERhdGUgKEQ6MjAyNjA1MjMxNDI3NDYrMDAnMDAnKSAvUHJvZHVjZXIgKFJlcG9ydExhYiBQREYgTGlicmFyeSAtIFwob3BlbnNvdXJjZVwpKSAKICAvU3ViamVjdCAoXCh1bnNwZWNpZmllZFwpKSAvVGl0bGUgKFwoYW5vbnltb3VzXCkpIC9UcmFwcGVkIC9GYWxzZQo+PgplbmRvYmoKMTQgMCBvYmoKPDwKL0NvdW50IDQgL0tpZHMgWyA3IDAgUiA5IDAgUiAxMCAwIFIgMTEgMCBSIF0gL1R5cGUgL1BhZ2VzCj4+CmVuZG9iagoxNSAwIG9iago8PAovRmlsdGVyIFsgL0FTQ0lJODVEZWNvZGUgL0ZsYXRlRGVjb2RlIF0gL0xlbmd0aCAxOTA0Cj4+CnN0cmVhbQpHYiEjWz8jU0lXJjpEZy1mTE5GJjEqUy9GO0xsWS45cTxJc0UoT2pOLWs6XTdEJ2AxKT5EWFgiJWZRJlpVY3A9aVtaYSg8aWE9JT9hPGMmP108YWtFbydrVytzKGshbkA3JiN0U0BHNjYqSEBfSTFxQkZAalFQaWFIIVYnWVAqajpUJVExc0hRW3R0MXJiMVBeWCU0clctciREXT1Wc1VPalk+VCk0X2JDbj5MLy5HVSY6aWwoTlJXXjBCSU1qI2F0PW1ZTnQ5aFJnWzFMazk3JEE0XnI7MVQzL1VTN3JBQy1jUEcwLkwkZCFMPCRMbDY5RFAoXzMxJSdYXm08VEcmVjtlVmxCITIqI3FlJi8oLFdQNihmKm9raixmIiZMODIpU2pRYyprQy5xUEwhaClfKVk5dC0hVmFTU0c3K1lCJW9EPCc0THFmWSoiJjdXVVtsNFMsaXV1YyNlL0RzKlBbbGdTYU1hKmE1Y05xPVtORTI4Z0VRc3JwZnJtYUk3STJmLFAobl5XJCZuUkE1N2FtQ2tNLCdoblZQNiVgW2diR3FrMUlAPitwKWBFZEl0TElQdD4jcD86cWxqLCpHYzdjbyU6OEpjYjpMOjAucDZQMGVXbCphWkBKKFNAVG4/TVBjTShFVFckWkpZaVZEVSlNaD9ZaGxbVVpDPiFvQzJjRTlXKF5kIls9Z1Y7PTRIUTI+USpJKUFIU0dwT2NrOktnWUlCIVsoNXM+WTRPaWFBX2BnY2pPYytfJ2AiQEoqXz00VytbJTxqKDJXQmYzLyM0cnJJMEN1XDJMVUdWVDtnQFJZN0YoRyZKbydhLT4iOT1KbW1KNUFeZENePDJbUHBZciZMQC1EUUJFOzImcGZHZTpvLjtVPHA3KDxBa2RMSSgsR3VmNF1HM09aPy9GYy00dGlkamN0Qm41WCdXYjgrWDJHX3I/Nk5BKkNGJElDYmxhY0sqOzMrJiswcTJVX0NUI1tcJENrXm1iTzRlUGszXU9WRVhhOCYuWix1UWpUbTlOTUVGKVxYNGZ1cUtTbCllYC1cKT8nUEg2ViojcUUxYVZjQCErTmU4XVwoUnVQLitiYSNAMGp1Sysrc3UoaWxHRkI1U1FIU19XXVJBYldoXzU8QiJVQHBYbUouYmNhVUk8PWlPXEsmUDBbO1gvU3EmIy1WYFZJYWNsWD0vaEcvbkY9J1U0VippMjclN2NqcUpeXyZHKGs/TFg2dS5cQE9ZIlYyc1dHZWEhaT8yOV0sSkdwXCYpIiRGRlEuXzo2ZEUySU1YWy10cnVabS1NQWQ6QmNSO2JEOGBzQjZuS2cpWVZhZmJybSteRFdNZ1BWT00uc15NOkZmUFg2XEhMI3EiIUMqY3BHYzVOWmQ3Q0pnRyRnWyM3cCoubikqRk9UUmhNJkUkXUAyXUQybi1dcFVlMldeNllBS1tnbUtcJmpQIk1qbEZKQEZJPVtuX0VIUDVxRTRfZHUsVDIwPWwwOE1wM0Q4a0phTS1aWFdzKyhJRVZfOF5hNClaQGNATSEhUU03SDAvV2gqbV5uVmE5YDJSR2lNRGFyQ1hGcCcxb2wsIlo4YCNRVSFVPEFzaDVqOVc+RCtCaW4haEBBQyZGJUhsUSVTOkgiJ2tCRmdBQ1EtTi5GbUo1QSIkOkEtVHVHKG8sY0heL0AtNj9ZRDw7XWdDajJzcWQrZ0JWdVAwNyIhOkYwbV9fTWRDTSYlcywlO0U5PTNmU0c+bSNFJUk/QTdhLHFMSExAXUVnZis+KFNYV0Y7WDMkUFw0Lyg4W28hTlpqcHU9NjByMTpmZU9MTEVbNzZBSmJAZUNUJEc6N1ltOTRJYmJmbUhmOm9SISwwN2NYOV8+b1wtaUBYTFtLYkQlKCsqMmQzbm44NGciPyNQT1RnSHNMRVlKRG4qO2tYPmpFSDRDUmU+VjQpVEJdOywpZjksYip0MC5QJjo7cSVbY0hoQChCZ2NUTWZpKzFPMWQmMTFVMjNvPTt1RVdbVlkjKGQ0WElaa0sjaXVxPC1qRFgoQzImMlcmZkNPRWFXI09vUD5SV2ZiZFpbLkFiPS5TNT04Ry9VWWROck1JPHAlMENRPD8rYjMibENmL19oR2VoVkdubidScG5paWlULkdHIyMiL2A1dCxWWWFeQjciKDA5UDJnWGteUTBhMz0nXEMqSGNBVUUlVyluKFsjOV5IVTc9KGVTX2ciMiJoYmNvV01VJGtRTTNsZ2pRMCRgS2dNOylAayY7amdBT2VeNCxvLCwyOU5vamlaSXFGMyFcVGYvdDRoRXJqUCNZcVtAJDktL3A+XC0qWScrNjxwPDxpJWZ0RC8hLCxzdStKJzttJmpHMC9sRmFkYF9yTCNiZjg8ZUpcI25qRS9aTjw3WVI/Y2w/XicxMFhRXCVYNjFSWF5tPGU+VCldTC49Si5HXkM2P3U9KlIsJlZbYEBRM08xUEsvXjhNbEArUU1RVyUpVVw8Ij4pXUVac083O3AqQDs/PHIjWzlJbFgrVydWWSFKazg5JWBAaz9ZSDU3LWl+PmVuZHN0cmVhbQplbmRvYmoKMTYgMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggMjA3NAo+PgpzdHJlYW0KR2F1SEw+Pk8hRSdSbzRIU0IiSSZQSV5PQTwzN1BYLm9wQDVPQGpyamI7Oil1WDJHMyhrdVJdSXBXV0NSKiMkdDwnZ1hbSjFOVyFBRzhwZiQ1S3MoNVg4dE4xQDwwSj9FTD5WY1A9Mzk4IzFOQ2lkZztfdCYjOTFsUklVQ2leQkc6YkpGKTU/RVE7KFgja3NTaEpSZyMzXz5sPW5wWzpqLDYvcDBHK0guZmc8cCdOMkxsdChdYSpCcSdvVj5QMGhtbzctVSk0OD9cUCVMYD46I0E9YHVfTCQ4RWxVXj5ta0RuTGVwM3VCVTRnP3E8NC9YWTxaNWtMNSdiPTcsUzRbUClxS2ZfMGNdZWciInBWKidSKSpxTCpbOiZJRzxlWS0uNDlpblQ7W0U6SigiRmBAbUZSL2hWb0tPYlU1VTRKclJyJFRfRz1nXjEqZFJvL1xPaGdTOCNAQjJQXGFWOWZcRD9JVGI6ajpPZytwNSJeaEFpYGxkT29tRk9tNSpXU0o6Ll84azclYEFSLyVraEdAYG08S3RVTys2Li1WRCtLRz1vW3AoOVA2Lzs3UTRQOEReKy1oUDYyUDBURnFaMCdxS01xbE0hbkNVMiRsZksiazFGWTdvbzg/UmRSIyFrQTM4Ymg8c1xCJEY8WUtiYEQxP0whX05FRDJRNG5GaV5HXT8xSVcmZjtDTiNaTGZtRURdYDInPUYiKjNpaUteOjEvcDRbYUxYNGZGW2csVTJUJy9caE5dXEptJ1QwTSEmOVYiYFJWL00yPllUaSU/YWJlYmAsaD9nKTw5bmxFaipqYGtoMW1GVDNXPUJJKWFkdWxFL1UkImRcUCVbZkE+SUJOUVQkIXQlOTFMTm9LYic6N1wiMlpQaCJSM2FXJjhLWUotQ1oqQloxJCJuLWNKSSwsJXVBTiMwSjwvaTM2aWByPGZTUFRrTlFARjpSSkZfIk8sQDAuOTtCN2YzZF9maDxeLlVMLjdlJ1wnUk1PMi5ULzEhXnM+UjFdPS9lZWxiUTw7NjsvJWhySy84J09ScTM5UXRYbG06Plg2NmtdUW84dDpNPEVMR20tP1JVPSUhRFFwLWlvWzg/Xm0iSDMnS3FpXkwhRF1qNFckPClOXmsvRyw9KyFeb01dM2VsIzszW0w0XiNkNSlCMTI+O0NYYkxVKmxUJT4nblByKWAkR1VnWzhwKDxxXkpPUTQ1c0pmX1hUSCQuMlNHUnJcNDs3bGxsQGQlITg1QjBdcE5JIjVoNC8/Mko9b09FKXBJLEYhYy5XS1B0WUlGSV8nUj9aI2dvOCJKZl1RNzsjK2xPZzJnIjBhTiEzZG9NR0xAI24uYFFLZz8+TU8nPSVgOUpyNlc6Tmc7XS5UUVA9PC4mW2M3KGFYVGgocmlAMD5JWF45cnUxY1hsbWdoRkFiaSoxKkUvM106RzsnZDU1MSlMMSQrYGRnKitfSTshbXQsL2BFUFkmQSt0ZSMkUSZFZ0czYFtYTGU0LytnWyFiPlo7U0FtTjVFOUxxVyhdRWZsIzIwXTQqRmReVGYxJU5HJzJqcm5Da0YtbWgoVmowRFxJUG5xN1BWYmAxJzkzISZ1MjUnZWxaTnNETDojOm1bYkQrMnEib1owWCNKYCtERXEsQD0/PWhJPlBUSTZbakRPLS9lUks0QUhaRDczR2pRVURgR0tMZDlMdW0mSyJxbUlQRy1AbSRwYXAtQEw3cVsyaWxeUk1AQTFVTFdQN2NaIV47TSdzLkszPy5SIk9NcWNbIidkQmA2L1xxUDtQXEEsSF5TLi4kPVtUTT88JiIzdEhfPmB0dGczNyY4NGlXU0Q+UGlVLnA3TShfM0oyUDs5Q11eVUwvZHJaVkBYWD1ibz5rcS9iJWM4ZDJgPkNaYnQvKlR1LENsKjI1VGwjayYzKSNIKW9UNSRnMGVhUUVaRytPdGMuJUhAVUlJOkIrMnAyRkksKjNoQ11GS0EzImspVClvak08KVxLMDVzOWYhSjpGbCp1MWApMExZaCl0JGBzVmRsNUJnYDU/JExsR2A8QjduS2NuN1liO1NMSyhSP0RERVdPdS1EL2VZJHEwTyNBZ3NqbkNnbioya25YTm5dbGQwJSs4RC1YNSojMGhvMyQ1MGNqSDg0LUYmYTc4Ji1IbUdyT0R1YjtrUj5rT2JXa1x0VzdEJ1RzNipkNz9zLW1jXSgmWkRVXiZkLmpdWzE7YTthP3MyKjdpQkdtTUBzR0EnXnFnJSh0I0tiRlZ0LT5WRj1EQCkmLDBMTjNLVEQ+IkAwWFIhVWQsaEVPblsuS05zMjVIOkleLkJKUlVgJSNlKU85VkpnTSgtS2w6Wz8lQyNBaTsuIVp1V1tRK1NaTFFQWGlcOy5gPnJKJXJyZz10XEJiQDB1LGIqVis3YWMjYkBFKS1VYGFYW1lhXiluPV0/NUNhJzkhUEVVXVluaT4kcjBZR1ZwKSRxTV5TLF5xPXRIJV48RUxhP2Q4bj1NOCJPSGNBUTw3Pm5sQkloO0UnW04jN1gmSDQ4UDUwLSorMGEkNmQ+LE40TCIlPGciK1dtZGsoMmRzc0AiJGMmVWgzPDpdPC5lR01lQnQ1VUY0MkMncEs2XTJlbW1JbkJedEElQ1UzKiFILHFbKk8lKHB0Q0hHLyMpRk1QLG4sSVBdNlZCIyInWWUpdEpxTylvTydaPWoiMzVLa25VcGNgNjRYb1orPjI/RUNWdGkzRzYiUmVkTFNVbklMU1FWQzJgLjRfJVNnKChVIUpKLU5+PmVuZHN0cmVhbQplbmRvYmoKMTcgMCBvYmoKPDwKL0ZpbHRlciBbIC9BU0NJSTg1RGVjb2RlIC9GbGF0ZURlY29kZSBdIC9MZW5ndGggMjI4MAo+PgpzdHJlYW0KR2IhI1xEL1wvZSZIODguRT9DYDBBYltISTwuVkpzJz1aJkUvOHNzXCVLPTVzRWlRcz0nJDg6UnJxW1k3cFZeK1xjMyZmMUNGU2hxTFguIjBcTUY+RkohZy01NDlrUj9LdTZbcChsLj5nUXEnOStUIywkTEdKP1dyb3NIL3Q6YVZILnBwWFlKKFFkSkAtLWZhIlAmT2JYY2xPRTgjOSdsWlFFVSNJS3VEWSMrSC9ySFc5bERUNyFfMixrJC9TWS44TnQrTyNIMGE4QipLZUFnbjsjV3M7JFdfQlUqKFdVQXAnWDZKYlk2cUFBRCNZVEsmcTA0UShcJW9EUVU1IV9ZS044dW0mb2JpKjlPZXAxU201KDNFJy9dbm11c2ZJUjosVUxqU1RwLlNHT3VSPlswcnVObEQnU0xCJixIaU5fLGMwZC0wdXFBMmg0ZmpjW3RkZVgrKC1cOj8nW2FMKzIvZWtuNjBnOC11I0cpM1duMHJ1SzMyanMlXVljLSonWE0rNGQmSyFlNi0iZT5lZC0xSEVOdT1cKDg3MClmZUE4JT1yWC5SaXBFQSQuMk9fZzcxPStvVjdtcEUuJ0wzWW1BXi9JVSVbcjxuaWtzQExVOCVGRypSNyZkSUQjcGNHQ2pPQDFhaTMkP21nUSZAV19rK0g1OW4wV1kncGJnNl89Ok11KGpnKj9SJU5zdHRuLCcwaC9lYjhdb3FqcjBCYixbZjMlWzFrITUrPExUN0kwUnQqKklBMWcoJiJsYFtyVGBzL24uWzc8LFtFTE9kTVNrQiJJczMxNCtUb20va2ZjJUheND5jXD5iZE8uUSJLZmklQCxEWTRIUE8pSC89J3RrJVNgNGVMNixGLUcjLidIKil1ZWtcSVtLTDkoc2Vyb2NPJzIqQ2xeVy0iVEwmT3BoQ2xSQTBzbydRQm1xQVJtbEE1T2FCQ1tGQ0R1I1dxX1Y6ZF8+RDkuVTVMPTBoVSMqUTVDbGoqS2drYnJJWShKWzkhU2dkbCpBP0UmWUgrTjBBYG1mY191P2NqSHJHNlBKQU5IU10/NEMmXjg7VC9WRTMqXkY3WSFrdSUlJCcpKzNqV2hoQk1KL2pVNzQ7Tik1a3JwUFMqK2RkQ0FyWydjS2lDS1hbQUIqbiZPUCRfYlshYypbUihdcW9fSXVuYXViQyo3TGcsYFI0TTNqO08nIUU7SlpsUikmNzZvdTYiV0g3I1JNOCYmQ0hARDliJlAkbmkiKjw+YVUiS0gsMz5AWTNiLHNmMz84cmJncTRfLDUwPSUsLj9mb1Y4b2dyVFw5THRuKFYtMWEzRjxbaitnRURScjw3V2cpUlonWF1TNVdea2AobSNpKyZVRiVRbEBkZ1tPLm8wck8jQjsnLHROJDJZM29mbi0uLzprZzRhL1VgLztrOVlLLFxKLTowLT8wYiFjdWpQb0ljJSVZQT86PCJBOig7bFFNOWxfMyI5LTkhIjBXIlsjU2Fdakppbkg6b0RQMkQlMiVTdWs2O3JnbWpbZmVOXV1CPnFPYW5VPVEmMUw7YnBzTVZOIVZuSFcqOzpdP0VCYEw7NkJKPGwhT1g3M3QtNT47SGhbIWYrRFdgZEZJRUBeIkRjRFU9JCJVM1ZAWD05Oi48SkJBY2BeJlZsJmJyO2ZyNjMwaFZXRScsQk5ZNmBvNmFiYF8tcDtDbmBUUD8yKkVJYFhMNVRXRU1XKF1mSzdxWzxmImlRNCtlOVwwbS1PczNiVComJUY8bm47SmxQQywuIzVFSXA2OFQjKEFyMDdlXCYvNShCTFNiJ1w2MmhDKVszcENUXFtjUmgkRyhPJ0BRM2c4dWtjalF1c2BwPCk5YXQyPHIncy08KSZwPDxvWkVbLEFJNm9QQ1JJNDVVSjNxNWx0MSk5KHI6XWRIRVFWZUQqXlhWWCokaWM3SDouOUYuU2xNbicvamc2WXA+cXQ4WjdyTUlAaDxtLDJyJWJnU1FCSSxwQCpkMTdoNF5qMWVXaSJ1aiFUViVmJGpgRSpOLlw0P2EpR1hSbEpRcWBrbXNDUTw8QkcqYkdvZTk8OjdoSktjX0lZO2Y4KUgnWklZQFR1P0QhdFhNIjIkPlA6ZClOKD9aVnNUa1E1QCVZUUcwalQ6WmRmODBTaiQ8NDZbLW09R2toZklmT1tBZiYoX18xa1M1PGEvXEVgTWhOJDpfZmpNKkApZGJ1b1VBLScrVnJmPEA5bUVQKHEtWmNIakc+XCUzTiJsXF1AVTIwYSNFITJDQid1RjJUY2VZOEhRVGlSWjcrJHNeaE48U0grO2JUNC01UG1TWDpqc0VtMUxHNlIsVWlHPEo5bnA5UypPZnNWOGMpPDxaPm89WlFMJ0QlIkM2Wi9wa0hUK1dlZEZnNTBsPU9gZFkqdWlmYzxZRChydDhgQCYkYDxGcFtzV3JsYWhyVU5uPSs0dCFdR0hTSF5OO1NTdGJOQS9PcVVqYmI3J3A3MD1bX1RPPGl1OHQoOThAVmJ0Wm9RcExkYDBfTmlKUEFNKkU8XVdZWmRDSjpkOHMuTmFHQ09Jb081OVdsdCJoVGpFaGIka1cmS0ZLRlNmIVY9XFBdJ0dfLjwwMCVCPjYuME9IaGs+LEdHPUNlMUdWSTFhMTY6Pz9lR19OTWZSXGkuKWxpKlZDdHFPUTk6RXUtL18wYjYnJW4kOVJNPjR1c3VsLGpGczsjYSN0RWs1N2ZgcFVwO2JUcTgxaEZlN2NwVV5ickVrZCJjQDB1ZDczTkBOcSE9UmM/bS9WOmFWPnVzMWxeSyRDOiRQaEtxLUJCTGM/cTtkTU9iKCsoc0ckOW80PGBHQmM0Jig8XkojTmZ0PFtTaFhTPVlNaT9Iam1Vb1IkQiRnWFhbczExcC4oIkBcblQhP0doXXVcSldqMkw/Y2tUI29wLD1LMT00RlU0Wjs2MyNLYTBbczA4P0ldUkJqQVRVYFUsTjJvYGFOa2tfaCFPLlQ1SjJSaUBKJiwhRzhDOytMdVFFJ2E9Y1xtNjYsUDNkO3JmSTI7OjdkNlNJZlAvU2JTQ34+ZW5kc3RyZWFtCmVuZG9iagoxOCAwIG9iago8PAovRmlsdGVyIFsgL0FTQ0lJODVEZWNvZGUgL0ZsYXRlRGVjb2RlIF0gL0xlbmd0aCAxNjQ2Cj4+CnN0cmVhbQpHYXVISzkyalM5JkFJYGRxV0sxWWJeMmZZbUQwV3BuZU1ONC5wSUFpNzo4RU82PDU7YGxySlQ2cDVHZjBecDlWSmZlKD8pWG9BL080b0d1cU1MV2oiaGR1a2QwY1lbUl5jOThWXmEsJFI/YmVLXnBqIytRMi0oJixQVVVILHJYKCEySkUkUTltRFcpJCNXR0EuUSZKZmE9WFsxWEhbakJCTTNoaj8oZnJKLWo9Q3M0OEtoOFdETWFIWWw8PStSRWl0NC1iZCpbMUpVIjowTGplRUhHalwrTjJXS2cwX29bXjI0SGVvb1ApTDhAUVphaGliTmRHbmNBOF5ZNjo8JENcOnV0cWREXW9DTzVYbV5kbSdiXlBEKkNaMTpzJ29Kb18jJV84VmFjMkFsVDoqczZtbiNnKUw5bE5IOTFMcWM9VGhPMidvTz5bbDUrZChidGdbTCJxL2k2bWdPOClRMCYxJ2I1S1Y4ZzdLRlloQUxKVENvLW0ibVRiQ3BTSDE9V3A1KlNPamFvcD0iQmVNaHEkNmUvP1EnSnUlZGBeVDFmVVAtX1MnMklIS0YmS2wnXjs5OEwkRmVwJE8zJVxaN1ZxVClTW2c2YE4wVjU/YTh0PWRYdUFlVDlGX1pNLyY0T0tHSyFqaTJlZlBqL0M+dFAsLHMnSStgSWJVXlwpVmlTImUwaSQ6YD8wKmc6JnVeaG9aL21fNC9iV3NtODljSENWJkhtbUdjOFdnKkAzTT5pTUgnK0VSYWBVVyNxRScvPysjTUFYZXFHMU9wWjIhLTFCNEFcMVRSXD0hVHMvIj5gKmtMTHFvbGBUMllkYi5iTGhkOC8mJF0oNHNBTU5KKTlmZVhMKSlaNDZpMSo5MTpHJyNtY2xiR2xXIS4jVHAnXWA6XG0yZSI5JThyPFFzMiojTz03V1RmPml0Mik9L0xlYWouNjYkXWUqLSlfRjwzKDwncGgxZi8pJVA3a2cvZEA1KSZPWy89dWghQ09MNUs0ZTs9UEg+bkZMPWgyPGZdam1QPGBdLkpiXShYXT5YaWVuczkhKm05MDZnMEsvOkk7Si45Qkg4SnVTYzdxNmJZPy5ATk1mUTxFNEo/c1RxJCNzb0UmZGNeRVEvX19PSFFFLzlxMGoyLk5LYCNHR0FwSllXa2VEcj0mMm02P19RMEYhXCNUJWosJDM8T19UYUtZVStxdHAiWmxSVjgybllgNXBrTC1pK1skXmFjW2lyKGM1c2FrKG81VEBbPmVaVCw9cjZocl1sMVtEYShZUS5uVFdmVSsxQV4uTykwIiUlRTVtK1JWXlhfcz1kOk4hQldEWG5IY14hU2QrJSsmVSo7ZydPLSUzT0xKNUghdWlTMnI8REQhPi5EJSdCdE4yYE9tPi1FXj9QLDVUMjtpbDQua25qPVtuZlZlInAlUlhCaHFvPW4jWjo4RDxYMVBgKDUjLWtcKmdHQ3VbLFQ0NVtPJHFXODJKbitgP2tQXW5bZmpyQyN0P3BramUmPUJTJCxnVT5aYmMpZS5IUTQrJ1BFcmJiPyRHQk1DJmkrcixFK1g4NDpYVkAkXjteTUxHRSwxc14hM2NJdWwvVWZVXEBeKTttZVA+azUzSS4vRm9xQGQ8aTJZJUc8dFNmI14qUU5gSzRlJk41N3AkQjFrcGNuYGZncCgxLitRSj9QU1dCOXU8cyonRkpuJ0YlPDxYV3JpLk9ibyoiWT9MPktPP1IuSUZZYWhSNFlsbmxaI2VdNFE/RzJuOGhBUlI6LC9hJ1o/c1BPJC9gUTo3NGJWJDs4RF5OKiMjOTQ7JVtiViYnZ245YiU4QjFJTjRdPVFxNFtiV0JFNGdCZVdTV0pDRkhWVGhxQWQyVy43bjovWjtmWm90VltpKkw2Lj5pPGVdTWxMXmFVWE1AXFtEV3QiZG00Wl1XNkFYOy8oQSo6NEFoTmRHWkxkNV4xYTVuLTIiSnBOYSY5RChzPjJaL3AoMy0ocywpNCx0MiprMko1LzxUTy0jPDZdOGk7YVs0R00vQmRKT28wMyJdamZTVHMzaj06a2s9QVJ1UHA/cVdTYV1PLiNcJmA6aFJ0LXFGcyd0czdMPV8lSjdnZi8/dXEmKGcrKERZNypASjppNm9aUCleO0tpXixrOCZEYHAvbi9fZCJNYCJxQ2QlOGpIWVJrRlQhVUtpY28zOzxfVldNR15+PmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDE5CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDA2MSAwMDAwMCBuIAowMDAwMDAwMTQyIDAwMDAwIG4gCjAwMDAwMDAyNDkgMDAwMDAgbiAKMDAwMDAwMDM2MSAwMDAwMCBuIAowMDAwMDAwNDQ0IDAwMDAwIG4gCjAwMDAwMDA1NTkgMDAwMDAgbiAKMDAwMDAwMDYzNiAwMDAwMCBuIAowMDAwMDAwODQxIDAwMDAwIG4gCjAwMDAwMDA5NDYgMDAwMDAgbiAKMDAwMDAwMTE1MSAwMDAwMCBuIAowMDAwMDAxMzU3IDAwMDAwIG4gCjAwMDAwMDE1NjMgMDAwMDAgbiAKMDAwMDAwMTYzMyAwMDAwMCBuIAowMDAwMDAxOTE0IDAwMDAwIG4gCjAwMDAwMDE5OTQgMDAwMDAgbiAKMDAwMDAwMzk5MCAwMDAwMCBuIAowMDAwMDA2MTU2IDAwMDAwIG4gCjAwMDAwMDg1MjggMDAwMDAgbiAKdHJhaWxlcgo8PAovSUQgCls8OWNlZjgyYWZkYzg2ODczZWVjOTA4NjcxZjUyMjBmOTY+PDljZWY4MmFmZGM4Njg3M2VlYzkwODY3MWY1MjIwZjk2Pl0KJSBSZXBvcnRMYWIgZ2VuZXJhdGVkIFBERiBkb2N1bWVudCAtLSBkaWdlc3QgKG9wZW5zb3VyY2UpCgovSW5mbyAxMyAwIFIKL1Jvb3QgMTIgMCBSCi9TaXplIDE5Cj4+CnN0YXJ0eHJlZgoxMDI2NgolJUVPRgo=";
+      var blob = b64toBlob(b64, 'application/pdf');
+      var url  = URL.createObjectURL(blob);
+      document.getElementById('downloadBtn').href = url;
+    })();
+
+    function b64toBlob(b64Data, contentType) {
+      var byteChars = atob(b64Data);
+      var byteArrays = [];
+      for (var offset = 0; offset < byteChars.length; offset += 512) {
+        var slice = byteChars.slice(offset, offset + 512);
+        var byteNums = new Array(slice.length);
+        for (var i = 0; i < slice.length; i++) byteNums[i] = slice.charCodeAt(i);
+        byteArrays.push(new Uint8Array(byteNums));
+      }
+      return new Blob(byteArrays, {type: contentType});
+    }
+  </script>
+
+</main>
+
+<footer>
+  <div>◈ ÓPTICA — FÍSICA DO ENSINO MÉDIO ◈</div>
+  <div style="margin-top:8px;">REFLEXÃO · REFRAÇÃO · CORES DA LUZ</div>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────
+//  QUIZ LOGIC
+// ─────────────────────────────────────────────
+const answers = { q1:0, q2:0, q3:0, q4:0, q5:0, q6:0, q7:0, q8:0 };
+const feedbacks = {
+  q1: { correct: "✓ Correto! O ângulo de 30° é em relação à SUPERFÍCIE, logo o ângulo com a normal é 90° − 30° = 60°. E pela 2ª lei: θ_reflexão = 60°.", wrong: "✗ Atenção: o ângulo dado (30°) é em relação à superfície. O ângulo com a normal = 90° − 30° = 60°. Logo θᵣ = 60°." },
+  q2: { correct: "✓ Correto! Na reflexão difusa, a superfície irregular faz os raios refletirem em direções variadas, permitindo a visibilidade do objeto de múltiplos ângulos.", wrong: "✗ Na reflexão difusa os raios se dispersam em várias direções por conta da superfície irregular — é ela que permite enxergar objetos opacos." },
+  q3: { correct: "✓ Correto! Pela Lei de Snell: 1,0 · sen30° = 1,5 · senθ₂ → senθ₂ = 0,5/1,5 ≈ 0,333 → θ₂ ≈ 19,5°. O raio se aproxima da normal ao entrar em meio mais denso.", wrong: "✗ Use a Lei de Snell: n₁·sen30° = n₂·senθ₂ → 1,0 × 0,5 = 1,5 × senθ₂ → senθ₂ ≈ 0,333 → θ₂ ≈ 19,5°." },
+  q4: { correct: "✓ Correto! Ao entrar em um meio mais refringente (n maior), a luz desacelera e o raio se aproxima da normal.", wrong: "✗ Ao passar de um meio com n menor para n maior, a luz desacelera e o raio se curva em direção à normal." },
+  q5: { correct: "✓ Correto! A reflexão total interna ocorre quando a luz vai de um meio mais denso (n maior) para um menos denso (n menor) e o ângulo de incidência é maior ou igual ao ângulo limite θ_L.", wrong: "✗ Para reflexão total interna, a luz deve ir de um meio MAIS denso para MENOS denso E o ângulo deve ser ≥ ângulo limite." },
+  q6: { correct: "✓ Correto! A camisa azul só reflete luz azul. Sob luz vermelha, não há frequência azul disponível — ela absorve o vermelho e nada reflete, parecendo preta.", wrong: "✗ A camisa azul reflete apenas luz azul. Sob iluminação vermelha monocromática, ela absorve a luz vermelha e nada reflete → aparência preta." },
+  q7: { correct: "✓ Correto! Nas gotas de chuva, a luz solar sofre refração ao entrar, reflexão interna e refração ao sair, com cada frequência saindo em ângulo diferente — formando o arco-íris.", wrong: "✗ O arco-íris resulta da dispersão: nas gotas de chuva, a luz branca sofre refração + reflexão interna + refração novamente, separando as cores." },
+  q8: { correct: "✓ Correto! R + G + B = Branco. É a síntese aditiva das cores primárias da luz, princípio usado em telas de monitores e TVs.", wrong: "✗ Na síntese aditiva: R + G + B = Luz Branca. As cores pigmento seguem outra lógica (síntese subtrativa)." },
+};
+
+let answered = 0;
+const total = 8;
+
+function answer(btn, qId, result) {
+  const card = document.getElementById(qId);
+  const btns = card.querySelectorAll('.opt-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('f_' + qId);
+
+  if (result === 'correct') {
+    btn.classList.add('correct');
+    fb.textContent = feedbacks[qId].correct;
+    fb.className = 'feedback show correct-msg';
+    answers[qId] = 1;
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = feedbacks[qId].wrong;
+    fb.className = 'feedback show wrong-msg';
+    // highlight correct
+    btns.forEach(b => {
+      if (b.getAttribute('onclick').includes("'correct'")) b.classList.add('correct');
+    });
+    answers[qId] = 0;
+  }
+
+  answered++;
+  updateProgress();
+  if (answered === total) showScore();
+}
+
+function updateProgress() {
+  const pct = (answered / total) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${answered} / ${total} respondidas`;
+}
+
+function showScore() {
+  const score = Object.values(answers).reduce((a,b) => a+b, 0);
+  const panel = document.getElementById('scorePanel');
+  panel.style.display = 'block';
+  document.getElementById('scoreValue').textContent = score + '/' + total;
+  const msgs = ['Não desista — revise o conteúdo e tente novamente!', 'Bom início! Revise os pontos em que errou.', 'Bem! Continue praticando.', 'Muito bem! Você domina o conteúdo.', 'Excelente! Desempenho perfeito! 🔆'];
+  const idx = score <= 2 ? 0 : score <= 4 ? 1 : score <= 5 ? 2 : score <= 7 ? 3 : 4;
+  document.getElementById('scoreMsg').textContent = msgs[idx];
+  const colors = ['var(--neon-pink)','var(--neon-orange)','var(--neon-yellow)','var(--neon-green)','var(--neon-cyan)'];
+  document.getElementById('scoreValue').style.color = colors[idx];
+  document.getElementById('scoreValue').style.textShadow = `0 0 20px ${colors[idx]}`;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetQuiz() {
+  Object.keys(answers).forEach(k => answers[k] = 0);
+  answered = 0;
+  updateProgress();
+  document.getElementById('scorePanel').style.display = 'none';
+  ['q1','q2','q3','q4','q5','q6','q7','q8'].forEach(qId => {
+    const card = document.getElementById(qId);
+    card.querySelectorAll('.opt-btn').forEach(b => {
+      b.disabled = false;
+      b.classList.remove('correct','wrong');
+    });
+    const fb = document.getElementById('f_' + qId);
+    fb.className = 'feedback';
+    fb.textContent = '';
+  });
+}
+
+// ─────────────────────────────────────────────
+//  CANVAS: REFLEXÃO
+// ─────────────────────────────────────────────
+function drawReflection() {
+  const angle = parseInt(document.getElementById('reflAngle').value);
+  document.getElementById('reflAngleVal').textContent = angle + '°';
+  const canvas = document.getElementById('reflCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const cx = W/2, cy = H/2;
+  const rad = angle * Math.PI / 180;
+  const len = 220;
+
+  // background
+  ctx.fillStyle = '#050d15';
+  ctx.fillRect(0,0,W,H);
+
+  // surface
+  const grad = ctx.createLinearGradient(0, cy, W, cy);
+  grad.addColorStop(0, 'transparent');
+  grad.addColorStop(0.3, 'rgba(0,245,255,0.5)');
+  grad.addColorStop(0.7, 'rgba(0,245,255,0.5)');
+  grad.addColorStop(1, 'transparent');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
+
+  // mirror glow
+  ctx.strokeStyle = 'rgba(0,245,255,0.1)';
+  ctx.lineWidth = 8;
+  ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
+
+  // normal (dashed)
+  ctx.setLineDash([6,4]);
+  ctx.strokeStyle = 'rgba(180,180,255,0.4)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(cx, cy-160); ctx.lineTo(cx, cy+160); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // incident ray
+  const ix = cx - len * Math.sin(rad);
+  const iy = cy - len * Math.cos(rad);
+  drawArrow(ctx, ix, iy, cx, cy, '#ff006e', 2.5, 'rgba(255,0,110,0.3)');
+
+  // reflected ray
+  const rx = cx + len * Math.sin(rad);
+  const ry = cy - len * Math.cos(rad);
+  drawArrow(ctx, cx, cy, rx, ry, '#00f5ff', 2.5, 'rgba(0,245,255,0.3)');
+
+  // angle arcs
+  ctx.strokeStyle = 'rgba(255,0,110,0.6)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 50, -Math.PI/2, -Math.PI/2 + rad);
+  ctx.stroke();
+
+  ctx.strokeStyle = 'rgba(0,245,255,0.6)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 50, -Math.PI/2 - rad, -Math.PI/2);
+  ctx.stroke();
+
+  // labels
+  ctx.font = '14px Share Tech Mono, monospace';
+  ctx.fillStyle = '#ff006e';
+  ctx.fillText('θᵢ = ' + angle + '°', cx - 90, cy - 20);
+  ctx.fillStyle = '#00f5ff';
+  ctx.fillText('θᵣ = ' + angle + '°', cx + 20, cy - 20);
+
+  // NORMAL label
+  ctx.fillStyle = 'rgba(180,180,255,0.5)';
+  ctx.font = '11px Share Tech Mono, monospace';
+  ctx.fillText('N', cx + 6, cy - 148);
+
+  // ray labels
+  ctx.fillStyle = '#ff006e';
+  ctx.font = '12px Share Tech Mono, monospace';
+  ctx.fillText('RAIO INCIDENTE', ix - 40, iy - 14);
+  ctx.fillStyle = '#00f5ff';
+  ctx.fillText('RAIO REFLETIDO', rx - 20, ry - 14);
+}
+
+function drawArrow(ctx, x1, y1, x2, y2, color, lw, glow) {
+  const angle = Math.atan2(y2-y1, x2-x1);
+  const len = 12;
+
+  // glow
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 18;
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+
+  // arrowhead
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(x2 - len*Math.cos(angle-0.4), y2 - len*Math.sin(angle-0.4));
+  ctx.lineTo(x2 - len*Math.cos(angle+0.4), y2 - len*Math.sin(angle+0.4));
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+// ─────────────────────────────────────────────
+//  CANVAS: REFRAÇÃO
+// ─────────────────────────────────────────────
+function drawRefraction() {
+  const angle = parseInt(document.getElementById('refrAngle').value);
+  document.getElementById('refrAngleVal').textContent = angle + '°';
+  const canvas = document.getElementById('refrCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const n1 = 1.0, n2 = 1.5;
+  const cx = W/2, cy = H/2;
+  const rad1 = angle * Math.PI / 180;
+  const sinR2 = (n1 * Math.sin(rad1)) / n2;
+  const len = 200;
+  const isTotalInternal = sinR2 > 1;
+
+  // backgrounds
+  ctx.fillStyle = '#020a14';
+  ctx.fillRect(0,0,W,cy);
+  ctx.fillStyle = '#030d1a';
+  ctx.fillRect(0,cy,W,H-cy);
+
+  // medium labels
+  ctx.font = '11px Share Tech Mono, monospace';
+  ctx.fillStyle = 'rgba(0,245,255,0.35)';
+  ctx.fillText('AR — n₁ = 1.0', 16, 20);
+  ctx.fillStyle = 'rgba(191,0,255,0.45)';
+  ctx.fillText('VIDRO — n₂ = 1.5', 16, cy + 20);
+
+  // interface line
+  const ifGrad = ctx.createLinearGradient(0, cy, W, cy);
+  ifGrad.addColorStop(0, 'transparent');
+  ifGrad.addColorStop(0.2, 'rgba(0,245,255,0.6)');
+  ifGrad.addColorStop(0.8, 'rgba(0,245,255,0.6)');
+  ifGrad.addColorStop(1, 'transparent');
+  ctx.strokeStyle = ifGrad;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+
+  // normal
+  ctx.setLineDash([6,4]);
+  ctx.strokeStyle = 'rgba(180,180,255,0.3)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(cx, 10); ctx.lineTo(cx, H-10); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(180,180,255,0.4)';
+  ctx.font = '11px Share Tech Mono, monospace';
+  ctx.fillText('N', cx+6, 22);
+
+  // incident ray
+  const ix = cx - len * Math.sin(rad1);
+  const iy = cy - len * Math.cos(rad1);
+  drawArrow(ctx, ix, iy, cx, cy, '#ff006e', 2.5);
+
+  if (!isTotalInternal) {
+    const rad2 = Math.asin(sinR2);
+    const rx = cx + len * Math.sin(rad2);
+    const ry = cy + len * Math.cos(rad2);
+    drawArrow(ctx, cx, cy, rx, ry, '#bf00ff', 2.5);
+
+    // angle arcs
+    ctx.strokeStyle = 'rgba(255,0,110,0.5)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(cx, cy, 44, -Math.PI/2, -Math.PI/2 + rad1); ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(191,0,255,0.5)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(cx, cy, 44, Math.PI/2 - rad2, Math.PI/2); ctx.stroke();
+
+    ctx.font = '13px Share Tech Mono, monospace';
+    ctx.fillStyle = '#ff006e';
+    ctx.fillText('θ₁=' + angle + '°', cx - 95, cy - 16);
+    ctx.fillStyle = '#bf00ff';
+    ctx.fillText('θ₂≈' + Math.round(rad2*180/Math.PI) + '°', cx + 18, cy + 32);
+
+    ctx.fillStyle = '#ff006e';
+    ctx.font = '11px Share Tech Mono, monospace';
+    ctx.fillText('RAIO INCIDENTE', ix - 30, iy - 12);
+    ctx.fillStyle = '#bf00ff';
+    ctx.fillText('RAIO REFRATADO', rx - 20, ry + 16);
+  } else {
+    // total internal (shouldn't happen ar→vidro but just in case)
+    ctx.font = '13px Share Tech Mono, monospace';
+    ctx.fillStyle = '#ff006e';
+    ctx.fillText('REFLEXÃO TOTAL INTERNA', cx - 120, cy + 40);
+  }
+
+  // snell equation display
+  ctx.font = '12px Share Tech Mono, monospace';
+  ctx.fillStyle = 'rgba(0,245,255,0.5)';
+  const r2deg = isTotalInternal ? '—' : Math.round(Math.asin(sinR2)*180/Math.PI) + '°';
+  ctx.fillText(`n₁·sen(${angle}°) = n₂·sen(θ₂)  →  θ₂ ≈ ${r2deg}`, W/2 - 200, H - 14);
+}
+
+// ─────────────────────────────────────────────
+//  CANVAS: PRISMA
+// ─────────────────────────────────────────────
+function drawPrism() {
+  const canvas = document.getElementById('prismCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  ctx.fillStyle = '#050d15';
+  ctx.fillRect(0,0,W,H);
+
+  const px = 260, py = H/2;
+  const prismW = 100, prismH = 130;
+
+  // prism shape
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(px, py - prismH/2);
+  ctx.lineTo(px + prismW, py + prismH/2);
+  ctx.lineTo(px - prismW*0.1, py + prismH/2);
+  ctx.closePath();
+  ctx.strokeStyle = 'rgba(0,245,255,0.7)';
+  ctx.lineWidth = 2;
+  ctx.shadowColor = 'rgba(0,245,255,0.5)';
+  ctx.shadowBlur = 12;
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(0,180,255,0.06)';
+  ctx.fill();
+  ctx.restore();
+
+  // incident white ray
+  drawArrow(ctx, 80, py, px + 30, py, '#ffffff', 3);
+
+  // dispersed rays
+  const colors = [
+    { c: '#8B00FF', offset: -55, label: 'Violeta' },
+    { c: '#4444ff', offset: -38, label: 'Anil' },
+    { c: '#0088ff', offset: -22, label: 'Azul' },
+    { c: '#00dd44', offset: -6,  label: 'Verde' },
+    { c: '#ffee00', offset: 12,  label: 'Amarelo' },
+    { c: '#ff8800', offset: 28,  label: 'Laranja' },
+    { c: '#ff2200', offset: 46,  label: 'Vermelho' },
+  ];
+
+  const exitX = px + prismW * 0.65;
+  const exitY = py + prismH * 0.1;
+
+  colors.forEach(({c, offset, label}) => {
+    ctx.save();
+    ctx.shadowColor = c;
+    ctx.shadowBlur = 10;
+    ctx.strokeStyle = c;
+    ctx.lineWidth = 2;
+    const endX = exitX + 260;
+    const endY = exitY + offset;
+    ctx.beginPath();
+    ctx.moveTo(exitX, exitY);
+    ctx.lineTo(endX, endY);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = c;
+    ctx.font = '11px Share Tech Mono, monospace';
+    ctx.fillText(label, endX + 8, endY + 4);
+  });
+
+  // label white
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.font = '11px Share Tech Mono, monospace';
+  ctx.fillText('LUZ BRANCA', 82, py - 12);
+
+  // prisma label
+  ctx.fillStyle = 'rgba(0,245,255,0.5)';
+  ctx.font = '10px Share Tech Mono, monospace';
+  ctx.fillText('PRISMA', px + 10, py + prismH/2 + 18);
+}
+
+// ─────────────────────────────────────────────
+//  SNELL CALCULATOR
+// ─────────────────────────────────────────────
+function calcSnell() {
+  const n1 = parseFloat(document.getElementById('n1Select').value);
+  const n2 = parseFloat(document.getElementById('n2Select').value);
+  const t1 = parseFloat(document.getElementById('snellAngle').value);
+
+  if (isNaN(t1) || t1 <= 0 || t1 >= 90) {
+    document.getElementById('snellResult').textContent = '—';
+    document.getElementById('snellStatus').textContent = 'Ângulo inválido (use entre 1° e 89°)';
+    return;
+  }
+
+  const sinT1 = Math.sin(t1 * Math.PI / 180);
+  const sinT2 = (n1 * sinT1) / n2;
+
+  const status = document.getElementById('snellStatus');
+  const result = document.getElementById('snellResult');
+
+  if (sinT2 > 1) {
+    result.textContent = 'REFLEXÃO TOTAL';
+    result.style.fontSize = '1.3rem';
+    result.style.color = 'var(--neon-pink)';
+    result.style.textShadow = '0 0 16px var(--neon-pink)';
+    status.textContent = 'Ângulo maior que o limite → reflexão total interna';
+  } else {
+    const t2 = Math.asin(sinT2) * 180 / Math.PI;
+    result.textContent = t2.toFixed(2) + '°';
+    result.style.fontSize = '2rem';
+    result.style.color = 'var(--neon-cyan)';
+    result.style.textShadow = '0 0 16px var(--neon-cyan)';
+    const dir = n2 > n1 ? 'aproxima' : 'afasta';
+    status.textContent = `Raio se ${dir} da normal ao mudar de meio`;
+  }
+}
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+window.addEventListener('load', () => {
+  drawReflection();
+  drawRefraction();
+  drawPrism();
+  calcSnell();
+});
+
+window.addEventListener('resize', () => {
+  // refit canvases on mobile if needed
+});
+</script>
+</body>
+</html>
