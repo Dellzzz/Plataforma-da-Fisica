@@ -1,4 +1,3 @@
-
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -13,9 +12,9 @@ body{background:#05010a;}
 .tb.danger{border-color:rgba(255,80,80,0.4);color:#ff9090;}
 .tb.danger:hover{background:rgba(200,0,0,0.15);}
 .tb.demo{border-color:#ff00ff;color:#ff00ff;background:rgba(255,0,255,0.08);}
-.wrap{display:grid;grid-template-columns:1fr 176px;gap:12px;}
-.cvs-box{background:#080010;border:1px solid rgba(188,19,254,0.28);border-radius:10px;overflow:auto;}
-canvas{display:block;border-radius:10px;cursor:crosshair;}
+.wrap{display:grid;grid-template-columns:1fr 190px;gap:12px;}
+.cvs-box{background:#080010;border:1px solid rgba(188,19,254,0.28);border-radius:10px;overflow:hidden;}
+canvas{display:block;border-radius:10px;cursor:crosshair;width:100%;height:auto;max-width:100%;touch-action:none;}
 .side{display:flex;flex-direction:column;gap:9px;}
 .sp{background:rgba(188,19,254,0.07);border:1px solid rgba(188,19,254,0.22);border-radius:9px;padding:11px 10px;}
 .spt{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:#bc13fe;margin-bottom:8px;}
@@ -42,6 +41,18 @@ input[type=range]{width:100%;accent-color:#bc13fe;}
 .swt-s:before{content:"";position:absolute;width:12px;height:12px;left:2px;top:2px;background:#444;border-radius:50%;transition:0.3s;}
 .swt input:checked+.swt-s{background:rgba(188,19,254,0.35);border-color:#bc13fe;}
 .swt input:checked+.swt-s:before{transform:translateX(16px);background:#ff00ff;}
+@media(max-width:760px){
+  .lab{padding:12px 9px;}
+  .wrap{grid-template-columns:1fr;gap:10px;}
+  .side{flex-direction:column;}
+  #sp-comp{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+  #sp-comp .spt{grid-column:1 / -1;margin-bottom:2px;}
+  #sp-comp .cb{margin:0;}
+  .top{gap:5px;}
+  .tb{font-size:10px;padding:7px 11px;}
+  .cb{padding:10px 8px;font-size:13px;}
+  .lab-sub{font-size:12px;}
+}
 </style>
 
 <div class="lab">
@@ -52,6 +63,7 @@ input[type=range]{width:100%;accent-color:#bc13fe;}
     <button class="tb sel" id="m-place" onclick="setMode('place')">+ COLOCAR</button>
     <button class="tb" id="m-wire" onclick="setMode('wire')">~ FIO</button>
     <button class="tb" id="m-move" onclick="setMode('move')">✦ MOVER</button>
+    <button class="tb" id="m-rotate" onclick="setMode('rotate')">↻ GIRAR</button>
     <button class="tb" id="m-del" onclick="setMode('del')">✕ APAGAR</button>
     <button class="tb danger" onclick="clearAll()">⟳ LIMPAR</button>
     <button class="tb demo" onclick="loadDemo()">⚡ DEMO</button>
@@ -61,7 +73,7 @@ input[type=range]{width:100%;accent-color:#bc13fe;}
       <canvas id="cv" width="800" height="800"></canvas>
     </div>
     <div class="side">
-      <div class="sp">
+      <div class="sp" id="sp-comp">
         <div class="spt">COMPONENTES</div>
         <button class="cb on" id="cb-battery" onclick="pick('battery')">⚡ Bateria</button>
         <button class="cb" id="cb-resistor" onclick="pick('resistor')">▭ Resistor</button>
@@ -88,7 +100,7 @@ input[type=range]{width:100%;accent-color:#bc13fe;}
     </div>
   </div>
   <div class="info" id="info">Escolha um componente e clique na grade para posicioná-lo.</div>
-  <div class="info" id="info">Prof. Jardel A. Leite</div>
+  <div class="info author">Prof. Jardel A. Leite</div>
 </div>
 
 <script>
@@ -124,6 +136,10 @@ function makeUF(n){
 }
 
 function analyze(){
+  // zera energização de tudo
+  comps.forEach(c=>c._on=false);
+  wires.forEach(w=>w._on=false);
+
   const bats=comps.filter(c=>c.type==='battery');
   if(!bats.length) return false;
 
@@ -138,20 +154,48 @@ function analyze(){
   const wireIdx=wires.map(w=>[addPt(w.x1,w.y1),addPt(w.x2,w.y2)]);
   const n=pts.length; if(!n) return false;
 
+  // um componente "conduz" no circuito externo se NÃO é bateria e não é chave aberta
+  const conducts=k => comps[k].type!=='battery' && !(comps[k].type==='switch' && !comps[k].closed);
+
+  // união dos condutores externos (fios + componentes que conduzem),
+  // podendo excluir 1 componente e/ou 1 fio (para o teste de "ponte")
+  function buildUF(exC,exW){
+    const uf=makeUF(n);
+    wireIdx.forEach(([a,b],wi)=>{ if(wi!==exW) uf.union(a,b); });
+    comps.forEach((c,k)=>{ if(k!==exC && conducts(k)) uf.union(compIdx[k][0],compIdx[k][1]); });
+    return uf;
+  }
+
+  let anyClosed=false;
   for(let bi=0;bi<comps.length;bi++){
     if(comps[bi].type!=='battery') continue;
-    const[a,b]=compIdx[bi];
-    const uf=makeUF(n);
-    wireIdx.forEach(([wa,wb])=>uf.union(wa,wb));
-    comps.forEach((c2,j)=>{
-      if(j===bi) return;
-      if(c2.type==='switch'&&!c2.closed) return;
-      const[a2,b2]=compIdx[j];
-      uf.union(a2,b2);
+    const [a,b]=compIdx[bi];
+    // laço fechado: o circuito externo (sem a própria bateria) liga os dois polos
+    const ufAll=buildUF(-1,-1);
+    if(ufAll.find(a)!==ufAll.find(b)) continue;   // bateria sem laço → segue
+    anyClosed=true;
+    comps[bi]._on=true;                            // bateria ligada
+    const fa=ufAll.find(a), fb=ufAll.find(b);
+
+    // cada componente que conduz: liga só se está no caminho da corrente.
+    // Removendo-o, suas pontas devem alcançar polos OPOSTOS da bateria.
+    comps.forEach((c,k)=>{
+      if(k===bi || !conducts(k)) return;
+      const uf=buildUF(k,-1);
+      const u=uf.find(compIdx[k][0]), v=uf.find(compIdx[k][1]);
+      const A=uf.find(a), B=uf.find(b);
+      if((u===A&&v===B)||(u===B&&v===A)) c._on=true;
     });
-    if(uf.find(a)===uf.find(b)) return true;
+
+    // mesmo teste para cada fio (para o brilho/animação só no laço ativo)
+    wires.forEach((w,wi)=>{
+      const uf=buildUF(-1,wi);
+      const u=uf.find(wireIdx[wi][0]), v=uf.find(wireIdx[wi][1]);
+      const A=uf.find(a), B=uf.find(b);
+      if((u===A&&v===B)||(u===B&&v===A)) w._on=true;
+    });
   }
-  return false;
+  return anyClosed;
 }
 
 function recalc(){
@@ -177,13 +221,14 @@ function setInfo(s){document.getElementById('info').innerHTML=s;}
 
 function setMode(m){
   mode=m; wireStart=null;
-  ['place','wire','move','del'].forEach(k=>document.getElementById('m-'+k).classList.toggle('sel',k===m));
-  cv.style.cursor={place:'crosshair',wire:'crosshair',move:'grab',del:'not-allowed'}[m]||'default';
+  ['place','wire','move','rotate','del'].forEach(k=>{const el=document.getElementById('m-'+k); if(el) el.classList.toggle('sel',k===m);});
+  cv.style.cursor={place:'crosshair',wire:'crosshair',move:'grab',rotate:'pointer',del:'not-allowed'}[m]||'default';
   setInfo({
-    place:'Clique na grade para posicionar. <b>Botão direito</b> para rotacionar.',
-    wire:'Clique num <b>terminal</b> para iniciar o fio, clique no destino para concluir.',
+    place:'Toque na grade para posicionar. Use <b>↻ Girar</b> (ou botão direito) para rotacionar.',
+    wire:'Toque num <b>terminal</b> para iniciar o fio e toque no destino para concluir.',
     move:'Arraste um componente para reposicionar.',
-    del:'Clique num componente ou fio para remover.'
+    rotate:'Toque num componente para girá-lo 90°.',
+    del:'Toque num componente ou fio para remover.'
   }[m]||'');
 }
 
@@ -212,15 +257,22 @@ function nearTerm(mx,my){
   return best;
 }
 
-cv.addEventListener('click',e=>{
+function evtPos(cx,cy){
   const r=cv.getBoundingClientRect();
-  const scaleX=W/r.width, scaleY=H/r.height;
-  const mx=(e.clientX-r.left)*scaleX, my=(e.clientY-r.top)*scaleY;
+  return { mx:(cx-r.left)*(W/r.width), my:(cy-r.top)*(H/r.height) };
+}
+
+function handleTap(mx,my){
   const sx=snap(mx), sy=snap(my);
 
   if(mode==='place'){
     comps.push({id:uid++,type:picked,x:sx,y:sy,rot:0,closed:document.getElementById('swEl').checked});
     recalc(); return;
+  }
+  if(mode==='rotate'){
+    const c=comps.find(c=>dst(mx,my,c.x,c.y)<GS*0.72);
+    if(c){c.rot=((c.rot||0)+1)%4;recalc();}
+    return;
   }
   if(mode==='del'){
     const ci=comps.findIndex(c=>dst(mx,my,c.x,c.y)<GS*0.72);
@@ -239,7 +291,7 @@ cv.addEventListener('click',e=>{
     const px=near?near.x:sx, py=near?near.y:sy;
     if(!wireStart){
       wireStart={x:px,y:py};
-      setInfo('Origem marcada. Clique no terminal de destino.');
+      setInfo('Origem marcada. Toque no terminal de destino.');
     } else {
       if(dst(px,py,wireStart.x,wireStart.y)>4){
         wires.push({x1:wireStart.x,y1:wireStart.y,x2:px,y2:py});
@@ -250,32 +302,17 @@ cv.addEventListener('click',e=>{
     }
     return;
   }
-});
+}
 
-cv.addEventListener('contextmenu',e=>{
-  e.preventDefault();
-  const r=cv.getBoundingClientRect();
-  const scaleX=W/r.width, scaleY=H/r.height;
-  const mx=(e.clientX-r.left)*scaleX, my=(e.clientY-r.top)*scaleY;
-  const c=comps.find(c=>dst(mx,my,c.x,c.y)<GS*0.72);
-  if(c){c.rot=((c.rot||0)+1)%4;recalc();}
-});
-
-cv.addEventListener('mousedown',e=>{
-  if(mode!=='move') return;
-  const r=cv.getBoundingClientRect();
-  const scaleX=W/r.width, scaleY=H/r.height;
-  const mx=(e.clientX-r.left)*scaleX, my=(e.clientY-r.top)*scaleY;
+// ── arraste (compartilhado por mouse e toque) ──
+function startDrag(mx,my){
   dragC=comps.find(c=>dst(mx,my,c.x,c.y)<GS*0.72);
   if(dragC){dragOff={x:mx-dragC.x,y:my-dragC.y};cv.style.cursor='grabbing';}
-});
-cv.addEventListener('mousemove',e=>{
+}
+function moveDrag(mx,my){
   if(!dragC) return;
-  const r=cv.getBoundingClientRect();
-  const scaleX=W/r.width, scaleY=H/r.height;
   const oldT=getTerminals(dragC).map(t=>({...t}));
-  dragC.x=snap((e.clientX-r.left)*scaleX-dragOff.x);
-  dragC.y=snap((e.clientY-r.top)*scaleY-dragOff.y);
+  dragC.x=snap(mx-dragOff.x); dragC.y=snap(my-dragOff.y);
   const newT=getTerminals(dragC);
   oldT.forEach((ot,i)=>{
     const nt=newT[i];
@@ -285,8 +322,36 @@ cv.addEventListener('mousemove',e=>{
     });
   });
   recalc();
+}
+function endDrag(){ const had=dragC; dragC=null; if(mode==='move')cv.style.cursor='grab'; return had; }
+
+// ── mouse ──
+cv.addEventListener('click',e=>{ const p=evtPos(e.clientX,e.clientY); handleTap(p.mx,p.my); });
+cv.addEventListener('contextmenu',e=>{
+  e.preventDefault();
+  const p=evtPos(e.clientX,e.clientY);
+  const c=comps.find(c=>dst(p.mx,p.my,c.x,c.y)<GS*0.72);
+  if(c){c.rot=((c.rot||0)+1)%4;recalc();}
 });
-cv.addEventListener('mouseup',()=>{dragC=null;if(mode==='move')cv.style.cursor='grab';});
+cv.addEventListener('mousedown',e=>{ if(mode!=='move')return; const p=evtPos(e.clientX,e.clientY); startDrag(p.mx,p.my); });
+cv.addEventListener('mousemove',e=>{ if(!dragC)return; const p=evtPos(e.clientX,e.clientY); moveDrag(p.mx,p.my); });
+cv.addEventListener('mouseup',()=>endDrag());
+
+// ── toque (arraste no modo mover; toques nos demais modos viram clique nativo) ──
+cv.addEventListener('touchstart',e=>{
+  if(mode!=='move'||e.touches.length!==1) return;
+  const t=e.touches[0]; const p=evtPos(t.clientX,t.clientY);
+  startDrag(p.mx,p.my); if(dragC) e.preventDefault();
+},{passive:false});
+cv.addEventListener('touchmove',e=>{
+  if(mode!=='move'||!dragC||e.touches.length!==1) return;
+  const t=e.touches[0]; const p=evtPos(t.clientX,t.clientY);
+  moveDrag(p.mx,p.my); e.preventDefault();
+},{passive:false});
+cv.addEventListener('touchend',e=>{
+  if(mode!=='move') return;
+  if(endDrag()) e.preventDefault();
+},{passive:false});
 
 // ── DRAWING ──────────────────────────────────────────────────────────────────
 function drawGrid(){
@@ -301,10 +366,11 @@ function drawGrid(){
 
 function drawWires(){
   wires.forEach((w,i)=>{
-    g.strokeStyle=circuitOn?'#ff00ff':'#5a1a7a';
-    g.lineWidth=circuitOn?2.5:2;
+    const won=!!w._on;
+    g.strokeStyle=won?'#ff00ff':'#5a1a7a';
+    g.lineWidth=won?2.5:2;
     g.beginPath();g.moveTo(w.x1,w.y1);g.lineTo(w.x2,w.y2);g.stroke();
-    if(circuitOn){
+    if(won){
       const t=((tick*0.025+i*0.4)%1);
       const px=w.x1+(w.x2-w.x1)*t, py=w.y1+(w.y2-w.y1)*t;
       g.beginPath();g.arc(px,py,4,0,Math.PI*2);
@@ -312,7 +378,7 @@ function drawWires(){
     }
     [[w.x1,w.y1],[w.x2,w.y2]].forEach(([px,py])=>{
       g.beginPath();g.arc(px,py,4,0,Math.PI*2);
-      g.fillStyle=circuitOn?'#ff00ff':'#5a1a7a';g.fill();
+      g.fillStyle=won?'#ff00ff':'#5a1a7a';g.fill();
     });
   });
 }
@@ -320,7 +386,7 @@ function drawWires(){
 function drawComp(c){
   const[t0,t1]=getTerminals(c);
   const vertical=(c.rot||0)%2===1;
-  const on=circuitOn;
+  const on=!!c._on;
   g.save();
   g.translate(c.x,c.y);
   if(vertical) g.rotate(Math.PI/2);
