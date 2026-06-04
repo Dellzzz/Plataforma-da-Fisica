@@ -152,46 +152,20 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border:none;border-ra
 </div>
 
 <script>
-// ============== COMPLEXOS + SOLVER ==============
-const cadd=(a,b)=>[a[0]+b[0],a[1]+b[1]];
-const csub=(a,b)=>[a[0]-b[0],a[1]-b[1]];
-const cmul=(a,b)=>[a[0]*b[0]-a[1]*b[1],a[0]*b[1]+a[1]*b[0]];
-const cdiv=(a,b)=>{const d=b[0]*b[0]+b[1]*b[1];return [(a[0]*b[0]+a[1]*b[1])/d,(a[1]*b[0]-a[0]*b[1])/d];};
-const cabs=a=>Math.hypot(a[0],a[1]);
-const cconj=a=>[a[0],-a[1]];
-function csolve(A,b){
-  const n=b.length;
-  const M=A.map(r=>r.map(c=>[c[0],c[1]])); const x=b.map(c=>[c[0],c[1]]);
+
+// ============== SOLVER REAL (Gauss-Jordan, pivoteamento) ==============
+function rsolve(A,b){
+  const n=b.length; const M=A.map(r=>r.slice()); const x=b.slice();
   for(let col=0;col<n;col++){
-    let piv=col,best=M[col][col][0]**2+M[col][col][1]**2;
-    for(let r=col+1;r<n;r++){const m=M[r][col][0]**2+M[r][col][1]**2; if(m>best){best=m;piv=r;}}
+    let piv=col,best=Math.abs(M[col][col]);
+    for(let r=col+1;r<n;r++){const v=Math.abs(M[r][col]); if(v>best){best=v;piv=r;}}
     if(best<1e-30) return null;
     if(piv!==col){const t=M[piv];M[piv]=M[col];M[col]=t;const tx=x[piv];x[piv]=x[col];x[col]=tx;}
     const d=M[col][col];
-    for(let r=0;r<n;r++){ if(r===col)continue; const f=cdiv(M[r][col],d); if(f[0]===0&&f[1]===0)continue;
-      for(let k=col;k<n;k++) M[r][k]=csub(M[r][k],cmul(f,M[col][k]));
-      x[r]=csub(x[r],cmul(f,x[col])); }
+    for(let r=0;r<n;r++){ if(r===col)continue; const f=M[r][col]/d; if(f===0)continue;
+      for(let k=col;k<n;k++) M[r][k]-=f*M[col][k]; x[r]-=f*x[col]; }
   }
-  return x.map((xi,i)=>cdiv(xi,M[i][i]));
-}
-function mnaSolve(nodeIds,gnd,branches,sources){
-  const N=nodeIds.length,M=sources.length; const ridx={}; let c=0;
-  nodeIds.forEach(id=>{if(id!==gnd)ridx[id]=c++;});
-  const sz=(N-1)+M;
-  const A=Array.from({length:sz},()=>Array.from({length:sz},()=>[0,0]));
-  const b=Array.from({length:sz},()=>[0,0]);
-  nodeIds.forEach(id=>{if(id!==gnd){const i=ridx[id];A[i][i]=cadd(A[i][i],[1e-9,0]);}});
-  branches.forEach(br=>{const ia=br.a===gnd?-1:ridx[br.a], ib=br.b===gnd?-1:ridx[br.b], y=br.y;
-    if(ia>=0)A[ia][ia]=cadd(A[ia][ia],y);
-    if(ib>=0)A[ib][ib]=cadd(A[ib][ib],y);
-    if(ia>=0&&ib>=0){A[ia][ib]=csub(A[ia][ib],y);A[ib][ia]=csub(A[ib][ia],y);}});
-  sources.forEach((s,k)=>{const col=(N-1)+k; const ip=s.p===gnd?-1:ridx[s.p], im=s.m===gnd?-1:ridx[s.m];
-    if(ip>=0){A[ip][col]=cadd(A[ip][col],[1,0]);A[col][ip]=cadd(A[col][ip],[1,0]);}
-    if(im>=0){A[im][col]=csub(A[im][col],[1,0]);A[col][im]=csub(A[col][im],[1,0]);}
-    b[col]=[s.E[0],s.E[1]];});
-  const x=csolve(A,b); if(!x) return null;
-  const V={}; V[gnd]=[0,0]; nodeIds.forEach(id=>{if(id!==gnd)V[id]=x[ridx[id]];});
-  return {V, Is:sources.map((s,k)=>x[(N-1)+k])};
+  return x.map((xi,i)=>xi/M[i][i]);
 }
 
 // ============== ESTADO ==============
@@ -204,8 +178,14 @@ let comps=[], wires=[];
 let wireStart=null, dragC=null, selId=-1, uid=0;
 let dmmOn=false, scopeOn=false;
 let probeR={gx:4,gy:4}, probeB={gx:4,gy:7}, dragProbe=null;
-let sim={ok:false,ac:false,omega:0,Imag:0,Vmag:0,P:0,short:false,warn:''};
-let simTime=0, lastT=0;
+
+let topo={dirty:true,nodeIds:[],gnd:null,elems:[],sources:[],ac:false,omega:0,justComp:false};
+let lastV={}, simT=0, lastT=0;
+let srcMsI=0, emaP=0;
+let scopeBuf=[];
+let sim={ok:false,ac:false,omega:0,Irms:0,Vmag:0,P:0,short:false,warn:''};
+const TIMESCALE=0.04;          // segundos de simulação por segundo real (deixa 60Hz visível)
+const KFLOW=6;                 // ganho da animação dos elétrons
 
 const DEF={battery:{volt:9},acsource:{amp:10,freq:60},resistor:{r:100},lamp:{r:24},
   led:{rf:140},motor:{r:20},capacitor:{cap:100},inductor:{ind:100},switch:{closed:true},fuse:{imax:1}};
@@ -214,16 +194,13 @@ const key=(gx,gy)=>gx+','+gy;
 const dst=(ax,ay,bx,by)=>Math.hypot(ax-bx,ay-by);
 const clampCol=v=>Math.min(COLS-1,Math.max(1,v));
 const clampRow=v=>Math.min(ROWS-1,Math.max(1,v));
-const X=g_=>g_*GS, Y=g_=>g_*GS;
 
 function termGrid(c){
   if((c.rot||0)%2===0) return [{gx:c.gx-1,gy:c.gy},{gx:c.gx+1,gy:c.gy}];
   return [{gx:c.gx,gy:c.gy-1},{gx:c.gx,gy:c.gy+1}];
 }
 function dirIndex(c){const r=((c.rot||0)%4); return (r===0||r===1)?0:1;}
-// bateria/fonte: polos dependem da rotação (girar troca + e −)
 function poles(c){const t=termGrid(c);const ni=dirIndex(c);return {neg:t[ni],pos:t[1-ni],ni};}
-// LED: anodo -> catodo (sentido permitido), também depende da rotação
 function ledDir(c){const t=termGrid(c);const ai=dirIndex(c);return {a:t[ai],b:t[1-ai],ai};}
 
 // ============== LAYOUT ADAPTATIVO ==============
@@ -238,225 +215,205 @@ function layout(){
   W=cssW; H=cssH; g.setTransform(dpr,0,0,dpr,0,0);
   comps.forEach(c=>{c.gx=clampCol(c.gx);c.gy=clampRow(c.gy);});
   wires.forEach(w=>{w.gx1=Math.min(COLS,Math.max(0,w.gx1));w.gy1=Math.min(ROWS,Math.max(0,w.gy1));w.gx2=Math.min(COLS,Math.max(0,w.gx2));w.gy2=Math.min(ROWS,Math.max(0,w.gy2));});
-  probeR.gx=Math.min(COLS-1,probeR.gx); probeR.gy=Math.min(ROWS-1,probeR.gy);
-  probeB.gx=Math.min(COLS-1,probeB.gx); probeB.gy=Math.min(ROWS-1,probeB.gy);
-  if(scopeOn){ const sr=scp.getBoundingClientRect(); scp.width=Math.round(sr.width*dpr); scp.height=Math.round(sr.height*dpr); sg.setTransform(dpr,0,0,dpr,0,0); }
-  solve();
+  probeR.gx=Math.min(COLS-1,probeR.gx);probeR.gy=Math.min(ROWS-1,probeR.gy);
+  probeB.gx=Math.min(COLS-1,probeB.gx);probeB.gy=Math.min(ROWS-1,probeB.gy);
+  if(scopeOn){const sr=scp.getBoundingClientRect();scp.width=Math.round(sr.width*dpr);scp.height=Math.round(sr.height*dpr);sg.setTransform(dpr,0,0,dpr,0,0);}
+  invalidate();
 }
 
-// ============== MOTOR (monta nós, resolve, atribui correntes) ==============
-function solve(){
-  comps.forEach(c=>{c._I=[0,0];c._on=false;c._lit=0;});
-  wires.forEach(w=>{w._I=[0,0];});
-  sim={ok:false,ac:false,omega:0,Imag:0,Vmag:0,P:0,short:false,warn:''};
+// ============== COMPILA TOPOLOGIA (nós, elementos, fontes) ==============
+function ensureState(o){ if(o.vc===undefined)o.vc=0; if(o.il===undefined)o.il=0; if(o._ph===undefined)o._ph=Math.random(); if(o._msI===undefined)o._msI=0; if(o._i===undefined)o._i=0; }
+function compile(){
+  comps.forEach(ensureState); wires.forEach(ensureState);
   const srcComps=comps.filter(c=>c.type==='battery'||c.type==='acsource');
-  if(!srcComps.length){ refreshMeters(); return; }
-  const acc=comps.find(c=>c.type==='acsource');
-  const omega=acc?2*Math.PI*acc.freq:0;
-  sim.ac=!!acc; sim.omega=omega;
-  const Rw=0.01;
   const nodeSet=new Set();
   comps.forEach(c=>{const t=termGrid(c);nodeSet.add(key(t[0].gx,t[0].gy));nodeSet.add(key(t[1].gx,t[1].gy));});
   wires.forEach(w=>{nodeSet.add(key(w.gx1,w.gy1));nodeSet.add(key(w.gx2,w.gy2));});
-  const nodeIds=[...nodeSet];
-  const s0=srcComps[0]; const p0=poles(s0); const gnd=key(p0.neg.gx,p0.neg.gy);
-
-  let ledOpen=new Set(), fuseOpen=new Set();
-  comps.forEach(c=>{ if(c.type==='fuse'&&c.blown) fuseOpen.add(c.id); });
-
-  let res=null, brefs=null;
-  for(let iter=0; iter<7; iter++){
-    const branches=[], sources=[];
-    wires.forEach(w=>branches.push({src:{w},a:key(w.gx1,w.gy1),b:key(w.gx2,w.gy2),y:[1/Rw,0]}));
-    comps.forEach(c=>{
-      const t=termGrid(c); const a=key(t[0].gx,t[0].gy), b=key(t[1].gx,t[1].gy);
-      if(c.type==='battery'){const p=poles(c);sources.push({src:{c},p:key(p.pos.gx,p.pos.gy),m:key(p.neg.gx,p.neg.gy),E:[c.volt,0]});}
-      else if(c.type==='acsource'){const p=poles(c);sources.push({src:{c},p:key(p.pos.gx,p.pos.gy),m:key(p.neg.gx,p.neg.gy),E:[c.amp,0]});}
-      else if(c.type==='resistor'||c.type==='lamp'||c.type==='motor'){branches.push({src:{c},a,b,y:[1/Math.max(0.01,c.r),0]});}
-      else if(c.type==='switch'){ if(c.closed) branches.push({src:{c},a,b,y:[1/Rw,0]}); }
-      else if(c.type==='fuse'){ if(!fuseOpen.has(c.id)) branches.push({src:{c},a,b,y:[1/Rw,0]}); }
-      else if(c.type==='led'){ if(!ledOpen.has(c.id)) branches.push({src:{c},a,b,y:[1/c.rf,0]}); }
-      else if(c.type==='capacitor'){ branches.push({src:{c},a,b,y:[0,omega*c.cap*1e-6]}); }
-      else if(c.type==='inductor'){ const L=c.ind*1e-3; branches.push({src:{c},a,b,y: omega<1e-9?[1/Rw,0]:[0,-1/(omega*L)]}); }
-    });
-    res=mnaSolve(nodeIds,gnd,branches,sources); brefs={branches,sources};
-    if(!res){ sim.warn='Sem solução.'; refreshMeters(); return; }
-    let changed=false;
-    // LED só conduz no sentido anodo->catodo
-    comps.filter(c=>c.type==='led'&&!ledOpen.has(c.id)).forEach(c=>{
-      const d=ledDir(c); const va=res.V[key(d.a.gx,d.a.gy)], vb=res.V[key(d.b.gx,d.b.gy)];
-      const If=(va[0]-vb[0])/c.rf; if(If<1e-5){ ledOpen.add(c.id); changed=true; }
-    });
-    // fusível queima se corrente > limite
-    comps.filter(c=>c.type==='fuse'&&!fuseOpen.has(c.id)).forEach(c=>{
-      const br=branches.find(b=>b.src.c===c); if(!br) return;
-      const I=cabs(cmul(csub(res.V[br.a],res.V[br.b]),br.y));
-      const Im=sim.ac?I/Math.SQRT2:I;
-      if(Im>c.imax){ fuseOpen.add(c.id); c.blown=true; changed=true; }
-    });
-    if(!changed) break;
-  }
-
-  // correntes por ramo (sentido convencional ao longo da orientação desenhada)
-  brefs.branches.forEach(br=>{
-    const I=cmul(csub(res.V[br.a],res.V[br.b]),br.y);
-    if(br.src.w) br.src.w._I=I; else if(br.src.c) br.src.c._I=I;
-  });
-  brefs.sources.forEach((s,k)=>{ s.src.c._I=res.Is[k]; });
-  res._brefs=brefs; window._lastV=res.V;
-
-  // estado de cada componente
-  let anyClosed=false;
+  const acc=comps.find(c=>c.type==='acsource');
+  const elems=[], sources=[];
+  const Rw=0.01;
+  wires.forEach(w=>elems.push({kind:'R',a:key(w.gx1,w.gy1),b:key(w.gx2,w.gy2),val:Rw,ref:w}));
   comps.forEach(c=>{
-    const Im = sim.ac? cabs(c._I)/Math.SQRT2 : Math.abs(c._I[0]);
-    if(['resistor','lamp','motor','led','capacitor','inductor'].includes(c.type) && Im>1e-4) c._on=true;
-    if(c.type==='switch'&&c.closed&&Im>1e-4) c._on=true;
-    if(c.type==='fuse'&&!c.blown&&Im>1e-4) c._on=true;
-    if(c.type==='lamp'){ const P=c.r*Im*Im; c._lit=Math.max(0,Math.min(1,P/3.2)); }
-    if(c.type==='led'){ c._lit=Math.max(0,Math.min(1, Im/0.02)); c._on=c._on&&Im>0.002; }
-    if(c.type==='motor'){ c._lit=Math.max(0,Math.min(1, Im/0.5)); }
-    if((c.type==='battery'||c.type==='acsource')){ const Is=sim.ac?cabs(c._I)/Math.SQRT2:Math.abs(c._I[0]); if(Is>1e-4){c._on=true;anyClosed=true;} }
+    const t=termGrid(c); const a=key(t[0].gx,t[0].gy), b=key(t[1].gx,t[1].gy);
+    if(c.type==='battery') sources.push({kind:'dc',p:key(poles(c).pos.gx,poles(c).pos.gy),m:key(poles(c).neg.gx,poles(c).neg.gy),ref:c});
+    else if(c.type==='acsource') sources.push({kind:'ac',p:key(poles(c).pos.gx,poles(c).pos.gy),m:key(poles(c).neg.gx,poles(c).neg.gy),ref:c});
+    else if(c.type==='resistor'||c.type==='lamp'||c.type==='motor') elems.push({kind:'R',a,b,val:Math.max(0.01,c.r),ref:c});
+    else if(c.type==='switch'){ if(c.closed) elems.push({kind:'R',a,b,val:Rw,ref:c}); }
+    else if(c.type==='fuse'){ if(!c.blown) elems.push({kind:'R',a,b,val:Rw,ref:c}); }
+    else if(c.type==='led'){ const d=ledDir(c); elems.push({kind:'led',a,b,val:c.rf,anode:key(d.a.gx,d.a.gy),cath:key(d.b.gx,d.b.gy),ref:c}); }
+    else if(c.type==='capacitor') elems.push({kind:'C',a,b,val:c.cap*1e-6,ref:c});
+    else if(c.type==='inductor') elems.push({kind:'L',a,b,val:c.ind*1e-3,ref:c});
   });
-  wires.forEach(w=>{ const Im=sim.ac?cabs(w._I)/Math.SQRT2:Math.abs(w._I[0]); w._on=Im>1e-4; });
-
-  // medições globais (fonte primária)
-  const Is0=res.Is[0]; const Imag=cabs(Is0); const Irms=sim.ac?Imag/Math.SQRT2:Imag;
-  const Vsrc = s0.type==='battery'? s0.volt : s0.amp;
-  const Vrms = sim.ac? Vsrc/Math.SQRT2 : Vsrc;
-  // potência real entregue pela fonte
-  let P;
-  if(sim.ac){ P=0.5*(s0._I[0]*Vsrc); P=Math.abs(P); } else { P=Math.abs(Vsrc*Is0[0]); }
-  sim.ok=anyClosed; sim.Imag=sim.ac?Irms:Imag; sim.Vmag=sim.ac?Vrms:Vsrc; sim.P=P;
-  // curto / sobrecarga: corrente da fonte muito alta e nenhum fusível protegeu
-  const fuseProtected = comps.some(c=>c.type==='fuse'&&c.blown);
-  if(Imag>6 && !fuseProtected){ sim.short=true; sim.warn='⚠ CURTO-CIRCUITO / SOBRECARGA'; }
-  else if(comps.some(c=>c.type==='fuse'&&c.blown)){ sim.warn='⚠ FUSÍVEL QUEIMADO'; }
-  refreshMeters();
+  const gnd = srcComps.length? key(poles(srcComps[0]).neg.gx,poles(srcComps[0]).neg.gy) : null;
+  topo={dirty:false,nodeIds:[...nodeSet],gnd,elems,sources,ac:!!acc,omega:acc?2*Math.PI*acc.freq:0,justComp:true,primary:srcComps[0]||null};
+}
+function invalidate(){ // recompila + reinicia o transitório (mostra a carga de novo)
+  comps.forEach(c=>{c.vc=0;c.il=0;c._msI=0;c._i=0;}); wires.forEach(w=>{w._msI=0;w._i=0;});
+  srcMsI=0; emaP=0; scopeBuf=[]; topo.dirty=true;
 }
 
+// ============== UM PASSO NO TEMPO ==============
+function stepSim(dt){
+  if(topo.dirty) compile();
+  const {nodeIds,gnd,elems,sources,omega}=topo;
+  if(!sources.length||gnd===null){ elems.forEach(e=>{e.ref._i=0;}); return; }
+  const ridx={}; let ci=0; nodeIds.forEach(id=>{if(id!==gnd)ridx[id]=ci++;});
+  const N=nodeIds.length,M=sources.length,sz=(N-1)+M;
+  const A=Array.from({length:sz},()=>new Array(sz).fill(0));
+  const b=new Array(sz).fill(0);
+  const ri=id=>id===gnd?-1:ridx[id];
+  const G=(a,bn,gg)=>{const ia=ri(a),ib=ri(bn);if(ia>=0)A[ia][ia]+=gg;if(ib>=0)A[ib][ib]+=gg;if(ia>=0&&ib>=0){A[ia][ib]-=gg;A[ib][ia]-=gg;}};
+  const Inj=(node,val)=>{const i=ri(node);if(i>=0)b[i]+=val;};
+  nodeIds.forEach(id=>{if(id!==gnd)A[ridx[id]][ridx[id]]+=1e-9;});
+  elems.forEach(e=>{
+    if(e.kind==='R') G(e.a,e.b,1/e.val);
+    else if(e.kind==='led'){ const fwd=((lastV[e.anode]||0)-(lastV[e.cath]||0))> -0.02 || topo.justComp; e._cond=fwd; if(fwd) G(e.a,e.b,1/e.val); }
+    else if(e.kind==='C'){ const Geq=e.val/dt; G(e.a,e.b,Geq); Inj(e.a,Geq*e.ref.vc); Inj(e.b,-Geq*e.ref.vc); }
+    else if(e.kind==='L'){ const Geq=dt/e.val; G(e.a,e.b,Geq); Inj(e.a,-e.ref.il); Inj(e.b,e.ref.il); }
+  });
+  sources.forEach((s,k)=>{const col=(N-1)+k;const ip=ri(s.p),im=ri(s.m);
+    if(ip>=0){A[ip][col]+=1;A[col][ip]+=1;} if(im>=0){A[im][col]-=1;A[col][im]-=1;}
+    b[col]= s.kind==='dc'? s.ref.volt : s.ref.amp*Math.sin(omega*simT); });
+  const x=rsolve(A,b); if(!x) return;
+  lastV={}; lastV[gnd]=0; nodeIds.forEach(id=>{if(id!==gnd)lastV[id]=x[ridx[id]];});
+  const tau = topo.ac? Math.max(0.05, 3/((omega/(2*Math.PI))||1)) : 0.12;
+  const aE=Math.min(1,dt/tau);
+  elems.forEach(e=>{ const va=lastV[e.a]||0, vb=lastV[e.b]||0, vab=va-vb;
+    if(e.kind==='C'){const Geq=e.val/dt; e.ref._i=Geq*(vab-e.ref.vc); e.ref.vc=vab;}
+    else if(e.kind==='L'){const Geq=dt/e.val; e.ref._i=Geq*vab+e.ref.il; e.ref.il=e.ref._i;}
+    else if(e.kind==='led'){ e.ref._i=e._cond? vab/e.val : 0; }
+    else { e.ref._i=vab/e.val; }
+    const i2=e.ref._i*e.ref._i; e.ref._msI = topo.justComp? i2 : e.ref._msI+(i2-e.ref._msI)*aE;
+  });
+  // fonte primária: corrente, RMS, potência real
+  const Is0=x[(N-1)+0]; const i2=Is0*Is0;
+  srcMsI = topo.justComp? i2 : srcMsI+(i2-srcMsI)*aE;
+  const s0=sources[0]; const vsrc = s0.kind==='dc'? s0.ref.volt : s0.ref.amp*Math.sin(omega*simT);
+  const pInst=vsrc*Is0; emaP = topo.justComp? pInst : emaP+(pInst-emaP)*aE;
+  topo.primary && (topo.primary._i = Is0);
+  // fusível queima
+  topo.elems.forEach(e=>{ if(e.ref.type==='fuse'&&!e.ref.blown){ const Irms=Math.sqrt(e.ref._msI); if(Irms>e.ref.imax){ e.ref.blown=true; topo.dirty=true; } } });
+  topo.justComp=false;
+}
+
+// ============== MEDIÇÕES ==============
 function refreshMeters(){
   const st=document.getElementById('stBox');
-  if(sim.short){ st.textContent='CURTO-CIRCUITO!'; st.className='stat warn'; }
-  else if(sim.warn.includes('FUSÍVEL')){ st.textContent='FUSÍVEL QUEIMADO'; st.className='stat warn'; }
-  else if(sim.ok){ st.textContent=sim.ac?'CIRCUITO AC ATIVO':'CIRCUITO ATIVO'; st.className='stat on'; }
-  else { st.textContent='CIRCUITO ABERTO'; st.className='stat off'; }
-  document.getElementById('modePill').textContent = sim.ac? ('AC '+ (comps.find(c=>c.type==='acsource')?.freq||0)+'Hz') : 'DC';
-  const mA=sim.Imag*1000;
-  document.getElementById('mI').textContent = sim.ok? (mA>=1000?(mA/1000).toFixed(2):mA.toFixed(0)) : '—';
-  document.getElementById('uI').textContent = mA>=1000?'A':'mA';
-  document.getElementById('mV').textContent = sim.ok? sim.Vmag.toFixed(1) : '—';
-  document.getElementById('mP').textContent = sim.ok? sim.P.toFixed(2) : '—';
+  if(sim.short){st.textContent='CURTO-CIRCUITO!';st.className='stat warn';}
+  else if(sim.warn.includes('FUSÍVEL')){st.textContent='FUSÍVEL QUEIMADO';st.className='stat warn';}
+  else if(sim.ok){st.textContent=sim.ac?'CIRCUITO AC ATIVO':'CIRCUITO ATIVO';st.className='stat on';}
+  else{st.textContent='CIRCUITO ABERTO';st.className='stat off';}
+  document.getElementById('modePill').textContent= sim.ac? ('AC '+(comps.find(c=>c.type==='acsource')?.freq||0)+'Hz') : 'DC';
+  const mA=sim.Irms*1000;
+  document.getElementById('mI').textContent= sim.ok? (mA>=1000?(mA/1000).toFixed(2):mA.toFixed(mA<10?1:0)) : '—';
+  document.getElementById('uI').textContent= mA>=1000?'A':'mA';
+  document.getElementById('mV').textContent= sim.ok? sim.Vmag.toFixed(1) : '—';
+  document.getElementById('mP').textContent= sim.ok? sim.P.toFixed(2) : '—';
   updateDMM();
 }
-
-// ============== MEDIÇÃO MULTÍMETRO ==============
-function nodeV(p){ const V=window._lastV; if(!V) return null; return V[key(p.gx,p.gy)]||[0,0]; }
+function nodeV(p){ const v=lastV[key(p.gx,p.gy)]; return v===undefined?null:v; }
 function updateDMM(){
   if(!dmmOn) return;
   const va=nodeV(probeR), vb=nodeV(probeB);
-  if(va&&vb){ const d=csub(va,vb); const m=cabs(d); const val=sim.ac?m/Math.SQRT2:d[0];
+  if(va!==null&&vb!==null){ const d=va-vb; const val=sim.ac? Math.abs(d) : d;
     document.getElementById('dmmV').textContent=val.toFixed(2);
-    document.getElementById('dmmVu').textContent=sim.ac?'V(rms)':'V';
-  } else { document.getElementById('dmmV').textContent='—'; }
-  // corrente: pontas nos dois terminais do mesmo componente
+    document.getElementById('dmmVu').textContent=sim.ac?'V (inst.)':'V';
+  } else document.getElementById('dmmV').textContent='—';
   let comp=null;
   comps.forEach(c=>{ if(['resistor','lamp','motor','led','capacitor','inductor','fuse','switch'].includes(c.type)){
-    const t=termGrid(c); const aOK=(t[0].gx===probeR.gx&&t[0].gy===probeR.gy)||(t[0].gx===probeB.gx&&t[0].gy===probeB.gy);
+    const t=termGrid(c);
+    const aOK=(t[0].gx===probeR.gx&&t[0].gy===probeR.gy)||(t[0].gx===probeB.gx&&t[0].gy===probeB.gy);
     const bOK=(t[1].gx===probeR.gx&&t[1].gy===probeR.gy)||(t[1].gx===probeB.gx&&t[1].gy===probeB.gy);
     if(aOK&&bOK) comp=c; } });
-  if(comp){ const I=sim.ac?cabs(comp._I)/Math.SQRT2:Math.abs(comp._I[0]); document.getElementById('dmmI').textContent=(I*1000).toFixed(1); }
-  else document.getElementById('dmmI').textContent='—';
+  document.getElementById('dmmI').textContent= comp? (Math.sqrt(comp._msI||0)*1000).toFixed(1) : '—';
 }
 
-// ============== EDITOR DE COMPONENTE ==============
-function selComp(){ return comps.find(c=>c.id===selId); }
+// ============== EDITOR ==============
+function selComp(){return comps.find(c=>c.id===selId);}
 function buildEditor(){
   const box=document.getElementById('editor'); const c=selComp();
   if(!c){ box.innerHTML='<div class="editHint">Use o modo <b style="color:var(--hot)">⊙ Editar</b> e toque num componente para ajustar seu valor.</div>'; return; }
   const names={battery:'Bateria (DC)',acsource:'Fonte AC',resistor:'Resistor',lamp:'Lâmpada',led:'LED',motor:'Motor',capacitor:'Capacitor',inductor:'Indutor',switch:'Chave',fuse:'Fusível'};
   let h='<div class="pl" style="color:var(--hot);font-weight:600;margin-bottom:8px">'+names[c.type]+'</div>';
-  const row=(lab,id,min,max,step,val,unit)=>`<div class="pr"><div class="pl">${lab} <b><span id="${id}v">${val}</span> ${unit}</b></div><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}" oninput="editVal('${c.type}','${id}',this.value)"></div>`;
+  const row=(lab,id,min,max,step,val,unit)=>`<div class="pr"><div class="pl">${lab} <b><span id="${id}v">${val}</span> ${unit}</b></div><input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}" oninput="editVal('${id}',this.value)"></div>`;
   if(c.type==='battery') h+=row('Tensão','eVolt',1,24,1,c.volt,'V');
-  else if(c.type==='acsource'){ h+=row('Amplitude','eAmp',1,24,1,c.amp,'V'); h+=row('Frequência','eFreq',1,1000,1,c.freq,'Hz'); }
+  else if(c.type==='acsource'){ h+=row('Amplitude','eAmp',1,24,1,c.amp,'V'); h+=row('Frequência','eFreq',1,400,1,c.freq,'Hz'); }
   else if(c.type==='resistor') h+=row('Resistência','eR',1,1000,1,c.r,'Ω');
   else if(c.type==='lamp') h+=row('Resistência','eR',5,200,1,c.r,'Ω');
   else if(c.type==='motor') h+=row('Resistência','eR',5,200,1,c.r,'Ω');
   else if(c.type==='capacitor') h+=row('Capacitância','eC',1,1000,1,c.cap,'µF');
   else if(c.type==='inductor') h+=row('Indutância','eL',1,1000,1,c.ind,'mH');
-  else if(c.type==='fuse') h+=row('Limite','eF',0.1,5,0.1,c.imax,'A')+'<div class="editHint">'+(c.blown?'Queimado — toque em Restaurar':'Intacto')+'</div>'+(c.blown?'<div class="pr"><button class="cb" onclick="restoreFuse('+c.id+')">↻ Restaurar fusível</button></div>':'');
-  else if(c.type==='led') h+='<div class="editHint">LED conduz só no sentido do triângulo. Gire-o (↻) para inverter.</div>';
+  else if(c.type==='fuse') h+=row('Limite','eF',0.1,5,0.1,c.imax,'A')+'<div class="editHint">'+(c.blown?'Queimado.':'Intacto')+'</div>'+(c.blown?'<div class="pr"><button class="cb" onclick="restoreFuse('+c.id+')">↻ Restaurar fusível</button></div>':'');
+  else if(c.type==='led') h+='<div class="editHint">O LED conduz só no sentido do triângulo. Gire-o (↻) para inverter.</div>';
   else if(c.type==='switch'){ h+=`<div class="toggle-row"><div class="opt ${c.closed?'on':''}" onclick="setSwitch(${c.id},true)">Fechada</div><div class="opt ${!c.closed?'on':''}" onclick="setSwitch(${c.id},false)">Aberta</div></div>`; }
   box.innerHTML=h;
 }
-function editVal(type,id,v){
-  const c=selComp(); if(!c) return; v=+v;
-  document.getElementById(id+'v').textContent = v;
-  if(id==='eVolt')c.volt=v; else if(id==='eAmp')c.amp=v; else if(id==='eFreq')c.freq=v;
-  else if(id==='eR')c.r=v; else if(id==='eC')c.cap=v; else if(id==='eL')c.ind=v; else if(id==='eF')c.imax=v;
-  solve();
-}
-function setSwitch(id,cl){ const c=comps.find(c=>c.id===id); if(c){c.closed=cl;} buildEditor(); solve(); }
-function restoreFuse(id){ const c=comps.find(c=>c.id===id); if(c){c.blown=false;} buildEditor(); solve(); }
+function editVal(id,v){ const c=selComp(); if(!c)return; v=+v; document.getElementById(id+'v').textContent=v;
+  if(id==='eVolt')c.volt=v;else if(id==='eAmp')c.amp=v;else if(id==='eFreq')c.freq=v;
+  else if(id==='eR')c.r=v;else if(id==='eC')c.cap=v;else if(id==='eL')c.ind=v;else if(id==='eF')c.imax=v;
+  invalidate(); }
+function setSwitch(id,cl){const c=comps.find(c=>c.id===id);if(c)c.closed=cl;buildEditor();invalidate();}
+function restoreFuse(id){const c=comps.find(c=>c.id===id);if(c)c.blown=false;buildEditor();invalidate();}
 
 // ============== INTERAÇÃO ==============
 function setMode(m){ mode=m; wireStart=null;
-  ['place','wire','move','rotate','select','del'].forEach(k=>{const el=document.getElementById('m-'+k); if(el) el.classList.toggle('sel',k===m);});
+  ['place','wire','move','rotate','select','del'].forEach(k=>{const el=document.getElementById('m-'+k);if(el)el.classList.toggle('sel',k===m);});
   cv.style.cursor={place:'crosshair',wire:'crosshair',move:'grab',rotate:'pointer',select:'pointer',del:'not-allowed'}[m]||'default';
-  setInfo({place:'Toque na grade para posicionar.',wire:'Toque num <b>terminal</b> e depois no destino para criar o fio.',move:'Arraste um componente.',rotate:'Toque para girar 90°. Em fontes/LED isso <b>inverte a polaridade</b>.',select:'Toque num componente para <b>editar o valor</b> dele.',del:'Toque para remover componente ou fio.'}[m]||'');
+  setInfo({place:'Toque na grade para posicionar.',wire:'Toque num <b>terminal</b> e depois no destino para criar o fio.',move:'Arraste um componente.',rotate:'Toque para girar 90°. Em fontes/LED isso <b>inverte a polaridade</b>.',select:'Toque num componente para <b>editar o valor</b>.',del:'Toque para remover componente ou fio.'}[m]||'');
 }
-function pick(t){ picked=t; setMode('place'); document.querySelectorAll('.cb').forEach(b=>b.classList.remove('on')); const b=document.getElementById('cb-'+t); if(b)b.classList.add('on'); }
-function setConv(v){ conv=v; document.getElementById('cv-real').classList.toggle('on',v==='real'); document.getElementById('cv-conv').classList.toggle('on',v==='conv'); }
-function clearAll(){ comps=[];wires=[];wireStart=null;selId=-1;buildEditor();solve(); }
-function setInfo(s){ document.getElementById('info').innerHTML=s; }
-function hitComp(mx,my){ return comps.find(c=>dst(mx,my,c.gx*GS,c.gy*GS)<GS*0.7); }
-function nearTerm(mx,my){ let best=null,bd=GS*0.7;
+function pick(t){picked=t;setMode('place');document.querySelectorAll('.cb').forEach(b=>b.classList.remove('on'));const b=document.getElementById('cb-'+t);if(b)b.classList.add('on');}
+function setConv(v){conv=v;document.getElementById('cv-real').classList.toggle('on',v==='real');document.getElementById('cv-conv').classList.toggle('on',v==='conv');}
+function clearAll(){comps=[];wires=[];wireStart=null;selId=-1;buildEditor();invalidate();}
+function setInfo(s){document.getElementById('info').innerHTML=s;}
+function hitComp(mx,my){return comps.find(c=>dst(mx,my,c.gx*GS,c.gy*GS)<GS*0.7);}
+function nearTerm(mx,my){let best=null,bd=GS*0.7;
   comps.forEach(c=>termGrid(c).forEach(t=>{const d=dst(mx,my,t.gx*GS,t.gy*GS);if(d<bd){bd=d;best={gx:t.gx,gy:t.gy};}}));
   wires.forEach(w=>[{gx:w.gx1,gy:w.gy1},{gx:w.gx2,gy:w.gy2}].forEach(p=>{const d=dst(mx,my,p.gx*GS,p.gy*GS);if(d<bd){bd=d;best={gx:p.gx,gy:p.gy};}}));
-  return best; }
-function evtPos(cx,cy){ const r=cv.getBoundingClientRect(); return {mx:(cx-r.left)*(W/r.width),my:(cy-r.top)*(H/r.height)}; }
-function newComp(type,gx,gy){ const c={id:uid++,type,gx,gy,rot:0,...JSON.parse(JSON.stringify(DEF[type]||{}))}; if(type==='fuse')c.blown=false; return c; }
+  return best;}
+function evtPos(cx,cy){const r=cv.getBoundingClientRect();return {mx:(cx-r.left)*(W/r.width),my:(cy-r.top)*(H/r.height)};}
+function newComp(type,gx,gy){const c={id:uid++,type,gx,gy,rot:0,...JSON.parse(JSON.stringify(DEF[type]||{}))};if(type==='fuse')c.blown=false;return c;}
 
 function handleTap(mx,my){
   const gx=clampCol(Math.round(mx/GS)), gy=clampRow(Math.round(my/GS));
-  if(mode==='place'){ comps.push(newComp(picked,gx,gy)); solve(); return; }
-  if(mode==='rotate'){ const c=hitComp(mx,my); if(c){c.rot=((c.rot||0)+1)%4;solve();} return; }
-  if(mode==='select'){ const c=hitComp(mx,my); if(c){ if(c.type==='switch'){c.closed=!c.closed;} selId=c.id; buildEditor(); solve(); } else { selId=-1; buildEditor(); } return; }
+  if(mode==='place'){ comps.push(newComp(picked,gx,gy)); invalidate(); return; }
+  if(mode==='rotate'){ const c=hitComp(mx,my); if(c){c.rot=((c.rot||0)+1)%4;invalidate();} return; }
+  if(mode==='select'){ const c=hitComp(mx,my); if(c){ if(c.type==='switch')c.closed=!c.closed; selId=c.id; buildEditor(); invalidate(); } else { selId=-1; buildEditor(); } return; }
   if(mode==='del'){
     const ci=comps.findIndex(c=>dst(mx,my,c.gx*GS,c.gy*GS)<GS*0.7);
-    if(ci>=0){ if(comps[ci].id===selId){selId=-1;buildEditor();} comps.splice(ci,1); solve(); return; }
+    if(ci>=0){ if(comps[ci].id===selId){selId=-1;buildEditor();} comps.splice(ci,1); invalidate(); return; }
     const wi=wires.findIndex(w=>{const x1=w.gx1*GS,y1=w.gy1*GS,x2=w.gx2*GS,y2=w.gy2*GS,dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy);
       if(len<1)return dst(mx,my,x1,y1)<GS*0.4; const t=Math.max(0,Math.min(1,((mx-x1)*dx+(my-y1)*dy)/(len*len))); return dst(mx,my,x1+t*dx,y1+t*dy)<GS*0.35;});
-    if(wi>=0){wires.splice(wi,1);solve();}
+    if(wi>=0){wires.splice(wi,1);invalidate();}
     return;
   }
   if(mode==='wire'){
     const near=nearTerm(mx,my); const ggx=near?near.gx:gx, ggy=near?near.gy:gy;
     if(!wireStart){ wireStart={gx:ggx,gy:ggy}; setInfo('Origem marcada. Toque no destino.'); }
-    else { if(ggx!==wireStart.gx||ggy!==wireStart.gy){ wires.push({gx1:wireStart.gx,gy1:wireStart.gy,gx2:ggx,gy2:ggy}); solve(); } wireStart=null; setInfo('Fio adicionado!'); }
+    else { if(ggx!==wireStart.gx||ggy!==wireStart.gy){ wires.push({gx1:wireStart.gx,gy1:wireStart.gy,gx2:ggx,gy2:ggy}); invalidate(); } wireStart=null; setInfo('Fio adicionado!'); }
     return;
   }
 }
-function startDrag(mx,my){ dragC=hitComp(mx,my); if(dragC)cv.style.cursor='grabbing'; }
-function moveDrag(mx,my){ if(!dragC)return; const oldT=termGrid(dragC).map(t=>({...t}));
-  dragC.gx=clampCol(Math.round(mx/GS)); dragC.gy=clampRow(Math.round(my/GS)); const nt=termGrid(dragC);
+function startDrag(mx,my){dragC=hitComp(mx,my);if(dragC)cv.style.cursor='grabbing';}
+function moveDrag(mx,my){if(!dragC)return;const oldT=termGrid(dragC).map(t=>({...t}));
+  dragC.gx=clampCol(Math.round(mx/GS));dragC.gy=clampRow(Math.round(my/GS));const nt=termGrid(dragC);
   oldT.forEach((ot,i)=>{const n=nt[i];wires.forEach(w=>{if(w.gx1===ot.gx&&w.gy1===ot.gy){w.gx1=n.gx;w.gy1=n.gy;}if(w.gx2===ot.gx&&w.gy2===ot.gy){w.gx2=n.gx;w.gy2=n.gy;}});});
-  solve(); }
-function endDrag(){ const had=dragC; dragC=null; if(mode==='move')cv.style.cursor='grab'; return had; }
+  invalidate();}
+function endDrag(){const had=dragC;dragC=null;if(mode==='move')cv.style.cursor='grab';return had;}
 function probeHit(mx,my){ if(!dmmOn&&!scopeOn)return null;
   if(dst(mx,my,probeR.gx*GS,probeR.gy*GS)<GS*0.6)return 'R';
   if(dst(mx,my,probeB.gx*GS,probeB.gy*GS)<GS*0.6)return 'B'; return null; }
 
-cv.addEventListener('click',e=>{ const p=evtPos(e.clientX,e.clientY); if(probeHit(p.mx,p.my))return; handleTap(p.mx,p.my); });
-cv.addEventListener('contextmenu',e=>{e.preventDefault();const p=evtPos(e.clientX,e.clientY);const c=hitComp(p.mx,p.my);if(c){c.rot=((c.rot||0)+1)%4;solve();}});
-cv.addEventListener('mousedown',e=>{const p=evtPos(e.clientX,e.clientY);const ph=probeHit(p.mx,p.my);if(ph){dragProbe=ph;return;} if(mode==='move')startDrag(p.mx,p.my);});
-cv.addEventListener('mousemove',e=>{const p=evtPos(e.clientX,e.clientY); if(dragProbe){const pr=dragProbe==='R'?probeR:probeB;pr.gx=clampCol(Math.round(p.mx/GS));pr.gy=clampRow(Math.round(p.my/GS));updateDMM();return;} if(dragC)moveDrag(p.mx,p.my);});
+cv.addEventListener('click',e=>{const p=evtPos(e.clientX,e.clientY);if(probeHit(p.mx,p.my))return;handleTap(p.mx,p.my);});
+cv.addEventListener('contextmenu',e=>{e.preventDefault();const p=evtPos(e.clientX,e.clientY);const c=hitComp(p.mx,p.my);if(c){c.rot=((c.rot||0)+1)%4;invalidate();}});
+cv.addEventListener('mousedown',e=>{const p=evtPos(e.clientX,e.clientY);const ph=probeHit(p.mx,p.my);if(ph){dragProbe=ph;return;}if(mode==='move')startDrag(p.mx,p.my);});
+cv.addEventListener('mousemove',e=>{const p=evtPos(e.clientX,e.clientY);if(dragProbe){const pr=dragProbe==='R'?probeR:probeB;pr.gx=clampCol(Math.round(p.mx/GS));pr.gy=clampRow(Math.round(p.my/GS));updateDMM();return;}if(dragC)moveDrag(p.mx,p.my);});
 cv.addEventListener('mouseup',()=>{dragProbe=null;endDrag();});
-cv.addEventListener('touchstart',e=>{ if(e.touches.length!==1)return; const t=e.touches[0]; const p=evtPos(t.clientX,t.clientY); const ph=probeHit(p.mx,p.my); if(ph){dragProbe=ph;e.preventDefault();return;} if(mode==='move'){startDrag(p.mx,p.my);if(dragC)e.preventDefault();} },{passive:false});
-cv.addEventListener('touchmove',e=>{ if(e.touches.length!==1)return; const t=e.touches[0]; const p=evtPos(t.clientX,t.clientY); if(dragProbe){const pr=dragProbe==='R'?probeR:probeB;pr.gx=clampCol(Math.round(p.mx/GS));pr.gy=clampRow(Math.round(p.my/GS));updateDMM();e.preventDefault();return;} if(mode==='move'&&dragC){moveDrag(p.mx,p.my);e.preventDefault();} },{passive:false});
-cv.addEventListener('touchend',e=>{ if(dragProbe){dragProbe=null;e.preventDefault();return;} if(mode==='move'&&endDrag())e.preventDefault(); },{passive:false});
+cv.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;const t=e.touches[0];const p=evtPos(t.clientX,t.clientY);const ph=probeHit(p.mx,p.my);if(ph){dragProbe=ph;e.preventDefault();return;}if(mode==='move'){startDrag(p.mx,p.my);if(dragC)e.preventDefault();}},{passive:false});
+cv.addEventListener('touchmove',e=>{if(e.touches.length!==1)return;const t=e.touches[0];const p=evtPos(t.clientX,t.clientY);if(dragProbe){const pr=dragProbe==='R'?probeR:probeB;pr.gx=clampCol(Math.round(p.mx/GS));pr.gy=clampRow(Math.round(p.my/GS));updateDMM();e.preventDefault();return;}if(mode==='move'&&dragC){moveDrag(p.mx,p.my);e.preventDefault();}},{passive:false});
+cv.addEventListener('touchend',e=>{if(dragProbe){dragProbe=null;e.preventDefault();return;}if(mode==='move'&&endDrag())e.preventDefault();},{passive:false});
 
-function toggleDMM(){ dmmOn=!dmmOn; document.getElementById('t-dmm').classList.toggle('act',dmmOn); document.getElementById('dmmPanel').style.display=dmmOn?'block':'none'; updateDMM(); }
-function toggleScope(){ scopeOn=!scopeOn; document.getElementById('t-scope').classList.toggle('act',scopeOn); scp.classList.toggle('show',scopeOn); if(scopeOn)layout(); }
+function toggleDMM(){dmmOn=!dmmOn;document.getElementById('t-dmm').classList.toggle('act',dmmOn);document.getElementById('dmmPanel').style.display=dmmOn?'block':'none';updateDMM();}
+function toggleScope(){scopeOn=!scopeOn;document.getElementById('t-scope').classList.toggle('act',scopeOn);scp.classList.toggle('show',scopeOn);scopeBuf=[];if(scopeOn)layout();}
 
 // ============== DESENHO ==============
 function drawGrid(){
@@ -466,83 +423,71 @@ function drawGrid(){
   g.fillStyle='rgba(188,19,254,0.18)';const dr=Math.max(1,GS*0.04);
   for(let i=0;i<=COLS;i++)for(let j=0;j<=ROWS;j++){g.beginPath();g.arc(i*GS,j*GS,dr,0,Math.PI*2);g.fill();}
 }
-// carga em movimento (elétron azul ou carga + laranja conforme convenção)
 function charge(px,py){
   const rr=Math.max(2.6,GS*0.07);
-  if(conv==='real'){ g.fillStyle='rgba(120,200,255,0.98)';g.shadowColor='#7ad0ff'; }
-  else { g.fillStyle='rgba(255,180,70,0.98)';g.shadowColor='#ffb24a'; }
+  if(conv==='real'){g.fillStyle='rgba(120,200,255,0.98)';g.shadowColor='#7ad0ff';}
+  else{g.fillStyle='rgba(255,180,70,0.98)';g.shadowColor='#ffb24a';}
   g.beginPath();g.arc(px,py,rr,0,Math.PI*2);g.shadowBlur=9;g.fill();g.shadowBlur=0;
 }
-// posição animada ao longo de um ramo. Ic = corrente convencional complexa (a->b)
-let flowBase=0;
-function drawBranchFlow(ax,ay,bx,by,Ic){
-  const Imag=cabs(Ic); if(Imag<1e-4)return;
+// desenha cargas ao longo de um ramo usando a fase animada acumulada (ref._ph)
+function drawBranchFlow(ax,ay,bx,by,ref){
+  const Irms=Math.sqrt(ref._msI||0); if(Irms<1e-4)return;
   const len=Math.hypot(bx-ax,by-ay); const segs=Math.max(1,Math.round(len/(GS*1.05)));
-  if(sim.ac){
-    const phase=Math.atan2(Ic[1],Ic[0]);
-    const amp=Math.min(0.4, Imag*1.4+0.05);
-    for(let s=0;s<segs;s++){ let f=(s+0.5)/segs + amp*Math.sin(simTime*3.2 + phase)*(conv==='conv'?1:-1); f=((f%1)+1)%1; charge(ax+(bx-ax)*f, ay+(by-ay)*f); }
-  } else {
-    let dir=(Ic[0]>=0?1:-1); if(conv==='real')dir=-dir;
-    for(let s=0;s<segs;s++){ let f=((s/segs) + dir*flowBase); f=((f%1)+1)%1; charge(ax+(bx-ax)*f, ay+(by-ay)*f); }
-  }
+  for(let s=0;s<segs;s++){ let f=((s/segs)+ref._ph); f=((f%1)+1)%1; charge(ax+(bx-ax)*f, ay+(by-ay)*f); }
 }
 function drawWires(){
-  wires.forEach(w=>{ const on=w._on; const x1=w.gx1*GS,y1=w.gy1*GS,x2=w.gx2*GS,y2=w.gy2*GS;
+  wires.forEach(w=>{ const on=Math.sqrt(w._msI||0)>1e-4; const x1=w.gx1*GS,y1=w.gy1*GS,x2=w.gx2*GS,y2=w.gy2*GS;
     g.strokeStyle=on?'#ff00ff':'#5a1a7a';g.lineWidth=on?3:2;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();
-    if(on)drawBranchFlow(x1,y1,x2,y2,w._I);
+    if(on)drawBranchFlow(x1,y1,x2,y2,w);
     [[x1,y1],[x2,y2]].forEach(([px,py])=>{g.beginPath();g.arc(px,py,4,0,Math.PI*2);g.fillStyle=on?'#ff00ff':'#5a1a7a';g.fill();});
   });
 }
-function lead(g_,x,y,col){g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.moveTo(-BASE,0);g.lineTo(-x,0);g.stroke();g.beginPath();g.moveTo(x,0);g.lineTo(BASE,0);g.stroke();}
+function lead(x,col){g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.moveTo(-BASE,0);g.lineTo(-x,0);g.stroke();g.beginPath();g.moveTo(x,0);g.lineTo(BASE,0);g.stroke();}
 function drawComp(c){
-  const t=termGrid(c); const vertical=(c.rot||0)%2===1; const on=!!c._on; const S=GS/BASE, HS=BASE;
+  const t=termGrid(c); const vertical=(c.rot||0)%2===1; const on=!!c._on; const S=GS/BASE;
   const sel=(c.id===selId);
-  g.save(); g.translate(c.gx*GS,c.gy*GS); if(vertical)g.rotate(Math.PI/2); g.scale(S,S);
-  if(sel){ g.strokeStyle='rgba(0,255,140,0.9)';g.lineWidth=1.5;g.setLineDash([4,3]);g.strokeRect(-BASE+2,-22,2*BASE-4,44);g.setLineDash([]); }
-  const C=col=>{g.strokeStyle=col;};
+  g.save();g.translate(c.gx*GS,c.gy*GS);if(vertical)g.rotate(Math.PI/2);g.scale(S,S);
+  if(sel){g.strokeStyle='rgba(0,255,140,0.9)';g.lineWidth=1.5;g.setLineDash([4,3]);g.strokeRect(-BASE+2,-22,2*BASE-4,44);g.setLineDash([]);}
   if(c.type==='battery'||c.type==='acsource'){
-    const col=on?'#ff00ff':'#7a2a9a'; lead(g,16,0,col);
+    const col=on?'#ff00ff':'#7a2a9a'; lead(16,col);
     if(c.type==='battery'){ [{x:-10,h:22,w:3.5},{x:-2,h:12,w:1.5},{x:6,h:22,w:3.5},{x:12,h:12,w:1.5}].forEach(p=>{g.beginPath();g.moveTo(p.x,-p.h/2);g.lineTo(p.x,p.h/2);g.strokeStyle=on?'#ff00ff':'#bc13fe';g.lineWidth=p.w;g.stroke();}); }
-    else { g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.arc(0,0,15,0,Math.PI*2);g.stroke(); g.beginPath(); for(let i=-12;i<=12;i++){const yy=Math.sin(i/12*Math.PI*2)*7; if(i===-12)g.moveTo(i,yy);else g.lineTo(i,yy);} g.stroke(); }
-    g.save();if(vertical)g.rotate(-Math.PI/2);g.fillStyle=on?'#ff00ff':'#bc13fe';g.font='bold 10px Poppins';g.textAlign='center';
-    g.fillText(c.type==='battery'?c.volt+'V':(c.amp+'V~'),0,-26);g.restore();
+    else { g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.arc(0,0,15,0,Math.PI*2);g.stroke();g.beginPath();for(let i=-12;i<=12;i++){const yy=Math.sin(i/12*Math.PI*2)*7;if(i===-12)g.moveTo(i,yy);else g.lineTo(i,yy);}g.stroke(); }
+    g.save();if(vertical)g.rotate(-Math.PI/2);g.fillStyle=on?'#ff00ff':'#bc13fe';g.font='bold 10px Poppins';g.textAlign='center';g.fillText(c.type==='battery'?c.volt+'V':(c.amp+'V~'),0,-26);g.restore();
   }
-  else if(c.type==='resistor'){ const col=on?'#bc13fe':'#5a1a7a'; lead(g,20,0,col); g.fillStyle=on?'rgba(188,19,254,0.18)':'rgba(188,19,254,0.05)';g.fillRect(-20,-10,40,20);g.strokeStyle=col;g.lineWidth=1.5;g.strokeRect(-20,-10,40,20);
+  else if(c.type==='resistor'){ const col=on?'#bc13fe':'#5a1a7a';lead(20,col);g.fillStyle=on?'rgba(188,19,254,0.18)':'rgba(188,19,254,0.05)';g.fillRect(-20,-10,40,20);g.strokeStyle=col;g.lineWidth=1.5;g.strokeRect(-20,-10,40,20);
     g.save();if(vertical)g.rotate(-Math.PI/2);g.fillStyle='#c0b0d0';g.font='9px Poppins';g.textAlign='center';g.fillText(c.r>=1000?(c.r/1000).toFixed(1)+'kΩ':c.r+'Ω',0,23);g.restore(); }
-  else if(c.type==='lamp'){ const col=on?'#ffdd00':'#555500'; lead(g,14,0,col);
-    if(c._lit>0){g.beginPath();g.arc(0,0,14+12*c._lit,0,Math.PI*2);g.fillStyle='rgba(255,220,0,'+(0.28*c._lit)+')';g.fill();}
-    g.beginPath();g.arc(0,0,13,0,Math.PI*2);g.fillStyle=on?'rgba(255,220,0,'+(0.2+0.55*c._lit)+')':'rgba(60,50,0,0.12)';g.fill();g.strokeStyle=col;g.lineWidth=2;g.stroke();
+  else if(c.type==='lamp'){ const lit=c._lit||0; const col=on?'#ffdd00':'#555500';lead(14,col);
+    if(lit>0.02){g.beginPath();g.arc(0,0,14+14*lit,0,Math.PI*2);g.fillStyle='rgba(255,220,0,'+(0.32*lit)+')';g.fill();}
+    g.beginPath();g.arc(0,0,13,0,Math.PI*2);g.fillStyle=on?'rgba(255,220,0,'+(0.15+0.6*lit)+')':'rgba(60,50,0,0.12)';g.fill();g.strokeStyle=col;g.lineWidth=2;g.stroke();
     g.beginPath();g.moveTo(-6,-6);g.lineTo(6,6);g.moveTo(6,-6);g.lineTo(-6,6);g.strokeStyle=col;g.lineWidth=1.4;g.stroke(); }
-  else if(c.type==='led'){ const d=ledDir(c); const col=c._on?'#ff5050':'#6a1a1a'; lead(g,15,0,col);
-    // triângulo apontando do anodo para o catodo (na orientação local)
-    const flip=(dirIndex(c)===0)?1:-1;
-    g.save();g.scale(flip,1);
-    g.beginPath();g.moveTo(-13,-12);g.lineTo(-13,12);g.lineTo(13,0);g.closePath();g.fillStyle=c._on?'rgba(255,60,60,'+(0.35+0.5*c._lit)+')':'rgba(100,20,20,0.12)';g.fill();g.strokeStyle=col;g.stroke();
-    g.beginPath();g.moveTo(13,-12);g.lineTo(13,12);g.stroke();
-    g.restore();
+  else if(c.type==='led'){ const lit=c._lit||0; const col=c._on?'#ff5050':'#6a1a1a';lead(15,col);
+    const flip=(dirIndex(c)===0)?1:-1; g.save();g.scale(flip,1);
+    g.beginPath();g.moveTo(-13,-12);g.lineTo(-13,12);g.lineTo(13,0);g.closePath();g.fillStyle=c._on?'rgba(255,60,60,'+(0.3+0.55*lit)+')':'rgba(100,20,20,0.12)';g.fill();g.strokeStyle=col;g.stroke();
+    g.beginPath();g.moveTo(13,-12);g.lineTo(13,12);g.stroke();g.restore();
     if(c._on){g.strokeStyle='rgba(255,170,0,0.7)';g.lineWidth=1.5;g.beginPath();g.moveTo(17,-9);g.lineTo(25,-17);g.stroke();g.beginPath();g.moveTo(20,-4);g.lineTo(29,-8);g.stroke();} }
-  else if(c.type==='motor'){ const col=on?'#34d0ff':'#1a4a5a'; lead(g,15,0,col); g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.arc(0,0,15,0,Math.PI*2);g.stroke();
-    g.save();g.rotate(simTime*c._lit*9); g.strokeStyle=col;g.lineWidth=2.4; for(let a=0;a<3;a++){g.rotate(Math.PI*2/3);g.beginPath();g.moveTo(0,0);g.lineTo(11,0);g.stroke();} g.restore();
+  else if(c.type==='motor'){ const col=on?'#34d0ff':'#1a4a5a';lead(15,col);g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.arc(0,0,15,0,Math.PI*2);g.stroke();
+    g.save();g.rotate((c._spin||0));g.strokeStyle=col;g.lineWidth=2.4;for(let a=0;a<3;a++){g.rotate(Math.PI*2/3);g.beginPath();g.moveTo(0,0);g.lineTo(11,0);g.stroke();}g.restore();
     g.save();if(vertical)g.rotate(-Math.PI/2);g.fillStyle=col;g.font='bold 9px Orbitron';g.textAlign='center';g.fillText('M',0,4);g.restore(); }
-  else if(c.type==='capacitor'){ const col=on?'#7ad0ff':'#2a4a6a'; g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.moveTo(-BASE,0);g.lineTo(-5,0);g.stroke();g.beginPath();g.moveTo(5,0);g.lineTo(BASE,0);g.stroke();
+  else if(c.type==='capacitor'){ const col=on?'#7ad0ff':'#2a4a6a';g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.moveTo(-BASE,0);g.lineTo(-5,0);g.stroke();g.beginPath();g.moveTo(5,0);g.lineTo(BASE,0);g.stroke();
     g.lineWidth=3;g.beginPath();g.moveTo(-5,-13);g.lineTo(-5,13);g.moveTo(5,-13);g.lineTo(5,13);g.stroke();
+    // indicador de carga
+    const ch=Math.max(0,Math.min(1,Math.abs(c.vc||0)/Math.max(1,(topo.primary?(topo.primary.volt||topo.primary.amp||9):9))));
+    if(ch>0.02){g.fillStyle='rgba(122,208,255,'+(0.5*ch)+')';g.fillRect(-4,-12,8,24);}
     g.save();if(vertical)g.rotate(-Math.PI/2);g.fillStyle='#9fd8ff';g.font='9px Poppins';g.textAlign='center';g.fillText(c.cap+'µF',0,24);g.restore(); }
-  else if(c.type==='inductor'){ const col=on?'#b48cff':'#3a2a5a'; g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.moveTo(-BASE,0);g.lineTo(-18,0);g.stroke();g.beginPath();g.moveTo(18,0);g.lineTo(BASE,0);g.stroke();
+  else if(c.type==='inductor'){ const col=on?'#b48cff':'#3a2a5a';g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.moveTo(-BASE,0);g.lineTo(-18,0);g.stroke();g.beginPath();g.moveTo(18,0);g.lineTo(BASE,0);g.stroke();
     g.beginPath();for(let i=0;i<4;i++){g.arc(-13+i*9,0,4.5,Math.PI,0,false);}g.stroke();
     g.save();if(vertical)g.rotate(-Math.PI/2);g.fillStyle='#cdb4ff';g.font='9px Poppins';g.textAlign='center';g.fillText(c.ind+'mH',0,22);g.restore(); }
-  else if(c.type==='switch'){ const cl=c.closed,col=cl?(on?'#ff00ff':'#bc13fe'):'#888'; g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.moveTo(-BASE,0);g.lineTo(-14,0);g.stroke();g.beginPath();g.moveTo(14,0);g.lineTo(BASE,0);g.stroke();
+  else if(c.type==='switch'){ const cl=c.closed,col=cl?(on?'#ff00ff':'#bc13fe'):'#888';g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.moveTo(-BASE,0);g.lineTo(-14,0);g.stroke();g.beginPath();g.moveTo(14,0);g.lineTo(BASE,0);g.stroke();
     g.beginPath();g.arc(-14,0,4,0,Math.PI*2);g.fillStyle=col;g.fill();g.beginPath();g.arc(14,0,4,0,Math.PI*2);g.fill();
     g.beginPath();g.moveTo(-12,0);g.lineTo(cl?12:9,cl?0:-15);g.lineWidth=2.5;g.stroke();
     g.save();if(vertical)g.rotate(-Math.PI/2);g.fillStyle=col;g.font='8px Poppins';g.textAlign='center';g.fillText(cl?'ON':'OFF',0,24);g.restore(); }
-  else if(c.type==='fuse'){ const blown=c.blown,col=blown?'#ff5050':(on?'#ffd166':'#6a5a1a'); g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.moveTo(-BASE,0);g.lineTo(-16,0);g.stroke();g.beginPath();g.moveTo(16,0);g.lineTo(BASE,0);g.stroke();
+  else if(c.type==='fuse'){ const blown=c.blown,col=blown?'#ff5050':(on?'#ffd166':'#6a5a1a');g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.moveTo(-BASE,0);g.lineTo(-16,0);g.stroke();g.beginPath();g.moveTo(16,0);g.lineTo(BASE,0);g.stroke();
     g.strokeRect(-16,-8,32,16);
-    if(blown){ g.strokeStyle='#ff5050';g.lineWidth=2;g.beginPath();g.moveTo(-12,0);g.lineTo(-2,-5);g.lineTo(2,5);g.lineTo(12,0);g.stroke(); }
-    else { g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.moveTo(-14,0);g.lineTo(14,0);g.stroke(); }
+    if(blown){g.strokeStyle='#ff5050';g.lineWidth=2;g.beginPath();g.moveTo(-12,0);g.lineTo(-2,-5);g.lineTo(2,5);g.lineTo(12,0);g.stroke();}
+    else{g.strokeStyle=col;g.lineWidth=2;g.beginPath();g.moveTo(-14,0);g.lineTo(14,0);g.stroke();}
     g.save();if(vertical)g.rotate(-Math.PI/2);g.fillStyle=col;g.font='8px Poppins';g.textAlign='center';g.fillText(blown?'QUEIMOU':c.imax+'A',0,22);g.restore(); }
   g.restore();
 
-  // terminais
   const tr=Math.max(5,GS*0.15);
   let ni=-1; if(c.type==='battery'||c.type==='acsource')ni=poles(c).ni;
   t.forEach((tt,i)=>{ let col=on?'#ff00ff':'#7a2a9a';
@@ -551,62 +496,91 @@ function drawComp(c){
     g.beginPath();g.arc(tx,ty,tr,0,Math.PI*2);g.fillStyle=col+'55';g.fill();g.strokeStyle=col;g.lineWidth=1.5;g.stroke();
     if(ni>=0){g.fillStyle='#fff';g.font='bold '+Math.max(11,GS*0.32)+'px Orbitron';g.textAlign='center';g.textBaseline='middle';g.fillText(i===ni?'−':'+',tx,ty-tr-Math.max(8,GS*0.2));g.textBaseline='alphabetic';}
   });
-  // fluxo através do componente (corrente convencional t0->t1 = c._I)
-  if(on && c.type!=='battery' && c.type!=='acsource'){
-    drawBranchFlow(t[0].gx*GS,t[0].gy*GS,t[1].gx*GS,t[1].gy*GS,c._I);
-  }
-  // bateria pegando fogo no curto
-  if(sim.short && (c.type==='battery'||c.type==='acsource')){ drawFire(c.gx*GS,c.gy*GS); }
+  if(c._on && c.type!=='battery' && c.type!=='acsource'){ drawBranchFlow(t[0].gx*GS,t[0].gy*GS,t[1].gx*GS,t[1].gy*GS,c); }
+  if(sim.short && (c.type==='battery'||c.type==='acsource')) drawFire(c.gx*GS,c.gy*GS);
 }
 function drawFire(cx,cy){
-  for(let i=0;i<14;i++){ const a=Math.random()*Math.PI*2,d=Math.random()*GS*0.6; const fx=cx+Math.cos(a)*d, fy=cy+Math.sin(a)*d-GS*0.2;
-    g.beginPath();g.arc(fx,fy,Math.random()*GS*0.13+2,0,Math.PI*2);
-    g.fillStyle=['rgba(255,180,0,0.9)','rgba(255,90,0,0.9)','rgba(255,40,0,0.85)'][i%3];g.fill(); }
+  for(let i=0;i<14;i++){const a=Math.random()*Math.PI*2,d=Math.random()*GS*0.6;const fx=cx+Math.cos(a)*d,fy=cy+Math.sin(a)*d-GS*0.2;
+    g.beginPath();g.arc(fx,fy,Math.random()*GS*0.13+2,0,Math.PI*2);g.fillStyle=['rgba(255,180,0,0.9)','rgba(255,90,0,0.9)','rgba(255,40,0,0.85)'][i%3];g.fill();}
   g.fillStyle='#fff';g.font='bold '+Math.max(11,GS*0.3)+'px Orbitron';g.textAlign='center';g.fillText('🔥',cx,cy-GS*0.5);
 }
 function drawProbes(){
   if(!dmmOn&&!scopeOn)return;
-  [['R',probeR,'#ff4d4d'],['B',probeB,'#dddddd']].forEach(([n,p,col])=>{
-    const x=p.gx*GS,y=p.gy*GS;
+  [['R',probeR,'#ff4d4d'],['B',probeB,'#dddddd']].forEach(([n,p,col])=>{const x=p.gx*GS,y=p.gy*GS;
     g.beginPath();g.moveTo(x,y);g.lineTo(x,y-GS*0.9);g.strokeStyle=col;g.lineWidth=3;g.stroke();
     g.beginPath();g.arc(x,y,Math.max(6,GS*0.16),0,Math.PI*2);g.fillStyle=col;g.shadowColor=col;g.shadowBlur=8;g.fill();g.shadowBlur=0;
-    g.fillStyle='#000';g.font='bold '+Math.max(9,GS*0.2)+'px Orbitron';g.textAlign='center';g.textBaseline='middle';g.fillText(n==='R'?'+':'−',x,y);g.textBaseline='alphabetic';
-  });
+    g.fillStyle='#000';g.font='bold '+Math.max(9,GS*0.2)+'px Orbitron';g.textAlign='center';g.textBaseline='middle';g.fillText(n==='R'?'+':'−',x,y);g.textBaseline='alphabetic';});
 }
 function drawScope(){
-  if(!scopeOn)return; const sw=scp.width/(window.devicePixelRatio||1), sh=scp.height/(window.devicePixelRatio||1);
+  if(!scopeOn)return; const dpr=window.devicePixelRatio||1; const sw=scp.width/dpr, sh=scp.height/dpr;
   sg.clearRect(0,0,sw,sh);
   sg.strokeStyle='rgba(60,220,120,0.18)';sg.lineWidth=1;
   for(let i=0;i<=8;i++){sg.beginPath();sg.moveTo(i*sw/8,0);sg.lineTo(i*sw/8,sh);sg.stroke();}
   for(let j=0;j<=4;j++){sg.beginPath();sg.moveTo(0,j*sh/4);sg.lineTo(sw,j*sh/4);sg.stroke();}
-  const va=nodeV(probeR), vb=nodeV(probeB);
-  let amp=0,phase=0,dc=0;
-  if(va&&vb){ const d=csub(va,vb); amp=cabs(d); phase=Math.atan2(d[1],d[0]); dc=d[0]; }
+  const mid=sh/2; sg.strokeStyle='rgba(60,220,120,0.4)';sg.beginPath();sg.moveTo(0,mid);sg.lineTo(sw,mid);sg.stroke();
   const f=comps.find(c=>c.type==='acsource')?.freq||0;
-  const mid=sh/2; const scale=(sh*0.4)/Math.max(1,(sim.ac?amp:Math.abs(dc))||1);
-  sg.strokeStyle='#3dff8b';sg.lineWidth=2;sg.beginPath();
-  for(let px=0;px<=sw;px++){
-    const tau=(px/sw)*4; // 4 períodos na tela
-    let v;
-    if(sim.ac) v=amp*Math.cos(2*Math.PI*tau + phase + simTime*2);
-    else v=dc;
-    const y=mid - v*scale;
-    if(px===0)sg.moveTo(px,y);else sg.lineTo(px,y);
-  }
-  sg.stroke();
+  const winT = sim.ac && f>0 ? Math.min(8,3/f) : 0.6; // janela em segundos de simulação
+  const t0=simT-winT;
+  const pts=scopeBuf.filter(p=>p.t>=t0);
+  let mx=0; pts.forEach(p=>{if(Math.abs(p.v)>mx)mx=Math.abs(p.v);});
+  const scale=(sh*0.42)/Math.max(0.5,mx);
+  if(pts.length>1){ sg.strokeStyle='#3dff8b';sg.lineWidth=2;sg.beginPath();
+    pts.forEach((p,i)=>{const x=((p.t-t0)/winT)*sw; const y=mid-p.v*scale; if(i===0)sg.moveTo(x,y);else sg.lineTo(x,y);});
+    sg.stroke(); }
   sg.fillStyle='#9effc4';sg.font='10px Orbitron';sg.textAlign='left';
-  sg.fillText(sim.ac?('Vpico='+amp.toFixed(1)+'V  f='+f+'Hz'):('DC '+dc.toFixed(2)+'V'),8,14);
+  sg.fillText(sim.ac?('V pico≈'+mx.toFixed(1)+'V   f='+f+'Hz'):('DC '+(pts.length?pts[pts.length-1].v.toFixed(2):'0')+'V'),8,14);
+  sg.textAlign='right';sg.fillText('janela '+(winT*1000).toFixed(0)+'ms',sw-8,14);
 }
 
+// ============== LOOP PRINCIPAL ==============
 function frame(ts){
-  const dt=Math.min(0.05,((ts||0)-lastT)/1000||0); lastT=ts||0; simTime+=dt;
-  // acumulador de fluxo DC proporcional à corrente da fonte
-  flowBase += Math.min(0.05, sim.Imag*3*dt + (sim.ok&&!sim.ac?0.002:0));
+  const realDt=Math.min(0.05,((ts||0)-lastT)/1000||0); lastT=ts||0;
+  // passos de integração no tempo simulado (desacelerado p/ visualização)
+  const simAdv=realDt*TIMESCALE;
+  const f=topo.ac? (topo.omega/(2*Math.PI)) : 0;
+  const dtMax = topo.ac && f>0 ? Math.min(5e-4, 1/(f*50)) : 5e-4;
+  let steps=Math.max(1,Math.min(120,Math.round(simAdv/dtMax)));
+  const dt=simAdv/steps;
+  for(let s=0;s<steps;s++){ simT+=dt; stepSim(dt); }
+
+  // resumo p/ medições
+  sim.ac=topo.ac; sim.omega=topo.omega;
+  sim.Irms=Math.sqrt(srcMsI);
+  const prim=topo.primary;
+  sim.Vmag= prim? (prim.type==='acsource'? prim.amp/Math.SQRT2 : prim.volt) : 0;
+  sim.P=Math.abs(emaP);
+  sim.ok = sim.Irms>1e-4;
+  const fuseBlown=comps.some(c=>c.type==='fuse'&&c.blown);
+  sim.short = sim.Irms>6 && !fuseBlown;
+  sim.warn = sim.short?'CURTO':(fuseBlown?'FUSÍVEL':'');
+
+  // estado visual por componente (brilho instantâneo => pisca em AC)
+  comps.forEach(c=>{
+    const Irms=Math.sqrt(c._msI||0);
+    c._on=['resistor','lamp','motor','led','capacitor','inductor','switch','fuse'].includes(c.type)&&Irms>1e-4;
+    if(c.type==='switch') c._on=c.closed&&Irms>1e-4;
+    if(c.type==='fuse') c._on=!c.blown&&Irms>1e-4;
+    if(c.type==='lamp') c._lit=Math.max(0,Math.min(1,(c._i*c._i*c.r)/3.4));
+    if(c.type==='led'){ c._lit=Math.max(0,Math.min(1,Math.abs(c._i)/0.02)); c._on=c._on&&Math.abs(c._i)>0.002; }
+    if(c.type==='motor'){ c._lit=Math.max(0,Math.min(1,Math.abs(c._i)/0.5)); c._spin=(c._spin||0)+Math.abs(c._i)*6*realDt; }
+    if(c.type==='battery'||c.type==='acsource') c._on=sim.Irms>1e-4;
+  });
+  // avança a fase dos elétrons (sentido convencional => +I ao longo de a->b ; real inverte)
+  const sgn=conv==='real'?-1:1;
+  const adv=ref=>{ const a=Math.max(-0.06,Math.min(0.06,KFLOW*ref._i*realDt*sgn)); ref._ph=((ref._ph+a)%1+1)%1; };
+  comps.forEach(c=>{ if(c.type!=='battery'&&c.type!=='acsource') adv(c); });
+  wires.forEach(adv);
+
+  // amostra osciloscópio
+  if(scopeOn){ const va=nodeV(probeR), vb=nodeV(probeB); const v=(va!==null&&vb!==null)?va-vb:0;
+    scopeBuf.push({t:simT,v}); if(scopeBuf.length>5000)scopeBuf.splice(0,scopeBuf.length-5000); }
+
+  refreshMeters();
+
   g.clearRect(0,0,W,H);
   drawGrid(); drawWires(); comps.forEach(drawComp);
   if(wireStart){g.beginPath();g.arc(wireStart.gx*GS,wireStart.gy*GS,Math.max(8,GS*0.28),0,Math.PI*2);g.fillStyle='rgba(255,0,255,0.15)';g.fill();g.strokeStyle='#ff00ff';g.lineWidth=2;g.stroke();}
-  drawProbes();
-  drawScope();
+  drawProbes(); drawScope();
   requestAnimationFrame(frame);
 }
 
@@ -615,11 +589,8 @@ function loadDemo(){
   const L=Math.max(2,Math.round(COLS*0.22)), R=Math.min(COLS-2,Math.round(COLS*0.78));
   const T=Math.max(2,Math.round(ROWS*0.25)), B=Math.min(ROWS-2,Math.round(ROWS*0.75));
   const midC=Math.round((L+R)/2), midR=Math.round((T+B)/2);
-  const bat=newComp('battery',L,midR); 
-  const lamp=newComp('lamp',midC,T);
-  const res=newComp('resistor',R,midR); res.rot=1;
-  const sw=newComp('switch',midC,B);
-  comps=[bat,lamp,res,sw];
+  const bat=newComp('battery',L,midR), lamp=newComp('lamp',midC,T), res=newComp('resistor',R,midR), sw=newComp('switch',midC,B);
+  res.rot=1; comps=[bat,lamp,res,sw];
   const[bt0,bt1]=termGrid(bat),[lt0,lt1]=termGrid(lamp),[rt0,rt1]=termGrid(res),[st0,st1]=termGrid(sw);
   wires=[
     {gx1:bt1.gx,gy1:bt1.gy,gx2:bt1.gx,gy2:lt0.gy},{gx1:bt1.gx,gy1:lt0.gy,gx2:lt0.gx,gy2:lt0.gy},
@@ -627,13 +598,14 @@ function loadDemo(){
     {gx1:rt1.gx,gy1:rt1.gy,gx2:rt1.gx,gy2:st1.gy},{gx1:rt1.gx,gy1:st1.gy,gx2:st1.gx,gy2:st1.gy},
     {gx1:st0.gx,gy1:st0.gy,gx2:bt0.gx,gy2:st0.gy},{gx1:bt0.gx,gy1:st0.gy,gx2:bt0.gx,gy2:bt0.gy},
   ];
-  solve();
-  setInfo('Demo: bateria → lâmpada → resistor → chave. Edite (⊙) a tensão/resistência e veja o brilho e a velocidade dos elétrons mudarem.');
+  invalidate();
+  setInfo('Demo: bateria → lâmpada → resistor → chave. Troque a bateria por uma <b>Fonte AC</b> e ligue o osciloscópio para ver a onda e a lâmpada pulsar.');
 }
 
 new ResizeObserver(layout).observe(cv);
 window.addEventListener('resize',layout);
 layout(); buildEditor(); requestAnimationFrame(frame);
+
 </script>
 </body>
 </html>
