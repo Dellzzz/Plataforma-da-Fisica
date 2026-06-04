@@ -2,597 +2,251 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Simulador de Lançamentos</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
 <style>
+:root{ --neon:#d58cff; --border:rgba(255,255,255,0.12); }
+*{ margin:0; padding:0; box-sizing:border-box; }
+html,body{ height:100%; }
+body{ font-family:'Poppins',sans-serif; background:radial-gradient(circle at top,#37104f 0%,#12051f 45%,#05010d 100%); color:#fff; min-height:100%; overflow-x:hidden; }
+body::before{ content:""; position:fixed; inset:0; background:linear-gradient(90deg,transparent 48%,rgba(255,255,255,0.03) 50%,transparent 52%),linear-gradient(transparent 48%,rgba(255,255,255,0.03) 50%,transparent 52%); background-size:46px 46px; animation:gridMove 10s linear infinite; pointer-events:none; z-index:0; }
+@keyframes gridMove{ from{transform:translateY(0)} to{transform:translateY(46px)} }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+.back{ position:relative; z-index:2; display:inline-block; margin:14px 0 0 16px; color:#cdb4ff; text-decoration:none; font-size:.82rem; border:1px solid var(--border); padding:6px 12px; border-radius:10px; background:rgba(255,255,255,0.04); transition:.2s; }
+.back:hover{ color:#fff; border-color:var(--neon); }
+
+header{ position:relative; z-index:1; text-align:center; padding:14px 16px 4px; }
+header h1{ font-family:'Orbitron',sans-serif; font-size:clamp(1.5rem,5vw,2.7rem); color:var(--neon); text-shadow:0 0 10px #c94fff,0 0 26px #7a00ff; letter-spacing:1px; }
+header p{ margin-top:8px; color:#cbb8e0; font-size:clamp(.8rem,2.4vw,1rem); max-width:640px; margin-inline:auto; }
+
+.container{ position:relative; z-index:1; width:100%; max-width:1280px; margin:auto; display:grid; grid-template-columns:330px 1fr; gap:18px; padding:18px; align-items:start; }
+.panel,.simulation-area{ background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:18px; backdrop-filter:blur(10px); box-shadow:0 0 20px rgba(180,0,255,0.18); }
+.panel{ padding:18px; }
+.panel h2{ font-family:'Orbitron',sans-serif; font-size:1rem; margin-bottom:14px; color:var(--neon); letter-spacing:.5px; }
+
+.control{ margin-bottom:15px; }
+.control label{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px; font-size:.86rem; font-weight:600; }
+.control label b{ color:#ffb5ff; font-family:'Orbitron',monospace; font-weight:700; }
+.control input[type=range]{ width:100%; -webkit-appearance:none; appearance:none; height:6px; border-radius:8px; background:#4a1664; outline:none; }
+.control input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:20px; height:20px; border-radius:50%; background:#e879ff; box-shadow:0 0 10px #d14dff; cursor:pointer; }
+.control input[type=range]::-moz-range-thumb{ width:20px; height:20px; border:none; border-radius:50%; background:#e879ff; box-shadow:0 0 10px #d14dff; cursor:pointer; }
+
+.buttons{ display:flex; gap:10px; margin-top:2px; }
+button{ flex:1; padding:11px; border:none; border-radius:11px; background:linear-gradient(135deg,#d96cff,#7f2cff); color:#fff; font-family:'Poppins',sans-serif; font-weight:700; font-size:.9rem; cursor:pointer; transition:.2s; }
+button:active{ transform:translateY(1px); }
+button:hover{ box-shadow:0 0 16px #c84dff; }
+button.reset{ background:linear-gradient(135deg,#5a3a7a,#3a2050); }
+
+.results{ margin-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.results div{ background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:11px; padding:9px 10px; }
+.results small{ display:block; color:#bda7d6; font-size:.66rem; letter-spacing:.4px; text-transform:uppercase; }
+.results b{ color:#ffb5ff; font-family:'Orbitron',monospace; font-size:.98rem; }
+.results .full{ grid-column:1/-1; }
+
+.simulation-area{ position:relative; overflow:hidden; height:600px; }
+canvas{ width:100%; height:100%; display:block; }
+
+@media(max-width:900px){
+  .container{ grid-template-columns:1fr; gap:12px; padding:12px; }
+  .panel{ padding:14px; order:2; }
+  .simulation-area{ order:1; height:46vh; min-height:280px; }
+  .control{ margin-bottom:12px; }
+  header{ padding:10px 14px 2px; }
+  .results{ margin-top:12px; }
 }
-
-body{
-    font-family:'Poppins',sans-serif;
-    background:
-    radial-gradient(circle at top,#37104f 0%, #12051f 45%, #05010d 100%);
-    color:white;
-    overflow-x:hidden;
-}
-
-/* GRID FUTURISTA */
-
-body::before{
-    content:"";
-    position:fixed;
-    inset:0;
-    background:
-    linear-gradient(90deg,transparent 48%,rgba(255,255,255,0.03) 50%,transparent 52%),
-    linear-gradient(transparent 48%,rgba(255,255,255,0.03) 50%,transparent 52%);
-    background-size:50px 50px;
-    animation:gridMove 10s linear infinite;
-    pointer-events:none;
-}
-
-@keyframes gridMove{
-    from{transform:translateY(0);}
-    to{transform:translateY(50px);}
-}
-
-/* HEADER */
-
-header{
-    text-align:center;
-    padding:50px 20px 20px;
-}
-
-header h1{
-    font-family:'Orbitron',sans-serif;
-    font-size:3.5rem;
-    color:#d58cff;
-    text-shadow:
-    0 0 10px #c94fff,
-    0 0 20px #c94fff,
-    0 0 40px #7a00ff;
-}
-
-header p{
-    margin-top:15px;
-    color:#ddd;
-    font-size:1.1rem;
-}
-
-/* CONTAINER */
-
-.container{
-    width:95%;
-    max-width:1300px;
-    margin:auto;
-    display:grid;
-    grid-template-columns:350px 1fr;
-    gap:30px;
-    padding:30px;
-}
-
-.panel,
-.simulation-area{
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.1);
-    border-radius:25px;
-    backdrop-filter:blur(10px);
-    box-shadow:0 0 20px rgba(180,0,255,0.2);
-}
-
-/* PAINEL */
-
-.panel{
-    padding:30px;
-}
-
-.panel h2{
-    font-family:'Orbitron',sans-serif;
-    margin-bottom:25px;
-    color:#d58cff;
-}
-
-.control{
-    margin-bottom:30px;
-}
-
-.control label{
-    display:block;
-    margin-bottom:10px;
-    font-weight:600;
-}
-
-.control input{
-    width:100%;
-    appearance:none;
-    height:8px;
-    border-radius:10px;
-    background:#4a1664;
-    outline:none;
-}
-
-.control input::-webkit-slider-thumb{
-    appearance:none;
-    width:22px;
-    height:22px;
-    border-radius:50%;
-    background:#e879ff;
-    box-shadow:0 0 15px #d14dff;
-    cursor:pointer;
-}
-
-/* BOTÕES */
-
-.buttons{
-    display:flex;
-    gap:15px;
-    flex-wrap:wrap;
-}
-
-button{
-    flex:1;
-    padding:15px;
-    border:none;
-    border-radius:15px;
-    background:linear-gradient(135deg,#d96cff,#7f2cff);
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.3s;
-    font-size:1rem;
-}
-
-button:hover{
-    transform:translateY(-3px);
-    box-shadow:0 0 20px #c84dff;
-}
-
-/* RESULTADOS */
-
-.results{
-    margin-top:35px;
-    background:rgba(255,255,255,0.04);
-    padding:20px;
-    border-radius:20px;
-    line-height:2;
-}
-
-.results span{
-    color:#ffb5ff;
-    font-weight:bold;
-}
-
-/* SIMULAÇÃO */
-
-.simulation-area{
-    position:relative;
-    overflow:hidden;
-    height:700px;
-}
-
-canvas{
-    width:100%;
-    height:100%;
-    display:block;
-}
-
-/* RESPONSIVO */
-
-@media(max-width:1000px){
-
-.container{
-    grid-template-columns:1fr;
-}
-
-}
-
 </style>
 </head>
-
 <body>
-
+<a class="back" href="../experimentos.html">← Voltar aos experimentos</a>
 <header>
-    <h1>SIMULADOR DE LANÇAMENTOS</h1>
-    <p>
-        Explore os lançamentos horizontal e oblíquo alterando velocidade,
-        ângulo e altura inicial.
-    </p>
+  <h1>Simulador de Lançamentos</h1>
+  <p>Explore os lançamentos horizontal e oblíquo alterando velocidade, ângulo e altura inicial.</p>
 </header>
 
 <div class="container">
-
-    <!-- PAINEL -->
-
-    <div class="panel">
-
-        <h2>Controles</h2>
-
-        <div class="control">
-            <label>
-                Ângulo: <span id="angleValue">45</span>°
-            </label>
-
-            <input type="range" id="angle" min="0" max="90" value="45">
-        </div>
-
-        <div class="control">
-            <label>
-                Velocidade Inicial:
-                <span id="velocityValue">30</span> m/s
-            </label>
-
-            <input type="range" id="velocity" min="5" max="80" value="30">
-        </div>
-
-        <div class="control">
-            <label>
-                Altura Inicial:
-                <span id="heightValue">0</span> m
-            </label>
-
-            <input type="range" id="height" min="0" max="100" value="0">
-        </div>
-
-        <div class="buttons">
-            <button onclick="launchProjectile()">
-                Lançar
-            </button>
-
-            <button onclick="resetSimulation()">
-                Resetar
-            </button>
-        </div>
-
-        <div class="results">
-            <p>
-                Tipo:
-                <span id="typeResult">
-                    Lançamento Oblíquo
-                </span>
-            </p>
-
-            <p>
-                Distância:
-                <span id="distanceResult">
-                    0 m
-                </span>
-            </p>
-
-            <p>
-                Tempo:
-                <span id="timeResult">
-                    0 s
-                </span>
-            </p>
-
-            <p>
-                Altura Máxima:
-                <span id="maxHeightResult">
-                    0 m
-                </span>
-            </p>
-        </div>
-
+  <div class="panel">
+    <h2>Controles</h2>
+    <div class="control"><label>Ângulo <b><span id="angleValue">45</span>°</b></label><input type="range" id="angle" min="0" max="90" value="45"></div>
+    <div class="control"><label>Velocidade inicial <b><span id="velocityValue">30</span> m/s</b></label><input type="range" id="velocity" min="5" max="80" value="30"></div>
+    <div class="control"><label>Altura inicial <b><span id="heightValue">0</span> m</b></label><input type="range" id="height" min="0" max="100" value="0"></div>
+    <div class="buttons">
+      <button onclick="launchProjectile()">🚀 Lançar</button>
+      <button class="reset" onclick="resetSimulation()">↺ Resetar</button>
     </div>
-
-    <!-- ÁREA DA SIMULAÇÃO -->
-
-    <div class="simulation-area">
-        <canvas id="canvas"></canvas>
+    <div class="results">
+      <div class="full"><small>Tipo</small><b id="typeResult">Lançamento Oblíquo</b></div>
+      <div><small>Distância</small><b id="distanceResult">0 m</b></div>
+      <div><small>Tempo</small><b id="timeResult">0 s</b></div>
+      <div class="full"><small>Altura máxima</small><b id="maxHeightResult">0 m</b></div>
     </div>
+  </div>
 
+  <div class="simulation-area"><canvas id="canvas"></canvas></div>
 </div>
 
 <script>
-
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-
-canvas.width = 900;
-canvas.height = 700;
-
+const wrap = document.querySelector(".simulation-area");
 const g = 9.8;
 
-let projectile = null;
-let animationId;
+let W = 900, H = 600, groundY = 544, scale = 4;
+const cannonX = 56;
+let projectile = null, animationId = null;
 
 const angleInput = document.getElementById("angle");
 const velocityInput = document.getElementById("velocity");
 const heightInput = document.getElementById("height");
-
 const angleValue = document.getElementById("angleValue");
 const velocityValue = document.getElementById("velocityValue");
 const heightValue = document.getElementById("heightValue");
+const typeResult = document.getElementById("typeResult");
+const distanceResult = document.getElementById("distanceResult");
+const timeResult = document.getElementById("timeResult");
+const maxHeightResult = document.getElementById("maxHeightResult");
 
-angleInput.oninput = () => {
-    angleValue.textContent = angleInput.value;
+function vals(){ return { ang:+angleInput.value, v:+velocityInput.value, h:+heightInput.value }; }
 
-    if(angleInput.value == 0){
-        document.getElementById("typeResult").textContent =
-        "Lançamento Horizontal";
-    }else{
-        document.getElementById("typeResult").textContent =
-        "Lançamento Oblíquo";
-    }
-};
+// escala (px por metro) que faz a trajetória caber na tela atual
+function fitScale(ang, v, h){
+  const a = ang*Math.PI/180, vy = v*Math.sin(a), vx = v*Math.cos(a);
+  const tLand = (vy + Math.sqrt(vy*vy + 2*g*h)) / g;
+  const range = Math.max(vx*tLand, 1);
+  const maxH = Math.max(h + (vy>0 ? vy*vy/(2*g) : 0), 1);
+  const sx = (W - cannonX - 22) / range;
+  const sy = (groundY - 22) / maxH;
+  return Math.max(1.0, Math.min(sx, sy, 9));
+}
+function updateScale(){ const {ang,v,h} = vals(); scale = fitScale(ang,v,h); }
 
-velocityInput.oninput = () => {
-    velocityValue.textContent = velocityInput.value;
-};
-
-heightInput.oninput = () => {
-    heightValue.textContent = heightInput.value;
-};
-
-/* DESENHAR CENÁRIO */
+// canvas responsivo: resolução interna = tamanho real * densidade de pixels
+function resize(){
+  const r = wrap.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.round(r.width*dpr));
+  canvas.height = Math.max(1, Math.round(r.height*dpr));
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  W = r.width; H = r.height; groundY = H - 56;
+  if(!projectile) updateScale();
+  drawBackground();
+}
 
 function drawBackground(){
-
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    /* chão */
-
-    ctx.fillStyle = "#22002f";
-    ctx.fillRect(0,620,canvas.width,80);
-
-    /* grid */
-
-    ctx.strokeStyle = "rgba(255,255,255,0.05)";
-
-    for(let x=0;x<canvas.width;x+=50){
-
-        ctx.beginPath();
-        ctx.moveTo(x,0);
-        ctx.lineTo(x,canvas.height);
-        ctx.stroke();
-
-    }
-
-    for(let y=0;y<canvas.height;y+=50){
-
-        ctx.beginPath();
-        ctx.moveTo(0,y);
-        ctx.lineTo(canvas.width,y);
-        ctx.stroke();
-
-    }
-
-    drawCannon();
-
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle = "rgba(255,255,255,0.05)"; ctx.lineWidth = 1;
+  for(let x=0;x<=W;x+=46){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for(let y=0;y<=H;y+=46){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  ctx.fillStyle = "#22002f"; ctx.fillRect(0,groundY,W,H-groundY);
+  ctx.strokeStyle = "rgba(213,140,255,0.45)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(W,groundY); ctx.stroke();
+  drawCannon();
 }
-
-/* CANHÃO */
 
 function drawCannon(){
+  const {ang,h} = vals();
+  const a = ang*Math.PI/180;
+  const baseY = groundY - h*scale;
+  ctx.save();
+  ctx.translate(cannonX, baseY);
 
-    const angle =
-    parseFloat(angleInput.value) * Math.PI/180;
+  // roda / carreta (base)
+  const wg = ctx.createRadialGradient(0,2,3,0,2,16);
+  wg.addColorStop(0,"#ffb8ff"); wg.addColorStop(1,"#5d1485");
+  ctx.beginPath(); ctx.arc(0,2,15,0,Math.PI*2);
+  ctx.fillStyle = wg; ctx.shadowBlur = 14; ctx.shadowColor = "#d46cff"; ctx.fill();
+  ctx.shadowBlur = 0; ctx.strokeStyle = "#e57cff"; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(0,2,15,0,Math.PI*2); ctx.stroke();
+  ctx.lineWidth = 1.4;
+  for(let i=0;i<6;i++){ const r=i*Math.PI/3; ctx.beginPath(); ctx.moveTo(0,2); ctx.lineTo(Math.cos(r)*13, 2+Math.sin(r)*13); ctx.stroke(); }
+  ctx.beginPath(); ctx.arc(0,2,3.5,0,Math.PI*2); ctx.fillStyle="#3a0a55"; ctx.fill();
 
-    const height =
-    parseFloat(heightInput.value);
+  // cano (gira com o ângulo de tiro)
+  ctx.rotate(-a);
+  const L = 62, rB = 10, rM = 6.5;          // comprimento, raio na culatra, raio na boca
+  const lg = ctx.createLinearGradient(0,0,L,0);
+  lg.addColorStop(0,"#a85cff"); lg.addColorStop(0.5,"#f3d0ff"); lg.addColorStop(1,"#8a2dff");
+  ctx.fillStyle = lg; ctx.shadowBlur = 9; ctx.shadowColor = "#d46cff";
+  ctx.beginPath();                           // corpo cônico: largo atrás, fino na frente
+  ctx.moveTo(-4,-rB); ctx.lineTo(L-4,-rM); ctx.lineTo(L-4,rM); ctx.lineTo(-4,rB); ctx.closePath();
+  ctx.fill();
+  ctx.shadowBlur = 0; ctx.strokeStyle = "#e57cff"; ctx.lineWidth = 1.6; ctx.stroke();
+  // culatra arredondada (atrás)
+  ctx.beginPath(); ctx.arc(-4,0,rB,Math.PI/2,Math.PI*1.5); ctx.fillStyle = "#7a2dd0"; ctx.fill(); ctx.stroke();
+  // botão da culatra
+  ctx.beginPath(); ctx.arc(-rB-3,0,3,0,Math.PI*2); ctx.fillStyle = "#d46cff"; ctx.fill(); ctx.stroke();
+  // anel da boca (muzzle) + boca escura
+  ctx.fillStyle = "#d46cff";
+  ctx.fillRect(L-7,-rM-2.5,5,(rM+2.5)*2); ctx.strokeRect(L-7,-rM-2.5,5,(rM+2.5)*2);
+  ctx.beginPath(); ctx.arc(L-2,0,rM-1.5,0,Math.PI*2); ctx.fillStyle = "#2a0838"; ctx.fill();
 
-    const baseX = 80;
-    const baseY = 620 - height*4;
-
-    ctx.save();
-
-    ctx.translate(baseX, baseY);
-
-    /* base */
-
-    ctx.beginPath();
-    ctx.arc(0,0,28,0,Math.PI*2);
-
-    const baseGradient =
-    ctx.createRadialGradient(0,0,5,0,0,30);
-
-    baseGradient.addColorStop(0,"#ffb8ff");
-    baseGradient.addColorStop(1,"#5d1485");
-
-    ctx.fillStyle = baseGradient;
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = "#d46cff";
-    ctx.fill();
-
-    /* cano */
-
-    ctx.rotate(-angle);
-
-    const barrelGradient =
-    ctx.createLinearGradient(0,0,80,0);
-
-    barrelGradient.addColorStop(0,"#f3d0ff");
-    barrelGradient.addColorStop(1,"#892dff");
-
-    ctx.fillStyle = barrelGradient;
-
-    ctx.fillRect(0,-10,85,20);
-
-    /* brilho neon */
-
-    ctx.strokeStyle = "#e57cff";
-    ctx.lineWidth = 2;
-
-    ctx.strokeRect(0,-10,85,20);
-
-    /* ponta */
-
-    ctx.beginPath();
-    ctx.arc(85,0,10,0,Math.PI*2);
-
-    ctx.fillStyle = "#d46cff";
-    ctx.fill();
-
-    ctx.restore();
-
+  ctx.restore();
 }
-/* LANÇAR */
 
 function launchProjectile(){
-
-    cancelAnimationFrame(animationId);
-
-    const angle =
-    parseFloat(angleInput.value) * Math.PI/180;
-
-    const velocity =
-    parseFloat(velocityInput.value);
-
-    const height =
-    parseFloat(heightInput.value);
-
-    const vx = velocity * Math.cos(angle);
-    const vy = velocity * Math.sin(angle);
-
-    projectile = {
-
-        x:80,
-        y:620 - height*4,
-
-        vx:vx,
-        vy:vy,
-
-        time:0,
-
-        trail:[]
-    };
-
-    animate();
-
+  cancelAnimationFrame(animationId);
+  const {ang,v,h} = vals();
+  const a = ang*Math.PI/180;
+  updateScale();
+  projectile = { vx:v*Math.cos(a), vy:v*Math.sin(a), h:h, t:0, scale:scale, trail:[] };
+  animate();
 }
 
-/* RESET */
-
 function resetSimulation(){
-
-    cancelAnimationFrame(animationId);
-
-    projectile = null;
-
-    drawBackground();
-
-    document.getElementById("distanceResult")
-    .textContent = "0 m";
-
-    document.getElementById("timeResult")
-    .textContent = "0 s";
-
-    document.getElementById("maxHeightResult")
-    .textContent = "0 m";
-
+  cancelAnimationFrame(animationId);
+  projectile = null;
+  updateScale();
+  drawBackground();
+  distanceResult.textContent = "0 m";
+  timeResult.textContent = "0 s";
+  maxHeightResult.textContent = "0 m";
 }
 
 function animate(){
+  drawBackground();
+  if(projectile){
+    const p = projectile;
+    p.t += 0.033;
+    const t = p.t, s = p.scale;
+    const xm = p.vx * t;
+    const ym = p.h + p.vy*t - 0.5*g*t*t;
+    const px = cannonX + xm*s;
+    const py = groundY - ym*s;
+    p.trail.push({x:px, y:py});
 
-    drawBackground();
+    ctx.beginPath();
+    p.trail.forEach((pt,i)=> i ? ctx.lineTo(pt.x,pt.y) : ctx.moveTo(pt.x,pt.y));
+    ctx.strokeStyle = "#d46cff"; ctx.lineWidth = 3; ctx.shadowBlur = 14; ctx.shadowColor = "#d46cff"; ctx.stroke();
 
-    if(projectile){
+    const rg = ctx.createRadialGradient(px,py,2,px,py,12);
+    rg.addColorStop(0,"#ffffff"); rg.addColorStop(1,"#c84dff");
+    ctx.beginPath(); ctx.arc(px,py,9,0,Math.PI*2); ctx.fillStyle = rg; ctx.shadowBlur = 22; ctx.shadowColor = "#d46cff"; ctx.fill();
 
-        projectile.time += 0.03;
+    distanceResult.textContent = Math.max(0,xm).toFixed(1) + " m";
+    timeResult.textContent = t.toFixed(2) + " s";
+    maxHeightResult.textContent = (p.h + (p.vy>0 ? p.vy*p.vy/(2*g) : 0)).toFixed(1) + " m";
 
-        const t = projectile.time;
-
-        const scale = 4;
-
-        const x =
-        80 + projectile.vx * t * scale;
-
-        const y =
-        (620 - parseFloat(heightInput.value)*4)
-        - ((projectile.vy * t)
-        - (0.5 * g * t * t)) * scale;
-
-        projectile.trail.push({x,y});
-
-        /* trajetória */
-
-        ctx.beginPath();
-
-        for(let i=0;i<projectile.trail.length;i++){
-
-            const p = projectile.trail[i];
-
-            if(i===0){
-                ctx.moveTo(p.x,p.y);
-            }else{
-                ctx.lineTo(p.x,p.y);
-            }
-
-        }
-
-        ctx.strokeStyle = "#d46cff";
-        ctx.lineWidth = 3;
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = "#d46cff";
-        ctx.stroke();
-
-        /* projétil */
-
-        ctx.beginPath();
-
-        ctx.arc(x,y,12,0,Math.PI*2);
-
-        const gradient =
-        ctx.createRadialGradient(x,y,2,x,y,15);
-
-        gradient.addColorStop(0,"#ffffff");
-        gradient.addColorStop(1,"#c84dff");
-
-        ctx.fillStyle = gradient;
-
-        ctx.shadowBlur = 25;
-        ctx.shadowColor = "#d46cff";
-
-        ctx.fill();
-
-        /* valores */
-
-        const distance = ((x - 80)/scale).toFixed(1);
-
-        document.getElementById("distanceResult")
-        .textContent = distance + " m";
-
-        document.getElementById("timeResult")
-        .textContent = t.toFixed(2) + " s";
-
-        const maxHeight =
-        (
-            (
-            Math.pow(projectile.vy,2)
-            /(2*g)
-            )
-            + parseFloat(heightInput.value)
-        ).toFixed(1);
-
-        document.getElementById("maxHeightResult")
-        .textContent = maxHeight + " m";
-
-        /* chão */
-
-        if(y >= 620){
-
-            cancelAnimationFrame(animationId);
-
-            return;
-
-        }
-
+    if(ym <= 0 && t > 0.05){
+      const tLand = (p.vy + Math.sqrt(p.vy*p.vy + 2*g*p.h)) / g;
+      distanceResult.textContent = (p.vx*tLand).toFixed(1) + " m";
+      timeResult.textContent = tLand.toFixed(2) + " s";
+      cancelAnimationFrame(animationId);
+      return;
     }
-
-    animationId =
-    requestAnimationFrame(animate);
-
+  }
+  animationId = requestAnimationFrame(animate);
 }
 
-drawBackground();
+angleInput.oninput = () => {
+  angleValue.textContent = angleInput.value;
+  typeResult.textContent = (+angleInput.value === 0) ? "Lançamento Horizontal" : "Lançamento Oblíquo";
+  if(!projectile){ updateScale(); drawBackground(); }
+};
+velocityInput.oninput = () => { velocityValue.textContent = velocityInput.value; if(!projectile){ updateScale(); drawBackground(); } };
+heightInput.oninput  = () => { heightValue.textContent  = heightInput.value;  if(!projectile){ updateScale(); drawBackground(); } };
 
+new ResizeObserver(resize).observe(wrap);
+window.addEventListener("resize", resize);
+resize();
 </script>
-
 </body>
 </html>
