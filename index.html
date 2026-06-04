@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Física</title>
+  <title>Física - Início</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
 
@@ -23,10 +23,10 @@
       min-height: 100vh;
       font-family:'Poppins', sans-serif;
       
-      /* 1. FALLBACK GARANTIDO: Cor escura base caso o gradiente falhe no celular */
+      /* FALLBACK GARANTIDO: Cor escura base caso o gradiente falhe no celular */
       background-color: #060b18; 
       
-      /* 2. GRADIENTE: Navegadores modernos vão carregar isso por cima da cor base */
+      /* GRADIENTE: Navegadores modernos vão carregar isso por cima da cor base */
       background-image:
         radial-gradient(circle at top left, rgba(0,255,255,0.15), transparent 25%),
         radial-gradient(circle at bottom right, rgba(0,140,255,0.18), transparent 25%),
@@ -275,10 +275,10 @@
 <body>
 
   <nav class="navbar">
-  	<a href="main_page.html">Página Inicial</a>
-  	<a href="fisica.html" class="active">Física</a>
-  	<a href="geometria.html">Geometria</a>
-  	<a href="matematica.html">Matemática</a>
+  	<a href="index.html" class="active">Início</a>
+  	<a href="aula.html">Aulas</a>
+  	<a href="listas.html">Listas</a>
+  	<a href="experimentos.html">Experimentos</a>
   </nav>
 
   <div class="container">
@@ -286,27 +286,28 @@
     <div class="title">
       <h1>Física</h1>
       <p>Portal de estudos e descobertas científicas</p>
-      <p>Prof. Jardel A. Leite </p>
+      <p>Prof. Jardel A. Leite</p>
     </div>
 
     <div class="cards">
 
-     	<a href="aula.html" class="card">
- 		<h2>Aulas Prontas</h2>
- 		<p>O caminho mais rápido para o conhecimento.</p>
- 		<span class="btn-neon">Acessar Aulas</span>
-	    </a>
+      <a href="aula.html" class="card">
+        <h2>Aulas Prontas</h2>
+        <p>O caminho mais rápido para o conhecimento.</p>
+        <span class="btn-neon">Acessar Aulas</span>
+      </a>
 
-      <div class="card">
+      <a href="listas.html" class="card">
         <h2>Listas de Exercícios</h2>
-        <p>Novos conteúdos serão adicionados em breve.</p>
-      </div>
+        <p>Pratique seus conhecimentos e teste suas habilidades.</p>
+        <span class="btn-neon">Acessar Listas</span>
+      </a>
 
-	    <a href="experimentos.html" class="card">
- 		<h2>Experimentos</h2>
- 		<p>Explore simulações interativas de fenômenos físicos em tempo real.</p>
- 		<span class="btn-neon">Acessar Laboratório</span>
-	    </a>
+      <a href="experimentos.html" class="card">
+        <h2>Experimentos</h2>
+        <p>Explore simulações interativas de fenômenos físicos em tempo real.</p>
+        <span class="btn-neon">Acessar Laboratório</span>
+      </a>
 
     </div>
 
