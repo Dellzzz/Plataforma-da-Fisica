@@ -14,20 +14,24 @@
       box-sizing:border-box;
     }
 
-    /* Ocultar barra de rolagem horizontal com segurança */
     html, body {
       overflow-x: hidden;
       width: 100%;
     }
 
     body{
-      min-height:100vh;
-      min-height: 100dvh; /* Ajuste para altura correta no mobile */
+      min-height: 100vh;
       font-family:'Poppins', sans-serif;
-      background:
+      
+      /* 1. FALLBACK GARANTIDO: Cor escura base caso o gradiente falhe no celular */
+      background-color: #060b18; 
+      
+      /* 2. GRADIENTE: Navegadores modernos vão carregar isso por cima da cor base */
+      background-image:
         radial-gradient(circle at top left, rgba(0,255,255,0.15), transparent 25%),
         radial-gradient(circle at bottom right, rgba(0,140,255,0.18), transparent 25%),
         linear-gradient(135deg, #050816, #0b1026, #060b18);
+      
       color:white;
       position:relative;
     }
@@ -51,15 +55,14 @@
       height:500px;
       background:rgba(0,255,255,0.08);
       filter:blur(120px);
-      -webkit-filter:blur(120px); /* Suporte essencial para iOS/Safari */
+      -webkit-filter:blur(120px);
       top:-120px;
       right:-120px;
       z-index:-1;
-      pointer-events: none; /* Evita que o brilho bloqueie cliques */
+      pointer-events: none; 
     }
 
     /* NAVBAR */
-
     .navbar{
       width:100%;
       padding:20px 40px;
@@ -70,12 +73,9 @@
       position:sticky;
       top:0;
       z-index:1000;
-
       background:rgba(5, 10, 25, 0.7);
-      
-      -webkit-backdrop-filter:blur(12px); /* Suporte essencial para iOS/Safari */
+      -webkit-backdrop-filter:blur(12px);
       backdrop-filter:blur(12px);
-
       border-bottom:1px solid rgba(0,255,255,0.2);
       box-shadow:0 0 20px rgba(0,255,255,0.08);
     }
@@ -86,25 +86,18 @@
       font-family:'Orbitron', sans-serif;
       font-size:0.95rem;
       letter-spacing:1px;
-
       padding:12px 20px;
       border-radius:12px;
-
       transition:0.3s ease;
-
       border:1px solid transparent;
-      white-space: nowrap; /* Evita quebras indesejadas no texto do menu */
+      white-space: nowrap; 
     }
 
     .navbar a:hover{
       color:#7df9ff;
       border:1px solid rgba(0,255,255,0.4);
-
       background:rgba(0,255,255,0.08);
-
-      box-shadow:
-        0 0 10px rgba(0,255,255,0.2),
-        0 0 20px rgba(0,255,255,0.1);
+      box-shadow: 0 0 10px rgba(0,255,255,0.2), 0 0 20px rgba(0,255,255,0.1);
     }
 
     .active{
@@ -132,14 +125,9 @@
       letter-spacing:8px;
       text-transform:uppercase;
       color:#7df9ff;
-
-      text-shadow:
-        0 0 10px #00f7ff,
-        0 0 25px #00f7ff,
-        0 0 50px #00f7ff;
-
+      text-shadow: 0 0 10px #00f7ff, 0 0 25px #00f7ff, 0 0 50px #00f7ff;
       animation:glow 3s infinite alternate;
-      word-break: break-word; /* Garante que o texto gigante não quebre a tela no celular */
+      word-break: break-word; 
     }
 
     .title p{
@@ -150,18 +138,8 @@
     }
 
     @keyframes glow{
-      from{
-        text-shadow:
-          0 0 10px #00f7ff,
-          0 0 25px #00f7ff;
-      }
-
-      to{
-        text-shadow:
-          0 0 20px #00f7ff,
-          0 0 40px #00f7ff,
-          0 0 80px #00f7ff;
-      }
+      from{ text-shadow: 0 0 10px #00f7ff, 0 0 25px #00f7ff; }
+      to{ text-shadow: 0 0 20px #00f7ff, 0 0 40px #00f7ff, 0 0 80px #00f7ff; }
     }
 
     .cards{
@@ -174,23 +152,14 @@
       position:relative;
       padding:35px;
       border-radius:24px;
-
       background:rgba(255,255,255,0.05);
-
       -webkit-backdrop-filter:blur(12px);
       backdrop-filter:blur(12px);
-
       border:1px solid rgba(0,255,255,0.2);
-
       overflow:hidden;
-
       transition:0.4s ease;
-
-      box-shadow:
-        0 0 15px rgba(0,255,255,0.08),
-        inset 0 0 20px rgba(255,255,255,0.03);
-        
-      display: block; /* Essencial para que os cards que são links funcionem direito */
+      box-shadow: 0 0 15px rgba(0,255,255,0.08), inset 0 0 20px rgba(255,255,255,0.03);
+      display: block; 
       text-decoration: none;
     }
 
@@ -209,12 +178,8 @@
 
     .card:hover{
       transform:translateY(-10px) scale(1.02);
-
       border-color:#00f7ff;
-
-      box-shadow:
-        0 0 20px rgba(0,255,255,0.25),
-        0 0 50px rgba(0,255,255,0.15);
+      box-shadow: 0 0 20px rgba(0,255,255,0.25), 0 0 50px rgba(0,255,255,0.15);
     }
 
     .card h2{
@@ -236,7 +201,6 @@
       margin-bottom: 20px;
     }
 
-    /* CÓDIGO CSS DO BOTÃO NEON QUE ESTAVA FALTANDO */
     .btn-neon {
       display: inline-block;
       color: white;
@@ -266,9 +230,14 @@
     /* ========================================= */
     @media(max-width:768px){
 
-      /* Desliga o brilho gigante no celular para evitar Tela Branca */
+      /* Força um fundo escuro limpo caso todos os efeitos falhem */
+      body {
+        background: #060b18 !important;
+      }
+
+      /* Remove o desfoque gigante no celular */
       body::after {
-        display: none; 
+        display: none !important; 
       }
 
       .navbar{
@@ -280,12 +249,15 @@
       .navbar a {
         font-size: 0.85rem;
         padding: 8px 12px;
-        flex: 1 1 calc(50% - 15px); /* Divide em 2 colunas no celular */
+        flex: 1 1 calc(50% - 15px);
         text-align: center;
       }
 
+      /* Desliga a animação para não bugar GPUs de celular */
       .title h1{
         font-size:2.5rem;
+        animation: none !important; 
+        text-shadow: 0 0 15px #00f7ff !important; 
       }
 
       .card{
@@ -303,12 +275,10 @@
 <body>
 
   <nav class="navbar">
-
   	<a href="main_page.html">Página Inicial</a>
   	<a href="fisica.html" class="active">Física</a>
   	<a href="geometria.html">Geometria</a>
   	<a href="matematica.html">Matemática</a>
-
   </nav>
 
   <div class="container">
@@ -329,9 +299,7 @@
 
       <div class="card">
         <h2>Listas de Exercícios</h2>
-        <p>
-          Novos conteúdos serão adicionados em breve.
-        </p>
+        <p>Novos conteúdos serão adicionados em breve.</p>
       </div>
 
 	    <a href="experimentos.html" class="card">
