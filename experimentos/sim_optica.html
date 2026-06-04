@@ -17,10 +17,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .tab{flex:1;font-family:'Orbitron',monospace;font-size:8px;letter-spacing:1px;padding:7px 3px;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--text);cursor:pointer;transition:.2s;text-transform:uppercase;}
 .tab:hover{background:rgba(188,19,254,0.15);border-color:var(--neon);color:#ffc2ff;}
 .tab.on{background:rgba(255,0,255,0.15);border-color:var(--pink);color:var(--pink);}
-.main-area{display:flex;gap:12px;margin-bottom:12px;}
-.cv-wrap{flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;}
-canvas{display:block;border-radius:8px;background:#06000f;cursor:default;}
-.info-col{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;}
+.main-area{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start;flex-wrap:wrap;}
+.cv-wrap{flex:1 1 360px;min-width:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;}
+canvas{display:block;width:100%;height:auto;border-radius:8px;background:#06000f;cursor:default;touch-action:none;}
+.info-col{flex:1 1 220px;min-width:200px;display:flex;flex-direction:column;gap:10px;}
 .panel{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px;}
 .pt{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;color:var(--neon);margin-bottom:9px;text-transform:uppercase;}
 .eq{background:rgba(0,0,0,.3);border:1px solid rgba(255,0,255,.2);border-radius:8px;padding:9px;text-align:center;margin-bottom:7px;}
@@ -49,13 +49,32 @@ input[type=range]{width:100%;accent-color:var(--neon);cursor:pointer;}
 .prose{font-size:10px;color:var(--text);line-height:1.8;}
 .prose b{color:var(--pink);}
 .prose span{color:var(--neon);}
+.topnav{margin-bottom:10px;}
+.back{display:inline-block;color:#e6c2ff;text-decoration:none;font-size:10px;font-family:'Orbitron',monospace;border:1px solid var(--border);padding:8px 13px;border-radius:9px;background:var(--card);letter-spacing:1px;transition:.2s;}
+.back:hover{border-color:var(--neon);color:#fff;background:rgba(188,19,254,0.18);}
+.explain{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 15px;margin-bottom:12px;}
+.explain h3{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;color:var(--neon);margin-bottom:9px;text-transform:uppercase;}
+.explain p{font-size:12.5px;color:var(--text);line-height:1.75;margin-bottom:8px;}
+.explain b{color:var(--pink);}
+.explain .formula{font-family:'Orbitron',monospace;color:#ffc2ff;background:rgba(0,0,0,.32);border:1px solid rgba(255,0,255,.22);border-radius:8px;padding:9px 10px;text-align:center;font-size:12.5px;margin:9px 0;letter-spacing:.5px;}
+.explain .ex{font-size:11.5px;color:rgba(216,150,255,.9);}
+.foot{text-align:center;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;color:var(--neon);padding:16px 0 4px;border-top:1px solid var(--border);margin-top:8px;}
+@media(max-width:560px){
+  body{padding:10px;}
+  .lab-title{font-size:15px;}
+  .cv-wrap,.info-col{flex-basis:100%;}
+  .tabs{flex-wrap:wrap;}
+  .tab{flex:1 1 30%;font-size:8px;padding:8px 3px;}
+  .cg{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
 <div class="app">
+  <div class="topnav"><a class="back" href="../experimentos.html">← Voltar aos experimentos</a></div>
   <h1 class="lab-title">ÓPTICA GEOMÉTRICA</h1>
   <p class="lab-sub">Simulador Interativo — Reflexão · Refração · Formação de Imagens</p>
-  <div class="info" id="info">Prof. Jardel A. Leite</div>	
+  
   <nav class="tabs">
     <button class="tab on"  id="t0" onclick="setMod('plane')">Espelho Plano</button>
     <button class="tab"     id="t1" onclick="setMod('spher')">Espelhos Esféricos</button>
@@ -68,6 +87,8 @@ input[type=range]{width:100%;accent-color:var(--neon);cursor:pointer;}
     <div class="info-col" id="infoPnl"></div>
   </div>
   <div class="ctrl-area" id="ctrlPnl"></div>
+  <div class="explain" id="explain"></div>
+  <footer class="foot">Prof. Jardel A. Leite</footer>
 </div>
 
 <script>
@@ -807,28 +828,19 @@ function cvCoords(e){
   return{mx:(e.clientX-r.left)*(CW/r.width), my:(e.clientY-r.top)*(CH/r.height)};
 }
 
-cv.addEventListener('mousedown',e=>{
-  const{mx,my}=cvCoords(e); const ay=CH/2;
-  if(active==='plane'){
-    const ox=CW/2-ST.plane.d;
-    if(Math.abs(mx-ox)<22&&my<ay+12) dragging=true;
-  }
-  if(active==='spher'){
-    const ox=(CW-80)-ST.spher.d;
-    if(Math.abs(mx-ox)<22&&my<ay+12) dragging=true;
-  }
-  if(active==='lens'){
-    const ox=CW/2-ST.lens.d;
-    if(Math.abs(mx-ox)<22&&my<ay+12) dragging=true;
-  }
+function ptCoords(cx,cy){
+  const r=cv.getBoundingClientRect();
+  return{mx:(cx-r.left)*(CW/r.width), my:(cy-r.top)*(CH/r.height)};
+}
+function dragStart(mx,my){
+  const ay=CH/2;
+  if(active==='plane'){const ox=CW/2-ST.plane.d; if(Math.abs(mx-ox)<26&&my<ay+14) dragging=true;}
+  if(active==='spher'){const ox=(CW-80)-ST.spher.d; if(Math.abs(mx-ox)<26&&my<ay+14) dragging=true;}
+  if(active==='lens'){const ox=CW/2-ST.lens.d; if(Math.abs(mx-ox)<26&&my<ay+14) dragging=true;}
   if(active==='refrac'&&my<ay-10) dragging=true;
-  if(dragging) cv.style.cursor='grabbing';
-});
-
-cv.addEventListener('mousemove',e=>{
-  if(!dragging) return;
-  const{mx,my}=cvCoords(e); const ay=CH/2;
-
+}
+function dragMove(mx,my){
+  if(!dragging) return; const ay=CH/2;
   if(active==='plane'){
     ST.plane.d=Math.max(50,Math.min(270,Math.round(CW/2-mx)));
     const el=document.getElementById('sPd');
@@ -851,10 +863,14 @@ cv.addEventListener('mousemove',e=>{
     if(el){el.value=ST.refrac.theta; document.getElementById('lRt').textContent=ST.refrac.theta+'°';}
   }
   render();
-});
-
+}
+cv.addEventListener('mousedown',e=>{const{mx,my}=ptCoords(e.clientX,e.clientY);dragStart(mx,my);if(dragging)cv.style.cursor='grabbing';});
+cv.addEventListener('mousemove',e=>{if(!dragging)return;const{mx,my}=ptCoords(e.clientX,e.clientY);dragMove(mx,my);});
 cv.addEventListener('mouseup',()=>{ dragging=false; cv.style.cursor='default'; });
 cv.addEventListener('mouseleave',()=>{ dragging=false; cv.style.cursor='default'; });
+cv.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;const t=e.touches[0];const{mx,my}=ptCoords(t.clientX,t.clientY);dragStart(mx,my);if(dragging)e.preventDefault();},{passive:false});
+cv.addEventListener('touchmove',e=>{if(!dragging||e.touches.length!==1)return;const t=e.touches[0];const{mx,my}=ptCoords(t.clientX,t.clientY);dragMove(mx,my);e.preventDefault();},{passive:false});
+cv.addEventListener('touchend',()=>{ dragging=false; });
 
 /* Hover cursor hint */
 cv.addEventListener('mousemove',e=>{
@@ -873,9 +889,36 @@ cv.addEventListener('mousemove',e=>{
 const MODS=['plane','spher','refrac','lens','instru'];
 let active='plane';
 
+const EXPLAIN={
+  plane:`<h3>Espelho Plano</h3>
+    <p>A imagem forma-se atrás do espelho, à <b>mesma distância</b> em que o objeto está à frente. Ela é <b>virtual</b> (não pode ser projetada numa tela), <b>direita</b> e do <b>mesmo tamanho</b> do objeto.</p>
+    <p>Há apenas a <b>inversão lateral</b> (esquerda↔direita) — por isso a palavra "AMBULÂNCIA" aparece espelhada nos veículos.</p>
+    <div class="formula">distância da imagem = distância do objeto · altura mantida</div>
+    <p class="ex">No dia a dia: espelho do banheiro, provador de roupas, retrovisor plano.</p>`,
+  spher:`<h3>Espelhos Esféricos</h3>
+    <p>No espelho <b>côncavo</b> os raios paralelos convergem para o foco; no <b>convexo</b> eles divergem (foco virtual). A distância focal vale <b>f = R/2</b> (metade do raio de curvatura).</p>
+    <div class="formula">1/f = 1/d₀ + 1/dᵢ &nbsp;&nbsp;|&nbsp;&nbsp; A = −dᵢ/d₀ = hᵢ/h₀</div>
+    <p>Convenção: imagem com <b>dᵢ &gt; 0</b> é <b>real e invertida</b> (forma-se à frente); <b>dᵢ &lt; 0</b> é <b>virtual e direita</b> (atrás do espelho). Arraste o objeto e observe a imagem passar de real para virtual ao cruzar o foco.</p>
+    <p class="ex">No dia a dia: espelho de maquiagem e farol (côncavo); espelho de segurança de loja e retrovisor convexo "objetos mais próximos do que parecem".</p>`,
+  refrac:`<h3>Refração da Luz</h3>
+    <p>Ao mudar de meio, a luz muda de velocidade e <b>desvia</b>. Quanto maior o índice de refração <b>n</b>, mais lenta a luz e maior o desvio. A relação é a <b>Lei de Snell-Descartes</b>:</p>
+    <div class="formula">n₁ · sen θ₁ = n₂ · sen θ₂</div>
+    <p>Indo de um meio mais refringente para um menos refringente, acima de um <b>ângulo limite</b> ocorre <b>reflexão total interna</b> — o princípio das fibras ópticas. Aumente θ₁ no controle e veja o raio refratado "deitar" até sumir.</p>
+    <p class="ex">No dia a dia: o canudo "quebrado" no copo d'água, miragens no asfalto quente, fibras ópticas e o brilho do diamante (n ≈ 2,42).</p>`,
+  lens:`<h3>Lentes Delgadas</h3>
+    <p>A lente <b>convergente</b> (mais grossa no centro) junta os raios no foco; a <b>divergente</b> (mais fina no centro) os espalha. Vale a equação de Gauss, idêntica à dos espelhos esféricos:</p>
+    <div class="formula">1/f = 1/d₀ + 1/dᵢ &nbsp;&nbsp;|&nbsp;&nbsp; A = −dᵢ/d₀</div>
+    <p>Com a convergente: objeto além do foco → imagem <b>real e invertida</b>; objeto entre foco e lente → imagem <b>virtual, direita e ampliada</b> (é a lupa!). A divergente sempre dá imagem virtual, direita e menor.</p>
+    <p class="ex">No dia a dia: óculos, lupa, câmera do celular, projetor, olho humano (o cristalino é uma lente convergente de foco variável).</p>`,
+  instru:`<h3>Instrumentos Ópticos</h3>
+    <p>Instrumentos combinam lentes e espelhos para ampliar ou registrar imagens. A <b>lupa</b> é uma única lente convergente usada dentro do foco. O <b>microscópio</b> usa duas lentes (objetiva + ocular) para grandes ampliações. A <b>luneta/telescópio</b> aproxima objetos distantes. A <b>câmera</b> projeta uma imagem real e reduzida sobre o sensor.</p>
+    <p>O <b>olho humano</b> ajusta o foco mudando a curvatura do cristalino (acomodação); a imagem forma-se <b>real e invertida</b> na retina — o cérebro a "desinverte".</p>
+    <p class="ex">No dia a dia: óculos corrigem miopia (lente divergente) e hipermetropia (convergente).</p>`
+};
 function setMod(id){
   active=id;
   MODS.forEach((m,i)=>document.getElementById('t'+i).classList.toggle('on',m===id));
+  document.getElementById('explain').innerHTML=EXPLAIN[id]||'';
   render();
 }
 
@@ -893,7 +936,7 @@ function render(){
 // ════════════════════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════════════════════
-render();
+setMod('plane');
 </script>
 </body>
 </html>
