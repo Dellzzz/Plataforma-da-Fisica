@@ -1,996 +1,308 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>Ondulatória — Simulador Interativo</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
 <style>
-:root{
-  --neon:#bc13fe;
-  --pink:#ff00ff;
-  --bg:#05010a;
-  --card:rgba(188,19,254,.07);
-  --border:rgba(188,19,254,.25);
-  --text:#d0c0d8;
-  --cyan:#00eeff;
-  --green:#44ff88;
-  --red:#ff5555;
-  --yellow:#ffee44;
-  --orange:#ff9933;
-}
+:root{--neon:#bc13fe;--pink:#ff00ff;--bg:#05010a;--card:rgba(188,19,254,.07);--border:rgba(188,19,254,.25);--text:#d0c0d8;--cyan:#00eeff;--green:#44ff88;--red:#ff5555;--yellow:#ffee44;--orange:#ff9933;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;}
+body{background:var(--bg);color:#fff;font-family:'Poppins',sans-serif;padding:12px;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at top,rgba(188,19,254,.15),transparent 55%);pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;max-width:1100px;margin:auto;}
+.back{display:inline-block;margin-bottom:10px;color:#e6c2ff;text-decoration:none;font-size:.78rem;font-family:'Orbitron',monospace;border:1px solid var(--border);padding:8px 13px;border-radius:10px;background:var(--card);letter-spacing:1px;transition:.2s;}
+.back:hover{border-color:var(--neon);color:#fff;background:rgba(188,19,254,.18);}
+.lab-title{font-family:'Orbitron',monospace;text-align:center;color:var(--neon);letter-spacing:3px;text-shadow:0 0 20px var(--neon);margin-bottom:6px;font-size:clamp(1.1rem,5vw,2rem);}
+.lab-sub{text-align:center;color:var(--text);font-size:clamp(.74rem,2.6vw,.85rem);margin-bottom:14px;}
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;justify-content:center;}
+.tab{flex:1 1 auto;white-space:nowrap;border:1px solid var(--border);padding:10px 12px;border-radius:10px;background:var(--card);color:var(--text);cursor:pointer;transition:.2s;font-family:'Orbitron',monospace;font-size:clamp(.6rem,2.6vw,.74rem);letter-spacing:.5px;}
+.tab:hover{border-color:var(--neon);color:#ffc2ff;}
+.tab.active{color:var(--pink);border-color:var(--pink);background:rgba(255,0,255,.12);}
 
-body{
-  background:var(--bg);
-  color:white;
-  font-family:'Poppins',sans-serif;
-  padding:14px;
-  overflow-x:hidden;
-}
+.layout{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;}
+.canvas-wrap{flex:1 1 420px;min-width:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px;}
+.cbox{position:relative;width:100%;aspect-ratio:720/430;border-radius:10px;overflow:hidden;background:#06000f;}
+canvas{display:block;width:100%;height:100%;touch-action:none;}
+.side{flex:1 1 230px;min-width:210px;display:flex;flex-direction:column;gap:12px;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;}
+.panel-title{color:var(--neon);font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;margin-bottom:10px;}
+.eq{padding:10px;border-radius:8px;background:rgba(0,0,0,.3);border:1px solid rgba(255,0,255,.2);text-align:center;}
+.eq-main{color:var(--pink);font-family:'Orbitron',monospace;margin-bottom:5px;font-size:.85rem;}
+#eqSub{font-size:.74rem;color:var(--text);}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.box{background:rgba(255,0,255,.05);border:1px solid rgba(255,0,255,.12);border-radius:8px;padding:8px 4px;text-align:center;}
+.box-label{font-size:.56rem;color:var(--text);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;}
+.box-value{font-family:'Orbitron',monospace;color:var(--pink);font-size:.95rem;}
+.box-unit{font-size:.5rem;color:var(--neon);}
 
-body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at top,
-    rgba(188,19,254,.15),
-    transparent 55%);
-  pointer-events:none;
-}
+.controls{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;}
+.ctitle{color:var(--neon);font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;}
+.slider-row{margin-bottom:2px;}
+.slider-label{display:flex;justify-content:space-between;margin-bottom:7px;font-size:.84rem;color:var(--text);}
+.slider-label b{color:var(--pink);font-family:'Orbitron',monospace;}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:7px;border-radius:8px;background:#3a1357;outline:none;touch-action:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink);cursor:pointer;}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border:none;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink);cursor:pointer;}
+.btn{font-family:'Orbitron',monospace;font-size:.66rem;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;letter-spacing:1px;transition:.2s;}
+.btn:hover{background:rgba(188,19,254,.2);border-color:var(--neon);color:#ffc2ff;}
 
-.app{
-  max-width:1100px;
-  margin:auto;
-}
+.explain{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px 16px;}
+.explain h3{font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;color:var(--neon);margin-bottom:9px;text-transform:uppercase;}
+.explain p{font-size:.84rem;color:var(--text);line-height:1.75;margin-bottom:8px;}
+.explain b{color:var(--pink);}
+.explain .formula{font-family:'Orbitron',monospace;color:#ffc2ff;background:rgba(0,0,0,.32);border:1px solid rgba(255,0,255,.22);border-radius:8px;padding:9px 10px;text-align:center;font-size:.82rem;margin:9px 0;}
+.explain .ex{font-size:.78rem;color:rgba(216,150,255,.9);}
+.foot{text-align:center;font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;color:var(--neon);padding:16px 0 4px;border-top:1px solid var(--border);margin-top:14px;}
 
-.lab-title{
-  font-family:'Orbitron',monospace;
-  text-align:center;
-  color:var(--neon);
-  letter-spacing:3px;
-  text-shadow:0 0 20px var(--neon);
-  margin-bottom:6px;
-}
-
-.lab-sub{
-  text-align:center;
-  color:var(--text);
-  font-size:12px;
-  margin-bottom:14px;
-}
-
-.tabs{
-  display:flex;
-  gap:6px;
-  margin-bottom:14px;
-}
-
-.tab{
-  flex:1;
-  border:none;
-  padding:10px;
-  border-radius:10px;
-  background:var(--card);
-  border:1px solid var(--border);
-  color:var(--text);
-  cursor:pointer;
-  transition:.2s;
-  font-family:'Orbitron',monospace;
-  font-size:11px;
-}
-
-.tab:hover{
-  border-color:var(--neon);
-}
-
-.tab.active{
-  color:var(--pink);
-  border-color:var(--pink);
-  background:rgba(255,0,255,.1);
-}
-
-.layout{
-  display:flex;
-  gap:14px;
-}
-
-.canvas-wrap{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:10px;
-}
-
-canvas{
-  display:block;
-  background:#06000f;
-  border-radius:10px;
-}
-
-.side{
-  width:280px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.panel{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:12px;
-}
-
-.panel-title{
-  color:var(--neon);
-  font-family:'Orbitron',monospace;
-  font-size:11px;
-  letter-spacing:2px;
-  margin-bottom:10px;
-}
-
-.eq{
-  padding:10px;
-  border-radius:8px;
-  background:rgba(0,0,0,.3);
-  border:1px solid rgba(255,0,255,.2);
-  text-align:center;
-  margin-bottom:10px;
-}
-
-.eq-main{
-  color:var(--pink);
-  font-family:'Orbitron',monospace;
-  margin-bottom:5px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-
-.box{
-  background:rgba(255,0,255,.05);
-  border:1px solid rgba(255,0,255,.12);
-  border-radius:8px;
-  padding:8px;
-  text-align:center;
-}
-
-.box-label{
-  font-size:9px;
-  color:var(--text);
-  margin-bottom:4px;
-}
-
-.box-value{
-  font-family:'Orbitron',monospace;
-  color:var(--pink);
-  font-size:14px;
-}
-
-.controls{
-  margin-top:14px;
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:14px;
-}
-
-.control-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-}
-
-.slider-row{
-  margin-bottom:8px;
-}
-
-.slider-label{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:4px;
-  font-size:11px;
-}
-
-.slider-label b{
-  color:var(--pink);
-}
-
-input[type=range]{
-  width:100%;
-  accent-color:var(--neon);
-}
-
-.note{
-  text-align:center;
-  margin-top:10px;
-  font-size:11px;
-  color:rgba(208,192,216,.8);
-}
-
-@media(max-width:980px){
-  .layout{
-    flex-direction:column;
-  }
-
-  .side{
-    width:100%;
-  }
-
-  canvas{
-    width:100%;
-    height:auto;
-  }
-
-  .control-grid{
-    grid-template-columns:1fr;
-  }
+@media(max-width:560px){
+  body{padding:10px;}
+  .canvas-wrap,.side{flex-basis:100%;}
+  .control-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
-
 <body>
-
 <div class="app">
+  <a class="back" href="../experimentos.html">← Voltar aos experimentos</a>
+  <h1 class="lab-title">ONDULATÓRIA</h1>
+  <p class="lab-sub">Simulador Interativo — Ondas · Superposição · Estacionárias · Interferência · Doppler</p>
 
-<h1 class="lab-title">ONDULATÓRIA</h1>
-<p class="lab-sub">
-Simulador Interativo — Ondas · Interferência · Doppler
-</p>
+  <div class="tabs">
+    <button class="tab active" data-tab="wave" onclick="setMode('wave',this)">ONDA</button>
+    <button class="tab" data-tab="super" onclick="setMode('super',this)">BATIMENTO</button>
+    <button class="tab" data-tab="stand" onclick="setMode('stand',this)">ESTACIONÁRIA</button>
+    <button class="tab" data-tab="interf" onclick="setMode('interf',this)">INTERFERÊNCIA</button>
+    <button class="tab" data-tab="doppler" onclick="setMode('doppler',this)">DOPPLER</button>
+  </div>
 
-<div class="tabs">
-  <button class="tab active" data-tab="wave">ONDA</button>
-  <button class="tab" data-tab="super">SUPERPOSIÇÃO</button>
-  <button class="tab" data-tab="stand">ESTACIONÁRIA</button>
-  <button class="tab" data-tab="interf">INTERFERÊNCIA</button>
-  <button class="tab" data-tab="doppler">DOPPLER</button>
-</div>
+  <div class="layout">
+    <div class="canvas-wrap"><div class="cbox"><canvas id="cv"></canvas></div></div>
+    <div class="side">
+      <div class="panel">
+        <div class="panel-title">EQUAÇÃO</div>
+        <div class="eq"><div class="eq-main" id="eqMain"></div><div id="eqSub"></div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">VALORES</div>
+        <div class="grid" id="values"></div>
+      </div>
+    </div>
+  </div>
 
-<div class="layout">
+  <div class="controls">
+    <div class="ctitle"><span id="ctrlTitle">CONTROLES</span><button class="btn" id="btnPause" onclick="togglePause()">⏸ Pausar</button></div>
+    <div class="control-grid" id="controls"></div>
+  </div>
 
-<div class="canvas-wrap">
-<canvas id="cv" width="700" height="430"></canvas>
-</div>
-
-<div class="side">
-
-<div class="panel">
-<div class="panel-title">EQUAÇÃO</div>
-
-<div class="eq">
-<div class="eq-main" id="eqMain">
-y(x,t)=A·sin(kx−ωt)
-</div>
-
-<div id="eqSub">
-Onda progressiva transversal
-</div>
-</div>
-
-</div>
-
-<div class="panel">
-
-<div class="panel-title">VALORES</div>
-
-<div class="grid">
-
-<div class="box">
-<div class="box-label">Amplitude</div>
-<div class="box-value" id="vA">60</div>
-</div>
-
-<div class="box">
-<div class="box-label">Frequência</div>
-<div class="box-value" id="vF">1.5</div>
-</div>
-
-<div class="box">
-<div class="box-label">λ</div>
-<div class="box-value" id="vL">160</div>
-</div>
-
-<div class="box">
-<div class="box-label">Velocidade</div>
-<div class="box-value" id="vV">240</div>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="controls">
-
-<div class="control-grid">
-
-<div class="slider-row">
-<div class="slider-label">
-Amplitude
-<b id="aLabel">60</b>
-</div>
-
-<input type="range" id="amp" min="10" max="120" value="60">
-</div>
-
-<div class="slider-row">
-<div class="slider-label">
-Frequência
-<b id="fLabel">1.5</b>
-</div>
-
-<input type="range" id="freq" min="0.3" max="5" step="0.1" value="1.5">
-</div>
-
-<div class="slider-row">
-<div class="slider-label">
-Velocidade
-<b id="vLabel">240</b>
-</div>
-
-<input type="range" id="vel" min="60" max="500" value="240">
-</div>
-
-</div>
-
-<div class="note">
-Espaço = Pausar animação
-</div>
-
-</div>
-
+  <div class="explain" id="explain"></div>
+  <footer class="foot">Prof. Jardel A. Leite</footer>
 </div>
 
 <script>
-const canvas = document.getElementById("cv");
-const ctx = canvas.getContext("2d");
+const DW=720, DH=430, TAU=Math.PI*2;
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+let SCALE=1;
+let mode='wave', paused=false, t=0, lastTs=0, ift=0;
 
-const W = canvas.width;
-const H = canvas.height;
-
-const TAU = Math.PI * 2;
-
-let paused = false;
-let time = 0;
-
-let active = "wave";
-
-const state = {
-
-wave:{
-  A:60,
-  f:1.5,
-  v:240
-},
-
-super:{
-  A1:50,
-  A2:50,
-  f1:2,
-  f2:2.2
-},
-
-stand:{
-  A:60,
-  n:2,
-  v:300
-},
-
-interf:{
-  lambda:60,
-  d:140
-},
-
-doppler:{
-  f0:2,
-  ratio:0.35,
-  vw:220,
-  sourceX:140,
-  dir:1,
-  waves:[]
-}
-
+const state={
+  wave:{A:60,f:1.5,v:240},
+  super:{A:45,f1:2.0,f2:2.4},
+  stand:{A:55,n:3},
+  interf:{lambda:70,d:130},
+  doppler:{f0:2.0,mach:0.5}
 };
 
-function glow(color, blur=14){
-  ctx.shadowColor = color;
-  ctx.shadowBlur = blur;
-}
+// specs de controles por modo
+const CTRL={
+  wave:[ {k:'A',lab:'Amplitude',min:10,max:120,step:1,u:'px'},
+         {k:'f',lab:'Frequência',min:0.3,max:5,step:0.1,u:'Hz'},
+         {k:'v',lab:'Velocidade',min:60,max:500,step:10,u:'px/s'} ],
+  super:[ {k:'A',lab:'Amplitude (cada)',min:10,max:70,step:1,u:'px'},
+          {k:'f1',lab:'Frequência f₁',min:1,max:6,step:0.1,u:'Hz'},
+          {k:'f2',lab:'Frequência f₂',min:1,max:6,step:0.1,u:'Hz'} ],
+  stand:[ {k:'n',lab:'Harmônico (n)',min:1,max:6,step:1,u:''},
+          {k:'A',lab:'Amplitude',min:15,max:70,step:1,u:'px'} ],
+  interf:[ {k:'lambda',lab:'Comprimento λ',min:30,max:120,step:2,u:'px'},
+           {k:'d',lab:'Separação das fontes',min:30,max:220,step:5,u:'px'} ],
+  doppler:[ {k:'f0',lab:'Frequência da fonte',min:0.8,max:4,step:0.1,u:'Hz'},
+            {k:'mach',lab:'Velocidade (Mach)',min:0,max:1.3,step:0.05,u:'·v'} ]
+};
+const EQ={
+  wave:['y(x,t) = A·sin(kx − ωt)','Onda progressiva transversal'],
+  super:['y = y₁ + y₂','Superposição → batimento se f₁≈f₂'],
+  stand:['y = 2A·sin(kx)·cos(ωt)','Onda estacionária (corda presa nas pontas)'],
+  interf:['d·senθ = m·λ','Duas fontes coerentes em fase'],
+  doppler:["f' = f / (1 ∓ v_f/v)",'Efeito Doppler (fonte em movimento)']
+};
+const EXPLAIN={
+  wave:`<h3>Onda Progressiva</h3>
+    <p>Uma onda transporta <b>energia</b>, não matéria: cada ponto do meio apenas <b>oscila</b> no lugar (veja a partícula destacada subir e descer) enquanto o padrão avança. Velocidade, frequência e comprimento de onda se ligam por:</p>
+    <div class="formula">v = λ · f &nbsp;&nbsp;|&nbsp;&nbsp; T = 1/f &nbsp;&nbsp;|&nbsp;&nbsp; k = 2π/λ</div>
+    <p>Aumente a <b>frequência</b> e veja λ diminuir (v fixa); aumente a <b>velocidade</b> e λ cresce. A faixa marcada na tela mostra <b>um comprimento de onda</b>.</p>
+    <p class="ex">No dia a dia: ondas no mar, som, luz, ondas numa corda de violão.</p>`,
+  super:`<h3>Superposição e Batimento</h3>
+    <p>Quando duas ondas se encontram, suas elongações se <b>somam</b> ponto a ponto (princípio da superposição). Se as frequências são próximas, a amplitude resultante <b>pulsa</b>: é o <b>batimento</b>.</p>
+    <div class="formula">f_batimento = |f₁ − f₂|</div>
+    <p>As curvas finas são as ondas componentes; a curva forte é a soma, e a linha tracejada é a <b>envoltória</b> do batimento. Deixe f₁ e f₂ quase iguais e ouça (mentalmente) o "vai e vem" do volume.</p>
+    <p class="ex">No dia a dia: afinação de instrumentos (o batimento some quando as cordas ficam iguais).</p>`,
+  stand:`<h3>Onda Estacionária</h3>
+    <p>Numa corda presa nas duas pontas, a onda que vai e a que volta se superpõem e formam pontos que <b>nunca se movem</b> (nós, em vermelho) e pontos de oscilação máxima (ventres, em ciano). Só "cabem" certos harmônicos:</p>
+    <div class="formula">λₙ = 2L / n &nbsp;&nbsp;|&nbsp;&nbsp; nós = n+1 &nbsp;·&nbsp; ventres = n</div>
+    <p>Mude o <b>harmônico n</b> e conte os nós e ventres. A linha tracejada mostra a envoltória (amplitude máxima de cada ponto).</p>
+    <p class="ex">No dia a dia: cordas de violão/violino, tubos de instrumentos de sopro.</p>`,
+  interf:`<h3>Interferência de Duas Fontes</h3>
+    <p>Duas fontes em fase emitem ondas que se cruzam. Onde as cristas se encontram, há reforço (<b>interferência construtiva</b>, claro); onde crista encontra vale, há anulação (<b>destrutiva</b>, escuro). As linhas claras radiais são as franjas construtivas.</p>
+    <div class="formula">construtiva: d·senθ = m·λ &nbsp;|&nbsp; destrutiva: d·senθ = (m+½)·λ</div>
+    <p>Aumente a <b>separação d</b> ou diminua <b>λ</b> e veja surgirem mais franjas (mais juntas). É o experimento da <b>dupla fenda</b> de Young.</p>
+    <p class="ex">No dia a dia: cores em bolhas de sabão e em CDs, padrões em alto-falantes.</p>`,
+  doppler:`<h3>Efeito Doppler</h3>
+    <p>Quando a fonte se move, as frentes de onda se <b>comprimem na frente</b> (frequência maior, som mais agudo) e se <b>esticam atrás</b> (frequência menor, som mais grave).</p>
+    <div class="formula">f' = f · v / (v ∓ v_fonte)</div>
+    <p>Aumente a velocidade até <b>Mach 1</b>: as frentes se acumulam e formam um <b>cone de choque</b> (a "barreira do som"). Acima disso, surge o cone supersônico.</p>
+    <p class="ex">No dia a dia: a sirene da ambulância que muda de tom ao passar; o radar de velocidade.</p>`
+};
 
-function clearGlow(){
-  ctx.shadowBlur = 0;
-}
+// ---------- responsivo ----------
+function resize(){ const r=cv.getBoundingClientRect(); const dpr=window.devicePixelRatio||1;
+  cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr);
+  SCALE=r.width/DW; ctx.setTransform(SCALE*dpr,0,0,SCALE*dpr,0,0); }
 
-function bg(){
+// ---------- helpers ----------
+function bg(){ ctx.fillStyle='#06000f'; ctx.fillRect(0,0,DW,DH);
+  ctx.strokeStyle='rgba(188,19,254,.06)';ctx.lineWidth=1;
+  for(let x=0;x<DW;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,DH);ctx.stroke();}
+  for(let y=0;y<DH;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(DW,y);ctx.stroke();} }
+function axis(y){ ctx.strokeStyle='rgba(188,19,254,.3)';ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(DW,y);ctx.stroke();ctx.setLineDash([]); }
+function glow(c,b){ctx.shadowColor=c;ctx.shadowBlur=b||14;} function ng(){ctx.shadowBlur=0;}
 
-  ctx.fillStyle = "#06000f";
-  ctx.fillRect(0,0,W,H);
-
-  ctx.strokeStyle = "rgba(188,19,254,.06)";
-  ctx.lineWidth = 1;
-
-  for(let x=0;x<W;x+=20){
-    ctx.beginPath();
-    ctx.moveTo(x,0);
-    ctx.lineTo(x,H);
-    ctx.stroke();
-  }
-
-  for(let y=0;y<H;y+=20){
-    ctx.beginPath();
-    ctx.moveTo(0,y);
-    ctx.lineTo(W,y);
-    ctx.stroke();
-  }
-
-}
-
-function axis(y){
-
-  ctx.strokeStyle = "rgba(188,19,254,.3)";
-  ctx.setLineDash([6,5]);
-
+// ---------- desenhos ----------
+function drawWave(){ bg(); const s=state.wave; const lambda=s.v/s.f, k=TAU/lambda, w=TAU*s.f, mid=DH/2; axis(mid);
+  // marca de um comprimento de onda
+  ctx.fillStyle='rgba(0,238,255,.08)';ctx.fillRect(60,40,lambda,DH-80);
+  ctx.strokeStyle='rgba(0,238,255,.5)';ctx.setLineDash([4,4]);ctx.strokeRect(60,40,lambda,DH-80);ctx.setLineDash([]);
+  ctx.fillStyle='#00eeff';ctx.font='12px Orbitron';ctx.textAlign='center';ctx.fillText('λ',60+lambda/2,34);
   ctx.beginPath();
-  ctx.moveTo(0,y);
-  ctx.lineTo(W,y);
-  ctx.stroke();
-
+  for(let x=0;x<=DW;x++){ const y=mid-s.A*Math.sin(k*x-w*t); if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y); }
+  ctx.lineWidth=3;ctx.strokeStyle='#00eeff';glow('#00eeff');ctx.stroke();ng();
+  // partícula que apenas oscila (mostra movimento transversal)
+  const px=150, py=mid-s.A*Math.sin(k*px-w*t);
+  ctx.strokeStyle='rgba(255,255,255,.25)';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(px,mid-s.A);ctx.lineTo(px,mid+s.A);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#ffee44';glow('#ffee44',12);ctx.beginPath();ctx.arc(px,py,7,0,TAU);ctx.fill();ng();
+  ctx.fillStyle='#ffee44';ctx.font='10px Poppins';ctx.fillText('oscila ↕',px,mid+s.A+18);
+  setVals({A:s.A.toFixed(0),f:s.f.toFixed(1),lambda:lambda.toFixed(0),T:(1/s.f).toFixed(2)});
+}
+function drawSuper(){ bg(); const s=state.super; const v=240, mid=DH/2; axis(mid);
+  const k1=TAU/(v/s.f1),w1=TAU*s.f1, k2=TAU/(v/s.f2),w2=TAU*s.f2;
+  const f=(x)=>s.A*Math.sin(k1*x-w1*t), g=(x)=>s.A*Math.sin(k2*x-w2*t);
+  // componentes
+  ctx.lineWidth=1.4;
+  ctx.strokeStyle='rgba(0,238,255,.45)';ctx.beginPath();for(let x=0;x<=DW;x++){const y=mid-f(x);x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();
+  ctx.strokeStyle='rgba(255,153,51,.45)';ctx.beginPath();for(let x=0;x<=DW;x++){const y=mid-g(x);x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();
+  // envoltória do batimento
+  const df=Math.abs(s.f1-s.f2), kd=Math.abs(k1-k2)/2, wd=Math.abs(w1-w2)/2;
+  ctx.strokeStyle='rgba(255,255,255,.35)';ctx.setLineDash([5,5]);ctx.lineWidth=1.2;
+  for(const sgn of [1,-1]){ctx.beginPath();for(let x=0;x<=DW;x++){const env=2*s.A*Math.abs(Math.cos(kd*x-wd*t));const y=mid-sgn*env;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();}
   ctx.setLineDash([]);
-
+  // resultante
+  ctx.lineWidth=3;ctx.strokeStyle='#ff00ff';glow('#ff00ff');ctx.beginPath();for(let x=0;x<=DW;x++){const y=mid-(f(x)+g(x));x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();ng();
+  setVals({'f₁':s.f1.toFixed(1),'f₂':s.f2.toFixed(1),'f bat':df.toFixed(2),'f méd':((s.f1+s.f2)/2).toFixed(2)});
 }
-
-function drawWave(){
-
-  bg();
-
-  const s = state.wave;
-
-  const lambda = s.v / s.f;
-
-  const k = TAU / lambda;
-
-  const omega = TAU * s.f;
-
-  const mid = H/2;
-
+function drawStand(){ bg(); const s=state.stand; const mL=40,L=DW-2*mL, mid=DH/2; const k=Math.PI*s.n/L, w=TAU*1.1;
   axis(mid);
-
-  ctx.beginPath();
-
-  for(let x=0;x<W;x++){
-
-    const y =
-      mid -
-      s.A *
-      Math.sin(k*x - omega*time);
-
-    if(x===0){
-      ctx.moveTo(x,y);
-    }else{
-      ctx.lineTo(x,y);
-    }
-
-  }
-
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = "#00eeff";
-
-  glow("#00eeff");
-
-  ctx.stroke();
-
-  clearGlow();
-
-  const px = 180;
-
-  const py =
-    mid -
-    s.A *
-    Math.sin(k*px - omega*time);
-
-  for(let i=6;i>=1;i--){
-
-    const alpha = i/6;
-
-    ctx.save();
-
-    ctx.globalAlpha = alpha * .25;
-
-    ctx.fillStyle = "#ff00ff";
-
-    ctx.beginPath();
-
-    ctx.arc(
-      px - i*10,
-      py,
-      10 - i,
-      0,
-      TAU
-    );
-
-    ctx.fill();
-
-    ctx.restore();
-  }
-
-  glow("#ff00ff");
-
-  ctx.fillStyle = "#ff00ff";
-
-  ctx.beginPath();
-  ctx.arc(px,py,8,0,TAU);
-  ctx.fill();
-
-  clearGlow();
-
-  document.getElementById("eqMain").textContent =
-    "y(x,t)=A·sin(kx−ωt)";
-
-  document.getElementById("eqSub").textContent =
-    "λ = " + lambda.toFixed(1);
-
-  document.getElementById("vA").textContent =
-    s.A;
-
-  document.getElementById("vF").textContent =
-    s.f;
-
-  document.getElementById("vL").textContent =
-    lambda.toFixed(0);
-
-  document.getElementById("vV").textContent =
-    s.v;
-
+  // paredes
+  ctx.fillStyle='rgba(188,19,254,.5)';ctx.fillRect(mL-6,mid-70,6,140);ctx.fillRect(mL+L,mid-70,6,140);
+  // envoltória
+  ctx.strokeStyle='rgba(255,255,255,.3)';ctx.setLineDash([5,5]);ctx.lineWidth=1.2;
+  for(const sgn of[1,-1]){ctx.beginPath();for(let i=0;i<=L;i++){const x=mL+i;const env=2*s.A*Math.sin(k*i);const y=mid-sgn*env;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();}
+  ctx.setLineDash([]);
+  // corda
+  ctx.lineWidth=3;ctx.strokeStyle='#00eeff';glow('#00eeff');ctx.beginPath();
+  for(let i=0;i<=L;i++){const x=mL+i;const y=mid-2*s.A*Math.sin(k*i)*Math.cos(w*t);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();ng();
+  // nós e ventres
+  for(let m=0;m<=s.n;m++){const x=mL+L*m/s.n;ctx.fillStyle='#ff5555';glow('#ff5555',8);ctx.beginPath();ctx.arc(x,mid,5,0,TAU);ctx.fill();ng();}
+  for(let m=0;m<s.n;m++){const x=mL+L*(m+0.5)/s.n;ctx.fillStyle='rgba(0,238,255,.6)';ctx.beginPath();ctx.arc(x,mid,3,0,TAU);ctx.fill();}
+  ctx.fillStyle='#ff5555';ctx.font='10px Poppins';ctx.textAlign='left';ctx.fillText('● nós',mL,mid+90);
+  ctx.fillStyle='#00eeff';ctx.fillText('● ventres',mL+70,mid+90);
+  setVals({n:s.n,'nós':s.n+1,ventres:s.n,'λₙ':(2*L/s.n).toFixed(0)});
 }
-
-function drawSuper(){
-
-  bg();
-
-  const s = state.super;
-
-  const mid1 = 120;
-  const mid2 = 220;
-  const mid3 = 330;
-
-  function plot(mid, amp, freq, color){
-
-    ctx.beginPath();
-
-    for(let x=0;x<W;x++){
-
-      const t =
-        time -
-        (1-x/W)*3;
-
-      const y =
-        mid -
-        amp*Math.sin(TAU*freq*t);
-
-      if(x===0){
-        ctx.moveTo(x,y);
-      }else{
-        ctx.lineTo(x,y);
-      }
-
-    }
-
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-
-    glow(color);
-
-    ctx.stroke();
-
-    clearGlow();
-  }
-
-  plot(mid1,s.A1,s.f1,"#ff5555");
-  plot(mid2,s.A2,s.f2,"#4488ff");
-
-  ctx.beginPath();
-
-  for(let x=0;x<W;x++){
-
-    const t =
-      time -
-      (1-x/W)*3;
-
-    const y =
-      mid3 -
-      (
-      s.A1*Math.sin(TAU*s.f1*t) +
-      s.A2*Math.sin(TAU*s.f2*t)
-      );
-
-    if(x===0){
-      ctx.moveTo(x,y);
-    }else{
-      ctx.lineTo(x,y);
-    }
-
-  }
-
-  ctx.strokeStyle = "#ffee44";
-  ctx.lineWidth = 3;
-
-  glow("#ffee44");
-
-  ctx.stroke();
-
-  clearGlow();
-
+function drawInterf(){ bg(); const s=state.interf; const cy=DH/2, sx1=120, sx2=120, sy1=cy-s.d/2, sy2=cy+s.d/2;
+  const cell=9; ift+=0.04;
+  for(let py=0;py<DH;py+=cell){ for(let px=140;px<DW;px+=cell){
+    const r1=Math.hypot(px-sx1,py-sy1), r2=Math.hypot(px-sx2,py-sy2);
+    const val=Math.cos(TAU*(r1/s.lambda-ift))+Math.cos(TAU*(r2/s.lambda-ift)); // -2..2
+    const a=(val+2)/4; // 0..1
+    ctx.fillStyle='rgba('+Math.round(40+a*40)+','+Math.round(120+a*135)+','+Math.round(150+a*105)+','+(0.18+a*0.7)+')';
+    ctx.fillRect(px,py,cell,cell);
+  }}
+  // fontes
+  [ [sx1,sy1],[sx2,sy2] ].forEach(([x,y])=>{ctx.fillStyle='#ff00ff';glow('#ff00ff',14);ctx.beginPath();ctx.arc(x,y,7,0,TAU);ctx.fill();ng();});
+  ctx.strokeStyle='rgba(255,255,255,.25)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(sx1,sy1);ctx.lineTo(sx2,sy2);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#fff';ctx.font='10px Poppins';ctx.textAlign='left';ctx.fillText('fontes em fase',sx1+12,(sy1+sy2)/2);
+  // nº de franjas construtivas ~ 2*d/λ
+  const fr=Math.floor(2*s.d/s.lambda)+1;
+  setVals({λ:s.lambda.toFixed(0),d:s.d.toFixed(0),franjas:fr,'d/λ':(s.d/s.lambda).toFixed(2)});
 }
-
-function drawStanding(){
-
-  bg();
-
-  const s = state.stand;
-
-  const mid = H/2;
-
-  const L = 520;
-
-  const startX = 90;
-
-  const omega =
-    TAU *
-    (
-      s.n *
-      s.v /
-      (2*L)
-    );
-
-  ctx.beginPath();
-
-  for(let x=0;x<=L;x++){
-
-    const y =
-      mid -
-      s.A *
-      Math.sin(
-        s.n*Math.PI*x/L
-      ) *
-      Math.cos(omega*time);
-
-    if(x===0){
-      ctx.moveTo(startX+x,y);
-    }else{
-      ctx.lineTo(startX+x,y);
-    }
-
+function drawDoppler(){ bg(); const s=state.doppler; const cy=DH/2, vw=150; const period=1/s.f0;
+  // posição da fonte (vai-e-volta na horizontal)
+  const span=DW-120, sp=s.mach*vw;
+  let sxRaw=60+((sp*t)%(span*2)); if(sxRaw>60+span) sxRaw=60+span*2-(sxRaw-60); const srcX=sxRaw, dir=((Math.floor((sp*t)/span))%2===0)?1:-1;
+  axis(cy);
+  // frentes de onda emitidas no passado
+  ctx.lineWidth=1.6;
+  for(let n=0;n<22;n++){ const te=t-n*period; if(te<0)break; const age=t-te; const rad=vw*age;
+    // posição da fonte no instante da emissão
+    let exRaw=60+((sp*te)%(span*2)); if(exRaw>60+span) exRaw=60+span*2-(exRaw-60);
+    ctx.strokeStyle='rgba(0,238,255,'+Math.max(0.05,0.6-age*0.12)+')';
+    ctx.beginPath();ctx.arc(exRaw,cy,rad,0,TAU);ctx.stroke();
   }
-
-  ctx.strokeStyle = "#ff00ff";
-  ctx.lineWidth = 3;
-
-  glow("#ff00ff");
-
-  ctx.stroke();
-
-  clearGlow();
-
+  // cone de choque se Mach>=1
+  if(s.mach>=1){ const ang=Math.asin(Math.min(1,1/s.mach)); ctx.strokeStyle='rgba(255,85,85,.8)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(srcX,cy);ctx.lineTo(srcX-Math.cos(ang)*400*dir,cy-Math.sin(ang)*400);ctx.moveTo(srcX,cy);ctx.lineTo(srcX-Math.cos(ang)*400*dir,cy+Math.sin(ang)*400);ctx.stroke(); }
+  // fonte
+  ctx.fillStyle='#ff00ff';glow('#ff00ff',16);ctx.beginPath();ctx.arc(srcX,cy,9,0,TAU);ctx.fill();ng();
+  arrowH(srcX,cy,dir);
+  const M=s.mach; const fa= M<1? (s.f0/(1-M)) : Infinity, fb=s.f0/(1+M);
+  setVals({Mach:M.toFixed(2),"f'frente":(M<1?fa.toFixed(2):'∞'),"f'trás":fb.toFixed(2),fonte:s.f0.toFixed(1)});
 }
+function arrowH(x,y,dir){ ctx.strokeStyle='#ffee44';ctx.fillStyle='#ffee44';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+22*dir,y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x+22*dir,y);ctx.lineTo(x+14*dir,y-5);ctx.lineTo(x+14*dir,y+5);ctx.closePath();ctx.fill(); }
 
-let interferenceCache = null;
+// ---------- valores ----------
+function setVals(obj){ const c=document.getElementById('values'); let h='';
+  for(const k in obj){ h+=`<div class="box"><div class="box-label">${k}</div><div class="box-value">${obj[k]}</div></div>`; }
+  c.innerHTML=h; }
 
-function buildInterference(){
+// ---------- loop ----------
+function frame(ts){ const dt=Math.min(0.05,((ts||0)-lastTs)/1000||0); lastTs=ts||0; if(!paused)t+=dt;
+  if(mode==='wave')drawWave(); else if(mode==='super')drawSuper(); else if(mode==='stand')drawStand();
+  else if(mode==='interf')drawInterf(); else drawDoppler();
+  requestAnimationFrame(frame); }
 
-  const img =
-    ctx.createImageData(W,H);
-
-  const data = img.data;
-
-  const s = state.interf;
-
-  const s1x = W/2 - s.d/2;
-  const s2x = W/2 + s.d/2;
-
-  const sy = H/2;
-
-  const k = TAU / s.lambda;
-
-  const step = 4;
-
-  for(let py=0;py<H;py+=step){
-
-    for(let px=0;px<W;px+=step){
-
-      const r1 =
-        Math.hypot(px-s1x,py-sy);
-
-      const r2 =
-        Math.hypot(px-s2x,py-sy);
-
-      const delta = r1-r2;
-
-      const I =
-        Math.cos(k*delta/2)**2;
-
-      const c =
-        Math.floor(I*255);
-
-      for(let yy=0;yy<step;yy++){
-
-        for(let xx=0;xx<step;xx++){
-
-          const p =
-            ((py+yy)*W + (px+xx))*4;
-
-          if(p >= data.length) continue;
-
-          data[p] = c;
-          data[p+1] = 20;
-          data[p+2] = 255;
-          data[p+3] = 255;
-
-        }
-
-      }
-
-    }
-
-  }
-
-  interferenceCache = img;
-
+// ---------- UI ----------
+function renderControls(){ const wrap=document.getElementById('controls'); const specs=CTRL[mode]; const st=state[mode]; let h='';
+  specs.forEach(sp=>{ h+=`<div class="slider-row"><div class="slider-label">${sp.lab} <b><span id="lbl_${sp.k}">${st[sp.k]}</span> ${sp.u}</b></div>
+    <input type="range" id="sl_${sp.k}" min="${sp.min}" max="${sp.max}" step="${sp.step}" value="${st[sp.k]}" oninput="onCtrl('${sp.k}',this.value)"></div>`; });
+  wrap.innerHTML=h; }
+function onCtrl(k,v){ v=+v; state[mode][k]=v; const l=document.getElementById('lbl_'+k); if(l)l.textContent=(Math.round(v*100)/100); }
+function setMode(m,btn){ mode=m; t=0; ift=0;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active')); if(btn)btn.classList.add('active');
+  document.getElementById('eqMain').textContent=EQ[m][0];
+  document.getElementById('eqSub').textContent=EQ[m][1];
+  document.getElementById('explain').innerHTML=EXPLAIN[m];
+  document.getElementById('ctrlTitle').textContent='CONTROLES — '+{wave:'Onda',super:'Batimento',stand:'Estacionária',interf:'Interferência',doppler:'Doppler'}[m];
+  renderControls();
 }
-
-function drawInterference(){
-
-  if(!interferenceCache){
-    buildInterference();
-  }
-
-  ctx.putImageData(
-    interferenceCache,
-    0,
-    0
-  );
-
-  const s = state.interf;
-
-  const s1x = W/2 - s.d/2;
-  const s2x = W/2 + s.d/2;
-
-  const sy = H/2;
-
-  function source(x){
-
-    glow("#ff00ff");
-
-    ctx.fillStyle = "#ff00ff";
-
-    ctx.beginPath();
-    ctx.arc(x,sy,8,0,TAU);
-    ctx.fill();
-
-    clearGlow();
-
-  }
-
-  source(s1x);
-  source(s2x);
-
-}
-
-function updateDoppler(dt){
-
-  const d = state.doppler;
-
-  const vs = d.vw * d.ratio;
-
-  d.sourceX += d.dir * vs * dt;
-
-  if(d.sourceX > W-90){
-    d.sourceX = W-90;
-    d.dir = -1;
-  }
-
-  if(d.sourceX < 90){
-    d.sourceX = 90;
-    d.dir = 1;
-  }
-
-  if(!d.lastEmit){
-    d.lastEmit = 0;
-  }
-
-  if(time - d.lastEmit >= 1/d.f0){
-
-    d.waves.push({
-      x:d.sourceX,
-      y:H/2,
-      t:time
-    });
-
-    d.lastEmit = time;
-
-  }
-
-  if(d.waves.length > 120){
-    d.waves.shift();
-  }
-
-}
-
-function drawDoppler(){
-
-  bg();
-
-  const d = state.doppler;
-
-  d.waves.forEach(w=>{
-
-    const r =
-      (time - w.t) *
-      d.vw;
-
-    ctx.beginPath();
-
-    ctx.arc(w.x,w.y,r,0,TAU);
-
-    ctx.strokeStyle =
-      "rgba(188,19,254,.5)";
-
-    ctx.lineWidth = 2;
-
-    ctx.stroke();
-
-  });
-
-  glow("#ff00ff");
-
-  ctx.fillStyle = "#ff00ff";
-
-  ctx.beginPath();
-  ctx.arc(d.sourceX,H/2,12,0,TAU);
-  ctx.fill();
-
-  clearGlow();
-
-}
-
-function render(){
-
-  switch(active){
-
-    case "wave":
-      drawWave();
-      break;
-
-    case "super":
-      drawSuper();
-      break;
-
-    case "stand":
-      drawStanding();
-      break;
-
-    case "interf":
-      drawInterference();
-      break;
-
-    case "doppler":
-      drawDoppler();
-      break;
-
-  }
-
-}
-
-let last = 0;
-
-function loop(ts){
-
-  const dt =
-    Math.min(
-      (ts-last)/1000,
-      .03
-    );
-
-  last = ts;
-
-  if(!paused){
-
-    time += dt;
-
-    if(active==="doppler"){
-      updateDoppler(dt);
-    }
-
-  }
-
-  render();
-
-  requestAnimationFrame(loop);
-
-}
-
-requestAnimationFrame(loop);
-
-document.addEventListener("keydown",e=>{
-
-  if(e.code==="Space"){
-
-    e.preventDefault();
-
-    paused = !paused;
-
-  }
-
-});
-
-document.querySelectorAll(".tab")
-.forEach(btn=>{
-
-  btn.addEventListener("click",()=>{
-
-    document
-    .querySelectorAll(".tab")
-    .forEach(t=>t.classList.remove("active"));
-
-    btn.classList.add("active");
-
-    active = btn.dataset.tab;
-
-  });
-
-});
-
-const amp =
-  document.getElementById("amp");
-
-const freq =
-  document.getElementById("freq");
-
-const vel =
-  document.getElementById("vel");
-
-amp.addEventListener("input",()=>{
-
-  state.wave.A = +amp.value;
-
-  document.getElementById("aLabel")
-  .textContent = amp.value;
-
-});
-
-freq.addEventListener("input",()=>{
-
-  state.wave.f = +freq.value;
-
-  document.getElementById("fLabel")
-  .textContent = freq.value;
-
-});
-
-vel.addEventListener("input",()=>{
-
-  state.wave.v = +vel.value;
-
-  document.getElementById("vLabel")
-  .textContent = vel.value;
-
-});
-
+function togglePause(){ paused=!paused; document.getElementById('btnPause').textContent=paused?'▶ Continuar':'⏸ Pausar'; }
+window.addEventListener('keydown',e=>{ if(e.code==='Space'){e.preventDefault();togglePause();} });
+
+new ResizeObserver(resize).observe(document.querySelector('.cbox'));
+window.addEventListener('resize',resize);
+resize(); setMode('wave',document.querySelector('.tab')); requestAnimationFrame(frame);
 </script>
-
 </body>
 </html>
