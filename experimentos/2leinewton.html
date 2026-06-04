@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>2ª Lei de Newton</title>
+<title>2ª Lei de Newton &amp; Máquinas Simples</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 :root{ --neon:#d58cff; --border:rgba(255,255,255,0.12); }
@@ -17,21 +17,33 @@ body::before{ content:""; position:fixed; inset:0; z-index:0; background:linear-
 .back:hover{ color:#fff; border-color:var(--neon); }
 
 header{ position:relative; z-index:1; text-align:center; padding:12px 16px 2px; }
-header h1{ font-family:'Orbitron',sans-serif; font-size:clamp(1.45rem,5vw,2.6rem); color:var(--neon); text-shadow:0 0 10px #c94fff,0 0 25px #7a00ff; letter-spacing:1px; }
+header h1{ font-family:'Orbitron',sans-serif; font-size:clamp(1.4rem,5vw,2.5rem); color:var(--neon); text-shadow:0 0 10px #c94fff,0 0 25px #7a00ff; letter-spacing:1px; }
 header p{ margin-top:6px; color:#cbb8e0; font-size:clamp(.8rem,2.3vw,1rem); }
 header .info{ margin-top:4px; color:#9b86bd; font-size:.74rem; }
+
+.tabs{ position:relative; z-index:3; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:1400px; margin:12px auto 0; padding:0 16px; }
+.tabs button{ flex:0 1 auto; padding:10px 16px; border:1px solid var(--border); border-radius:999px; background:rgba(255,255,255,0.05); color:#d9c7f2; font-family:'Orbitron',sans-serif; font-size:.82rem; font-weight:700; letter-spacing:.4px; cursor:pointer; transition:.2s; box-shadow:none; }
+.tabs button:hover{ border-color:var(--neon); color:#fff; }
+.tabs button.on{ background:linear-gradient(135deg,#e175ff,#7f2cff); color:#fff; border-color:transparent; box-shadow:0 0 16px rgba(202,77,255,.55); }
+
+.sim-view{ display:none; }
+.sim-view.active{ display:block; }
 
 .container{ position:relative; z-index:1; width:100%; max-width:1400px; margin:auto; display:grid; grid-template-columns:330px 1fr; gap:18px; padding:16px; align-items:start; }
 .panel,.simulation{ background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:18px; backdrop-filter:blur(11px); box-shadow:0 0 20px rgba(190,0,255,0.2); }
 .panel{ padding:16px; }
-.panel h2{ font-family:'Orbitron',sans-serif; font-size:1rem; color:var(--neon); margin-bottom:14px; letter-spacing:.5px; }
+.panel h2{ font-family:'Orbitron',sans-serif; font-size:1rem; color:var(--neon); margin-bottom:12px; letter-spacing:.5px; }
+.sub{ font-size:.7rem; letter-spacing:.5px; text-transform:uppercase; color:#9b86bd; margin:12px 0 6px; }
 
-.control{ margin-bottom:14px; }
-.control label{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:7px; font-size:.85rem; font-weight:600; }
+.control{ margin-bottom:12px; }
+.control label{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:6px; font-size:.84rem; font-weight:600; }
 .control label b{ color:#ffb9ff; font-family:'Orbitron',monospace; font-weight:700; }
 .control input[type=range]{ width:100%; -webkit-appearance:none; appearance:none; height:6px; border-radius:8px; background:#4a1664; outline:none; }
 .control input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:19px; height:19px; border-radius:50%; background:#f08cff; box-shadow:0 0 10px #d84dff; cursor:pointer; }
 .control input[type=range]::-moz-range-thumb{ width:19px; height:19px; border:none; border-radius:50%; background:#f08cff; box-shadow:0 0 10px #d84dff; cursor:pointer; }
+.load input::-webkit-slider-thumb{ background:#ff8c42; } .load input::-moz-range-thumb{ background:#ff8c42; }
+.effort input::-webkit-slider-thumb{ background:#44d6ff; } .effort input::-moz-range-thumb{ background:#44d6ff; }
+
 select,.numinput{ width:100%; padding:10px; border:none; border-radius:10px; background:#2d0b45; color:#fff; font-family:'Poppins',sans-serif; font-size:.88rem; }
 
 .btn-row{ display:flex; gap:10px; margin-top:4px; }
@@ -39,6 +51,14 @@ button{ flex:1; padding:11px; border:none; border-radius:11px; cursor:pointer; b
 button:active{ transform:translateY(1px); }
 button:hover{ box-shadow:0 0 16px #ca4dff; }
 button.sec{ background:linear-gradient(135deg,#5a3a7a,#3a2050); }
+
+.presets{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:4px; }
+.presets button{ flex:1 1 auto; padding:8px 9px; border:1px solid var(--border); border-radius:9px; background:rgba(213,140,255,0.1); color:#eadcff; font-size:.74rem; font-weight:600; box-shadow:none; }
+.presets button:hover{ background:rgba(213,140,255,0.24); box-shadow:none; }
+
+.seg{ display:flex; gap:8px; }
+.seg button{ flex:1; padding:10px 8px; border:1px solid var(--border); border-radius:11px; background:rgba(255,255,255,0.04); color:#d9c7f2; font-size:.78rem; font-weight:600; line-height:1.25; box-shadow:none; }
+.seg button.on{ background:linear-gradient(135deg,#e175ff,#7f2cff); color:#fff; border-color:transparent; box-shadow:0 0 14px rgba(202,77,255,.5); }
 
 .results{ margin-top:16px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:14px; padding:14px; }
 .results .row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
@@ -49,26 +69,51 @@ button.sec{ background:linear-gradient(135deg,#5a3a7a,#3a2050); }
 .challenge h3{ font-family:'Orbitron',sans-serif; color:var(--neon); font-size:.82rem; margin-bottom:8px; letter-spacing:.5px; }
 #challengeResult{ font-weight:700; }
 
-.simulation{ position:relative; overflow:hidden; width:100%; aspect-ratio:1000/650; max-height:74vh; }
+.readout{ margin-top:14px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:14px; padding:13px; }
+.readout .row{ display:grid; grid-template-columns:1fr 1fr; gap:8px 10px; }
+.readout .cell{ text-align:center; }
+.readout small{ display:block; color:#bda7d6; font-size:.62rem; letter-spacing:.3px; text-transform:uppercase; }
+.readout b{ font-family:'Orbitron',monospace; font-size:.95rem; }
+.tauL{ color:#ff8c42 !important; } .tauR{ color:#44d6ff !important; }
+.cPx{ color:#ff5ef2 !important; } .cPy{ color:#7dff66 !important; } .cN{ color:#7dff66 !important; } .cAt{ color:#ffd166 !important; }
+.cP{ color:#ff8c42 !important; } .cF{ color:#44d6ff !important; }
+#status{ margin-top:11px; text-align:center; font-family:'Orbitron',sans-serif; font-size:.9rem; font-weight:700; }
+#application{ margin-top:9px; font-size:.8rem; line-height:1.5; color:#d7c7ee; background:rgba(124,80,170,0.18); border-radius:10px; padding:9px 11px; }
+
+.simulation{ position:relative; overflow:hidden; width:100%; max-height:74vh; }
+#view-newton .simulation{ aspect-ratio:1000/650; }
+#view-alavanca .simulation{ aspect-ratio:1000/600; }
+#view-plano .simulation{ aspect-ratio:1000/600; }
+#view-polias .simulation{ aspect-ratio:1000/640; }
 canvas{ width:100%; height:100%; display:block; }
 
 @media(max-width:900px){
   .container{ grid-template-columns:1fr; gap:12px; padding:11px; }
   .simulation{ order:1; }
   .panel{ order:2; padding:13px; }
-  .control{ margin-bottom:11px; }
   header{ padding:8px 14px 2px; }
+  .tabs{ margin-top:10px; }
+  .tabs button{ padding:8px 12px; font-size:.74rem; }
 }
+
 </style>
 </head>
 <body>
 <a class="back" href="../experimentos.html">← Voltar aos experimentos</a>
 <header>
-  <h1>2ª Lei de Newton</h1>
-  <p>Explore força, atrito, massa e aceleração.</p>
+  <h1>Mecânica Interativa</h1>
+  <p>2ª Lei de Newton e as máquinas simples — escolha uma simulação.</p>
   <div class="info">Prof. Jardel A. Leite</div>
 </header>
 
+<div class="tabs">
+  <button data-sim="newton">2ª Lei de Newton</button>
+  <button data-sim="alavanca">Alavanca</button>
+  <button data-sim="plano">Plano Inclinado</button>
+  <button data-sim="polias">Polias</button>
+</div>
+
+<div class="sim-view" id="view-newton">
 <div class="container">
   <div class="panel">
     <h2>Controles</h2>
@@ -78,8 +123,8 @@ canvas{ width:100%; height:100%; display:block; }
     <div class="control"><label>Força aplicada <b><span id="forceValue">50</span> N</b></label><input type="range" id="force" min="0" max="300" value="50"></div>
     <div class="control"><label>Atrito (μ) <b><span id="frictionValue">0.2</span></b></label><input type="range" id="friction" min="0" max="1" step="0.01" value="0.2"></div>
     <div class="btn-row">
-      <button onclick="startSimulation()">▶ Iniciar</button>
-      <button class="sec" onclick="resetSimulation()">↺ Resetar</button>
+      <button onclick="SIMS.newton.ui.start()">▶ Iniciar</button>
+      <button class="sec" onclick="SIMS.newton.ui.reset()">↺ Resetar</button>
     </div>
 
     <div class="results">
@@ -91,7 +136,7 @@ canvas{ width:100%; height:100%; display:block; }
       <div class="challenge">
         <h3>Modo Desafio</h3>
         <div class="control"><label>Sua previsão da aceleração</label><input type="number" id="guessInput" class="numinput" placeholder="Digite em m/s²"></div>
-        <button onclick="checkAnswer()">Verificar resposta</button>
+        <button onclick="SIMS.newton.ui.check()">Verificar resposta</button>
         <p style="margin-top:10px;font-size:.88rem">Resultado: <span id="challengeResult">—</span></p>
       </div>
     </div>
@@ -99,29 +144,145 @@ canvas{ width:100%; height:100%; display:block; }
 
   <div class="simulation"><canvas id="canvas"></canvas></div>
 </div>
+</div>
+
+<div class="sim-view" id="view-alavanca">
+<div class="container">
+  <div class="panel">
+    <h2>Controles</h2>
+
+    <div class="sub">Carga (resistência) — lado esquerdo</div>
+    <div class="control load"><label>Peso da carga <b><span id="loadFVal">100</span> N</b></label><input type="range" id="loadF" min="10" max="300" value="100"></div>
+    <div class="control load"><label>Braço da carga <b><span id="loadDVal">1.0</span> m</b></label><input type="range" id="loadD" min="0.5" max="5" step="0.1" value="1"></div>
+
+    <div class="sub">Esforço (potência) — lado direito</div>
+    <div class="control effort"><label>Força do esforço <b><span id="effFVal">50</span> N</b></label><input type="range" id="effF" min="0" max="300" value="50"></div>
+    <div class="control effort"><label>Braço do esforço <b><span id="effDVal">2.0</span> m</b></label><input type="range" id="effD" min="0.5" max="5" step="0.1" value="2"></div>
+
+    <div class="sub">Aplicações</div>
+    <div class="presets">
+      <button onclick="SIMS.alavanca.ui.preset('eq')">Gangorra (equilíbrio)</button>
+      <button onclick="SIMS.alavanca.ui.preset('mech')">Multiplica força</button>
+      <button onclick="SIMS.alavanca.ui.preset('speed')">Multiplica velocidade</button>
+    </div>
+
+    <div class="readout">
+      <div class="row">
+        <div class="cell"><small>Torque da carga</small><b id="tauL" class="tauL">100 N·m</b></div>
+        <div class="cell"><small>Torque do esforço</small><b id="tauR" class="tauR">100 N·m</b></div>
+        <div class="cell"><small>Esforço p/ equilibrar</small><b id="effNeed">50 N</b></div>
+        <div class="cell"><small>Vantagem mecânica</small><b id="adv">2.0×</b></div>
+      </div>
+      <div id="status">Equilíbrio</div>
+      <div id="application"></div>
+    </div>
+  </div>
+
+  <div class="simulation"><canvas id="canvas"></canvas></div>
+</div>
+</div>
+
+<div class="sim-view" id="view-plano">
+<div class="container">
+  <div class="panel">
+    <h2>Controles</h2>
+
+    <div class="control"><label>Ângulo da rampa <b><span id="angVal">30</span>°</b></label><input type="range" id="ang" min="0" max="60" value="30"></div>
+    <div class="control"><label>Massa do bloco <b><span id="massVal">5</span> kg</b></label><input type="range" id="mass" min="1" max="20" value="5"></div>
+    <div class="control"><label>Coef. de atrito (μ) <b><span id="muVal">0.20</span></b></label><input type="range" id="mu" min="0" max="1" step="0.01" value="0.2"></div>
+
+    <div class="sub">Exemplos</div>
+    <div class="presets">
+      <button onclick="SIMS.plano.ui.preset('liso')">Rampa lisa</button>
+      <button onclick="SIMS.plano.ui.preset('iminente')">No limiar</button>
+      <button onclick="SIMS.plano.ui.preset('parado')">Bloco parado</button>
+    </div>
+
+    <div class="btn-row">
+      <button class="act" onclick="SIMS.plano.ui.run()" id="runBtn">▶ Soltar</button>
+      <button class="act sec" onclick="SIMS.plano.ui.reset()">↺ Resetar</button>
+    </div>
+
+    <div class="readout">
+      <div class="row">
+        <div class="cell"><small>P·sen θ (desce)</small><b id="px" class="cPx">25 N</b></div>
+        <div class="cell"><small>P·cos θ</small><b id="py" class="cPy">42 N</b></div>
+        <div class="cell"><small>Normal (N)</small><b id="nrm" class="cN">42 N</b></div>
+        <div class="cell"><small>Atrito máx.</small><b id="fat" class="cAt">8 N</b></div>
+        <div class="cell"><small>Aceleração</small><b id="acc">3.3 m/s²</b></div>
+        <div class="cell"><small>Velocidade</small><b id="vel">0.0 m/s</b></div>
+      </div>
+      <div id="status">—</div>
+      <div id="application"></div>
+    </div>
+  </div>
+
+  <div class="simulation"><canvas id="canvas"></canvas></div>
+</div>
+</div>
+
+<div class="sim-view" id="view-polias">
+<div class="container">
+  <div class="panel">
+    <h2>Controles</h2>
+
+    <div class="sub">Tipo de sistema</div>
+    <div class="seg">
+      <button id="btnFixa" class="on" onclick="SIMS.polias.ui.mode('fixa')">Polia fixa<br>(F = P)</button>
+      <button id="btnMovel" onclick="SIMS.polias.ui.mode('movel')">Fixa + móvel<br>(F = P/2)</button>
+    </div>
+
+    <div class="sub" style="margin-top:14px">Carga</div>
+    <div class="control"><label>Peso da carga <b><span id="loadVal">200</span> N</b></label><input type="range" id="load" min="20" max="500" value="200" step="10"></div>
+
+    <div class="btn-row">
+      <button class="act" onclick="SIMS.polias.ui.run()" id="runBtn">▶ Puxar</button>
+      <button class="act sec" onclick="SIMS.polias.ui.reset()">↺ Resetar</button>
+    </div>
+
+    <div class="readout">
+      <div class="row">
+        <div class="cell"><small>Peso da carga (P)</small><b id="oP" class="cP">200 N</b></div>
+        <div class="cell"><small>Esforço (F)</small><b id="oF" class="cF">200 N</b></div>
+        <div class="cell"><small>Vantagem mecânica</small><b id="oVM">1×</b></div>
+        <div class="cell"><small>Corda puxada p/ subir 1 m</small><b id="oS">1,0 m</b></div>
+      </div>
+      <div id="application"></div>
+    </div>
+  </div>
+
+  <div class="simulation"><canvas id="canvas"></canvas></div>
+</div>
+</div>
 
 <script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const sim = document.querySelector(".simulation");
+const SIMS = {};
+
+(function(){
+const root=document.getElementById('view-newton');
+const sim=root.querySelector('.simulation');
+const canvas=root.querySelector('canvas');
+const ctx=canvas.getContext('2d');
+const els=id=>root.querySelector('#'+id);
+
 const G = 9.8;
 const DW = 1000, DH = 650;   // espaço de projeto fixo (mapeado p/ a tela)
 
-const blocksInput = document.getElementById("blocks");
-const mass1Input = document.getElementById("mass1");
-const mass2Input = document.getElementById("mass2");
-const forceInput = document.getElementById("force");
-const frictionInput = document.getElementById("friction");
-const mass1Value = document.getElementById("mass1Value");
-const mass2Value = document.getElementById("mass2Value");
-const forceValue = document.getElementById("forceValue");
-const frictionValue = document.getElementById("frictionValue");
+const blocksInput = els("blocks");
+const mass1Input = els("mass1");
+const mass2Input = els("mass2");
+const forceInput = els("force");
+const frictionInput = els("friction");
+const mass1Value = els("mass1Value");
+const mass2Value = els("mass2Value");
+const forceValue = els("forceValue");
+const frictionValue = els("frictionValue");
 
 mass1Input.oninput = () => { mass1Value.textContent = mass1Input.value; if(!running) drawScene(); };
 mass2Input.oninput = () => { mass2Value.textContent = mass2Input.value; if(!running) drawScene(); };
 forceInput.oninput = () => { forceValue.textContent = forceInput.value; if(!running) drawScene(); };
 frictionInput.oninput = () => { frictionValue.textContent = (+frictionInput.value).toFixed(2); if(!running) drawScene(); };
-blocksInput.onchange = () => { document.getElementById("block2Control").style.display = (blocksInput.value === "2") ? "block" : "none"; if(!running) drawScene(); };
+blocksInput.onchange = () => { els("block2Control").style.display = (blocksInput.value === "2") ? "block" : "none"; if(!running) drawScene(); };
 
 let position = 120, velocity = 0, animationId = null, running = false;
 let particles = [];
@@ -207,19 +368,19 @@ function drawParticles(){ for(const p of particles){ ctx.globalAlpha = Math.max(
 
 function startSimulation(){ cancelAnimationFrame(animationId); running = true; animate(); }
 function resetSimulation(){ cancelAnimationFrame(animationId); running = false; position = 120; velocity = 0; particles = []; drawScene();
-  document.getElementById("netForce").textContent = "0 N";
-  document.getElementById("acceleration").textContent = "0 m/s²";
-  document.getElementById("massResult").textContent = totalMass().toFixed(1) + " kg"; }
+  els("netForce").textContent = "0 N";
+  els("acceleration").textContent = "0 m/s²";
+  els("massResult").textContent = totalMass().toFixed(1) + " kg"; }
 
 function checkAnswer(){
-  const guess = parseFloat(document.getElementById("guessInput").value);
+  const guess = parseFloat(els("guessInput").value);
   const force = parseFloat(forceInput.value);
   const friction = parseFloat(frictionInput.value);
   const fAt = friction * totalMass() * G;
   let net = Math.max(0, force - fAt);
   const realA = net / totalMass();
   const diff = Math.abs(guess - realA);
-  const res = document.getElementById("challengeResult");
+  const res = els("challengeResult");
   if(isNaN(guess)){ res.textContent = "Digite um valor"; res.style.color = "#ffe066"; return; }
   if(diff < 0.3){ res.textContent = "✅ Excelente previsão!"; res.style.color = "#7dff66"; }
   else if(diff < 1){ res.textContent = "⚡ Quase lá!"; res.style.color = "#ffe066"; }
@@ -242,9 +403,9 @@ function animate(){
   if(velocity > 0.1) spawnDust(position - 8, 458);
   updateParticles(); drawParticles();
 
-  document.getElementById("netForce").textContent = net.toFixed(1) + " N";
-  document.getElementById("acceleration").textContent = acc.toFixed(2) + " m/s²";
-  document.getElementById("massResult").textContent = m.toFixed(1) + " kg";
+  els("netForce").textContent = net.toFixed(1) + " N";
+  els("acceleration").textContent = acc.toFixed(2) + " m/s²";
+  els("massResult").textContent = m.toFixed(1) + " kg";
 
   animationId = requestAnimationFrame(animate);
 }
@@ -252,6 +413,512 @@ function animate(){
 new ResizeObserver(resize).observe(sim);
 window.addEventListener("resize", resize);
 resize();
+
+function activate(){ resize(); }
+function deactivate(){ running=false; if(animationId) cancelAnimationFrame(animationId); }
+SIMS.newton={activate,deactivate,ui:{start:startSimulation,reset:resetSimulation,check:checkAnswer}};
+})();
+
+(function(){
+const root=document.getElementById('view-alavanca');
+const sim=root.querySelector('.simulation');
+const canvas=root.querySelector('canvas');
+const ctx=canvas.getContext('2d');
+let active=false;
+
+const DW = 1000, DH = 600;
+const PIVX = 500, PIVY = 300, SCALE = 78;   // px por metro no braço
+const BEAM_HALF = 5 * SCALE;                 // até 5 m para cada lado
+
+const els=id=>root.querySelector('#'+id);
+const loadF=els("loadF"), loadD=els("loadD"), effF=els("effF"), effD=els("effD");
+let theta = 0;        // inclinação atual (rad, horário positivo)
+
+function vals(){ return { PL:+loadF.value, dL:+loadD.value, FR:+effF.value, dR:+effD.value }; }
+
+function resize(){
+  const r = sim.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.round(r.width*dpr));
+  canvas.height = Math.max(1, Math.round(r.height*dpr));
+  const s = Math.min(r.width/DW, r.height/DH);
+  const ox = (r.width - DW*s)/2, oy = (r.height - DH*s)/2;
+  ctx.setTransform(dpr*s, 0, 0, dpr*s, dpr*ox, dpr*oy);
+}
+
+function rot(d){ // ponto no braço (metros, +direita) -> coordenada de tela girada
+  const px = d*SCALE;
+  return { x: PIVX + px*Math.cos(theta), y: PIVY + px*Math.sin(theta) };
+}
+
+function drawArrowV(x, yTop, len, color, label){ // seta vertical (para baixo se len>0)
+  const y2 = yTop + len;
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=4; ctx.shadowBlur=10; ctx.shadowColor=color;
+  ctx.beginPath(); ctx.moveTo(x,yTop); ctx.lineTo(x,y2); ctx.stroke();
+  const dir = len>0?1:-1;
+  ctx.beginPath(); ctx.moveTo(x,y2); ctx.lineTo(x-7,y2-9*dir); ctx.lineTo(x+7,y2-9*dir); ctx.closePath(); ctx.fill();
+  ctx.shadowBlur=0; ctx.font="bold 15px Orbitron"; ctx.fillStyle="#fff"; ctx.textAlign="center";
+  ctx.fillText(label, x, yTop - 6); ctx.textAlign="left";
+}
+
+function draw(){
+  ctx.clearRect(-200,-200,DW+400,DH+400);
+  const groundY = 470;
+  // grade
+  ctx.strokeStyle="rgba(255,255,255,0.05)"; ctx.lineWidth=1;
+  for(let x=0;x<=DW;x+=50){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,DH); ctx.stroke(); }
+  for(let y=0;y<=DH;y+=50){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(DW,y); ctx.stroke(); }
+  // chão
+  ctx.fillStyle="#22002f"; ctx.fillRect(0,groundY,DW,DH-groundY);
+  ctx.strokeStyle="rgba(213,140,255,0.4)"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(DW,groundY); ctx.stroke();
+
+  // apoio (cunha triangular)
+  ctx.beginPath(); ctx.moveTo(PIVX,PIVY+6); ctx.lineTo(PIVX-46,groundY); ctx.lineTo(PIVX+46,groundY); ctx.closePath();
+  const fg=ctx.createLinearGradient(PIVX-46,PIVY,PIVX+46,groundY); fg.addColorStop(0,"#9b59d0"); fg.addColorStop(1,"#4a1d70");
+  ctx.fillStyle=fg; ctx.shadowBlur=12; ctx.shadowColor="#b066ff"; ctx.fill(); ctx.shadowBlur=0;
+
+  const {PL,dL,FR,dR}=vals();
+
+  // barra
+  const L=rot(-5), R=rot(5);
+  ctx.save(); ctx.strokeStyle="#e7c6ff"; ctx.lineWidth=14; ctx.lineCap="round"; ctx.shadowBlur=14; ctx.shadowColor="#c84dff";
+  ctx.beginPath(); ctx.moveTo(L.x,L.y); ctx.lineTo(R.x,R.y); ctx.stroke(); ctx.restore();
+  // marcas de metro
+  ctx.fillStyle="rgba(255,255,255,0.5)";
+  for(let m=-5;m<=5;m++){ const p=rot(m); ctx.beginPath(); ctx.arc(p.x,p.y,2.5,0,Math.PI*2); ctx.fill(); }
+  // pino do apoio
+  ctx.beginPath(); ctx.arc(PIVX,PIVY,7,0,Math.PI*2); ctx.fillStyle="#ffd166"; ctx.shadowBlur=10; ctx.shadowColor="#ffd166"; ctx.fill(); ctx.shadowBlur=0;
+
+  // carga (bloco laranja sobre a barra, à esquerda)
+  const lp = rot(-dL);
+  const bw=46, bh=Math.min(80, 26+PL*0.18);
+  ctx.save(); ctx.translate(lp.x,lp.y); ctx.rotate(theta);
+  const lg=ctx.createLinearGradient(0,-bh,0,0); lg.addColorStop(0,"#ffd0a8"); lg.addColorStop(1,"#ff7a1a");
+  ctx.fillStyle=lg; ctx.shadowBlur=14; ctx.shadowColor="#ff8c42";
+  ctx.fillRect(-bw/2,-bh-7,bw,bh); ctx.shadowBlur=0; ctx.strokeStyle="#ffcaa0"; ctx.lineWidth=2; ctx.strokeRect(-bw/2,-bh-7,bw,bh);
+  ctx.fillStyle="#fff"; ctx.font="bold 13px Orbitron"; ctx.textAlign="center"; ctx.fillText(PL+" N",0,-bh/2-2); ctx.textAlign="left";
+  ctx.restore();
+
+  // esforço (seta azul para baixo, à direita)
+  const rp = rot(dR);
+  const arrLen = 30 + FR*0.16;
+  drawArrowV(rp.x, rp.y - 7 - arrLen, arrLen, "#44d6ff", FR+" N");
+
+  // rótulos dos braços
+  ctx.fillStyle="#cbb8e0"; ctx.font="12px Poppins"; ctx.textAlign="center";
+  ctx.fillText("d = "+dL.toFixed(1)+" m", (PIVX+lp.x)/2, groundY+26);
+  ctx.fillText("d = "+dR.toFixed(1)+" m", (PIVX+rp.x)/2, groundY+26);
+  ctx.strokeStyle="rgba(255,255,255,0.25)"; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(lp.x,lp.y); ctx.lineTo(lp.x,groundY+14); ctx.moveTo(rp.x,rp.y); ctx.lineTo(rp.x,groundY+14);
+  ctx.moveTo(PIVX,PIVY); ctx.lineTo(PIVX,groundY+14); ctx.stroke(); ctx.setLineDash([]); ctx.textAlign="left";
+}
+
+function updateReadout(){
+  const {PL,dL,FR,dR}=vals();
+  const tauL=PL*dL, tauR=FR*dR;
+  els("tauL").textContent=tauL.toFixed(0)+" N·m";
+  els("tauR").textContent=tauR.toFixed(0)+" N·m";
+  els("effNeed").textContent=(tauL/dR).toFixed(0)+" N";
+  els("adv").textContent=(dR/dL).toFixed(2)+"×";
+  const st=els("status"); const diff=tauR-tauL;
+  if(Math.abs(diff) < 1){ st.textContent="⚖ Em equilíbrio"; st.style.color="#7dff9e"; }
+  else if(diff>0){ st.textContent="↻ Gira p/ a direita (esforço vence)"; st.style.color="#44d6ff"; }
+  else{ st.textContent="↺ Gira p/ a esquerda (carga vence)"; st.style.color="#ff8c42"; }
+  // aplicação real conforme braços
+  let app;
+  if(Math.abs(dR-dL)<0.05) app="Braços iguais: nenhuma vantagem de força — é a <b>balança de braços iguais</b>.";
+  else if(dR>dL) app="Braço do esforço maior ⇒ <b>multiplica a força</b>: uma força menor equilibra uma carga maior (pé de cabra, gangorra, alicate, remo).";
+  else app="Braço do esforço menor ⇒ <b>multiplica o deslocamento/velocidade</b>: exige mais força, mas a carga se move mais (pinça, vassoura, antebraço).";
+  els("application").innerHTML=app;
+}
+
+function tick(){ if(!active) return;
+  const {PL,dL,FR,dR}=vals();
+  const tauL=PL*dL, tauR=FR*dR;
+  // ângulo-alvo proporcional ao desequilíbrio (limitado a ±22°)
+  const target = Math.max(-0.38, Math.min(0.38, (tauR-tauL)/900));
+  theta += (target - theta)*0.12;
+  draw();
+  requestAnimationFrame(tick);
+}
+
+function refresh(){
+  loadFVal.textContent=loadF.value; loadDVal.textContent=(+loadD.value).toFixed(1);
+  effFVal.textContent=effF.value;  effDVal.textContent=(+effD.value).toFixed(1);
+  updateReadout();
+}
+[loadF,loadD,effF,effD].forEach(s=>s.oninput=refresh);
+
+function preset(t){
+  if(t==='eq'){ loadF.value=100; loadD.value=2; effF.value=100; effD.value=2; }
+  else if(t==='mech'){ loadF.value=240; loadD.value=1; effF.value=60; effD.value=4; }
+  else if(t==='speed'){ loadF.value=60; loadD.value=4; effF.value=240; effD.value=1; }
+  refresh();
+}
+
+new ResizeObserver(resize).observe(sim);
+window.addEventListener("resize", resize);
+resize(); refresh();
+
+function activate(){ active=true; resize(); refresh(); requestAnimationFrame(tick); }
+function deactivate(){ active=false; }
+SIMS.alavanca={activate,deactivate,ui:{preset:preset}};
+})();
+
+(function(){
+const root=document.getElementById('view-plano');
+const sim=root.querySelector('.simulation');
+const canvas=root.querySelector('canvas');
+const ctx=canvas.getContext('2d');
+
+const DW=1000, DH=600, G=9.8;
+const els=id=>root.querySelector('#'+id);
+const angI=els("ang"), massI=els("mass"), muI=els("mu");
+
+// geometria da rampa
+const APEXX=120, BASEY=470;     // vértice (canto superior-esq) e base
+const RAMPLEN=720;              // comprimento da hipotenusa em px
+let running=false, s=0, v=0;    // s: distância percorrida pela rampa (px), v: velocidade (px/s)
+let last=0;
+
+function vals(){
+  const ang=+angI.value*Math.PI/180, m=+massI.value, mu=+muI.value;
+  const P=m*G, Px=P*Math.sin(ang), Py=P*Math.cos(ang), N=Py, fatMax=mu*N;
+  let net=Px-fatMax; if(net<0) net=0;            // se atrito segura, não acelera
+  const willMove = Px > fatMax + 1e-9;
+  const a = willMove ? net/m : 0;                 // m/s²
+  return {ang,m,mu,P,Px,Py,N,fatMax,a,willMove};
+}
+
+function resize(){
+  const r=sim.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=Math.max(1,Math.round(r.width*dpr));
+  canvas.height=Math.max(1,Math.round(r.height*dpr));
+  const sc=Math.min(r.width/DW, r.height/DH);
+  const ox=(r.width-DW*sc)/2, oy=(r.height-DH*sc)/2;
+  ctx.setTransform(dpr*sc,0,0,dpr*sc,dpr*ox,dpr*oy);
+}
+
+function arrow(x1,y1,x2,y2,color,label){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=4; ctx.shadowBlur=9; ctx.shadowColor=color;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1);
+  ctx.beginPath(); ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-13*Math.cos(a-0.4),y2-13*Math.sin(a-0.4));
+  ctx.lineTo(x2-13*Math.cos(a+0.4),y2-13*Math.sin(a+0.4));
+  ctx.closePath(); ctx.fill(); ctx.shadowBlur=0;
+  if(label){ ctx.font="bold 14px Orbitron"; ctx.fillStyle="#fff";
+    ctx.fillText(label, x2 + 6*Math.cos(a), y2 + 6*Math.sin(a)); }
+}
+
+function draw(){
+  const {ang,Px,Py,N,fatMax,willMove}=vals();
+  ctx.clearRect(-200,-200,DW+400,DH+400);
+  // grade
+  ctx.strokeStyle="rgba(255,255,255,0.05)"; ctx.lineWidth=1;
+  for(let x=0;x<=DW;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,DH);ctx.stroke();}
+  for(let y=0;y<=DH;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(DW,y);ctx.stroke();}
+  // chão
+  ctx.fillStyle="#22002f"; ctx.fillRect(0,BASEY,DW,DH-BASEY);
+  ctx.strokeStyle="rgba(213,140,255,0.4)"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(0,BASEY); ctx.lineTo(DW,BASEY); ctx.stroke();
+
+  // triângulo da rampa: vértice superior em APEXX,(BASEY-h); base ao longo do chão
+  const dx=Math.cos(ang), dy=Math.sin(ang);          // direção rampa->baixo-direita
+  const baseX=APEXX, topY=BASEY-RAMPLEN*dy;           // topo da rampa
+  const footX=APEXX+RAMPLEN*dx, footY=BASEY;          // pé da rampa
+  // preenchimento
+  ctx.beginPath(); ctx.moveTo(baseX,topY); ctx.lineTo(footX,footY); ctx.lineTo(baseX,BASEY); ctx.closePath();
+  const rg=ctx.createLinearGradient(baseX,topY,footX,footY); rg.addColorStop(0,"#5a2e84"); rg.addColorStop(1,"#34155a");
+  ctx.fillStyle=rg; ctx.fill();
+  ctx.strokeStyle="#c98cff"; ctx.lineWidth=3; ctx.shadowBlur=10; ctx.shadowColor="#b066ff"; ctx.stroke(); ctx.shadowBlur=0;
+  // arco do ângulo
+  ctx.strokeStyle="#ffd166"; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(footX,footY,46,Math.PI+ang,Math.PI,true); ctx.stroke();
+  ctx.fillStyle="#ffd166"; ctx.font="bold 15px Orbitron"; ctx.fillText((+angI.value)+"°", footX-86, footY-12);
+
+  // posição do bloco ao longo da rampa (de cima para baixo)
+  const along = Math.min(s, RAMPLEN-70);
+  const bx = baseX + (along+8)*dx, by = topY + (along+8)*dy;   // ponto na superfície
+  const nx=dy, ny=-dx;   // normal externa: para fora da rampa (cima-direita)
+  // bloco (quadrado apoiado na rampa)
+  const half=26;
+  const cx=bx+nx*half, cy=by+ny*half;   // centro do bloco acima da superfície
+  ctx.save(); ctx.translate(cx,cy); ctx.rotate(ang);
+  const bg=ctx.createLinearGradient(-half,-half,half,half); bg.addColorStop(0,"#f2c6ff"); bg.addColorStop(1,"#7f2cff");
+  ctx.fillStyle=bg; ctx.shadowBlur=16; ctx.shadowColor="#d14dff"; ctx.fillRect(-half,-half,half*2,half*2);
+  ctx.shadowBlur=0; ctx.strokeStyle="#f2a3ff"; ctx.lineWidth=3; ctx.strokeRect(-half,-half,half*2,half*2);
+  ctx.fillStyle="#fff"; ctx.font="bold 14px Orbitron"; ctx.textAlign="center"; ctx.fillText((+massI.value)+"kg",0,5); ctx.textAlign="left";
+  ctx.restore();
+
+  // vetores a partir do centro do bloco (escala visual)
+  const k=2.0;
+  // Peso (para baixo)
+  arrow(cx,cy, cx, cy+(vals().P)*k*0.7, "#ff9d3c", "P");
+  // P·sen θ (ao longo da rampa, descendo)
+  arrow(cx,cy, cx+dx*Px*k, cy+dy*Px*k, "#ff5ef2", "Px");
+  // P·cos θ (contra a rampa) e Normal (oposta)
+  arrow(cx,cy, cx-nx*Py*k, cy-ny*Py*k, "#9d7dff", "Py");
+  arrow(cx,cy, cx+nx*N*k, cy+ny*N*k, "#7dff66", "N");
+  // atrito (rampa acima) se houver tendência de descer
+  if(fatMax>0.5){ const fa=Math.min(fatMax,Px); arrow(cx,cy, cx-dx*fa*k, cy-dy*fa*k, "#ffd166", "Fat"); }
+}
+
+function refresh(){
+  els("angVal").textContent=angI.value;
+  els("massVal").textContent=massI.value;
+  els("muVal").textContent=(+muI.value).toFixed(2);
+  const {Px,Py,N,fatMax,a,willMove}=vals();
+  els("px").textContent=Px.toFixed(0)+" N";
+  els("py").textContent=Py.toFixed(0)+" N";
+  els("nrm").textContent=N.toFixed(0)+" N";
+  els("fat").textContent=fatMax.toFixed(0)+" N";
+  els("acc").textContent=a.toFixed(2)+" m/s²";
+  const st=els("status");
+  if(willMove){ st.textContent="Bloco desce (P·sen θ vence o atrito)"; st.style.color="#ff8c66"; }
+  else{ st.textContent="Bloco em repouso (atrito segura)"; st.style.color="#7dff9e"; }
+  // aplicação
+  let app;
+  if(!willMove) app="Equilíbrio na rampa: o atrito estático equilibra P·sen θ. É o que mantém objetos parados em ladeiras e caixas em esteiras inclinadas.";
+  else if(+muI.value===0) app="Sem atrito: a aceleração depende só do ângulo (a = g·sen θ) — base dos experimentos de Galileo e dos toboáguas.";
+  else app="A rampa reduz a força necessária para erguer a carga, ao custo de maior distância — princípio das rampas de acesso, estradas em serra e parafusos.";
+  els("application").innerHTML=app;
+  if(!running) draw();
+}
+[angI,massI,muI].forEach(x=>x.oninput=()=>{ if(!running){ s=0; v=0; els("vel").textContent="0.0 m/s"; } refresh(); });
+
+function loop(t){
+  if(!running) return;
+  const dt=Math.min(0.05,(t-last)/1000||0); last=t;
+  const {a}=vals();
+  v += a*dt;                  // m/s
+  s += v*dt*100;              // 100 px por metro
+  els("vel").textContent=v.toFixed(1)+" m/s";
+  if(s>=RAMPLEN-70){ s=RAMPLEN-70; running=false; els("runBtn").textContent="▶ Soltar"; }
+  draw();
+  requestAnimationFrame(loop);
+}
+function toggleRun(){
+  const {willMove}=vals();
+  if(running){ running=false; els("runBtn").textContent="▶ Soltar"; return; }
+  if(!willMove){ refresh(); return; }   // não há movimento
+  running=true; last=performance.now(); els("runBtn").textContent="⏸ Pausar"; requestAnimationFrame(loop);
+}
+function resetSim(){ running=false; s=0; v=0; els("runBtn").textContent="▶ Soltar"; els("vel").textContent="0.0 m/s"; refresh(); draw(); }
+
+function preset(t){
+  if(t==='liso'){ angI.value=30; massI.value=5; muI.value=0; }
+  else if(t==='iminente'){ angI.value=30; massI.value=5; muI.value=0.58; }
+  else if(t==='parado'){ angI.value=15; massI.value=8; muI.value=0.45; }
+  resetSim();
+}
+
+new ResizeObserver(resize).observe(sim);
+window.addEventListener("resize", resize);
+resize(); refresh(); draw();
+
+function activate(){ resize(); refresh(); draw(); }
+function deactivate(){ running=false; const b=els('runBtn'); if(b) b.textContent='\u25B6 Soltar'; }
+SIMS.plano={activate,deactivate,ui:{preset:preset,run:toggleRun,reset:resetSim}};
+})();
+
+(function(){
+const root=document.getElementById('view-polias');
+const sim=root.querySelector('.simulation');
+const canvas=root.querySelector('canvas');
+const ctx=canvas.getContext('2d');
+
+const DW=1000, DH=640, G=9.8;
+const els=id=>root.querySelector('#'+id);
+const loadI=els("load");
+
+let mode="fixa";          // "fixa" | "movel"
+let running=false, h=0;   // h: altura levantada da carga (px), >=0
+const HMAX=150;           // curso máximo da carga (px)
+let last=0;
+
+function phys(){
+  const P=+loadI.value;
+  const VM = (mode==="movel") ? 2 : 1;
+  const F = P/VM;
+  return {P, F, VM};
+}
+
+function resize(){
+  const r=sim.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=Math.max(1,Math.round(r.width*dpr));
+  canvas.height=Math.max(1,Math.round(r.height*dpr));
+  const sc=Math.min(r.width/DW, r.height/DH);
+  const ox=(r.width-DW*sc)/2, oy=(r.height-DH*sc)/2;
+  ctx.setTransform(dpr*sc,0,0,dpr*sc,dpr*ox,dpr*oy);
+}
+
+function pulley(cx,cy,rad){
+  ctx.save();
+  const g=ctx.createRadialGradient(cx-rad*0.3,cy-rad*0.3,rad*0.2,cx,cy,rad);
+  g.addColorStop(0,"#f2d9ff"); g.addColorStop(1,"#9a5fd6");
+  ctx.fillStyle=g; ctx.shadowBlur=14; ctx.shadowColor="#c074ff";
+  ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+  ctx.strokeStyle="#7a3db8"; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(cx,cy,rad,0,Math.PI*2); ctx.stroke();
+  ctx.fillStyle="#5a2a8c"; ctx.beginPath(); ctx.arc(cx,cy,rad*0.18,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function rope(x1,y1,x2,y2){
+  ctx.strokeStyle="#ffe08a"; ctx.lineWidth=4; ctx.lineCap="round";
+  ctx.shadowBlur=6; ctx.shadowColor="#ffcf5a";
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.shadowBlur=0;
+}
+
+function loadBox(cx,topY,P,label){
+  const w=92, hh=72;
+  const g=ctx.createLinearGradient(cx-w/2,topY,cx+w/2,topY+hh);
+  g.addColorStop(0,"#ffd0a8"); g.addColorStop(1,"#ff7a1a");
+  ctx.fillStyle=g; ctx.shadowBlur=16; ctx.shadowColor="#ff8c42";
+  ctx.fillRect(cx-w/2,topY,w,hh); ctx.shadowBlur=0;
+  ctx.strokeStyle="#ffcaa0"; ctx.lineWidth=2; ctx.strokeRect(cx-w/2,topY,w,hh);
+  ctx.fillStyle="#fff"; ctx.font="bold 18px Orbitron"; ctx.textAlign="center";
+  ctx.fillText(P+" N", cx, topY+hh/2+6); ctx.textAlign="left";
+}
+
+function forceArrow(x,y,len,color,label){ // seta para baixo (puxão na ponta da corda)
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=5; ctx.shadowBlur=10; ctx.shadowColor=color;
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y+len); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x,y+len); ctx.lineTo(x-8,y+len-11); ctx.lineTo(x+8,y+len-11); ctx.closePath(); ctx.fill();
+  ctx.shadowBlur=0; ctx.font="bold 16px Orbitron"; ctx.fillStyle="#fff"; ctx.textAlign="center";
+  ctx.fillText(label, x, y+len/2); ctx.textAlign="left";
+}
+
+function draw(){
+  const {P,F,VM}=phys();
+  ctx.clearRect(-200,-200,DW+400,DH+400);
+  // grade
+  ctx.strokeStyle="rgba(255,255,255,0.05)"; ctx.lineWidth=1;
+  for(let x=0;x<=DW;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,DH);ctx.stroke();}
+  for(let y=0;y<=DH;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(DW,y);ctx.stroke();}
+
+  // teto / suporte
+  const ceilY=70;
+  ctx.fillStyle="#2a1140"; ctx.fillRect(0,0,DW,ceilY);
+  ctx.strokeStyle="rgba(213,140,255,0.5)"; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(0,ceilY); ctx.lineTo(DW,ceilY); ctx.stroke();
+  for(let x=20;x<DW;x+=34){ ctx.strokeStyle="rgba(213,140,255,0.18)"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x-18,ceilY); ctx.stroke(); }
+
+  const R=34;
+  const groundLoadY = 470;          // topo da carga quando em repouso
+  const loadTop = groundLoadY - h;  // sobe com h
+
+  if(mode==="fixa"){
+    // 1 polia fixa no teto; cordas TANGENTES às bordas da polia (px ± R)
+    const px=470, py=ceilY+R;
+    const loadX=px-R, pullX=px+R;
+    // corda do lado da carga: sobe da carga até a borda esquerda da polia
+    rope(loadX, loadTop, loadX, py);
+    // corda passa por cima da polia (semicírculo superior: esquerda -> topo -> direita)
+    ctx.strokeStyle="#ffe08a"; ctx.lineWidth=4; ctx.beginPath(); ctx.arc(px,py,R,Math.PI,2*Math.PI); ctx.stroke();
+    // corda do lado do esforço: desce da borda direita até a mão
+    rope(pullX, py, pullX, py+170+h);
+    pulley(px,py,R);
+    loadBox(loadX, loadTop, P);
+    // esforço (puxão para baixo)
+    forceArrow(pullX, py+64, 70, "#44d6ff", "F");
+    // legendas de tensão
+    ctx.fillStyle="#ffe08a"; ctx.font="13px Poppins"; ctx.textAlign="center";
+    ctx.fillText("T = "+P+" N", loadX-46, 300);
+    ctx.fillText("T = "+F+" N", pullX+46, 200);
+    ctx.textAlign="left";
+  } else {
+    // polia fixa no teto + polia móvel sustentando a carga.
+    // Todos os trechos são VERTICAIS: âncora ↓ | móvel | ↑ fixa | ↓ mão.
+    const mx=460;              // polia móvel (carrega a carga)
+    const fx=mx+2*R;           // polia fixa: borda esq. dela = borda dir. da móvel
+    const fy=ceilY+R;          // fixa presa no teto
+    const my=groundLoadY-44-h; // móvel sobe com h
+    // âncora no teto, acima do segmento esquerdo
+    ctx.fillStyle="#7a3db8"; ctx.fillRect(mx-R-7, ceilY-4, 14, 9);
+    // segmento 1 (âncora): vertical em mx-R, do teto até a móvel
+    rope(mx-R, ceilY, mx-R, my);
+    // contorno inferior da polia móvel (direita -> baixo -> esquerda)
+    ctx.strokeStyle="#ffe08a"; ctx.lineWidth=4; ctx.beginPath(); ctx.arc(mx,my,R,0,Math.PI); ctx.stroke();
+    // segmento 2: vertical em mx+R (= borda esq. da fixa), da móvel até a fixa
+    rope(mx+R, my, mx+R, fy);
+    // contorno superior da polia fixa (esquerda -> topo -> direita)
+    ctx.strokeStyle="#ffe08a"; ctx.lineWidth=4; ctx.beginPath(); ctx.arc(fx,fy,R,Math.PI,2*Math.PI); ctx.stroke();
+    // segmento 3 (esforço): vertical em fx+R, desce p/ a mão
+    rope(fx+R, fy, fx+R, fy+170+h);
+    pulley(mx,my,R);    // móvel
+    pulley(fx,fy,R);    // fixa
+    // carga pendurada na polia móvel
+    rope(mx, my+R, mx, my+R+8);
+    loadBox(mx, my+R+8, P);
+    // esforço
+    forceArrow(fx+R, fy+64, 70, "#44d6ff", "F");
+    // tensões (cada corda que segura a móvel vale F = P/2)
+    ctx.fillStyle="#ffe08a"; ctx.font="13px Poppins"; ctx.textAlign="center";
+    ctx.fillText("T = "+F+" N", mx-R-42, (ceilY+my)/2);
+    ctx.fillText("T = "+F+" N", fx+R+44, 200);
+    ctx.textAlign="left";
+  }
+
+  // título do modo
+  ctx.fillStyle="#d58cff"; ctx.font="bold 17px Orbitron"; ctx.textAlign="center";
+  ctx.fillText(mode==="fixa" ? "POLIA FIXA — só muda a direção da força" : "POLIA FIXA + MÓVEL — divide o esforço pela metade", DW/2, DH-22);
+  ctx.textAlign="left";
+}
+
+function refresh(){
+  const {P,F,VM}=phys();
+  els("loadVal").textContent=P;
+  els("oP").textContent=P+" N";
+  els("oF").textContent=F+" N";
+  els("oVM").textContent=VM+"×";
+  els("oS").textContent=(VM===2?"2,0":"1,0")+" m";
+  els("application").innerHTML = (mode==="fixa")
+    ? "A <b>polia fixa</b> não reduz a força (F = P): ela só inverte o sentido, deixando você puxar para baixo usando o próprio peso. Usada em poços, mastros e cortinas."
+    : "A <b>polia móvel</b> sustenta a carga por <b>dois segmentos de corda</b>, então cada um aguenta metade: F = P/2. O custo é puxar o <b>dobro de corda</b> para a carga subir a mesma altura — base de guindastes e talhas (a energia se conserva).";
+  els("btnFixa").classList.toggle("on", mode==="fixa");
+  els("btnMovel").classList.toggle("on", mode==="movel");
+  if(!running) draw();
+}
+
+function setMode(m){ mode=m; resetSim(); }
+
+function loop(t){
+  if(!running) return;
+  const dt=Math.min(0.05,(t-last)/1000||0); last=t;
+  h += 90*dt;                        // sobe a 90 px/s
+  if(h>=HMAX){ h=HMAX; running=false; els("runBtn").textContent="▶ Puxar"; }
+  draw();
+  requestAnimationFrame(loop);
+}
+function toggleRun(){
+  if(running){ running=false; els("runBtn").textContent="▶ Puxar"; return; }
+  if(h>=HMAX){ h=0; }
+  running=true; last=performance.now(); els("runBtn").textContent="⏸ Pausar"; requestAnimationFrame(loop);
+}
+function resetSim(){ running=false; h=0; els("runBtn").textContent="▶ Puxar"; refresh(); draw(); }
+
+loadI.oninput=refresh;
+
+new ResizeObserver(resize).observe(sim);
+window.addEventListener("resize", resize);
+resize(); refresh(); draw();
+
+function activate(){ resize(); refresh(); draw(); }
+function deactivate(){ running=false; const b=els('runBtn'); if(b) b.textContent='\u25B6 Puxar'; }
+SIMS.polias={activate,deactivate,ui:{mode:setMode,run:toggleRun,reset:resetSim}};
+})();
+
+
+function showSim(name){
+  document.querySelectorAll('.sim-view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));
+  const view=document.getElementById('view-'+name); if(view) view.classList.add('active');
+  const tab=document.querySelector('.tabs button[data-sim="'+name+'"]'); if(tab) tab.classList.add('on');
+  for(const k in SIMS){ if(k!==name && SIMS[k].deactivate) SIMS[k].deactivate(); }
+  if(SIMS[name] && SIMS[name].activate) SIMS[name].activate();
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click', ()=>showSim(b.dataset.sim)));
+showSim('newton');
 </script>
 </body>
 </html>
