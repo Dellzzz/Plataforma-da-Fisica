@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Física</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
@@ -14,15 +14,21 @@
       box-sizing:border-box;
     }
 
+    /* Ocultar barra de rolagem horizontal com segurança */
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+    }
+
     body{
       min-height:100vh;
+      min-height: 100dvh; /* Ajuste para altura correta no mobile */
       font-family:'Poppins', sans-serif;
       background:
         radial-gradient(circle at top left, rgba(0,255,255,0.15), transparent 25%),
         radial-gradient(circle at bottom right, rgba(0,140,255,0.18), transparent 25%),
         linear-gradient(135deg, #050816, #0b1026, #060b18);
       color:white;
-      overflow-x:hidden;
       position:relative;
     }
 
@@ -45,9 +51,11 @@
       height:500px;
       background:rgba(0,255,255,0.08);
       filter:blur(120px);
+      -webkit-filter:blur(120px); /* Suporte essencial para iOS/Safari */
       top:-120px;
       right:-120px;
       z-index:-1;
+      pointer-events: none; /* Evita que o brilho bloqueie cliques */
     }
 
     /* NAVBAR */
@@ -64,6 +72,8 @@
       z-index:1000;
 
       background:rgba(5, 10, 25, 0.7);
+      
+      -webkit-backdrop-filter:blur(12px); /* Suporte essencial para iOS/Safari */
       backdrop-filter:blur(12px);
 
       border-bottom:1px solid rgba(0,255,255,0.2);
@@ -83,6 +93,7 @@
       transition:0.3s ease;
 
       border:1px solid transparent;
+      white-space: nowrap; /* Evita quebras indesejadas no texto do menu */
     }
 
     .navbar a:hover{
@@ -112,6 +123,7 @@
     .title{
       text-align:center;
       margin-bottom:60px;
+      padding: 0 10px;
     }
 
     .title h1{
@@ -127,6 +139,7 @@
         0 0 50px #00f7ff;
 
       animation:glow 3s infinite alternate;
+      word-break: break-word; /* Garante que o texto gigante não quebre a tela no celular */
     }
 
     .title p{
@@ -164,6 +177,7 @@
 
       background:rgba(255,255,255,0.05);
 
+      -webkit-backdrop-filter:blur(12px);
       backdrop-filter:blur(12px);
 
       border:1px solid rgba(0,255,255,0.2);
@@ -175,6 +189,9 @@
       box-shadow:
         0 0 15px rgba(0,255,255,0.08),
         inset 0 0 20px rgba(255,255,255,0.03);
+        
+      display: block; /* Essencial para que os cards que são links funcionem direito */
+      text-decoration: none;
     }
 
     .card::before{
@@ -187,6 +204,7 @@
       top:-80px;
       right:-80px;
       filter:blur(20px);
+      -webkit-filter:blur(20px);
     }
 
     .card:hover{
@@ -205,12 +223,34 @@
       margin-bottom:18px;
       font-size:1.5rem;
       letter-spacing:2px;
+      position: relative;
+      z-index: 1;
     }
 
     .card p{
       color:#dbefff;
       line-height:1.8;
       font-size:1rem;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 20px;
+    }
+
+    /* CÓDIGO CSS DO BOTÃO NEON QUE ESTAVA FALTANDO */
+    .btn-neon {
+      display: inline-block;
+      color: white;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+      border: 1px solid #00f7ff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      background: transparent;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      z-index: 1;
+      transition: 0.3s;
     }
 
     .footer{
@@ -221,20 +261,39 @@
       letter-spacing:1px;
     }
 
+    /* ========================================= */
+    /* OTIMIZAÇÃO OBRIGATÓRIA PARA MOBILE        */
+    /* ========================================= */
     @media(max-width:768px){
+
+      /* Desliga o brilho gigante no celular para evitar Tela Branca */
+      body::after {
+        display: none; 
+      }
 
       .navbar{
         flex-wrap:wrap;
-        gap:12px;
-        padding:15px;
+        gap:10px;
+        padding:15px 10px;
+      }
+      
+      .navbar a {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        flex: 1 1 calc(50% - 15px); /* Divide em 2 colunas no celular */
+        text-align: center;
       }
 
       .title h1{
-        font-size:2.8rem;
+        font-size:2.5rem;
       }
 
       .card{
         padding:28px;
+      }
+      
+      .card h2 {
+        font-size: 1.3rem;
       }
     }
 
@@ -243,14 +302,12 @@
 
 <body>
 
-  <!-- NAVBAR -->
-
   <nav class="navbar">
 
-  	<a href="D:\Site Experimental\main_page.html">Página Inicial</a>
-  	<a href="D:\Site Experimental\fisica.html" class="active">Física</a>
-  	<a href="D:\Site Experimental\geometria.html">Geometria</a>
-  	<a href="D:\Site Experimental\matematica.html">Matemática</a>
+  	<a href="main_page.html">Página Inicial</a>
+  	<a href="fisica.html" class="active">Física</a>
+  	<a href="geometria.html">Geometria</a>
+  	<a href="matematica.html">Matemática</a>
 
   </nav>
 
@@ -264,11 +321,11 @@
 
     <div class="cards">
 
-     	<a href="aula.html" class="card" style="text-decoration: none;">
+     	<a href="aula.html" class="card">
  		<h2>Aulas Prontas</h2>
  		<p>O caminho mais rápido para o conhecimento.</p>
  		<span class="btn-neon">Acessar Aulas</span>
-	</a>
+	    </a>
 
       <div class="card">
         <h2>Listas de Exercícios</h2>
@@ -277,18 +334,17 @@
         </p>
       </div>
 
-	<a href="experimentos.html" class="card" style="text-decoration: none;">
+	    <a href="experimentos.html" class="card">
  		<h2>Experimentos</h2>
  		<p>Explore simulações interativas de fenômenos físicos em tempo real.</p>
  		<span class="btn-neon">Acessar Laboratório</span>
-	</a>
+	    </a>
 
     </div>
 
     <div class="footer">
       © 2026 • Compartilhe suas descobertas.
     </div>
-
 
   </div>
 
