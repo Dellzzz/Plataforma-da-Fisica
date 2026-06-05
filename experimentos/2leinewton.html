@@ -151,11 +151,18 @@ canvas{ width:100%; height:100%; display:block; }
   <div class="panel">
     <h2>Controles</h2>
 
-    <div class="sub">Carga (resistência) — lado esquerdo</div>
+    <div class="sub">Tipo de alavanca</div>
+    <div class="presets">
+      <button id="alvK-inter" onclick="SIMS.alavanca.ui.klass('inter')">Interfixa (1ª)</button>
+      <button id="alvK-resist" onclick="SIMS.alavanca.ui.klass('resist')">Inter-resistente (2ª)</button>
+      <button id="alvK-potente" onclick="SIMS.alavanca.ui.klass('potente')">Interpotente (3ª)</button>
+    </div>
+
+    <div class="sub">Carga (resistência)</div>
     <div class="control load"><label>Peso da carga <b><span id="loadFVal">100</span> N</b></label><input type="range" id="loadF" min="10" max="300" value="100"></div>
     <div class="control load"><label>Braço da carga <b><span id="loadDVal">1.0</span> m</b></label><input type="range" id="loadD" min="0.5" max="5" step="0.1" value="1"></div>
 
-    <div class="sub">Esforço (potência) — lado direito</div>
+    <div class="sub">Esforço (potência)</div>
     <div class="control effort"><label>Força do esforço <b><span id="effFVal">50</span> N</b></label><input type="range" id="effF" min="0" max="300" value="50"></div>
     <div class="control effort"><label>Braço do esforço <b><span id="effDVal">2.0</span> m</b></label><input type="range" id="effD" min="0.5" max="5" step="0.1" value="2"></div>
 
@@ -446,20 +453,31 @@ function resize(){
   ctx.setTransform(dpr*s, 0, 0, dpr*s, dpr*ox, dpr*oy);
 }
 
-function rot(d){ // ponto no braço (metros, +direita) -> coordenada de tela girada
-  const px = d*SCALE;
-  return { x: PIVX + px*Math.cos(theta), y: PIVY + px*Math.sin(theta) };
+let kls='inter';   // inter (1ª) | resist (2ª) | potente (3ª)
+let PX=500;        // posição x do fulcro (varia conforme a classe)
+
+function geom(){
+  const {dL,dR}=vals();
+  if(kls==='inter') return {px:500, load:-dL, eff:+dR, effDir:+1, bmin:-5, bmax:5};
+  // 2ª e 3ª classe: fulcro na ponta esquerda, carga e esforço do MESMO lado, esforço p/ cima
+  return {px:175, load:+dL, eff:+dR, effDir:-1, bmin:0, bmax:5};
 }
 
-function drawArrowV(x, yTop, len, color, label){ // seta vertical (para baixo se len>0)
-  const y2 = yTop + len;
-  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=4; ctx.shadowBlur=10; ctx.shadowColor=color;
-  ctx.beginPath(); ctx.moveTo(x,yTop); ctx.lineTo(x,y2); ctx.stroke();
-  const dir = len>0?1:-1;
-  ctx.beginPath(); ctx.moveTo(x,y2); ctx.lineTo(x-7,y2-9*dir); ctx.lineTo(x+7,y2-9*dir); ctx.closePath(); ctx.fill();
-  ctx.shadowBlur=0; ctx.font="bold 15px Orbitron"; ctx.fillStyle="#fff"; ctx.textAlign="center";
-  ctx.fillText(label, x, yTop - 6); ctx.textAlign="left";
+function rot(d){ // ponto no braço (metros) -> coordenada de tela girada
+  const px = d*SCALE;
+  return { x: PX + px*Math.cos(theta), y: PIVY + px*Math.sin(theta) };
 }
+
+function drawEffortArrow(x, yBar, dir, len, color, label){ // dir +1 empurra p/ baixo, -1 levanta
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=4; ctx.shadowBlur=10; ctx.shadowColor=color;
+  let y1,y2; if(dir>0){ y1=yBar-7-len; y2=yBar-7; } else { y1=yBar-7; y2=yBar-7-len; }
+  ctx.beginPath(); ctx.moveTo(x,y1); ctx.lineTo(x,y2); ctx.stroke();
+  const ah=dir>0?1:-1;
+  ctx.beginPath(); ctx.moveTo(x,y2); ctx.lineTo(x-7,y2-9*ah); ctx.lineTo(x+7,y2-9*ah); ctx.closePath(); ctx.fill();
+  ctx.shadowBlur=0; ctx.font="bold 15px Orbitron"; ctx.fillStyle="#fff"; ctx.textAlign="center";
+  ctx.fillText(label, x, (dir>0?y1:y2) - 6); ctx.textAlign="left";
+}
+function letter(x,y,txt,col){ ctx.fillStyle=col; ctx.font="bold 16px Orbitron"; ctx.textAlign="center"; ctx.fillText(txt,x,y); ctx.textAlign="left"; }
 
 function draw(){
   ctx.clearRect(-200,-200,DW+400,DH+400);
@@ -472,25 +490,26 @@ function draw(){
   ctx.fillStyle="#22002f"; ctx.fillRect(0,groundY,DW,DH-groundY);
   ctx.strokeStyle="rgba(213,140,255,0.4)"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(DW,groundY); ctx.stroke();
 
-  // apoio (cunha triangular)
-  ctx.beginPath(); ctx.moveTo(PIVX,PIVY+6); ctx.lineTo(PIVX-46,groundY); ctx.lineTo(PIVX+46,groundY); ctx.closePath();
-  const fg=ctx.createLinearGradient(PIVX-46,PIVY,PIVX+46,groundY); fg.addColorStop(0,"#9b59d0"); fg.addColorStop(1,"#4a1d70");
-  ctx.fillStyle=fg; ctx.shadowBlur=12; ctx.shadowColor="#b066ff"; ctx.fill(); ctx.shadowBlur=0;
-
+  const G=geom(); PX=G.px;
   const {PL,dL,FR,dR}=vals();
 
+  // apoio (cunha triangular) no fulcro
+  ctx.beginPath(); ctx.moveTo(PX,PIVY+6); ctx.lineTo(PX-46,groundY); ctx.lineTo(PX+46,groundY); ctx.closePath();
+  const fg=ctx.createLinearGradient(PX-46,PIVY,PX+46,groundY); fg.addColorStop(0,"#9b59d0"); fg.addColorStop(1,"#4a1d70");
+  ctx.fillStyle=fg; ctx.shadowBlur=12; ctx.shadowColor="#b066ff"; ctx.fill(); ctx.shadowBlur=0;
+
   // barra
-  const L=rot(-5), R=rot(5);
+  const A=rot(G.bmin), B=rot(G.bmax);
   ctx.save(); ctx.strokeStyle="#e7c6ff"; ctx.lineWidth=14; ctx.lineCap="round"; ctx.shadowBlur=14; ctx.shadowColor="#c84dff";
-  ctx.beginPath(); ctx.moveTo(L.x,L.y); ctx.lineTo(R.x,R.y); ctx.stroke(); ctx.restore();
+  ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke(); ctx.restore();
   // marcas de metro
   ctx.fillStyle="rgba(255,255,255,0.5)";
-  for(let m=-5;m<=5;m++){ const p=rot(m); ctx.beginPath(); ctx.arc(p.x,p.y,2.5,0,Math.PI*2); ctx.fill(); }
+  for(let m=Math.ceil(G.bmin);m<=Math.floor(G.bmax);m++){ const p=rot(m); ctx.beginPath(); ctx.arc(p.x,p.y,2.5,0,Math.PI*2); ctx.fill(); }
   // pino do apoio
-  ctx.beginPath(); ctx.arc(PIVX,PIVY,7,0,Math.PI*2); ctx.fillStyle="#ffd166"; ctx.shadowBlur=10; ctx.shadowColor="#ffd166"; ctx.fill(); ctx.shadowBlur=0;
+  ctx.beginPath(); ctx.arc(PX,PIVY,7,0,Math.PI*2); ctx.fillStyle="#ffd166"; ctx.shadowBlur=10; ctx.shadowColor="#ffd166"; ctx.fill(); ctx.shadowBlur=0;
 
-  // carga (bloco laranja sobre a barra, à esquerda)
-  const lp = rot(-dL);
+  // carga (bloco laranja sobre a barra)
+  const lp = rot(G.load);
   const bw=46, bh=Math.min(80, 26+PL*0.18);
   ctx.save(); ctx.translate(lp.x,lp.y); ctx.rotate(theta);
   const lg=ctx.createLinearGradient(0,-bh,0,0); lg.addColorStop(0,"#ffd0a8"); lg.addColorStop(1,"#ff7a1a");
@@ -499,18 +518,23 @@ function draw(){
   ctx.fillStyle="#fff"; ctx.font="bold 13px Orbitron"; ctx.textAlign="center"; ctx.fillText(PL+" N",0,-bh/2-2); ctx.textAlign="left";
   ctx.restore();
 
-  // esforço (seta azul para baixo, à direita)
-  const rp = rot(dR);
+  // esforço (seta azul; p/ baixo na interfixa, p/ cima na 2ª/3ª)
+  const rp = rot(G.eff);
   const arrLen = 30 + FR*0.16;
-  drawArrowV(rp.x, rp.y - 7 - arrLen, arrLen, "#44d6ff", FR+" N");
+  drawEffortArrow(rp.x, rp.y, G.effDir, arrLen, "#44d6ff", FR+" N");
 
-  // rótulos dos braços
+  // letras F (fulcro), R (resistência), P (potência)
+  letter(PX, PIVY-22, "F", "#ffd166");
+  letter(lp.x, lp.y+30, "R", "#ff8c42");
+  letter(rp.x, rp.y+30, "P", "#44d6ff");
+
+  // rótulos dos braços + verticais tracejadas
   ctx.fillStyle="#cbb8e0"; ctx.font="12px Poppins"; ctx.textAlign="center";
-  ctx.fillText("d = "+dL.toFixed(1)+" m", (PIVX+lp.x)/2, groundY+26);
-  ctx.fillText("d = "+dR.toFixed(1)+" m", (PIVX+rp.x)/2, groundY+26);
+  ctx.fillText("b_R = "+dL.toFixed(1)+" m", (PX+lp.x)/2, groundY+26);
+  ctx.fillText("b_P = "+dR.toFixed(1)+" m", (PX+rp.x)/2, groundY+42);
   ctx.strokeStyle="rgba(255,255,255,0.25)"; ctx.lineWidth=1; ctx.setLineDash([4,4]);
   ctx.beginPath(); ctx.moveTo(lp.x,lp.y); ctx.lineTo(lp.x,groundY+14); ctx.moveTo(rp.x,rp.y); ctx.lineTo(rp.x,groundY+14);
-  ctx.moveTo(PIVX,PIVY); ctx.lineTo(PIVX,groundY+14); ctx.stroke(); ctx.setLineDash([]); ctx.textAlign="left";
+  ctx.moveTo(PX,PIVY); ctx.lineTo(PX,groundY+14); ctx.stroke(); ctx.setLineDash([]); ctx.textAlign="left";
 }
 
 function updateReadout(){
@@ -522,21 +546,27 @@ function updateReadout(){
   els("adv").textContent=(dR/dL).toFixed(2)+"×";
   const st=els("status"); const diff=tauR-tauL;
   if(Math.abs(diff) < 1){ st.textContent="⚖ Em equilíbrio"; st.style.color="#7dff9e"; }
-  else if(diff>0){ st.textContent="↻ Gira p/ a direita (esforço vence)"; st.style.color="#44d6ff"; }
-  else{ st.textContent="↺ Gira p/ a esquerda (carga vence)"; st.style.color="#ff8c42"; }
-  // aplicação real conforme braços
-  let app;
-  if(Math.abs(dR-dL)<0.05) app="Braços iguais: nenhuma vantagem de força — é a <b>balança de braços iguais</b>.";
-  else if(dR>dL) app="Braço do esforço maior ⇒ <b>multiplica a força</b>: uma força menor equilibra uma carga maior (pé de cabra, gangorra, alicate, remo).";
-  else app="Braço do esforço menor ⇒ <b>multiplica o deslocamento/velocidade</b>: exige mais força, mas a carga se move mais (pinça, vassoura, antebraço).";
-  els("application").innerHTML=app;
+  else if(kls==='inter'){
+    if(diff>0){ st.textContent="↻ Gira p/ a direita (esforço vence)"; st.style.color="#44d6ff"; }
+    else{ st.textContent="↺ Gira p/ a esquerda (carga vence)"; st.style.color="#ff8c42"; }
+  } else {
+    if(diff>0){ st.textContent="↑ Sobe — o esforço vence a carga"; st.style.color="#44d6ff"; }
+    else{ st.textContent="↓ Desce — a carga vence o esforço"; st.style.color="#ff8c42"; }
+  }
+  const ex={
+    inter:"<b>Interfixa (1ª classe):</b> o <b>fulcro</b> fica entre a potência e a resistência. A vantagem depende dos braços. Ex.: gangorra, tesoura, alicate, pé de cabra, balança de braços iguais.",
+    resist:"<b>Inter-resistente (2ª classe):</b> a <b>resistência</b> fica entre o fulcro e a potência. O braço do esforço é sempre maior ⇒ <b>multiplica a força</b> (VM &gt; 1). Ex.: carrinho de mão, quebra-nozes, abridor de garrafa.",
+    potente:"<b>Interpotente (3ª classe):</b> a <b>potência</b> fica entre o fulcro e a resistência. O braço do esforço é menor ⇒ <b>multiplica o deslocamento/velocidade</b> (VM &lt; 1), exigindo mais força. Ex.: pinça, antebraço (bíceps), vara de pescar."
+  };
+  els("application").innerHTML=ex[kls];
 }
 
 function tick(){ if(!active) return;
   const {PL,dL,FR,dR}=vals();
   const tauL=PL*dL, tauR=FR*dR;
-  // ângulo-alvo proporcional ao desequilíbrio (limitado a ±22°)
-  const target = Math.max(-0.38, Math.min(0.38, (tauR-tauL)/900));
+  // interfixa: esforço à direita; 2ª/3ª: fulcro na ponta (carga desce, esforço sobe)
+  const drive = (kls==='inter') ? (tauR-tauL) : (tauL-tauR);
+  const target = Math.max(-0.38, Math.min(0.38, drive/900));
   theta += (target - theta)*0.12;
   draw();
   requestAnimationFrame(tick);
@@ -556,13 +586,23 @@ function preset(t){
   refresh();
 }
 
+function setKlass(k){
+  kls=k;
+  if(k==='inter'){ loadF.value=150; loadD.value=2; effF.value=75; effD.value=4; }
+  else if(k==='resist'){ loadF.value=200; loadD.value=1.5; effF.value=75; effD.value=4; }
+  else { loadF.value=50; loadD.value=4; effF.value=200; effD.value=1; }
+  ['inter','resist','potente'].forEach(x=>{ const b=root.querySelector('#alvK-'+x);
+    if(b){ const on=(x===k); b.style.borderColor=on?'#c84dff':''; b.style.color=on?'#fff':''; b.style.background=on?'rgba(200,77,255,0.22)':''; } });
+  theta=0; refresh();
+}
+
 new ResizeObserver(resize).observe(sim);
 window.addEventListener("resize", resize);
-resize(); refresh();
+resize(); setKlass('inter');
 
 function activate(){ active=true; resize(); refresh(); requestAnimationFrame(tick); }
 function deactivate(){ active=false; }
-SIMS.alavanca={activate,deactivate,ui:{preset:preset}};
+SIMS.alavanca={activate,deactivate,ui:{preset:preset,klass:setKlass}};
 })();
 
 (function(){
