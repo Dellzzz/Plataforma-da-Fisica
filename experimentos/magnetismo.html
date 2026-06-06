@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Magnetismo e Indução — Simulador</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#bc13fe;--pink:#ff00ff;--bg:#05010a;--card:rgba(188,19,254,.07);--border:rgba(188,19,254,.25);--text:#d0c0d8;--nred:#ff4d5e;--sblue:#4d8cff;--cyan:#00eeff;--gold:#ffd166;--green:#44ff88;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;}
+body{background:var(--bg);color:#fff;font-family:'Poppins',sans-serif;padding:12px;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at top,rgba(188,19,254,.15),transparent 55%);pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;max-width:1100px;margin:auto;}
+.back{display:inline-block;margin-bottom:10px;color:#e6c2ff;text-decoration:none;font-size:.78rem;font-family:'Orbitron',monospace;border:1px solid var(--border);padding:8px 13px;border-radius:10px;background:var(--card);letter-spacing:1px;transition:.2s;}
+.back:hover{border-color:var(--neon);color:#fff;background:rgba(188,19,254,.18);}
+.lab-title{font-family:'Orbitron',monospace;text-align:center;color:var(--neon);letter-spacing:3px;text-shadow:0 0 20px var(--neon);margin-bottom:6px;font-size:clamp(1.05rem,5vw,1.85rem);}
+.lab-sub{text-align:center;color:var(--text);font-size:clamp(.74rem,2.6vw,.85rem);margin-bottom:14px;}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;justify-content:center;}
+.tab{flex:1 1 auto;white-space:nowrap;border:1px solid var(--border);padding:11px 15px;border-radius:11px;background:var(--card);color:var(--text);cursor:pointer;transition:.2s;font-family:'Orbitron',monospace;font-size:clamp(.6rem,2.5vw,.74rem);letter-spacing:.5px;}
+.tab:hover{border-color:var(--neon);color:#ffc2ff;}
+.tab.active{color:var(--pink);border-color:var(--pink);background:rgba(255,0,255,.12);}
+.layout{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;}
+.canvas-wrap{flex:1 1 420px;min-width:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px;}
+.cbox{position:relative;width:100%;aspect-ratio:720/440;border-radius:10px;overflow:hidden;background:#06000f;}
+canvas{display:block;width:100%;height:100%;touch-action:none;}
+.side{flex:1 1 230px;min-width:210px;display:flex;flex-direction:column;gap:12px;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;}
+.panel-title{color:var(--neon);font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;margin-bottom:10px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.box{background:rgba(255,0,255,.05);border:1px solid rgba(255,0,255,.12);border-radius:8px;padding:8px 4px;text-align:center;}
+.box-label{font-size:.55rem;color:var(--text);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;}
+.box-value{font-family:'Orbitron',monospace;color:var(--pink);font-size:.9rem;}
+.controls{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;}
+.ctitle{color:var(--neon);font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;margin-bottom:12px;}
+.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;}
+.slider-label{display:flex;justify-content:space-between;margin-bottom:7px;font-size:.84rem;color:var(--text);}
+.slider-label b{color:var(--pink);font-family:'Orbitron',monospace;}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:7px;border-radius:8px;background:#3a1357;outline:none;touch-action:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink);cursor:pointer;}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border:none;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink);cursor:pointer;}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.btn{font-family:'Orbitron',monospace;font-size:.62rem;padding:8px 11px;border-radius:9px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;letter-spacing:.6px;transition:.2s;}
+.btn:hover{background:rgba(188,19,254,.2);border-color:var(--neon);color:#ffc2ff;}
+.explain{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px 16px;}
+.explain h3{font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;color:var(--neon);margin-bottom:9px;text-transform:uppercase;}
+.explain p{font-size:.85rem;color:var(--text);line-height:1.75;margin-bottom:8px;}
+.explain b{color:var(--pink);}
+.explain .formula{font-family:'Orbitron',monospace;color:#ffc2ff;background:rgba(0,0,0,.32);border:1px solid rgba(255,0,255,.22);border-radius:8px;padding:9px 10px;text-align:center;font-size:.82rem;margin:9px 0;}
+.explain .ex{font-size:.78rem;color:rgba(216,150,255,.9);}
+.foot{text-align:center;font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;color:var(--neon);padding:16px 0 4px;border-top:1px solid var(--border);margin-top:14px;}
+@media(max-width:560px){body{padding:10px;}.canvas-wrap,.side{flex-basis:100%;}.control-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="app">
+  <a class="back" href="../experimentos.html">← Voltar aos experimentos</a>
+  <h1 class="lab-title">MAGNETISMO E INDUÇÃO</h1>
+  <p class="lab-sub">Campo magnético · Força de Lorentz · Indução (Faraday/Lenz)</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setMode('campo',this)">CAMPO MAGNÉTICO</button>
+    <button class="tab" onclick="setMode('lorentz',this)">FORÇA DE LORENTZ</button>
+    <button class="tab" onclick="setMode('inducao',this)">INDUÇÃO</button>
+  </div>
+
+  <div class="layout">
+    <div class="canvas-wrap"><div class="cbox"><canvas id="cv"></canvas></div></div>
+    <div class="side"><div class="panel"><div class="panel-title">VALORES</div><div class="grid" id="values"></div></div></div>
+  </div>
+
+  <div class="controls">
+    <div class="ctitle" id="ctrlTitle">CONTROLES</div>
+    <div class="control-grid" id="controls"></div>
+    <div class="presets" id="presets"></div>
+  </div>
+
+  <div class="explain" id="explain"></div>
+  <footer class="foot">Prof. Jardel A. Leite</footer>
+</div>
+
+<script>
+const DW=720,DH=440,TAU=Math.PI*2;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let mode='campo',lastTs=0,clock=0;
+
+const state={ campo:{pol:1}, lorentz:{q:1,v:3,B:1,Bdir:1}, inducao:{N:80,B0:1,vel:1} };
+let comp={x:520,y:120}, dragComp=false;     // bússola (campo)
+let lor={th:0};
+let ind={phiPrev:null, emf:0};
+
+const CTRL={
+  campo:[],
+  lorentz:[ {k:'q',lab:'Carga',min:-3,max:3,step:0.5,u:'q'},
+            {k:'v',lab:'Velocidade',min:1,max:6,step:0.5,u:'v'},
+            {k:'B',lab:'Campo B',min:0.2,max:2,step:0.1,u:'B'} ],
+  inducao:[ {k:'N',lab:'Nº de espiras',min:10,max:200,step:5,u:''},
+            {k:'B0',lab:'Força do ímã',min:0.3,max:2,step:0.1,u:''},
+            {k:'vel',lab:'Velocidade do ímã',min:0.3,max:2.5,step:0.1,u:''} ]
+};
+const EXPLAIN={
+  campo:`<h3>Campo Magnético</h3>
+    <p>Um ímã cria linhas de campo que <b>saem do polo norte (N)</b> e <b>entram no sul (S)</b>, formando curvas fechadas. A intensidade é maior perto dos polos.</p>
+    <div class="formula">linhas: N → S (externas) · nunca se cruzam</div>
+    <p>Arraste a <b>bússola</b> pela tela: a agulha sempre se alinha à direção do campo no ponto onde está — é assim que ela aponta para o norte geográfico (que é um polo sul magnético!). Use "inverter polaridade" para trocar N e S.</p>
+    <p class="ex">Polos iguais se repelem, opostos se atraem. Não existe monopolo: quebrar um ímã gera dois ímãs completos.</p>`,
+  lorentz:`<h3>Força Magnética (Lorentz)</h3>
+    <p>Uma carga em movimento dentro de um campo magnético sofre uma força <b>perpendicular</b> à velocidade e ao campo. Como a força é sempre centrípeta, a trajetória é <b>circular</b>:</p>
+    <div class="formula">F = q·v·B &nbsp;|&nbsp; r = m·v/(q·B) &nbsp;|&nbsp; T = 2πm/(qB)</div>
+    <p>Aumente <b>v</b> e o raio cresce; aumente <b>B</b> e o raio diminui. Inverta o sinal da <b>carga</b> ou o sentido do <b>campo</b> e a rotação muda de sentido. Os símbolos × (entrando) e • (saindo) mostram a direção de B.</p>
+    <p class="ex">É o princípio dos aceleradores de partículas, das auroras polares e dos antigos monitores de tubo (TRC).</p>`,
+  inducao:`<h3>Indução Eletromagnética (Faraday/Lenz)</h3>
+    <p>Variar o <b>fluxo magnético</b> através de uma bobina induz uma força eletromotriz (FEM) e uma corrente. A FEM é maior quanto mais rápido o ímã se move e quanto mais espiras houver:</p>
+    <div class="formula">ε = − N · ΔΦ/Δt</div>
+    <p>Pela <b>Lei de Lenz</b>, a corrente induzida se opõe à variação: ao <b>aproximar</b> o ímã a corrente vai num sentido; ao <b>afastar</b>, inverte. Quando o ímã para, a FEM é zero. Veja o galvanômetro defletir e o sentido da corrente mudar.</p>
+    <p class="ex">É a base de geradores, usinas elétricas, dínamos de bicicleta e carregadores por indução.</p>`
+};
+
+function resize(){const r=cv.getBoundingClientRect();const dpr=window.devicePixelRatio||1;
+  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);const s=r.width/DW;ctx.setTransform(s*dpr,0,0,s*dpr,0,0);}
+function bg(){ctx.fillStyle='#06000f';ctx.fillRect(0,0,DW,DH);ctx.strokeStyle='rgba(188,19,254,.06)';ctx.lineWidth=1;
+  for(let x=0;x<DW;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,DH);ctx.stroke();}
+  for(let y=0;y<DH;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(DW,y);ctx.stroke();}}
+function glow(c,b){ctx.shadowColor=c;ctx.shadowBlur=b||12;}function ng(){ctx.shadowBlur=0;}
+function arrow(x1,y1,x2,y2,col,w){ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=w||3;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();const a=Math.atan2(y2-y1,x2-x1),hl=9;
+  ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-hl*Math.cos(a-.4),y2-hl*Math.sin(a-.4));ctx.lineTo(x2-hl*Math.cos(a+.4),y2-hl*Math.sin(a+.4));ctx.closePath();ctx.fill();}
+function setVals(o){let h='';for(const k in o)h+=`<div class="box"><div class="box-label">${k}</div><div class="box-value">${o[k]}</div></div>`;document.getElementById('values').innerHTML=h;}
+
+// ===== CAMPO =====
+const MAGX=360,MAGY=220,MAGHL=85;
+function poles(){const s=state.campo.pol; return [ {x:MAGX-MAGHL,y:MAGY,q:+s}, {x:MAGX+MAGHL,y:MAGY,q:-s} ];}
+function Bfield(px,py){let bx=0,by=0;for(const p of poles()){const dx=px-p.x,dy=py-p.y;const r2=dx*dx+dy*dy+40;const r=Math.sqrt(r2);const f=18000*p.q/(r2*r);bx+=f*dx;by+=f*dy;}return{bx,by};}
+function drawCampo(){bg();const s=state.campo.pol;
+  const P=poles(), Npole=P[0].q>0?P[0]:P[1], Spole=P[0].q>0?P[1]:P[0];
+  // linhas de campo (integradas a partir do N)
+  ctx.lineWidth=1.8;
+  for(let i=0;i<10;i++){const ang=(-Math.PI*0.42)+(i/9)*(Math.PI*0.84);
+    for(const side of [1,-1]){ let x=Npole.x+Math.cos(ang)*14, y=Npole.y+Math.sin(ang)*14*side;
+      ctx.strokeStyle='rgba(120,200,255,.55)';ctx.beginPath();ctx.moveTo(x,y);
+      let arrowAt=18;
+      for(let st=0;st<260;st++){const B=Bfield(x,y);const m=Math.hypot(B.bx,B.by)||1;x+=B.bx/m*4;y+=B.by/m*4;ctx.lineTo(x,y);
+        if(st===arrowAt){const B2=Bfield(x,y);const a=Math.atan2(B2.by,B2.bx);ctx.stroke();ctx.fillStyle='rgba(150,210,255,.8)';
+          ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-8*Math.cos(a-.4),y-8*Math.sin(a-.4));ctx.lineTo(x-8*Math.cos(a+.4),y-8*Math.sin(a+.4));ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(x,y);}
+        if(Math.hypot(x-Spole.x,y-Spole.y)<16||x<0||x>DW||y<0||y>DH)break;}
+      ctx.stroke();
+    }}
+  // ímã (barra)
+  const half=MAGHL+10;
+  ctx.fillStyle=Npole.x<Spole.x?'#ff4d5e':'#4d8cff';ctx.fillRect(MAGX-half,MAGY-26,half,52);
+  ctx.fillStyle=Npole.x<Spole.x?'#4d8cff':'#ff4d5e';ctx.fillRect(MAGX,MAGY-26,half,52);
+  ctx.fillStyle='#fff';ctx.font='bold 22px Orbitron';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(Npole.x<Spole.x?'N':'S',MAGX-half/2,MAGY);ctx.fillText(Npole.x<Spole.x?'S':'N',MAGX+half/2,MAGY);ctx.textBaseline='alphabetic';
+  // bússola
+  const B=Bfield(comp.x,comp.y), a=Math.atan2(B.by,B.bx);
+  ctx.save();ctx.translate(comp.x,comp.y);
+  ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,20,0,TAU);ctx.stroke();
+  ctx.fillStyle='rgba(0,0,0,.4)';ctx.beginPath();ctx.arc(0,0,20,0,TAU);ctx.fill();
+  ctx.rotate(a);
+  ctx.fillStyle='#ff4d5e';ctx.beginPath();ctx.moveTo(18,0);ctx.lineTo(-6,5);ctx.lineTo(-6,-5);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#9ab';ctx.beginPath();ctx.moveTo(-18,0);ctx.lineTo(6,5);ctx.lineTo(6,-5);ctx.closePath();ctx.fill();
+  ctx.restore();
+  ctx.fillStyle='#cbb8e0';ctx.font='10px Poppins';ctx.textAlign='center';ctx.fillText('bússola (arraste)',comp.x,comp.y+34);
+  setVals({polo:'N ↔ S','arraste':'a bússola','linhas':'N → S','campo':'∝ 1/r²'});
+}
+
+// ===== LORENTZ =====
+function drawLorentz(){bg();const s=state.lorentz;
+  const cx=DW/2,cy=DH/2;
+  // campo (× entrando / • saindo)
+  ctx.fillStyle='rgba(120,200,255,.5)';ctx.strokeStyle='rgba(120,200,255,.5)';ctx.lineWidth=1.5;
+  for(let x=60;x<DW-20;x+=56)for(let y=40;y<DH-20;y+=56){
+    if(s.Bdir>0){ctx.beginPath();ctx.moveTo(x-5,y-5);ctx.lineTo(x+5,y+5);ctx.moveTo(x+5,y-5);ctx.lineTo(x-5,y+5);ctx.stroke();}
+    else{ctx.beginPath();ctx.arc(x,y,3,0,TAU);ctx.fill();}}
+  const m=1, r=m*s.v/(Math.abs(s.q||0.5)*s.B);
+  const rpx=Math.max(24,Math.min(150, r*11));
+  const w=(s.q*s.B/m)*s.Bdir;     // sentido conforme q e B
+  lor.th+=w*0.02;
+  const px=cx+rpx*Math.cos(lor.th), py=cy+rpx*Math.sin(lor.th);
+  // órbita
+  ctx.strokeStyle='rgba(255,0,255,.3)';ctx.lineWidth=1.5;ctx.setLineDash([5,5]);ctx.beginPath();ctx.arc(cx,cy,rpx,0,TAU);ctx.stroke();ctx.setLineDash([]);
+  // velocidade (tangente) e força (centrípeta)
+  const vdir=lor.th+Math.PI/2*Math.sign(w||1);
+  arrow(px,py,px+Math.cos(vdir)*38,py+Math.sin(vdir)*38,'#00eeff',3);
+  ctx.fillStyle='#00eeff';ctx.font='12px Orbitron';ctx.fillText('v',px+Math.cos(vdir)*44,py+Math.sin(vdir)*44);
+  arrow(px,py,cx+(px-cx)*0.55,cy+(py-cy)*0.55,'#ffd166',3);
+  ctx.fillStyle='#ffd166';ctx.fillText('F',(px+cx)/2,(py+cy)/2);
+  // partícula
+  const col=s.q>=0?'#ff5566':'#4d8cff';
+  ctx.fillStyle=col;glow(col,16);ctx.beginPath();ctx.arc(px,py,11,0,TAU);ctx.fill();ng();
+  ctx.fillStyle='#fff';ctx.font='bold 13px Orbitron';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.q>=0?'+':'−',px,py);ctx.textBaseline='alphabetic';
+  ctx.fillStyle='#cbb8e0';ctx.font='11px Poppins';ctx.textAlign='left';ctx.fillText('B '+(s.Bdir>0?'entrando (×)':'saindo (•)'),16,DH-14);
+  const F=Math.abs(s.q)*s.v*s.B, T=TAU*m/(Math.abs(s.q||0.5)*s.B);
+  setVals({'raio r':r.toFixed(2),'período T':T.toFixed(2),'|F|=qvB':F.toFixed(2),'carga':s.q,'sentido':(w>=0?'horário':'anti-horário'),'B':s.B.toFixed(1)});
+}
+
+// ===== INDUÇÃO =====
+function Bdist(d,B0){return B0/Math.pow(1+(d/70)**2,1.5);}
+function drawInducao(dt){bg();const s=state.inducao;
+  const coilX=470, cy=DH/2;
+  const gap = 90 + 120*(0.5+0.5*Math.sin(clock*s.vel*1.4)); // distância variável
+  const magX = coilX - gap;
+  // fluxo e FEM (numérico)
+  const A=1, phi=s.N*A*Bdist(gap,s.B0);
+  if(ind.phiPrev===null)ind.phiPrev=phi;
+  const emfRaw=-(phi-ind.phiPrev)/Math.max(1e-4,dt); ind.phiPrev=phi;
+  ind.emf=ind.emf*0.8+emfRaw*0.2;
+  const emf=ind.emf;
+  // bobina (espiras)
+  ctx.strokeStyle='#d8a0ff';ctx.lineWidth=3;
+  for(let i=0;i<6;i++){const x=coilX+i*16;ctx.beginPath();ctx.ellipse(x,cy,12,40,0,0,TAU);ctx.stroke();}
+  // fios para o galvanômetro
+  ctx.strokeStyle='#9ab';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(coilX,cy+40);ctx.lineTo(coilX,cy+90);ctx.lineTo(620,cy+90);ctx.lineTo(620,cy+40);ctx.moveTo(coilX+80,cy-40);ctx.lineTo(coilX+80,cy-90);ctx.lineTo(560,cy-90);ctx.stroke();
+  // corrente induzida (setas animadas no fio inferior)
+  const onCur=Math.abs(emf)>2;
+  if(onCur){const dir=Math.sign(emf);ctx.fillStyle='#00eeff';
+    for(let i=0;i<6;i++){let t=((clock*1.5*dir)%1+1)%1; let xx=coilX+ (t+i/6)%1*(620-coilX); const yy=cy+90;
+      ctx.beginPath();ctx.arc(xx,yy,3.5,0,TAU);ctx.fill();}}
+  // galvanômetro
+  const gx=590,gy=cy-90;
+  ctx.fillStyle='rgba(0,0,0,.5)';ctx.strokeStyle='#bbb';ctx.lineWidth=2;ctx.beginPath();ctx.arc(gx,gy,34,Math.PI,TAU);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(gx-34,gy);ctx.lineTo(gx+34,gy);ctx.stroke();
+  const defl=Math.max(-1,Math.min(1,emf/30))* (Math.PI/2.4);
+  ctx.strokeStyle='#ff5566';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(gx+30*Math.sin(defl),gy-30*Math.cos(defl));ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='9px Orbitron';ctx.textAlign='center';ctx.fillText('0',gx,gy-12);ctx.fillText('G',gx,gy+ -40);
+  // ímã (movendo)
+  const mh=70;
+  ctx.fillStyle='#ff4d5e';ctx.fillRect(magX-mh,cy-22,mh,44);ctx.fillStyle='#4d8cff';ctx.fillRect(magX-mh*2,cy-22,mh,44);
+  ctx.fillStyle='#fff';ctx.font='bold 18px Orbitron';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('S',magX-mh*1.5,cy);ctx.fillText('N',magX-mh/2,cy);ctx.textBaseline='alphabetic';
+  // indicador aproxima/afasta
+  const vmag=Math.cos(clock*s.vel*1.4);
+  ctx.fillStyle='#cbb8e0';ctx.font='11px Poppins';ctx.textAlign='center';
+  ctx.fillText(Math.abs(emf)<2?'ímã quase parado — FEM ≈ 0':(emf>0?'afastando → corrente inverte':'aproximando → corrente induzida'),DW/2,28);
+  setVals({'FEM (ε)':emf.toFixed(1)+' V','fluxo Φ':phi.toFixed(0),'espiras N':s.N,'sentido':(Math.abs(emf)<2?'—':(emf>0?'horário':'anti-horário')),'ímã':(Math.abs(emf)<2?'parado':(emf<0?'aproxima':'afasta')),'B ímã':s.B0.toFixed(1)});
+}
+
+function frame(ts){const dt=Math.min(0.05,((ts||0)-lastTs)/1000||0.016);lastTs=ts||0;clock+=dt;
+  if(mode==='campo')drawCampo(); else if(mode==='lorentz')drawLorentz(); else drawInducao(dt);
+  requestAnimationFrame(frame);}
+
+// ===== arraste da bússola (campo) =====
+function ptCoords(cx,cy){const r=cv.getBoundingClientRect();return{x:(cx-r.left)*(DW/r.width),y:(cy-r.top)*(DH/r.height)};}
+cv.addEventListener('mousedown',e=>{if(mode!=='campo')return;const p=ptCoords(e.clientX,e.clientY);if(Math.hypot(p.x-comp.x,p.y-comp.y)<30)dragComp=true;});
+cv.addEventListener('mousemove',e=>{if(!dragComp)return;const p=ptCoords(e.clientX,e.clientY);comp.x=p.x;comp.y=p.y;});
+window.addEventListener('mouseup',()=>dragComp=false);
+cv.addEventListener('touchstart',e=>{if(mode!=='campo'||!e.touches[0])return;const p=ptCoords(e.touches[0].clientX,e.touches[0].clientY);if(Math.hypot(p.x-comp.x,p.y-comp.y)<36){dragComp=true;e.preventDefault();}},{passive:false});
+cv.addEventListener('touchmove',e=>{if(!dragComp||!e.touches[0])return;const p=ptCoords(e.touches[0].clientX,e.touches[0].clientY);comp.x=p.x;comp.y=p.y;e.preventDefault();},{passive:false});
+cv.addEventListener('touchend',()=>dragComp=false);
+
+// ===== UI =====
+function renderControls(){const wrap=document.getElementById('controls');const specs=CTRL[mode];const st=state[mode];let h='';
+  specs.forEach(sp=>{h+=`<div><div class="slider-label">${sp.lab} <b><span id="lbl_${sp.k}">${st[sp.k]}</span> ${sp.u}</b></div>
+   <input type="range" id="sl_${sp.k}" min="${sp.min}" max="${sp.max}" step="${sp.step}" value="${st[sp.k]}" oninput="onCtrl('${sp.k}',this.value)"></div>`;});
+  wrap.innerHTML=h;
+  const pr=document.getElementById('presets');
+  if(mode==='campo') pr.innerHTML=`<button class="btn" onclick="invPol()">⇄ Inverter polaridade</button>`;
+  else if(mode==='lorentz') pr.innerHTML=`<button class="btn" onclick="invB()">⇄ Inverter campo (×/•)</button>`;
+  else pr.innerHTML='';
+}
+function onCtrl(k,v){v=+v;state[mode][k]=v;document.getElementById('lbl_'+k).textContent=(Math.round(v*100)/100);}
+function invPol(){state.campo.pol*=-1;}
+function invB(){state.lorentz.Bdir*=-1;}
+function setMode(m,btn){mode=m;document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');
+  document.getElementById('ctrlTitle').textContent='CONTROLES — '+{campo:'Campo',lorentz:'Lorentz',inducao:'Indução'}[m];
+  document.getElementById('explain').innerHTML=EXPLAIN[m];ind.phiPrev=null;renderControls();}
+
+new ResizeObserver(resize).observe(document.querySelector('.cbox'));
+window.addEventListener('resize',resize);
+resize(); setMode('campo',document.querySelector('.tab')); requestAnimationFrame(frame);
+</script>
+</body>
+</html>
