@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Energia e Colisões — Simulador</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#bc13fe;--pink:#ff00ff;--bg:#05010a;--card:rgba(188,19,254,.07);--border:rgba(188,19,254,.25);--text:#d0c0d8;--green:#44ff88;--cyan:#00eeff;--red:#ff5566;--gold:#ffd166;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;}
+body{background:var(--bg);color:#fff;font-family:'Poppins',sans-serif;padding:12px;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at top,rgba(188,19,254,.15),transparent 55%);pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;max-width:1100px;margin:auto;}
+.back{display:inline-block;margin-bottom:10px;color:#e6c2ff;text-decoration:none;font-size:.78rem;font-family:'Orbitron',monospace;border:1px solid var(--border);padding:8px 13px;border-radius:10px;background:var(--card);letter-spacing:1px;transition:.2s;}
+.back:hover{border-color:var(--neon);color:#fff;background:rgba(188,19,254,.18);}
+.lab-title{font-family:'Orbitron',monospace;text-align:center;color:var(--neon);letter-spacing:3px;text-shadow:0 0 20px var(--neon);margin-bottom:6px;font-size:clamp(1.05rem,5vw,1.9rem);}
+.lab-sub{text-align:center;color:var(--text);font-size:clamp(.74rem,2.6vw,.85rem);margin-bottom:14px;}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;justify-content:center;}
+.tab{flex:1 1 auto;white-space:nowrap;border:1px solid var(--border);padding:11px 16px;border-radius:11px;background:var(--card);color:var(--text);cursor:pointer;transition:.2s;font-family:'Orbitron',monospace;font-size:clamp(.62rem,2.6vw,.76rem);letter-spacing:.5px;}
+.tab:hover{border-color:var(--neon);color:#ffc2ff;}
+.tab.active{color:var(--pink);border-color:var(--pink);background:rgba(255,0,255,.12);}
+.layout{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;}
+.canvas-wrap{flex:1 1 420px;min-width:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px;}
+.cbox{position:relative;width:100%;aspect-ratio:720/430;border-radius:10px;overflow:hidden;background:#06000f;}
+canvas{display:block;width:100%;height:100%;touch-action:none;}
+.side{flex:1 1 230px;min-width:210px;display:flex;flex-direction:column;gap:12px;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;}
+.panel-title{color:var(--neon);font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;margin-bottom:10px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.box{background:rgba(255,0,255,.05);border:1px solid rgba(255,0,255,.12);border-radius:8px;padding:8px 4px;text-align:center;}
+.box-label{font-size:.56rem;color:var(--text);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;}
+.box-value{font-family:'Orbitron',monospace;color:var(--pink);font-size:.92rem;}
+.controls{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;}
+.ctitle{color:var(--neon);font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;}
+.slider-label{display:flex;justify-content:space-between;margin-bottom:7px;font-size:.84rem;color:var(--text);}
+.slider-label b{color:var(--pink);font-family:'Orbitron',monospace;}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:7px;border-radius:8px;background:#3a1357;outline:none;touch-action:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink);cursor:pointer;}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border:none;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink);cursor:pointer;}
+.btn{font-family:'Orbitron',monospace;font-size:.66rem;padding:9px 13px;border-radius:9px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;letter-spacing:1px;transition:.2s;}
+.btn:hover{background:rgba(188,19,254,.2);border-color:var(--neon);color:#ffc2ff;}
+.btn.on{background:rgba(255,0,255,.2);border-color:var(--pink);color:var(--pink);}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.explain{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px 16px;}
+.explain h3{font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;color:var(--neon);margin-bottom:9px;text-transform:uppercase;}
+.explain p{font-size:.85rem;color:var(--text);line-height:1.75;margin-bottom:8px;}
+.explain b{color:var(--pink);}
+.explain .formula{font-family:'Orbitron',monospace;color:#ffc2ff;background:rgba(0,0,0,.32);border:1px solid rgba(255,0,255,.22);border-radius:8px;padding:9px 10px;text-align:center;font-size:.82rem;margin:9px 0;}
+.explain .ex{font-size:.78rem;color:rgba(216,150,255,.9);}
+.foot{text-align:center;font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;color:var(--neon);padding:16px 0 4px;border-top:1px solid var(--border);margin-top:14px;}
+@media(max-width:560px){body{padding:10px;}.canvas-wrap,.side{flex-basis:100%;}.control-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="app">
+  <a class="back" href="../experimentos.html">← Voltar aos experimentos</a>
+  <h1 class="lab-title">ENERGIA E COLISÕES</h1>
+  <p class="lab-sub">Conservação de energia mecânica · Quantidade de movimento e colisões</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setMode('energy',this)">CONSERVAÇÃO DE ENERGIA</button>
+    <button class="tab" onclick="setMode('collide',this)">COLISÕES</button>
+  </div>
+
+  <div class="layout">
+    <div class="canvas-wrap"><div class="cbox"><canvas id="cv"></canvas></div></div>
+    <div class="side">
+      <div class="panel"><div class="panel-title">VALORES</div><div class="grid" id="values"></div></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="ctitle"><span id="ctrlTitle">CONTROLES</span>
+      <span><button class="btn" id="btnPause" onclick="togglePause()">⏸ Pausar</button>
+      <button class="btn" id="btnReset" onclick="resetMode()">↺ Reiniciar</button></span></div>
+    <div class="control-grid" id="controls"></div>
+    <div class="presets" id="presets"></div>
+  </div>
+
+  <div class="explain" id="explain"></div>
+  <footer class="foot">Prof. Jardel A. Leite</footer>
+</div>
+
+<script>
+const DW=720,DH=430,g=9.8,TAU=Math.PI*2;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let mode='energy',paused=false,lastTs=0;
+
+const state={ energy:{m:2,h0:5,mu:0.05}, collide:{m1:2,m2:1,v1:3,v2:-1.5,e:1} };
+// runtime
+let en={x:0,vt:0,E0:0};
+let col={x1:-4,x2:4,v1:3,v2:-1.5,r1:0.8,r2:0.6};
+
+const CTRL={
+  energy:[ {k:'m',lab:'Massa',min:0.5,max:5,step:0.1,u:'kg'},
+           {k:'h0',lab:'Altura de soltura',min:1,max:7,step:0.5,u:'m'},
+           {k:'mu',lab:'Atrito (µ)',min:0,max:0.3,step:0.01,u:''} ],
+  collide:[ {k:'m1',lab:'Massa 1',min:0.5,max:5,step:0.1,u:'kg'},
+            {k:'m2',lab:'Massa 2',min:0.5,max:5,step:0.1,u:'kg'},
+            {k:'v1',lab:'Veloc. 1',min:-6,max:6,step:0.5,u:'m/s'},
+            {k:'v2',lab:'Veloc. 2',min:-6,max:6,step:0.5,u:'m/s'},
+            {k:'e',lab:'Restituição (e)',min:0,max:1,step:0.05,u:''} ]
+};
+const EXPLAIN={
+  energy:`<h3>Conservação de Energia Mecânica</h3>
+    <p>Sem atrito, a soma da energia <b>cinética</b> (Ec) com a <b>potencial gravitacional</b> (Ep) é constante: a energia só se <b>transforma</b> de uma forma na outra. No ponto mais alto tudo é Ep; no mais baixo, tudo é Ec.</p>
+    <div class="formula">E = Ec + Ep = ½mv² + mgh = constante</div>
+    <p>Ligue o <b>atrito (µ)</b> e veja a barra de energia: parte vira calor (energia <b>dissipada</b>, em vermelho) e a oscilação diminui até parar. A energia total não some — apenas deixa de ser mecânica.</p>
+    <p class="ex">No dia a dia: montanha-russa, pêndulo, skate numa rampa.</p>`,
+  collide:`<h3>Colisões e Quantidade de Movimento</h3>
+    <p>Em toda colisão (com forças internas) a <b>quantidade de movimento se conserva</b>: p = mv total antes = depois. O que muda é a energia cinética, conforme o <b>coeficiente de restituição e</b>:</p>
+    <div class="formula">m₁v₁ + m₂v₂ = m₁v₁' + m₂v₂'</div>
+    <p><b>e = 1</b>: colisão elástica (Ec também se conserva). <b>0 &lt; e &lt; 1</b>: parcialmente inelástica (perde Ec). <b>e = 0</b>: perfeitamente inelástica (os corpos seguem juntos). Compare os valores de p e Ec antes e depois.</p>
+    <p class="ex">No dia a dia: bolas de bilhar (≈elástica), massa de modelar grudando (inelástica), air bag.</p>`
+};
+
+function resize(){const r=cv.getBoundingClientRect();const dpr=window.devicePixelRatio||1;
+  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);const s=r.width/DW;ctx.setTransform(s*dpr,0,0,s*dpr,0,0);}
+function bg(){ctx.fillStyle='#06000f';ctx.fillRect(0,0,DW,DH);ctx.strokeStyle='rgba(188,19,254,.06)';ctx.lineWidth=1;
+  for(let x=0;x<DW;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,DH);ctx.stroke();}
+  for(let y=0;y<DH;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(DW,y);ctx.stroke();}}
+function glow(c,b){ctx.shadowColor=c;ctx.shadowBlur=b||14;}function ng(){ctx.shadowBlur=0;}
+
+// ===== ENERGIA =====
+const C=0.11, CX=360, SX=36, SY=40, YB=360;
+const hOf=x=>C*x*x;
+const scrX=x=>CX+x*SX, scrY=h=>YB-h*SY;
+function resetEnergy(){const s=state.energy; en.x=-Math.sqrt(s.h0/C); en.vt=0; en.E0=s.m*g*s.h0;}
+function stepEnergy(dt){const s=state.energy;
+  const hp=2*C*en.x, dn=Math.sqrt(1+hp*hp), sin=hp/dn, cos=1/dn;
+  let a=-g*sin; if(en.vt!==0)a-=s.mu*g*cos*Math.sign(en.vt);
+  en.vt+=a*dt; en.x+=en.vt*cos*dt;
+}
+function drawEnergy(){bg(); const s=state.energy;
+  // pista
+  ctx.strokeStyle='#9b59d0';ctx.lineWidth=5;ctx.beginPath();
+  for(let x=-8;x<=8;x+=0.1){const px=scrX(x),py=scrY(hOf(x));x===-8?ctx.moveTo(px,py):ctx.lineTo(px,py);}ctx.stroke();
+  ctx.strokeStyle='rgba(213,140,255,.25)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(scrX(-8),YB+2);ctx.lineTo(scrX(8),YB+2);ctx.stroke();
+  // bola
+  const h=hOf(en.x), px=scrX(en.x), py=scrY(h)-12;
+  const v=Math.abs(en.vt), Ec=0.5*s.m*en.vt*en.vt, Ep=s.m*g*h;
+  // vetor velocidade (tangente)
+  const hp=2*C*en.x, dn=Math.sqrt(1+hp*hp); const tx=(1/dn)*Math.sign(en.vt||1), ty=(hp/dn)*Math.sign(en.vt||1);
+  if(v>0.1){ctx.strokeStyle='#00eeff';ctx.fillStyle='#00eeff';ctx.lineWidth=3;glow('#00eeff',8);
+    const ex=px+tx*(14+v*7), ey=py+ty*(14+v*7);ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(ex,ey);ctx.stroke();
+    const ang=Math.atan2(ey-py,ex-px);ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(ex-9*Math.cos(ang-.4),ey-9*Math.sin(ang-.4));ctx.lineTo(ex-9*Math.cos(ang+.4),ey-9*Math.sin(ang+.4));ctx.closePath();ctx.fill();ng();}
+  ctx.fillStyle='#ffd166';glow('#ffd166',16);ctx.beginPath();ctx.arc(px,py,12,0,TAU);ctx.fill();ng();
+  // linha de altura
+  ctx.strokeStyle='rgba(255,255,255,.2)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,YB+2);ctx.stroke();ctx.setLineDash([]);
+  // barra de energia
+  const E0=en.E0||1, Dis=Math.max(0,E0-Ec-Ep);
+  const bx=70,bw=580,by=398,bh=18;
+  ctx.fillStyle='rgba(255,255,255,.08)';ctx.fillRect(bx,by,bw,bh);
+  let cur=bx; const seg=(val,col)=>{const w=bw*val/E0;ctx.fillStyle=col;ctx.fillRect(cur,by,w,bh);cur+=w;};
+  seg(Ep,'#44ff88'); seg(Ec,'#00eeff'); seg(Dis,'#ff5566');
+  ctx.fillStyle='#fff';ctx.font='10px Orbitron';ctx.textAlign='left';ctx.fillText('Ep',bx,by-4);
+  ctx.fillStyle='#00eeff';ctx.fillText('Ec',bx+40,by-4);ctx.fillStyle='#ff5566';ctx.fillText('Dissipada',bx+82,by-4);
+  setVals({h:h.toFixed(2)+' m', v:v.toFixed(2)+' m/s', Ec:Ec.toFixed(0)+' J', Ep:Ep.toFixed(0)+' J', 'E mec':(Ec+Ep).toFixed(0)+' J', 'E₀':E0.toFixed(0)+' J'});
+}
+
+// ===== COLISÕES =====
+const WM=16, CXc=360, SXc=600/WM, YL=200;
+function resetCollide(){const s=state.collide; col.r1=0.45+0.16*s.m1; col.r2=0.45+0.16*s.m2;
+  col.x1=-4; col.x2=4; col.v1=s.v1; col.v2=s.v2;}
+function stepCollide(dt){const s=state.collide;
+  col.x1+=col.v1*dt; col.x2+=col.v2*dt;
+  // paredes (elástico)
+  if(col.x1-col.r1<-WM/2){col.x1=-WM/2+col.r1;col.v1=Math.abs(col.v1);}
+  if(col.x2+col.r2>WM/2){col.x2=WM/2-col.r2;col.v2=-Math.abs(col.v2);}
+  if(col.x1+col.r1>WM/2){col.x1=WM/2-col.r1;col.v1=-Math.abs(col.v1);}
+  if(col.x2-col.r2<-WM/2){col.x2=-WM/2+col.r2;col.v2=Math.abs(col.v2);}
+  // colisão entre os dois
+  if(col.x1<col.x2 && (col.x2-col.x1)<=(col.r1+col.r2) && (col.v1-col.v2)>0){
+    const M=s.m1+s.m2, e=s.e;
+    const v1f=(s.m1*col.v1+s.m2*col.v2+s.m2*e*(col.v2-col.v1))/M;
+    const v2f=(s.m1*col.v1+s.m2*col.v2+s.m1*e*(col.v1-col.v2))/M;
+    col.v1=v1f; col.v2=v2f;
+    const overlap=(col.r1+col.r2)-(col.x2-col.x1); col.x1-=overlap/2; col.x2+=overlap/2;
+  }
+}
+function drawCollide(){bg(); const s=state.collide;
+  const trackY=DH*0.5;
+  // trilho e paredes
+  ctx.strokeStyle='rgba(213,140,255,.4)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(CXc-300,trackY+30);ctx.lineTo(CXc+300,trackY+30);ctx.stroke();
+  ctx.fillStyle='rgba(188,19,254,.4)';ctx.fillRect(CXc-300-8,trackY-50,8,80);ctx.fillRect(CXc+300,trackY-50,8,80);
+  const drawDisc=(x,r,m,v,col1,col2,lbl)=>{const sx=CXc+x*SXc, rpx=r*SXc;
+    const grad=ctx.createRadialGradient(sx-rpx*0.3,trackY-rpx*0.3,rpx*0.2,sx,trackY,rpx);grad.addColorStop(0,col1);grad.addColorStop(1,col2);
+    ctx.fillStyle=grad;glow(col2,14);ctx.beginPath();ctx.arc(sx,trackY,rpx,0,TAU);ctx.fill();ng();
+    ctx.fillStyle='#fff';ctx.font='bold 12px Orbitron';ctx.textAlign='center';ctx.fillText(lbl,sx,trackY+4);
+    ctx.font='10px Poppins';ctx.fillText(m.toFixed(1)+' kg',sx,trackY-rpx-14);ctx.fillText(v.toFixed(1)+' m/s',sx,trackY-rpx-2);
+    // seta de velocidade
+    if(Math.abs(v)>0.05){const dir=Math.sign(v),ex=sx+dir*(rpx+10+Math.abs(v)*6);ctx.strokeStyle='#ffd166';ctx.fillStyle='#ffd166';ctx.lineWidth=3;
+      ctx.beginPath();ctx.moveTo(sx+dir*rpx,trackY);ctx.lineTo(ex,trackY);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(ex,trackY);ctx.lineTo(ex-dir*8,trackY-5);ctx.lineTo(ex-dir*8,trackY+5);ctx.closePath();ctx.fill();}};
+  drawDisc(col.x1,col.r1,s.m1,col.v1,'#9be7ff','#0a84c4','1');
+  drawDisc(col.x2,col.r2,s.m2,col.v2,'#ffc8a8','#d4530a','2');
+  const p=s.m1*col.v1+s.m2*col.v2, Ec=0.5*s.m1*col.v1*col.v1+0.5*s.m2*col.v2*col.v2;
+  setVals({'p total':p.toFixed(1), 'Ec total':Ec.toFixed(1)+' J', 'v1':col.v1.toFixed(1), 'v2':col.v2.toFixed(1), 'e':s.e.toFixed(2), tipo:(s.e>=0.99?'elástica':s.e<=0.01?'inelástica':'parcial')});
+}
+
+function setVals(o){let h='';for(const k in o)h+=`<div class="box"><div class="box-label">${k}</div><div class="box-value">${o[k]}</div></div>`;document.getElementById('values').innerHTML=h;}
+
+function frame(ts){const realDt=Math.min(0.033,((ts||0)-lastTs)/1000||0);lastTs=ts||0;
+  if(!paused){ const sub=20, dt=realDt/sub;
+    for(let i=0;i<sub;i++){ if(mode==='energy')stepEnergy(dt); else stepCollide(dt); } }
+  if(mode==='energy')drawEnergy(); else drawCollide();
+  requestAnimationFrame(frame);}
+
+// ===== UI =====
+function renderControls(){const wrap=document.getElementById('controls');const specs=CTRL[mode];const st=state[mode];let h='';
+  specs.forEach(sp=>{h+=`<div><div class="slider-label">${sp.lab} <b><span id="lbl_${sp.k}">${st[sp.k]}</span> ${sp.u}</b></div>
+   <input type="range" id="sl_${sp.k}" min="${sp.min}" max="${sp.max}" step="${sp.step}" value="${st[sp.k]}" oninput="onCtrl('${sp.k}',this.value)"></div>`;});
+  wrap.innerHTML=h;
+  const pr=document.getElementById('presets');
+  if(mode==='collide') pr.innerHTML=`<button class="btn" onclick="preset(1)">Elástica (e=1)</button><button class="btn" onclick="preset(0.5)">Parcial (e=0,5)</button><button class="btn" onclick="preset(0)">Inelástica (e=0)</button>`;
+  else pr.innerHTML='';
+}
+function onCtrl(k,v){v=+v;state[mode][k]=v;document.getElementById('lbl_'+k).textContent=(Math.round(v*100)/100);
+  if(mode==='energy')resetEnergy(); else resetCollide();}
+function preset(e){state.collide.e=e;document.getElementById('sl_e').value=e;document.getElementById('lbl_e').textContent=e;resetCollide();}
+function setMode(m,btn){mode=m;document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');
+  document.getElementById('ctrlTitle').textContent='CONTROLES — '+(m==='energy'?'Energia':'Colisões');
+  document.getElementById('explain').innerHTML=EXPLAIN[m];
+  renderControls(); resetMode();}
+function resetMode(){ if(mode==='energy')resetEnergy(); else resetCollide(); paused=false; document.getElementById('btnPause').textContent='⏸ Pausar';}
+function togglePause(){paused=!paused;document.getElementById('btnPause').textContent=paused?'▶ Continuar':'⏸ Pausar';}
+
+new ResizeObserver(resize).observe(document.querySelector('.cbox'));
+window.addEventListener('resize',resize);
+resize(); setMode('energy',document.querySelector('.tab')); requestAnimationFrame(frame);
+</script>
+</body>
+</html>
