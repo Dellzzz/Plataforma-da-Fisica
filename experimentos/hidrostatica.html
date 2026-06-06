@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Hidrostática — Simulador</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{--neon:#bc13fe;--pink:#ff00ff;--bg:#05010a;--card:rgba(188,19,254,.07);--border:rgba(188,19,254,.25);--text:#d0c0d8;--water:#1f8fff;--gold:#ffd166;--green:#44ff88;--red:#ff5566;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;}
+body{background:var(--bg);color:#fff;font-family:'Poppins',sans-serif;padding:12px;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at top,rgba(188,19,254,.15),transparent 55%);pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;max-width:1100px;margin:auto;}
+.back{display:inline-block;margin-bottom:10px;color:#e6c2ff;text-decoration:none;font-size:.78rem;font-family:'Orbitron',monospace;border:1px solid var(--border);padding:8px 13px;border-radius:10px;background:var(--card);letter-spacing:1px;transition:.2s;}
+.back:hover{border-color:var(--neon);color:#fff;background:rgba(188,19,254,.18);}
+.lab-title{font-family:'Orbitron',monospace;text-align:center;color:var(--neon);letter-spacing:3px;text-shadow:0 0 20px var(--neon);margin-bottom:6px;font-size:clamp(1.05rem,5vw,1.9rem);}
+.lab-sub{text-align:center;color:var(--text);font-size:clamp(.74rem,2.6vw,.85rem);margin-bottom:14px;}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;justify-content:center;}
+.tab{flex:1 1 auto;white-space:nowrap;border:1px solid var(--border);padding:11px 16px;border-radius:11px;background:var(--card);color:var(--text);cursor:pointer;transition:.2s;font-family:'Orbitron',monospace;font-size:clamp(.62rem,2.6vw,.76rem);letter-spacing:.5px;}
+.tab:hover{border-color:var(--neon);color:#ffc2ff;}
+.tab.active{color:var(--pink);border-color:var(--pink);background:rgba(255,0,255,.12);}
+.layout{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;}
+.canvas-wrap{flex:1 1 420px;min-width:0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px;}
+.cbox{position:relative;width:100%;aspect-ratio:720/470;border-radius:10px;overflow:hidden;background:#06000f;}
+canvas{display:block;width:100%;height:100%;touch-action:none;}
+.side{flex:1 1 230px;min-width:210px;display:flex;flex-direction:column;gap:12px;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;}
+.panel-title{color:var(--neon);font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;margin-bottom:10px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.box{background:rgba(255,0,255,.05);border:1px solid rgba(255,0,255,.12);border-radius:8px;padding:8px 4px;text-align:center;}
+.box-label{font-size:.55rem;color:var(--text);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;}
+.box-value{font-family:'Orbitron',monospace;color:var(--pink);font-size:.9rem;}
+.controls{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;}
+.ctitle{color:var(--neon);font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;margin-bottom:12px;}
+.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;}
+.slider-label{display:flex;justify-content:space-between;margin-bottom:7px;font-size:.84rem;color:var(--text);}
+.slider-label b{color:var(--pink);font-family:'Orbitron',monospace;}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:7px;border-radius:8px;background:#3a1357;outline:none;touch-action:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink);cursor:pointer;}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border:none;border-radius:50%;background:var(--pink);box-shadow:0 0 12px var(--pink);cursor:pointer;}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.btn{font-family:'Orbitron',monospace;font-size:.62rem;padding:8px 11px;border-radius:9px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;letter-spacing:.6px;transition:.2s;}
+.btn:hover{background:rgba(188,19,254,.2);border-color:var(--neon);color:#ffc2ff;}
+.tg{display:inline-flex;align-items:center;gap:7px;font-size:.74rem;color:var(--text);padding:8px 10px;border:1px solid var(--border);border-radius:9px;cursor:pointer;margin-top:10px;}
+.tg .b{width:15px;height:15px;border-radius:4px;border:1px solid var(--pink);}
+.tg.on .b{background:var(--pink);box-shadow:0 0 8px var(--pink);}
+.explain{margin-top:14px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:15px 16px;}
+.explain h3{font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;color:var(--neon);margin-bottom:9px;text-transform:uppercase;}
+.explain p{font-size:.85rem;color:var(--text);line-height:1.75;margin-bottom:8px;}
+.explain b{color:var(--pink);}
+.explain .formula{font-family:'Orbitron',monospace;color:#ffc2ff;background:rgba(0,0,0,.32);border:1px solid rgba(255,0,255,.22);border-radius:8px;padding:9px 10px;text-align:center;font-size:.82rem;margin:9px 0;}
+.explain .ex{font-size:.78rem;color:rgba(216,150,255,.9);}
+.foot{text-align:center;font-family:'Orbitron',monospace;font-size:.66rem;letter-spacing:2px;color:var(--neon);padding:16px 0 4px;border-top:1px solid var(--border);margin-top:14px;}
+@media(max-width:560px){body{padding:10px;}.canvas-wrap,.side{flex-basis:100%;}.control-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="app">
+  <a class="back" href="../experimentos.html">← Voltar aos experimentos</a>
+  <h1 class="lab-title">HIDROSTÁTICA</h1>
+  <p class="lab-sub">Empuxo (Arquimedes) · Pressão (Stevin) · Prensa Hidráulica (Pascal)</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setMode('empuxo',this)">EMPUXO</button>
+    <button class="tab" onclick="setMode('stevin',this)">PRESSÃO (STEVIN)</button>
+    <button class="tab" onclick="setMode('pascal',this)">PRENSA (PASCAL)</button>
+  </div>
+
+  <div class="layout">
+    <div class="canvas-wrap"><div class="cbox"><canvas id="cv"></canvas></div></div>
+    <div class="side"><div class="panel"><div class="panel-title">VALORES</div><div class="grid" id="values"></div></div></div>
+  </div>
+
+  <div class="controls">
+    <div class="ctitle" id="ctrlTitle">CONTROLES</div>
+    <div class="control-grid" id="controls"></div>
+    <div class="presets" id="presets"></div>
+  </div>
+
+  <div class="explain" id="explain"></div>
+  <footer class="foot">Prof. Jardel A. Leite</footer>
+</div>
+
+<script>
+const DW=720,DH=470,g=9.8,TAU=Math.PI*2,P0=101325;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let mode='empuxo',lastTs=0,clock=0;
+
+const state={ empuxo:{ro:600,a:0.5,rl:1000}, stevin:{rl:1000,h:1.0,atm:false}, pascal:{A1:5,A2:50,F1:120} };
+let em={yb:0.25,v:0};
+const CTRL={
+  empuxo:[ {k:'ro',lab:'Densidade do objeto',min:200,max:2000,step:10,u:'kg/m³'},
+           {k:'a',lab:'Aresta do cubo',min:0.3,max:0.9,step:0.05,u:'m'},
+           {k:'rl',lab:'Densidade do líquido',min:600,max:1400,step:10,u:'kg/m³'} ],
+  stevin:[ {k:'rl',lab:'Densidade do líquido',min:600,max:1400,step:10,u:'kg/m³'},
+           {k:'h',lab:'Profundidade',min:0,max:2,step:0.05,u:'m'} ],
+  pascal:[ {k:'A1',lab:'Área do pistão 1',min:1,max:30,step:1,u:'cm²'},
+           {k:'A2',lab:'Área do pistão 2',min:10,max:200,step:5,u:'cm²'},
+           {k:'F1',lab:'Força aplicada F₁',min:10,max:500,step:10,u:'N'} ]
+};
+const EXPLAIN={
+  empuxo:`<h3>Empuxo — Princípio de Arquimedes</h3>
+    <p>Todo corpo imerso recebe um <b>empuxo</b> vertical para cima igual ao <b>peso do líquido deslocado</b>. Ele compete com o peso do corpo:</p>
+    <div class="formula">E = ρ_líquido · V_submerso · g</div>
+    <p>Se a densidade do objeto for <b>menor</b> que a do líquido, ele <b>flutua</b> com fração submersa = ρ_objeto/ρ_líquido. Se for <b>maior</b>, afunda. Mude as densidades e veja o cubo subir, descer ou estabilizar.</p>
+    <p class="ex">Por isso o gelo (917) boia na água (1000) com ~92% submerso, e um navio de aço flutua por causa do grande volume de água que desloca.</p>`,
+  stevin:`<h3>Pressão Hidrostática — Lei de Stevin</h3>
+    <p>A pressão num líquido <b>aumenta com a profundidade</b>, e depende só da profundidade e da densidade — <b>não</b> do formato do recipiente:</p>
+    <div class="formula">p = p₀ + ρ · g · h</div>
+    <p>Arraste a profundidade e veja a pressão crescer linearmente. Dois pontos na <b>mesma profundidade</b> têm a <b>mesma pressão</b> (princípio dos vasos comunicantes).</p>
+    <p class="ex">É por isso que barragens são mais grossas embaixo e seus ouvidos doem ao mergulhar fundo.</p>`,
+  pascal:`<h3>Prensa Hidráulica — Princípio de Pascal</h3>
+    <p>Uma pressão aplicada a um líquido se <b>transmite igualmente</b> a todos os pontos. Como p = F/A é a mesma nos dois pistões:</p>
+    <div class="formula">F₁/A₁ = F₂/A₂ ⇒ F₂ = F₁ · (A₂/A₁)</div>
+    <p>Um pistão grande multiplica a força — mas o volume deslocado é igual, então ele <b>sobe menos</b> (d₂ = d₁·A₁/A₂). Multiplica força, não energia.</p>
+    <p class="ex">No dia a dia: elevador de carros na oficina, freios e direção hidráulica.</p>`
+};
+
+function resize(){const r=cv.getBoundingClientRect();const dpr=window.devicePixelRatio||1;
+  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);const s=r.width/DW;ctx.setTransform(s*dpr,0,0,s*dpr,0,0);}
+function bg(){ctx.fillStyle='#06000f';ctx.fillRect(0,0,DW,DH);ctx.strokeStyle='rgba(188,19,254,.06)';ctx.lineWidth=1;
+  for(let x=0;x<DW;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,DH);ctx.stroke();}
+  for(let y=0;y<DH;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(DW,y);ctx.stroke();}}
+function glow(c,b){ctx.shadowColor=c;ctx.shadowBlur=b||12;}function ng(){ctx.shadowBlur=0;}
+function arrow(x1,y1,x2,y2,col,w){ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=w||3;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();const a=Math.atan2(y2-y1,x2-x1),hl=9;
+  ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-hl*Math.cos(a-.4),y2-hl*Math.sin(a-.4));ctx.lineTo(x2-hl*Math.cos(a+.4),y2-hl*Math.sin(a+.4));ctx.closePath();ctx.fill();}
+function setVals(o){let h='';for(const k in o)h+=`<div class="box"><div class="box-label">${k}</div><div class="box-value">${o[k]}</div></div>`;document.getElementById('values').innerHTML=h;}
+
+// ===== EMPUXO =====
+const DTANK=1.7, PM=180, SURF=70, TX=240, TW=300;
+function resetEmpuxo(){em.yb=state.empuxo.a*0.5; em.v=0;}
+function stepEmpuxo(dt){const s=state.empuxo,a=s.a; const m=s.ro*a*a*a;
+  const hs=Math.max(0,Math.min(a,em.yb)); const Vs=a*a*hs;
+  const E=s.rl*g*Vs, P=m*g;
+  let acc=(P-E)/m - 2.4*em.v;   // +y = para baixo
+  em.v+=acc*dt; em.yb+=em.v*dt;
+  if(em.yb> DTANK){em.yb=DTANK;em.v=0;}           // fundo
+  if(em.yb< -a){em.yb=-a;em.v=0;}
+}
+function drawEmpuxo(){bg();const s=state.empuxo,a=s.a;
+  const surfY=SURF, botY=SURF+DTANK*PM;
+  // tanque + água
+  ctx.fillStyle='rgba(31,143,255,.18)';ctx.fillRect(TX,surfY,TW,botY-surfY);
+  ctx.strokeStyle='rgba(31,143,255,.5)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(TX,40);ctx.lineTo(TX,botY);ctx.lineTo(TX+TW,botY);ctx.lineTo(TX+TW,40);ctx.stroke();
+  ctx.strokeStyle='rgba(120,200,255,.8)';ctx.lineWidth=2;ctx.beginPath();
+  for(let x=TX;x<=TX+TW;x+=6){ctx.lineTo(x,surfY+Math.sin((x*0.05)+clock*2)*2);}ctx.stroke();
+  // cubo
+  const apx=a*PM, cx=TX+TW/2, topY=surfY+(em.yb-a)*PM;
+  const grd=ctx.createLinearGradient(0,topY,0,topY+apx);grd.addColorStop(0,'#ffe0b0');grd.addColorStop(1,'#ff8c2a');
+  ctx.fillStyle=grd;glow('#ff8c42',12);ctx.fillRect(cx-apx/2,topY,apx,apx);ng();
+  ctx.strokeStyle='#ffcaa0';ctx.lineWidth=2;ctx.strokeRect(cx-apx/2,topY,apx,apx);
+  ctx.fillStyle='#fff';ctx.font='bold 12px Orbitron';ctx.textAlign='center';ctx.fillText(s.ro+'',cx,topY+apx/2-3);ctx.font='9px Poppins';ctx.fillText('kg/m³',cx,topY+apx/2+10);
+  // forças
+  const hs=Math.max(0,Math.min(a,em.yb)),Vs=a*a*hs; const E=s.rl*g*Vs,P=s.ro*g*a*a*a;
+  const cyc=topY+apx/2;
+  arrow(cx-apx/2-16,cyc,cx-apx/2-16,cyc+Math.min(120,P*0.06),'#ff5566',4);
+  ctx.fillStyle='#ff5566';ctx.font='11px Orbitron';ctx.textAlign='right';ctx.fillText('P',cx-apx/2-20,cyc+12);
+  if(E>1){arrow(cx+apx/2+16,cyc,cx+apx/2+16,cyc-Math.min(120,E*0.06),'#44ff88',4);
+    ctx.fillStyle='#44ff88';ctx.textAlign='left';ctx.fillText('E',cx+apx/2+20,cyc-6);}
+  const frac=Math.max(0,Math.min(1,hs/a))*100;
+  let status; if(s.ro<s.rl) status='Flutua'; else if(s.ro>s.rl) status='Afunda'; else status='Equilíbrio';
+  setVals({'P (peso)':P.toFixed(0)+' N','E (empuxo)':E.toFixed(0)+' N','ρ objeto':s.ro,'ρ líquido':s.rl,'submerso':frac.toFixed(0)+'%',estado:status});
+}
+
+// ===== STEVIN =====
+function drawStevin(){bg();const s=state.stevin;
+  const surfY=70, Hmax=2.0, pm=170, botY=surfY+Hmax*pm, tx=180, tw=360;
+  ctx.fillStyle='rgba(31,143,255,.18)';ctx.fillRect(tx,surfY,tw,botY-surfY);
+  ctx.strokeStyle='rgba(31,143,255,.5)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(tx,40);ctx.lineTo(tx,botY);ctx.lineTo(tx+tw,botY);ctx.lineTo(tx+tw,40);ctx.stroke();
+  // setas de pressão crescendo com a profundidade (na parede esquerda interna)
+  for(let d=0.2;d<=Hmax+1e-6;d+=0.2){const y=surfY+d*pm; const len=8+d*26;
+    arrow(tx+6,y,tx+6+len,y,'rgba(120,200,255,.7)',2);}
+  // marcador de profundidade
+  const y=surfY+s.h*pm;
+  ctx.strokeStyle='#ffd166';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(tx,y);ctx.lineTo(tx+tw,y);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#ffd166';glow('#ffd166',10);ctx.beginPath();ctx.arc(tx+tw/2,y,8,0,TAU);ctx.fill();ng();
+  // cota de profundidade
+  ctx.strokeStyle='rgba(255,255,255,.4)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(tx+tw+16,surfY);ctx.lineTo(tx+tw+16,y);ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='12px Orbitron';ctx.textAlign='left';ctx.fillText('h = '+s.h.toFixed(2)+' m',tx+tw+22,(surfY+y)/2);
+  ctx.fillStyle='rgba(120,200,255,.9)';ctx.font='11px Poppins';ctx.textAlign='center';ctx.fillText('superfície',tx+tw/2,surfY-6);
+  const pman=s.rl*g*s.h, p=(s.atm?P0:0)+pman;
+  setVals({'h':s.h.toFixed(2)+' m','ρ':s.rl+' kg/m³','p manom.':(pman/1000).toFixed(1)+' kPa','p atm.':(s.atm?(P0/1000).toFixed(1):'0')+' kPa','p total':(p/1000).toFixed(1)+' kPa','p (atm)':(p/P0).toFixed(2)});
+}
+
+// ===== PASCAL =====
+function drawPascal(){bg();const s=state.pascal;
+  const baseY=380, liqTop=300;
+  const x1=200, x2=500, w1=40+s.A1*2.2, w2=60+s.A2*1.3;
+  const press=Math.sin(clock*1.6)*0.5+0.5; // 0..1 bombeamento
+  const d1=press*40; const d2=d1*s.A1/s.A2;
+  // tubo em U / vasos
+  ctx.fillStyle='rgba(31,143,255,.2)';
+  ctx.fillRect(x1-w1/2,liqTop,w1,baseY-liqTop);
+  ctx.fillRect(x2-w2/2,liqTop,w2,baseY-liqTop);
+  ctx.fillRect(x1,baseY-30,x2-x1,30);
+  ctx.strokeStyle='rgba(31,143,255,.6)';ctx.lineWidth=3;
+  ctx.strokeRect(x1-w1/2,liqTop-40,w1,baseY-liqTop+40);
+  ctx.strokeRect(x2-w2/2,liqTop-90,w2,baseY-liqTop+90);
+  ctx.beginPath();ctx.moveTo(x1-w1/2,baseY);ctx.lineTo(x2+w2/2,baseY);ctx.stroke();
+  // pistões
+  const p1y=liqTop+d1, p2y=liqTop-50-d2;
+  ctx.fillStyle='#c084ff';ctx.fillRect(x1-w1/2,p1y-12,w1,14);
+  ctx.fillStyle='#9be7ff';ctx.fillRect(x2-w2/2,p2y-12,w2,14);
+  // carga sobre o grande
+  ctx.fillStyle='#ff8c2a';ctx.fillRect(x2-26,p2y-46,52,34);ctx.fillStyle='#fff';ctx.font='bold 11px Orbitron';ctx.textAlign='center';
+  const F2=s.F1*s.A2/s.A1; ctx.fillText('CARGA',x2,p2y-26);
+  // forças
+  arrow(x1,p1y-50,x1,p1y-14,'#ff5566',4);ctx.fillStyle='#ff5566';ctx.font='12px Orbitron';ctx.textAlign='center';ctx.fillText('F₁='+s.F1+'N',x1,p1y-56);
+  arrow(x2,p2y-52,x2,p2y-90,'#44ff88',4);ctx.fillStyle='#44ff88';ctx.fillText('F₂='+F2.toFixed(0)+'N',x2,p2y-96);
+  ctx.fillStyle='#c8b4e0';ctx.font='10px Poppins';ctx.fillText('A₁='+s.A1+' cm²',x1,baseY+18);ctx.fillText('A₂='+s.A2+' cm²',x2,baseY+18);
+  const p=s.F1/(s.A1*1e-4);
+  setVals({'pressão':(p/1000).toFixed(1)+' kPa','F₂':F2.toFixed(0)+' N','vantagem':(s.A2/s.A1).toFixed(1)+'×','A₂/A₁':(s.A2/s.A1).toFixed(1),'d₂/d₁':(s.A1/s.A2).toFixed(2),'F₁':s.F1+' N'});
+}
+
+function frame(ts){const dt=Math.min(0.033,((ts||0)-lastTs)/1000||0);lastTs=ts||0;clock+=dt;
+  if(mode==='empuxo'){const sub=20;for(let i=0;i<sub;i++)stepEmpuxo(dt/sub);drawEmpuxo();}
+  else if(mode==='stevin')drawStevin(); else drawPascal();
+  requestAnimationFrame(frame);}
+
+// ===== UI =====
+function renderControls(){const wrap=document.getElementById('controls');const specs=CTRL[mode];const st=state[mode];let h='';
+  specs.forEach(sp=>{h+=`<div><div class="slider-label">${sp.lab} <b><span id="lbl_${sp.k}">${st[sp.k]}</span> ${sp.u}</b></div>
+   <input type="range" id="sl_${sp.k}" min="${sp.min}" max="${sp.max}" step="${sp.step}" value="${st[sp.k]}" oninput="onCtrl('${sp.k}',this.value)"></div>`;});
+  wrap.innerHTML=h;
+  const pr=document.getElementById('presets');
+  if(mode==='empuxo') pr.innerHTML=liqBtns();
+  else if(mode==='stevin') pr.innerHTML=liqBtns()+`<span class="tg ${st.atm?'on':''}" id="tgAtm" onclick="toggleAtm()"><span class="b"></span>Incluir pressão atmosférica</span>`;
+  else pr.innerHTML='';
+}
+function liqBtns(){return `<button class="btn" onclick="setLiq(1000)">Água</button><button class="btn" onclick="setLiq(920)">Óleo</button><button class="btn" onclick="setLiq(1025)">Água do mar</button><button class="btn" onclick="setLiq(790)">Álcool</button>`;}
+function setLiq(v){state[mode].rl=v;const sl=document.getElementById('sl_rl');if(sl){sl.value=v;document.getElementById('lbl_rl').textContent=v;}}
+function toggleAtm(){state.stevin.atm=!state.stevin.atm;document.getElementById('tgAtm').classList.toggle('on',state.stevin.atm);}
+function onCtrl(k,v){v=+v;state[mode][k]=v;document.getElementById('lbl_'+k).textContent=(Math.round(v*100)/100);
+  if(mode==='empuxo'&&(k==='a'))resetEmpuxo();}
+function setMode(m,btn){mode=m;document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');
+  document.getElementById('ctrlTitle').textContent='CONTROLES — '+{empuxo:'Empuxo',stevin:'Pressão (Stevin)',pascal:'Prensa (Pascal)'}[m];
+  document.getElementById('explain').innerHTML=EXPLAIN[m];renderControls();if(m==='empuxo')resetEmpuxo();}
+
+new ResizeObserver(resize).observe(document.querySelector('.cbox'));
+window.addEventListener('resize',resize);
+resize(); setMode('empuxo',document.querySelector('.tab')); requestAnimationFrame(frame);
+</script>
+</body>
+</html>
