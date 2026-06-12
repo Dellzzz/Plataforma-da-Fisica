@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Vetores | Aula Interativa</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --yw:#ffcc00;--bl:#0088ff;--pk:#ff4488;--gr:#44ff99;
+  --pur:#cc44ff;--cy:#00ddff;--rd:#ff3300;
+  --bg:#08060a;--pan:#0e0b12;--card:#140f1a;
+  --by:rgba(255,204,0,.24);--bb:rgba(0,136,255,.2);
+  --dim:#7a6a10;--txt:#ffe0c0;
+}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:'Rajdhani',sans-serif;font-size:17px;line-height:1.7;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,204,0,.009) 2px,rgba(255,204,0,.009) 4px);pointer-events:none;z-index:9999}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,204,0,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,204,0,.025) 1px,transparent 1px);background-size:58px 58px;animation:gm 22s linear infinite;z-index:0}
+@keyframes gm{0%{background-position:0 0}100%{background-position:58px 58px}}
+header{position:relative;z-index:10;text-align:center;padding:78px 20px 54px;border-bottom:1px solid rgba(255,204,0,.22)}
+.htag{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--yw);letter-spacing:4px;border:1px solid var(--yw);padding:4px 18px;margin-bottom:22px;animation:tp 2.2s ease-in-out infinite}
+@keyframes tp{0%,100%{box-shadow:0 0 4px var(--yw),inset 0 0 4px rgba(255,204,0,.1)}50%{box-shadow:0 0 22px var(--yw),0 0 55px rgba(255,204,0,.22),inset 0 0 14px rgba(255,204,0,.18)}}
+h1.title{font-family:'Orbitron',monospace;font-size:clamp(2rem,7vw,5rem);font-weight:900;letter-spacing:.07em;line-height:1;color:#fff;text-shadow:0 0 10px var(--yw),0 0 40px var(--yw),0 0 100px rgba(255,204,0,.35);animation:flk 9s linear infinite}
+@keyframes flk{0%,92%,100%{opacity:1}93%{opacity:.78}94.5%{opacity:1}96%{opacity:.62}97%{opacity:1}}
+.tsub{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:.95rem;color:var(--dim);letter-spacing:7px;text-transform:uppercase;margin-top:10px}
+nav{position:sticky;top:0;z-index:100;background:rgba(8,6,10,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,204,0,.16);display:flex;justify-content:center;gap:6px;padding:10px 18px;flex-wrap:wrap}
+nav a{font-family:'Orbitron',monospace;font-size:.57rem;letter-spacing:2px;color:var(--dim);text-decoration:none;padding:6px 13px;border:1px solid rgba(255,204,0,.17);transition:all .28s}
+nav a:hover{color:var(--yw);border-color:var(--yw);box-shadow:0 0 12px var(--yw);text-shadow:0 0 8px var(--yw)}
+main{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:0 22px 80px}
+section{margin-top:78px}
+.sh{display:flex;align-items:center;gap:14px;margin-bottom:34px}
+.sn{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--yw);opacity:.6}
+h2.st{font-family:'Orbitron',monospace;font-size:clamp(1.15rem,2.8vw,1.75rem);font-weight:700;color:#fff;letter-spacing:.05em}
+h2.st span{color:var(--yw);text-shadow:0 0 12px var(--yw)}
+.sl{flex:1;height:1px;background:linear-gradient(90deg,var(--yw),transparent);opacity:.38}
+.card{background:var(--card);border:1px solid var(--by);padding:28px 30px;margin-bottom:20px;position:relative;transition:all .28s}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--yw);box-shadow:0 0 10px var(--yw)}
+.card:hover{border-color:var(--yw);box-shadow:0 0 22px rgba(255,204,0,.1),inset 0 0 22px rgba(255,204,0,.03)}
+.card.bl::before{background:var(--bl);box-shadow:0 0 10px var(--bl)}.card.bl{border-color:var(--bb)}.card.bl:hover{border-color:var(--bl)}
+.card.pk::before{background:var(--pk);box-shadow:0 0 10px var(--pk)}.card.pk{border-color:rgba(255,68,136,.2)}.card.pk:hover{border-color:var(--pk)}
+.card.gr::before{background:var(--gr);box-shadow:0 0 10px var(--gr)}.card.gr{border-color:rgba(68,255,153,.2)}.card.gr:hover{border-color:var(--gr)}
+.card.pur::before{background:var(--pur);box-shadow:0 0 10px var(--pur)}.card.pur{border-color:rgba(204,68,255,.2)}.card.pur:hover{border-color:var(--pur)}
+h3{font-family:'Orbitron',monospace;font-size:.88rem;color:var(--yw);text-shadow:0 0 8px var(--yw);margin-bottom:12px;letter-spacing:.05em}
+.card.bl h3{color:var(--bl);text-shadow:0 0 8px var(--bl)}.card.pk h3{color:var(--pk);text-shadow:0 0 8px var(--pk)}
+.card.gr h3{color:var(--gr);text-shadow:0 0 8px var(--gr)}.card.pur h3{color:var(--pur);text-shadow:0 0 8px var(--pur)}
+p{color:var(--txt);margin-bottom:10px}
+.law{background:rgba(255,204,0,.05);border:1px solid rgba(255,204,0,.38);border-left:4px solid var(--yw);padding:16px 20px;margin:12px 0;font-family:'Share Tech Mono',monospace;font-size:.88rem;color:var(--yw);text-shadow:0 0 4px rgba(255,204,0,.3);line-height:1.9}
+.law.bl{background:rgba(0,136,255,.05);border-color:rgba(0,136,255,.38);border-left-color:var(--bl);color:var(--bl)}
+.law.pk{background:rgba(255,68,136,.05);border-color:rgba(255,68,136,.38);border-left-color:var(--pk);color:var(--pk)}
+.law.gr{background:rgba(68,255,153,.05);border-color:rgba(68,255,153,.38);border-left-color:var(--gr);color:var(--gr)}
+.law.pur{background:rgba(204,68,255,.05);border-color:rgba(204,68,255,.38);border-left-color:var(--pur);color:var(--pur)}
+.fhero{text-align:center;padding:30px 18px;margin:20px 0;background:var(--pan);border:1px solid rgba(255,204,0,.28);position:relative;overflow:hidden}
+.fhero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(255,204,0,.07) 0%,transparent 70%)}
+.fhero .bf{font-family:'Orbitron',monospace;font-size:clamp(1.3rem,3vw,2.2rem);font-weight:700;color:#fff;text-shadow:0 0 14px var(--yw),0 0 35px rgba(255,204,0,.42);letter-spacing:.04em;line-height:1.35}
+.fhero .fl{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:3px;margin-top:10px}
+.vis{background:var(--pan);border:1px solid var(--by);padding:20px;margin:20px 0;overflow:hidden}
+.vis.bl{border-color:var(--bb)}.vis.pk{border-color:rgba(255,68,136,.2)}.vis.gr{border-color:rgba(68,255,153,.2)}
+.vis.special{border-color:var(--yw);border-width:2px}
+.vtag{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--dim);letter-spacing:3px;margin-bottom:14px;text-transform:uppercase;text-align:center}
+canvas{display:block;margin:0 auto;max-width:100%}
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:18px;margin:18px 0}
+table{width:100%;border-collapse:collapse;margin:14px 0}
+th{background:rgba(255,204,0,.09);color:var(--yw);font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:2px;padding:10px 13px;text-align:left;border:1px solid rgba(255,204,0,.18)}
+td{padding:10px 13px;border:1px solid rgba(255,204,0,.1);color:var(--txt);font-size:.92rem}
+tr:hover td{background:rgba(255,204,0,.03)}
+.ctrl-row{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin:14px 0}
+.ctrl{text-align:center}
+.ctrl label{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--yw);display:block;margin-bottom:5px;letter-spacing:1px}
+input[type=range]{-webkit-appearance:none;width:200px;height:4px;background:rgba(255,204,0,.2);outline:none;border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--yw);border-radius:50%;cursor:pointer;box-shadow:0 0 8px var(--yw)}
+.ctrl-val{font-family:'Orbitron',monospace;font-size:.95rem;color:var(--yw);text-shadow:0 0 8px var(--yw);margin-top:4px}
+.tabs{display:flex;gap:7px;justify-content:center;margin:12px 0;flex-wrap:wrap}
+.tab{font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:2px;color:var(--dim);padding:7px 14px;border:1px solid rgba(255,204,0,.2);background:transparent;cursor:pointer;transition:all .26s}
+.tab:hover{color:var(--yw);border-color:var(--yw)}
+.tab.active{color:var(--bg);background:var(--yw);border-color:var(--yw);box-shadow:0 0 14px var(--yw)}
+.sbtn{font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:2px;padding:8px 18px;border:1px solid;background:transparent;cursor:pointer;transition:all .26s;margin:4px}
+.sbtn.yel{color:var(--yw);border-color:rgba(255,204,0,.4)}.sbtn.yel:hover{background:rgba(255,204,0,.12);box-shadow:0 0 12px var(--yw)}
+.sbtn.red{color:#ff4444;border-color:rgba(255,68,68,.4)}.sbtn.red:hover{background:rgba(255,68,68,.1);box-shadow:0 0 10px #ff4444}
+.sbtn.gr{color:var(--gr);border-color:rgba(68,255,153,.4)}.sbtn.gr:hover{background:rgba(68,255,153,.1);box-shadow:0 0 10px var(--gr)}
+.vec-info{background:rgba(0,0,0,.5);border:1px solid rgba(255,204,0,.2);padding:12px 16px;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:.72rem;line-height:1.9;color:var(--yw);text-align:center}
+.hint-txt{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:rgba(255,204,0,.45);text-align:center;margin-top:8px;letter-spacing:1px}
+.step{display:flex;gap:14px;align-items:flex-start;background:rgba(255,204,0,.04);border:1px solid rgba(255,204,0,.12);padding:12px 16px;margin-bottom:8px}
+.sn2{font-family:'Orbitron',monospace;font-size:.75rem;color:var(--yw);min-width:22px}
+.qc{background:var(--card);border:1px solid var(--by);padding:24px 28px;margin-bottom:16px;transition:all .28s}.qc:hover{border-color:var(--yw)}
+.qnum{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--yw);letter-spacing:3px;margin-bottom:8px}
+.qtext{font-size:1rem;font-weight:600;color:#fff;margin-bottom:16px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.obt{background:rgba(0,0,0,.4);border:1px solid rgba(255,204,0,.22);color:var(--txt);padding:10px 15px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:.92rem;cursor:pointer;transition:all .24s;display:flex;align-items:flex-start;gap:11px}
+.obt:hover{border-color:var(--yw);background:rgba(255,204,0,.07);color:#fff}
+.obt.correct{border-color:var(--gr)!important;background:rgba(68,255,153,.1)!important;color:var(--gr)!important;box-shadow:0 0 12px rgba(68,255,153,.25)!important}
+.obt.wrong{border-color:var(--pk)!important;background:rgba(255,68,136,.1)!important;color:var(--pk)!important}
+.obt:disabled{cursor:not-allowed}
+.ol{font-family:'Orbitron',monospace;font-size:.58rem;color:var(--yw);min-width:17px;padding-top:2px}
+.fb{margin-top:11px;padding:10px 13px;font-family:'Share Tech Mono',monospace;font-size:.78rem;display:none;border-left:3px solid;line-height:1.6}
+.fb.show{display:block}.fb.ok{color:var(--gr);border-color:var(--gr);background:rgba(68,255,153,.05)}.fb.err{color:var(--pk);border-color:var(--pk);background:rgba(255,68,136,.05)}
+.sp{background:var(--card);border:1px solid var(--yw);padding:26px;text-align:center;box-shadow:0 0 30px rgba(255,204,0,.12);margin-top:26px}
+.scl{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim);letter-spacing:3px;margin-bottom:8px}
+.scv{font-family:'Orbitron',monospace;font-size:2.8rem;font-weight:900;color:var(--yw);text-shadow:0 0 20px var(--yw)}
+.scm{color:var(--dim);margin-top:7px;font-size:.93rem}
+.rbtn{background:transparent;border:1px solid var(--yw);color:var(--yw);font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:2px;padding:9px 24px;cursor:pointer;margin-top:13px;transition:all .28s}
+.rbtn:hover{background:rgba(255,204,0,.1);box-shadow:0 0 14px var(--yw)}
+.pw{height:4px;background:rgba(255,204,0,.1);margin-top:16px;border-radius:2px;overflow:hidden}
+.pf{height:100%;background:linear-gradient(90deg,var(--yw),var(--pk));transition:width .5s ease;box-shadow:0 0 10px var(--yw)}
+.ibox{background:linear-gradient(135deg,rgba(255,204,0,.04),rgba(0,136,255,.04));border:1px solid rgba(255,204,0,.2);padding:24px 28px;margin-top:32px;position:relative}
+.ibox::after{content:'→';position:absolute;top:-14px;left:22px;font-size:1.4rem;color:var(--yw);text-shadow:0 0 10px var(--yw);background:var(--bg);padding:0 8px;font-family:Orbitron,monospace}
+.hl{color:var(--yw);font-weight:600}.hlb{color:var(--bl);font-weight:600}
+.hlp{color:var(--pk);font-weight:600}.hlg{color:var(--gr);font-weight:600}.hlr{color:var(--pur);font-weight:600}
+footer{position:relative;z-index:10;text-align:center;padding:34px 20px;border-top:1px solid rgba(255,204,0,.2);font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:2px}
+@media(max-width:600px){header{padding:46px 14px 34px}main{padding:0 13px 58px}.card{padding:16px 18px}.fhero .bf{font-size:1.2rem}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<header>
+  <div class="htag">MÓDULO 11 // MATEMÁTICA / FÍSICA // ENSINO MÉDIO</div>
+  <h1 class="title">VETORES</h1>
+  <p class="tsub">Módulo · Direção · Sentido · Operações</p>
+</header>
+<nav>
+  <a href="#intro">→ Intro</a><a href="#componentes">→ Componentes</a><a href="#adicao">→ Adição</a>
+  <a href="#subtracao">→ Subtração</a><a href="#produto">→ Produto</a>
+  <a href="#simulacao">→ Simulação</a><a href="#exercicios">→ Exercícios</a>
+</nav>
+<main>
+
+<!-- INTRO -->
+<section id="intro">
+  <div class="sh"><span class="sn">01</span><h2 class="st">O QUE SÃO <span>VETORES</span>?</h2><div class="sl"></div></div>
+  <div class="ibox">
+    <p>Um <span class="hl">vetor</span> é uma grandeza que possui <strong>módulo</strong> (intensidade), <strong>direção</strong> (reta de ação) e <strong>sentido</strong> (para onde aponta). São representados por setas. Diferem das <span class="hlb">grandezas escalares</span>, que têm apenas módulo.</p>
+    <p>Vetores aparecem em toda a Física: força, velocidade, aceleração, campo elétrico, campo magnético. Dominar vetores é essencial para resolver problemas de lançamentos, dinâmica e eletromagnetismo.</p>
+  </div>
+  <div class="igrid" style="margin-top:20px">
+    <div class="card bl"><h3>ESCALARES × VETORIAIS</h3>
+      <p><span class="hlb">ESCALARES</span>: apenas número + unidade<br>Ex: massa (5 kg), temperatura (20°C), energia (100 J), tempo (3 s)</p>
+      <p><span class="hl">VETORIAIS</span>: módulo + direção + sentido<br>Ex: velocidade (5 m/s para leste), força (10 N para cima)</p>
+    </div>
+    <div class="card"><h3>REPRESENTAÇÃO</h3>
+      <p>✦ <span class="hl">Seta</span>: comprimento = módulo, direção e sentido pelo apontamento<br>
+         ✦ <span class="hl">Notação</span>: ⃗A, <strong>A</strong>, ou A com seta<br>
+         ✦ <span class="hl">Componentes</span>: A = (A_x, A_y) ou A = A_x î + A_y ĵ<br>
+         ✦ <span class="hl">Módulo</span>: |A| = √(A_x² + A_y²)</p>
+    </div>
+    <div class="card gr"><h3>VETORES NOTÁVEIS</h3>
+      <p>✦ <span class="hlg">Vetor nulo</span>: módulo = 0 (ponto)<br>
+         ✦ <span class="hlg">Vetores unitários</span>: |A| = 1 (î, ĵ, k̂)<br>
+         ✦ <span class="hlg">Vetores opostos</span>: mesmo módulo e direção, sentidos opostos<br>
+         ✦ <span class="hlg">Vetores colineares</span>: mesma direção</p>
+    </div>
+  </div>
+  <!-- COMPONENT VISUALIZER -->
+  <div class="vis">
+    <p class="vtag">[ EXPLORADOR DE VETORES — AJUSTE MÓDULO E ÂNGULO ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>MÓDULO |A|</label><input type="range" id="vecMod" min="20" max="160" value="100" oninput="drawVecExplorer()"><div class="ctrl-val" id="vecModV">100</div></div>
+      <div class="ctrl"><label>ÂNGULO θ (°)</label><input type="range" id="vecAng" min="0" max="360" value="40" oninput="drawVecExplorer()"><div class="ctrl-val" id="vecAngV">40°</div></div>
+    </div>
+    <canvas id="vecExCanvas" width="700" height="300"></canvas>
+    <div class="vec-info" id="vecExInfo">A = (100, 77) | |A| = 100 | θ = 40°</div>
+  </div>
+</section>
+
+<!-- COMPONENTES -->
+<section id="componentes">
+  <div class="sh"><span class="sn">02</span><h2 class="st">COMPONENTES <span>RETANGULARES</span></h2><div class="sl"></div></div>
+  <div class="fhero">
+    <div class="bf">A_x = |A|·cosθ &nbsp;&nbsp;|&nbsp;&nbsp; A_y = |A|·senθ &nbsp;&nbsp;|&nbsp;&nbsp; |A| = √(A_x² + A_y²)</div>
+    <div class="fl">θ = ângulo com eixo x positivo &nbsp;|&nbsp; θ = arctan(A_y / A_x) (ajustado para o quadrante)</div>
+  </div>
+  <div class="igrid">
+    <div class="card bl"><h3>DECOMPOSIÇÃO</h3>
+      <p>Qualquer vetor pode ser decomposto em duas componentes <span class="hlb">perpendiculares</span> (horizontal e vertical). Isso transforma problemas vetoriais em dois problemas escalares independentes.</p>
+      <div class="law bl" style="font-size:.83rem">A = A_x · î + A_y · ĵ<br>A_x = |A|·cosθ (componente x)<br>A_y = |A|·senθ (componente y)</div>
+    </div>
+    <div class="card pk"><h3>MÓDULO E ÂNGULO</h3>
+      <p>Dadas as componentes, recuperamos o módulo e a direção original:</p>
+      <div class="law pk" style="font-size:.83rem">|A| = √(A_x² + A_y²)<br>θ = arctan(A_y / A_x)<br><br>Atenção ao quadrante!<br>arctan retorna valor entre −90° e 90°</div>
+    </div>
+    <div class="card"><h3>VETORES UNITÁRIOS î E ĵ</h3>
+      <p>✦ <span class="hl">î</span> = vetor unitário na direção x (+)<br>
+         ✦ <span class="hl">ĵ</span> = vetor unitário na direção y (+)<br>
+         ✦ |î| = |ĵ| = 1<br>
+         ✦ î ⊥ ĵ (perpendiculares)</p>
+      <div class="law" style="font-size:.83rem">A = 3î + 4ĵ → |A| = √(9+16) = 5<br>θ = arctan(4/3) ≈ 53°</div>
+    </div>
+  </div>
+  <!-- COMPONENT DEMO -->
+  <div class="vis bl">
+    <p class="vtag" style="color:var(--bl)">[ DECOMPOSIÇÃO EM COMPONENTES — INTERATIVO ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>A_x</label><input type="range" id="dcAx" min="-120" max="120" value="80" oninput="drawDecomp()"><div class="ctrl-val" id="dcAxV">80</div></div>
+      <div class="ctrl"><label>A_y</label><input type="range" id="dcAy" min="-120" max="120" value="60" oninput="drawDecomp()"><div class="ctrl-val" id="dcAyV">60</div></div>
+    </div>
+    <canvas id="dcCanvas" width="700" height="300"></canvas>
+    <div class="vec-info" id="dcInfo">A = 80î + 60ĵ | |A| = 100 | θ = 36.87°</div>
+  </div>
+</section>
+
+<!-- ADIÇÃO -->
+<section id="adicao">
+  <div class="sh"><span class="sn">03</span><h2 class="st">ADIÇÃO DE <span>VETORES</span></h2><div class="sl"></div></div>
+  <div class="card gr"><h3>MÉTODOS DE ADIÇÃO</h3>
+    <p>Vetores são somados de dois modos: <span class="hlg">graficamente</span> (regra do triângulo/paralelogramo) ou <span class="hlg">analiticamente</span> (soma das componentes — mais preciso).</p>
+  </div>
+  <div class="fhero" style="border-color:rgba(68,255,153,.3)">
+    <div class="bf" style="text-shadow:0 0 14px var(--gr),0 0 35px rgba(68,255,153,.42)">R⃗ = A⃗ + B⃗ &nbsp;|&nbsp; R_x = A_x + B_x &nbsp;|&nbsp; R_y = A_y + B_y</div>
+    <div class="fl" style="color:var(--gr)">|R| = √(R_x² + R_y²) &nbsp;|&nbsp; θ_R = arctan(R_y/R_x)</div>
+  </div>
+  <!-- VECTOR ADDITION CANVAS -->
+  <div class="vis gr">
+    <p class="vtag" style="color:var(--gr)">[ ADIÇÃO VETORIAL — MÉTODO GRÁFICO E ANALÍTICO ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>|A⃗| (módulo)</label><input type="range" id="addAmod" min="20" max="130" value="80" oninput="drawAdd()"><div class="ctrl-val" id="addAmodV">80</div></div>
+      <div class="ctrl"><label>θ_A (°)</label><input type="range" id="addAang" min="0" max="350" value="30" oninput="drawAdd()"><div class="ctrl-val" id="addAangV">30°</div></div>
+      <div class="ctrl"><label>|B⃗| (módulo)</label><input type="range" id="addBmod" min="20" max="130" value="70" oninput="drawAdd()"><div class="ctrl-val" id="addBmodV">70</div></div>
+      <div class="ctrl"><label>θ_B (°)</label><input type="range" id="addBang" min="0" max="350" value="110" oninput="drawAdd()"><div class="ctrl-val" id="addBangV">110°</div></div>
+    </div>
+    <div class="tabs" id="addTabs">
+      <button class="tab active" onclick="setAddMode('triangle',this)">REGRA DO TRIÂNGULO</button>
+      <button class="tab" onclick="setAddMode('parallelogram',this)">PARALELOGRAMO</button>
+      <button class="tab" onclick="setAddMode('analytical',this)">ANALÍTICO</button>
+    </div>
+    <canvas id="addCanvas" width="700" height="320"></canvas>
+    <div class="vec-info" id="addInfo">R⃗ = A⃗ + B⃗ = ?</div>
+  </div>
+  <div class="igrid">
+    <div class="card gr"><h3>REGRA DO TRIÂNGULO</h3>
+      <p>Posicione a origem de B⃗ na ponta de A⃗. O vetor resultante R⃗ vai da origem de A⃗ à ponta de B⃗.</p>
+      <div class="law gr" style="font-size:.83rem">1. Desenhe A⃗<br>2. Na ponta de A⃗, desenhe B⃗<br>3. R⃗ = da origem de A⃗ à ponta de B⃗</div>
+    </div>
+    <div class="card"><h3>MÉTODO ANALÍTICO</h3>
+      <p>Decompõe cada vetor em componentes e soma separadamente. Funciona para qualquer número de vetores.</p>
+      <div class="law" style="font-size:.83rem">R_x = A_x + B_x + ...<br>R_y = A_y + B_y + ...<br>|R| = √(R_x² + R_y²)</div>
+    </div>
+  </div>
+</section>
+
+<!-- SUBTRAÇÃO -->
+<section id="subtracao">
+  <div class="sh"><span class="sn">04</span><h2 class="st">SUBTRAÇÃO E MULTIPLICAÇÃO <span>ESCALAR</span></h2><div class="sl"></div></div>
+  <div class="igrid">
+    <div class="card pk"><h3>SUBTRAÇÃO DE VETORES</h3>
+      <p>A⃗ − B⃗ = A⃗ + (−B⃗). O vetor −B⃗ tem o <span class="hlp">mesmo módulo e direção</span> de B⃗, mas <span class="hlp">sentido oposto</span>.</p>
+      <div class="law pk" style="font-size:.83rem">D⃗ = A⃗ − B⃗ = A⃗ + (−B⃗)<br>D_x = A_x − B_x<br>D_y = A_y − B_y</div>
+    </div>
+    <div class="card"><h3>MULTIPLICAÇÃO POR ESCALAR</h3>
+      <p>Multiplica cada componente pelo escalar k.</p>
+      <div class="law" style="font-size:.83rem">k·A⃗ = (k·A_x, k·A_y)<br>k > 0: mesmo sentido<br>k &lt; 0: sentido oposto<br>|k·A⃗| = |k|·|A⃗|</div>
+    </div>
+    <div class="card gr"><h3>VETOR DIFERENÇA (Δv⃗)</h3>
+      <p>Em cinemática, a variação de velocidade é um vetor:</p>
+      <div class="law gr" style="font-size:.83rem">Δv⃗ = v⃗_f − v⃗_i<br>a⃗ = Δv⃗ / Δt<br><br>Importante: mesmo que |v_f| = |v_i|,<br>se direção mudou, Δv⃗ ≠ 0</div>
+    </div>
+  </div>
+  <!-- SUBTRACTION CANVAS -->
+  <div class="vis pk">
+    <p class="vtag" style="color:var(--pk)">[ SUBTRAÇÃO VETORIAL A⃗ − B⃗ ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>|A⃗|</label><input type="range" id="subAm" min="20" max="120" value="90" oninput="drawSub()"><div class="ctrl-val" id="subAmV">90</div></div>
+      <div class="ctrl"><label>θ_A (°)</label><input type="range" id="subAa" min="0" max="350" value="20" oninput="drawSub()"><div class="ctrl-val" id="subAaV">20°</div></div>
+      <div class="ctrl"><label>|B⃗|</label><input type="range" id="subBm" min="20" max="120" value="60" oninput="drawSub()"><div class="ctrl-val" id="subBmV">60</div></div>
+      <div class="ctrl"><label>θ_B (°)</label><input type="range" id="subBa" min="0" max="350" value="70" oninput="drawSub()"><div class="ctrl-val" id="subBaV">70°</div></div>
+    </div>
+    <canvas id="subCanvas" width="700" height="280"></canvas>
+    <div class="vec-info" id="subInfo">D⃗ = A⃗ − B⃗ = ?</div>
+  </div>
+</section>
+
+<!-- PRODUTO ESCALAR -->
+<section id="produto">
+  <div class="sh"><span class="sn">05</span><h2 class="st">PRODUTO <span>ESCALAR</span></h2><div class="sl"></div></div>
+  <div class="card pur"><h3>DEFINIÇÃO</h3>
+    <p>O <span class="hlr">produto escalar</span> (produto interno) entre dois vetores A⃗ e B⃗ resulta em um <strong>escalar</strong>. Mede o quanto os vetores estão "alinhados".</p>
+  </div>
+  <div class="fhero" style="border-color:rgba(204,68,255,.3)">
+    <div class="bf" style="text-shadow:0 0 14px var(--pur),0 0 35px rgba(204,68,255,.42)">A⃗·B⃗ = |A|·|B|·cosθ = A_x·B_x + A_y·B_y</div>
+    <div class="fl" style="color:var(--pur)">θ = ângulo entre os vetores &nbsp;|&nbsp; Resultado é um ESCALAR (número)</div>
+  </div>
+  <div class="igrid">
+    <div class="card pur"><h3>INTERPRETAÇÃO GEOMÉTRICA</h3>
+      <p>O produto escalar é a <span class="hlr">projeção de A⃗ sobre B⃗</span> multiplicada por |B⃗| (ou vice-versa). Usado para calcular trabalho: W = F⃗·d⃗ = |F||d|cosθ.</p>
+      <div class="law pur" style="font-size:.83rem">A⃗·B⃗ = 0 → vetores perpendiculares<br>A⃗·B⃗ > 0 → ângulo agudo (&lt;90°)<br>A⃗·B⃗ &lt; 0 → ângulo obtuso (>90°)<br>A⃗·A⃗ = |A|² (produto por si mesmo)</div>
+    </div>
+    <div class="card"><h3>CALCULADORA — PRODUTO ESCALAR</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;font-family:Share Tech Mono,monospace;font-size:.75rem">
+        <div><label style="color:var(--yw);display:block;margin-bottom:3px">A_x</label><input type="number" id="ps_ax" value="3" style="width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,204,0,.3);color:var(--yw);font-family:Share Tech Mono,monospace;padding:6px 10px;outline:none" oninput="calcDot()"></div>
+        <div><label style="color:var(--yw);display:block;margin-bottom:3px">A_y</label><input type="number" id="ps_ay" value="4" style="width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,204,0,.3);color:var(--yw);font-family:Share Tech Mono,monospace;padding:6px 10px;outline:none" oninput="calcDot()"></div>
+        <div><label style="color:var(--bl);display:block;margin-bottom:3px">B_x</label><input type="number" id="ps_bx" value="5" style="width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(0,136,255,.3);color:var(--bl);font-family:Share Tech Mono,monospace;padding:6px 10px;outline:none" oninput="calcDot()"></div>
+        <div><label style="color:var(--bl);display:block;margin-bottom:3px">B_y</label><input type="number" id="ps_by" value="-3" style="width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(0,136,255,.3);color:var(--bl);font-family:Share Tech Mono,monospace;padding:6px 10px;outline:none" oninput="calcDot()"></div>
+      </div>
+      <div id="dotResult" style="font-family:Orbitron,monospace;font-size:1rem;color:var(--pur);text-shadow:0 0 10px var(--pur);text-align:center;margin-top:10px;padding:10px;background:rgba(204,68,255,.05);border:1px solid rgba(204,68,255,.2)">A⃗·B⃗ = ?</div>
+    </div>
+  </div>
+  <!-- DOT PRODUCT CANVAS -->
+  <div class="vis pur">
+    <p class="vtag" style="color:var(--pur)">[ PRODUTO ESCALAR — VISUALIZAÇÃO ]</p>
+    <canvas id="dotCanvas" width="700" height="260"></canvas>
+  </div>
+</section>
+
+<!-- SIMULAÇÃO LIVRE -->
+<section id="simulacao">
+  <div class="sh"><span class="sn">06</span><h2 class="st">SIMULADOR <span>VETORIAL</span></h2><div class="sl"></div></div>
+  <div class="vis special">
+    <p class="vtag" style="color:var(--yw);font-size:.74rem;letter-spacing:4px">[ ★ LABORÁTÓRIO VETORIAL — CLIQUE E ARRASTE ★ ]</p>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
+      <button class="sbtn yel" onclick="setLabMode('add')">SOMAR VETORES</button>
+      <button class="sbtn yel" onclick="setLabMode('sub')">SUBTRAIR VETORES</button>
+      <button class="sbtn red" onclick="clearVecLab()">LIMPAR TUDO</button>
+      <button class="sbtn gr" id="labModeBtn">MODO: ADIÇÃO</button>
+    </div>
+    <canvas id="labCanvas" width="700" height="440" style="cursor:crosshair"></canvas>
+    <div class="hint-txt" id="labHint">Clique e arraste no canvas para criar um vetor | Máx: 3 vetores</div>
+    <div class="vec-info" id="labInfo">Nenhum vetor criado ainda.</div>
+  </div>
+</section>
+
+<!-- EXERCÍCIOS -->
+<section id="exercicios">
+  <div class="sh"><span class="sn">07</span><h2 class="st">EXERCÍCIOS DE <span>FIXAÇÃO</span></h2><div class="sl"></div></div>
+  <p style="color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:.72rem;margin-bottom:22px;letter-spacing:2px">SELECIONE A ALTERNATIVA CORRETA</p>
+  <div class="pw"><div class="pf" id="pBar" style="width:0%"></div></div>
+  <p style="font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--dim);text-align:right;margin:6px 0 24px" id="pTxt">0 / 8 respondidas</p>
+
+  <div class="qc" id="q1"><div class="qnum">QUESTÃO 01 // COMPONENTES</div>
+    <div class="qtext">Um vetor A⃗ tem módulo 10 e faz 60° com o eixo x. Qual é A_x? (cos 60° = 0,5)</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">A</span>8,66</button>
+      <button class="obt" onclick="ans(this,'q1','correct')"><span class="ol">B</span>5</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">C</span>10</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">D</span>0</button>
+    </div><div class="fb" id="f_q1"></div>
+  </div>
+
+  <div class="qc" id="q2"><div class="qnum">QUESTÃO 02 // MÓDULO</div>
+    <div class="qtext">Um vetor tem componentes A_x = 6 e A_y = 8. Qual é o módulo |A⃗|?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">A</span>14</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">B</span>7</button>
+      <button class="obt" onclick="ans(this,'q2','correct')"><span class="ol">C</span>10</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">D</span>√28</button>
+    </div><div class="fb" id="f_q2"></div>
+  </div>
+
+  <div class="qc" id="q3"><div class="qnum">QUESTÃO 03 // ADIÇÃO ANALÍTICA</div>
+    <div class="qtext">A⃗ = (3, 4) e B⃗ = (−1, 2). Qual é R⃗ = A⃗ + B⃗?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">A</span>(4, 2)</button>
+      <button class="obt" onclick="ans(this,'q3','correct')"><span class="ol">B</span>(2, 6)</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">C</span>(3, 2)</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">D</span>(−3, 8)</button>
+    </div><div class="fb" id="f_q3"></div>
+  </div>
+
+  <div class="qc" id="q4"><div class="qnum">QUESTÃO 04 // SUBTRAÇÃO</div>
+    <div class="qtext">A⃗ = (5, 2) e B⃗ = (3, −1). Qual é D⃗ = A⃗ − B⃗?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">A</span>(8, 1)</button>
+      <button class="obt" onclick="ans(this,'q4','correct')"><span class="ol">B</span>(2, 3)</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">C</span>(−2, 3)</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">D</span>(2, −3)</button>
+    </div><div class="fb" id="f_q4"></div>
+  </div>
+
+  <div class="qc" id="q5"><div class="qnum">QUESTÃO 05 // PRODUTO ESCALAR</div>
+    <div class="qtext">A⃗ = (4, 3) e B⃗ = (2, −4). Qual é A⃗·B⃗?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">A</span>20</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">B</span>−12</button>
+      <button class="obt" onclick="ans(this,'q5','correct')"><span class="ol">C</span>−4</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">D</span>16</button>
+    </div><div class="fb" id="f_q5"></div>
+  </div>
+
+  <div class="qc" id="q6"><div class="qnum">QUESTÃO 06 // PRODUTO ESCALAR — PERPENDICULARIDADE</div>
+    <div class="qtext">Dois vetores têm produto escalar A⃗·B⃗ = 0. Isso significa que:</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">A</span>Um dos vetores é nulo</button>
+      <button class="obt" onclick="ans(this,'q6','correct')"><span class="ol">B</span>Os vetores são perpendiculares entre si (ângulo de 90°)</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">C</span>Os vetores são paralelos e têm mesmo sentido</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">D</span>Os vetores são opostos (antiparalelos)</button>
+    </div><div class="fb" id="f_q6"></div>
+  </div>
+
+  <div class="qc" id="q7"><div class="qnum">QUESTÃO 07 // MÓDULO DO RESULTANTE</div>
+    <div class="qtext">Duas forças perpendiculares de 30 N e 40 N atuam sobre um ponto. Qual é a resultante?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">A</span>35 N</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">B</span>70 N</button>
+      <button class="obt" onclick="ans(this,'q7','correct')"><span class="ol">C</span>50 N</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">D</span>10 N</button>
+    </div><div class="fb" id="f_q7"></div>
+  </div>
+
+  <div class="qc" id="q8"><div class="qnum">QUESTÃO 08 // GRANDEZAS</div>
+    <div class="qtext">Qual das grandezas abaixo é vetorial?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">A</span>Temperatura</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">B</span>Energia cinética</button>
+      <button class="obt" onclick="ans(this,'q8','correct')"><span class="ol">C</span>Aceleração</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">D</span>Massa</button>
+    </div><div class="fb" id="f_q8"></div>
+  </div>
+
+  <div class="sp" id="spanel" style="display:none">
+    <div class="scl">RESULTADO FINAL</div><div class="scv" id="scv">0/8</div>
+    <div class="scm" id="scm"></div>
+    <button class="rbtn" onclick="resetQ()">REFAZER EXERCÍCIOS</button>
+  </div>
+</section>
+</main>
+<footer>
+  <div>VETORES — MATEMÁTICA E FÍSICA DO ENSINO MÉDIO</div>
+  <div style="margin-top:7px">COMPONENTES · ADIÇÃO · SUBTRAÇÃO · PRODUTO ESCALAR</div>
+</footer>
+
+<script>
+// ══ HELPERS ══════════════════════════════════════
+function bg(ctx,W,H){ctx.fillStyle='#0e0b12';ctx.fillRect(0,0,W,H);}
+function ga(ctx,x1,y1,x2,y2,col,lw,blur){
+  lw=lw||2.5;blur=blur||12;var a=Math.atan2(y2-y1,x2-x1),L=10;
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=blur;ctx.strokeStyle=col;ctx.lineWidth=lw;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-L*Math.cos(a-.42),y2-L*Math.sin(a-.42));
+  ctx.lineTo(x2-L*Math.cos(a+.42),y2-L*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+}
+function lbl(ctx,x,y,txt,col,sz,align){
+  sz=sz||11;align=align||'center';
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=6;ctx.fillStyle=col;
+  ctx.font=sz+'px Share Tech Mono,monospace';ctx.textAlign=align;ctx.fillText(txt,x,y);ctx.restore();
+}
+function drawAxes(ctx,ox,oy,R,col){
+  col=col||'rgba(255,204,0,.25)';
+  ctx.save();ctx.strokeStyle=col;ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(ox-R,oy);ctx.lineTo(ox+R,oy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ox,oy-R);ctx.lineTo(ox,oy+R);ctx.stroke();
+  // tick marks
+  ctx.strokeStyle=col.replace('.25','.12');ctx.lineWidth=1;
+  for(var i=-R;i<=R;i+=50){if(i===0)continue;
+    ctx.beginPath();ctx.moveTo(ox+i,oy-4);ctx.lineTo(ox+i,oy+4);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(ox-4,oy+i);ctx.lineTo(ox+4,oy+i);ctx.stroke();
+  }
+  lbl(ctx,ox+R-12,oy-10,'x',col,10);lbl(ctx,ox+10,oy-R+14,'y',col,10);
+  ctx.restore();
+}
+
+// ══ VECTOR EXPLORER ══════════════════════════════
+function drawVecExplorer(){
+  var mod=+document.getElementById('vecMod').value;
+  var ang=+document.getElementById('vecAng').value;
+  document.getElementById('vecModV').textContent=mod;
+  document.getElementById('vecAngV').textContent=ang+'°';
+  var cv=document.getElementById('vecExCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var ox=W/2,oy=H/2;
+  drawAxes(ctx,ox,oy,280);
+  var rad=ang*Math.PI/180;
+  var ax=ox+mod*Math.cos(rad),ay=oy-mod*Math.sin(rad);
+  var ex=mod*Math.cos(rad),ey=-mod*Math.sin(rad);
+  // component lines (dashed)
+  ctx.save();ctx.strokeStyle='rgba(0,136,255,.5)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(ax,oy);ctx.stroke();
+  ctx.strokeStyle='rgba(255,68,136,.5)';
+  ctx.beginPath();ctx.moveTo(ax,oy);ctx.lineTo(ax,ay);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+  // main vector
+  ga(ctx,ox,oy,ax,ay,'#ffcc00',3,16);
+  // angle arc
+  ctx.save();ctx.strokeStyle='rgba(255,204,0,.4)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(ox,oy,35,-rad,0);ctx.stroke();ctx.restore();
+  // labels
+  lbl(ctx,(ox+ax)/2,oy+18,'A_x = '+(ex).toFixed(1),'rgba(0,136,255,.8)',10);
+  lbl(ctx,ax+28,(oy+ay)/2,'A_y = '+(-ey).toFixed(1),'rgba(255,68,136,.8)',10,'left');
+  lbl(ctx,ax+8,ay-14,'A⃗','#ffcc00',12,'left');
+  lbl(ctx,ox+50,oy-16,'θ='+ang+'°','rgba(255,204,0,.6)',10,'left');
+  document.getElementById('vecExInfo').textContent=
+    'A⃗ = ('+ex.toFixed(1)+', '+(-ey).toFixed(1)+') | |A⃗| = '+mod+' | θ = '+ang+'°';
+}
+
+// ══ DECOMPOSITION DEMO ════════════════════════════
+function drawDecomp(){
+  var ax=+document.getElementById('dcAx').value;
+  var ay=+document.getElementById('dcAy').value;
+  document.getElementById('dcAxV').textContent=ax;
+  document.getElementById('dcAyV').textContent=ay;
+  var cv=document.getElementById('dcCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var ox=W/2,oy=H/2,sc=1.1;
+  drawAxes(ctx,ox,oy,280);
+  var tx=ox+ax*sc,ty=oy-ay*sc;
+  // Component x
+  ga(ctx,ox,oy,tx,oy,'#0088ff',2.5,12);
+  lbl(ctx,(ox+tx)/2,oy+(ay>0?16:-22),'A_x = '+ax,'rgba(0,136,255,.9)',10);
+  // Component y
+  ga(ctx,tx,oy,tx,ty,'#ff4488',2.5,12);
+  lbl(ctx,tx+(ax>0?14:-60),( oy+ty)/2,'A_y = '+ay,'rgba(255,68,136,.9)',10,'left');
+  // Main vector
+  ga(ctx,ox,oy,tx,ty,'#ffcc00',3,16);
+  lbl(ctx,tx+10,ty-12,'A⃗','#ffcc00',13,'left');
+  // Right angle marker
+  var ra=10;
+  ctx.save();ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(tx,oy-(ay>0?ra:-ra));ctx.lineTo(tx+(ax>0?-ra:ra),oy-(ay>0?ra:-ra));ctx.lineTo(tx+(ax>0?-ra:ra),oy);ctx.stroke();ctx.restore();
+  var mod=Math.sqrt(ax*ax+ay*ay);
+  var theta=Math.atan2(ay,ax)*180/Math.PI;
+  document.getElementById('dcInfo').textContent=
+    'A⃗ = '+ax+'î + '+ay+'ĵ | |A⃗| = '+mod.toFixed(2)+' | θ = '+theta.toFixed(1)+'°';
+}
+
+// ══ VECTOR ADDITION ════════════════════════════════
+var addMode='triangle';
+function setAddMode(m,btn){addMode=m;document.querySelectorAll('#addTabs .tab').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');drawAdd();}
+function drawAdd(){
+  var Am=+document.getElementById('addAmod').value,Aa=+document.getElementById('addAang').value;
+  var Bm=+document.getElementById('addBmod').value,Ba=+document.getElementById('addBang').value;
+  ['addAmod','addAang','addBmod','addBang'].forEach(function(id){
+    document.getElementById(id+'V').textContent=document.getElementById(id).value+(id.includes('ang')?'°':'');
+  });
+  var cv=document.getElementById('addCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var ox=W/2,oy=H/2;
+  drawAxes(ctx,ox,oy,260);
+  var ar=Aa*Math.PI/180,br=Ba*Math.PI/180;
+  var Ax=Am*Math.cos(ar),Ay=-Am*Math.sin(ar);
+  var Bx=Bm*Math.cos(br),By=-Bm*Math.sin(br);
+  var Rx=Ax+Bx,Ry=Ay+By;
+  if(addMode==='triangle'){
+    // A from origin, B from tip of A, R from origin
+    ga(ctx,ox,oy,ox+Ax,oy+Ay,'#ffcc00',3,14);
+    ga(ctx,ox+Ax,oy+Ay,ox+Ax+Bx,oy+Ay+By,'#0088ff',3,14);
+    ga(ctx,ox,oy,ox+Rx,oy+Ry,'#44ff99',3,16);
+    lbl(ctx,ox+Ax/2+8,oy+Ay/2-8,'A⃗','#ffcc00',12,'left');
+    lbl(ctx,ox+Ax+Bx/2+8,oy+Ay+By/2,'B⃗','#0088ff',12,'left');
+    lbl(ctx,ox+Rx/2-12,oy+Ry/2-14,'R⃗=A⃗+B⃗','#44ff99',11);
+  } else if(addMode==='parallelogram'){
+    ga(ctx,ox,oy,ox+Ax,oy+Ay,'#ffcc00',3,14);
+    ga(ctx,ox,oy,ox+Bx,oy+By,'#0088ff',3,14);
+    // dashed completion
+    ctx.save();ctx.strokeStyle='rgba(255,204,0,.35)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(ox+Bx,oy+By);ctx.lineTo(ox+Rx,oy+Ry);ctx.stroke();
+    ctx.strokeStyle='rgba(0,136,255,.35)';
+    ctx.beginPath();ctx.moveTo(ox+Ax,oy+Ay);ctx.lineTo(ox+Rx,oy+Ry);ctx.stroke();
+    ctx.setLineDash([]);ctx.restore();
+    ga(ctx,ox,oy,ox+Rx,oy+Ry,'#44ff99',3,16);
+    lbl(ctx,ox+Ax/2+10,oy+Ay/2-8,'A⃗','#ffcc00',12,'left');
+    lbl(ctx,ox+Bx/2-20,oy+By/2-8,'B⃗','#0088ff',12);
+    lbl(ctx,ox+Rx/2+8,oy+Ry/2,'R⃗','#44ff99',12,'left');
+  } else {
+    // analytical: draw all from origin, show breakdown
+    ga(ctx,ox,oy,ox+Ax,oy+Ay,'#ffcc00',2.5,14);
+    ga(ctx,ox,oy,ox+Bx,oy+By,'#0088ff',2.5,14);
+    ga(ctx,ox,oy,ox+Rx,oy+Ry,'#44ff99',3,16);
+    lbl(ctx,ox+Ax+10,oy+Ay,'A⃗','#ffcc00',12,'left');
+    lbl(ctx,ox+Bx+10,oy+By,'B⃗','#0088ff',12,'left');
+    lbl(ctx,ox+Rx+10,oy+Ry,'R⃗','#44ff99',12,'left');
+    // component analysis in corner
+    ctx.save();ctx.fillStyle='rgba(0,0,0,.6)';ctx.strokeStyle='rgba(255,204,0,.2)';ctx.lineWidth=1;
+    ctx.fillRect(10,10,220,130);ctx.strokeRect(10,10,220,130);ctx.restore();
+    lbl(ctx,120,30,'ANÁLISE','rgba(255,204,0,.6)',9);
+    lbl(ctx,120,48,'A_x='+Ax.toFixed(1)+' A_y='+(-Ay).toFixed(1),'#ffcc00',9);
+    lbl(ctx,120,65,'B_x='+Bx.toFixed(1)+' B_y='+(-By).toFixed(1),'#0088ff',9);
+    lbl(ctx,120,82,'R_x='+Rx.toFixed(1)+' R_y='+(-Ry).toFixed(1),'#44ff99',9);
+    lbl(ctx,120,100,'|R⃗|='+Math.sqrt(Rx*Rx+Ry*Ry).toFixed(2),'#44ff99',9);
+    lbl(ctx,120,118,'θ_R='+Math.atan2(-Ry,Rx).toFixed(2)*180/Math.PI+'°','rgba(255,204,0,.6)',9);
+  }
+  var rMod=Math.sqrt(Rx*Rx+Ry*Ry);
+  var rAng=Math.atan2(-Ry,Rx)*180/Math.PI;
+  document.getElementById('addInfo').textContent=
+    'A⃗=('+Ax.toFixed(1)+', '+(-Ay).toFixed(1)+') + B⃗=('+Bx.toFixed(1)+', '+(-By).toFixed(1)+') = R⃗=('+Rx.toFixed(1)+', '+(-Ry).toFixed(1)+') | |R⃗|='+rMod.toFixed(2)+' | θ='+rAng.toFixed(1)+'°';
+}
+
+// ══ SUBTRACTION CANVAS ════════════════════════════
+function drawSub(){
+  var Am=+document.getElementById('subAm').value,Aa=+document.getElementById('subAa').value;
+  var Bm=+document.getElementById('subBm').value,Ba=+document.getElementById('subBa').value;
+  ['subAm','subAa','subBm','subBa'].forEach(function(id){
+    document.getElementById(id+'V').textContent=document.getElementById(id).value+(id.includes('a')&&!id.includes('Am')?'°':'');
+  });
+  var cv=document.getElementById('subCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var ox=W/2,oy=H/2;
+  drawAxes(ctx,ox,oy,240);
+  var ar=Aa*Math.PI/180,br=Ba*Math.PI/180;
+  var Ax=Am*Math.cos(ar),Ay=-Am*Math.sin(ar);
+  var Bx=Bm*Math.cos(br),By=-Bm*Math.sin(br);
+  var Dx=Ax-Bx,Dy=Ay-By;
+  // Draw A
+  ga(ctx,ox,oy,ox+Ax,oy+Ay,'#ffcc00',3,14);
+  lbl(ctx,ox+Ax+8,oy+Ay,'A⃗','#ffcc00',12,'left');
+  // Draw B (solid) and -B (dashed)
+  ga(ctx,ox,oy,ox+Bx,oy+By,'rgba(0,136,255,.4)',2,8);
+  lbl(ctx,ox+Bx+8,oy+By,'B⃗','rgba(0,136,255,.5)',11,'left');
+  // -B: same magnitude, opposite direction
+  ga(ctx,ox,oy,ox-Bx,oy-By,'#0088ff',2.5,12);
+  lbl(ctx,ox-Bx-8,oy-By,'−B⃗','#0088ff',11,'right');
+  // Triangle: A + (-B) = D
+  ctx.save();ctx.strokeStyle='rgba(0,136,255,.35)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(ox+Ax,oy+Ay);ctx.lineTo(ox+Dx,oy+Dy);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  // Resultant D
+  ga(ctx,ox,oy,ox+Dx,oy+Dy,'#ff4488',3,16);
+  lbl(ctx,ox+Dx/2-14,oy+Dy/2-14,'D⃗=A⃗−B⃗','#ff4488',11);
+  var dMod=Math.sqrt(Dx*Dx+Dy*Dy);
+  document.getElementById('subInfo').textContent=
+    'D⃗ = A⃗ − B⃗ = ('+Dx.toFixed(1)+', '+(-Dy).toFixed(1)+') | |D⃗| = '+dMod.toFixed(2);
+}
+
+// ══ DOT PRODUCT ═══════════════════════════════════
+function calcDot(){
+  var ax=+document.getElementById('ps_ax').value,ay=+document.getElementById('ps_ay').value;
+  var bx=+document.getElementById('ps_bx').value,by=+document.getElementById('ps_by').value;
+  var dot=ax*bx+ay*by;
+  var ma=Math.sqrt(ax*ax+ay*ay),mb=Math.sqrt(bx*bx+by*by);
+  var cosT=ma>0&&mb>0?dot/(ma*mb):0;
+  var theta=Math.acos(Math.max(-1,Math.min(1,cosT)))*180/Math.PI;
+  document.getElementById('dotResult').textContent=
+    'A⃗·B⃗ = '+dot.toFixed(2)+' | θ = '+theta.toFixed(1)+'° | '+(Math.abs(dot)<0.01?'PERPENDICULARES':dot>0?'ângulo agudo':'ângulo obtuso');
+  drawDotProd(ax,ay,bx,by,dot,theta);
+}
+function drawDotProd(ax,ay,bx,by,dot,theta){
+  var cv=document.getElementById('dotCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var ox=W/2,oy=H/2+20,sc=1.8;
+  drawAxes(ctx,ox,oy,260);
+  var Ax=ax*sc,Ay=-ay*sc,Bx=bx*sc,By=-by*sc;
+  // Draw A and B from origin
+  ga(ctx,ox,oy,ox+Ax,oy+Ay,'#ffcc00',3,14);
+  ga(ctx,ox,oy,ox+Bx,oy+By,'#0088ff',3,14);
+  lbl(ctx,ox+Ax+10,oy+Ay,'A⃗','#ffcc00',13,'left');
+  lbl(ctx,ox+Bx+10,oy+By,'B⃗','#0088ff',13,'left');
+  // Angle arc
+  var angA=Math.atan2(ay,ax),angB=Math.atan2(by,bx);
+  ctx.save();ctx.strokeStyle='rgba(204,68,255,.5)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(ox,oy,40,Math.min(-angA,-angB),Math.max(-angA,-angB));ctx.stroke();ctx.restore();
+  lbl(ctx,ox+55,oy-16,'θ='+theta.toFixed(0)+'°','rgba(204,68,255,.7)',10);
+  // Projection of A onto B
+  if(Math.sqrt(bx*bx+by*by)>0.5){
+    var projLen=dot/Math.sqrt(bx*bx+by*by);
+    var bUnit={x:bx/Math.sqrt(bx*bx+by*by),y:by/Math.sqrt(bx*bx+by*by)};
+    var projX=ox+bUnit.x*projLen*sc,projY=oy-bUnit.y*projLen*sc;
+    ctx.save();ctx.strokeStyle='rgba(204,68,255,.4)';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(ox+Ax,oy+Ay);ctx.lineTo(projX,projY);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+    ctx.save();ctx.shadowColor='#cc44ff';ctx.shadowBlur=10;ctx.fillStyle='#cc44ff';
+    ctx.beginPath();ctx.arc(projX,projY,4,0,Math.PI*2);ctx.fill();ctx.restore();
+    lbl(ctx,projX+8,projY-14,'proj A→B','rgba(204,68,255,.7)',9,'left');
+  }
+  // formula
+  lbl(ctx,W-140,H-14,'A⃗·B⃗ = '+dot.toFixed(2),'rgba(204,68,255,.7)',10);
+}
+
+// ══ FREE VECTOR LAB ═══════════════════════════════
+var labVectors=[],labDragging=false,labDragStart=null,labMode2='add';
+var VCOLS=['#ffcc00','#0088ff','#ff4488','#44ff99'];
+var labCv=document.getElementById('labCanvas');
+function setLabMode(m){labMode2=m;document.getElementById('labModeBtn').textContent='MODO: '+(m==='add'?'ADIÇÃO':'SUBTRAÇÃO');drawLab();}
+function clearVecLab(){labVectors=[];drawLab();}
+labCv.addEventListener('mousedown',function(e){
+  if(labVectors.length>=3)return;
+  var r=labCv.getBoundingClientRect();
+  var sx=(e.clientX-r.left)*(labCv.width/r.width),sy=(e.clientY-r.top)*(labCv.height/r.height);
+  labDragStart={x:sx,y:sy};labDragging=true;
+});
+labCv.addEventListener('mousemove',function(e){
+  if(!labDragging)return;
+  var r=labCv.getBoundingClientRect();
+  var sx=(e.clientX-r.left)*(labCv.width/r.width),sy=(e.clientY-r.top)*(labCv.height/r.height);
+  drawLab({x:sx,y:sy});
+});
+labCv.addEventListener('mouseup',function(e){
+  if(!labDragging)return;labDragging=false;
+  var r=labCv.getBoundingClientRect();
+  var sx=(e.clientX-r.left)*(labCv.width/r.width),sy=(e.clientY-r.top)*(labCv.height/r.height);
+  var dx=sx-labDragStart.x,dy=sy-labDragStart.y;
+  if(Math.hypot(dx,dy)>10){
+    labVectors.push({ox:labDragStart.x,oy:labDragStart.y,vx:dx,vy:dy,col:VCOLS[labVectors.length%4]});
+  }
+  labDragStart=null;drawLab();
+});
+labCv.addEventListener('mouseleave',function(){labDragging=false;labDragStart=null;drawLab();});
+// touch
+labCv.addEventListener('touchstart',function(e){e.preventDefault();var t=e.touches[0];var r=labCv.getBoundingClientRect();labDragStart={x:(t.clientX-r.left)*(labCv.width/r.width),y:(t.clientY-r.top)*(labCv.height/r.height)};labDragging=true;},{passive:false});
+labCv.addEventListener('touchmove',function(e){e.preventDefault();var t=e.touches[0];var r=labCv.getBoundingClientRect();var sx=(t.clientX-r.left)*(labCv.width/r.width),sy=(t.clientY-r.top)*(labCv.height/r.height);if(labDragging)drawLab({x:sx,y:sy});},{passive:false});
+labCv.addEventListener('touchend',function(e){e.preventDefault();if(!labDragging)return;labDragging=false;var t=e.changedTouches[0];var r=labCv.getBoundingClientRect();var sx=(t.clientX-r.left)*(labCv.width/r.width),sy=(t.clientY-r.top)*(labCv.height/r.height);if(labDragStart){var dx=sx-labDragStart.x,dy=sy-labDragStart.y;if(Math.hypot(dx,dy)>10)labVectors.push({ox:labDragStart.x,oy:labDragStart.y,vx:dx,vy:dy,col:VCOLS[labVectors.length%4]});}labDragStart=null;drawLab();},{passive:false});
+
+function drawLab(mousePos){
+  var cv=document.getElementById('labCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var ox=W/2,oy=H/2;
+  // grid
+  ctx.save();ctx.strokeStyle='rgba(255,204,0,.06)';ctx.lineWidth=1;
+  for(var x=0;x<W;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(var y=0;y<H;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  ctx.restore();
+  drawAxes(ctx,ox,oy,Math.min(ox,oy)-10,'rgba(255,204,0,.2)');
+  // Draw existing vectors (all from same origin for resultant calc)
+  var Rx=0,Ry=0;
+  labVectors.forEach(function(v,i){
+    var sign=labMode2==='sub'&&i>0?-1:1;
+    ga(ctx,ox,oy,ox+v.vx*sign,oy+v.vy*sign,v.col,3,14);
+    lbl(ctx,ox+v.vx*sign+10,oy+v.vy*sign-(i*12+8),'V⃗'+(i+1),v.col,12,'left');
+    Rx+=v.vx*sign;Ry+=v.vy*sign;
+  });
+  // Resultant (tip-to-tail for visual)
+  if(labVectors.length>1){
+    ga(ctx,ox,oy,ox+Rx,oy+Ry,'rgba(68,255,153,.9)',3.5,18);
+    lbl(ctx,ox+Rx/2,oy+Ry/2-18,'R⃗','#44ff99',13);
+  }
+  // Drag preview
+  if(labDragging&&labDragStart&&mousePos){
+    ga(ctx,labDragStart.x,labDragStart.y,mousePos.x,mousePos.y,'rgba(255,255,255,.5)',2,10);
+    ctx.save();ctx.fillStyle='rgba(255,255,255,.25)';
+    ctx.beginPath();ctx.arc(labDragStart.x,labDragStart.y,5,0,Math.PI*2);ctx.fill();ctx.restore();
+  }
+  // Info
+  if(labVectors.length===0){
+    document.getElementById('labHint').textContent='Clique e arraste para criar um vetor | Máx: 3 vetores';
+    document.getElementById('labInfo').textContent='Nenhum vetor criado ainda.';
+  } else {
+    document.getElementById('labHint').textContent='Vetores: '+labVectors.length+'/3 | '+labMode2.toUpperCase()+'  | Arraste para adicionar mais';
+    var infoStr=labVectors.map(function(v,i){return 'V'+(i+1)+'=('+v.vx.toFixed(0)+','+v.vy.toFixed(0)+')'}).join(' + ');
+    if(labVectors.length>1)infoStr+=' → R⃗=('+Rx.toFixed(0)+','+Ry.toFixed(0)+') |R⃗|='+Math.hypot(Rx,Ry).toFixed(1);
+    document.getElementById('labInfo').textContent=infoStr;
+  }
+}
+
+// ══ QUIZ ═════════════════════════════════════════
+var QA={q1:0,q2:0,q3:0,q4:0,q5:0,q6:0,q7:0,q8:0};
+var FB={
+  q1:{c:'CORRETO! A_x = |A|·cosθ = 10×cos(60°) = 10×0,5 = 5.',w:'ERRADO. A_x = |A|·cosθ = 10×cos(60°) = 10×0,5 = 5.'},
+  q2:{c:'CORRETO! |A⃗| = √(6²+8²) = √(36+64) = √100 = 10.',w:'ERRADO. |A⃗| = √(A_x²+A_y²) = √(36+64) = √100 = 10.'},
+  q3:{c:'CORRETO! R⃗ = (3+(−1), 4+2) = (2, 6).',w:'ERRADO. R_x = 3+(−1) = 2; R_y = 4+2 = 6. Logo R⃗ = (2, 6).'},
+  q4:{c:'CORRETO! D_x = 5−3 = 2; D_y = 2−(−1) = 3. D⃗ = (2, 3).',w:'ERRADO. D_x = A_x−B_x = 5−3 = 2; D_y = A_y−B_y = 2−(−1) = 3.'},
+  q5:{c:'CORRETO! A⃗·B⃗ = A_x·B_x + A_y·B_y = 4×2 + 3×(−4) = 8 − 12 = −4.',w:'ERRADO. A⃗·B⃗ = 4×2 + 3×(−4) = 8 − 12 = −4.'},
+  q6:{c:'CORRETO! A⃗·B⃗ = |A||B|cosθ = 0 → cosθ = 0 → θ = 90°. Vetores perpendiculares!',w:'ERRADO. A⃗·B⃗ = |A||B|cosθ = 0 → cosθ = 0 → θ = 90° → PERPENDICULARES.'},
+  q7:{c:'CORRETO! F⃗_R = √(30²+40²) = √(900+1600) = √2500 = 50 N. (triângulo 3-4-5)',w:'ERRADO. |R⃗| = √(30²+40²) = √2500 = 50 N. Triângulo 3-4-5 escalado por 10.'},
+  q8:{c:'CORRETO! Aceleração é vetorial (tem módulo, direção e sentido). Temperatura, energia e massa são grandezas escalares.',w:'ERRADO. Aceleração é VETORIAL. Temperatura, energia cinética e massa são ESCALARES.'}
+};
+var answered=0;
+function ans(btn,qId,result){
+  var card=document.getElementById(qId);card.querySelectorAll('.obt').forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('f_'+qId);
+  if(result==='correct'){btn.classList.add('correct');fb.textContent=FB[qId].c;fb.className='fb show ok';QA[qId]=1;}
+  else{btn.classList.add('wrong');fb.textContent=FB[qId].w;fb.className='fb show err';card.querySelectorAll('.obt').forEach(function(b){if(b.getAttribute('onclick').indexOf("'correct'")>-1)b.classList.add('correct');});}
+  answered++;updateP();if(answered===8)showScore();
+}
+function updateP(){document.getElementById('pBar').style.width=(answered/8*100)+'%';document.getElementById('pTxt').textContent=answered+' / 8 respondidas';}
+function showScore(){
+  var sc=0;Object.values(QA).forEach(function(v){sc+=v;});
+  var p=document.getElementById('spanel');p.style.display='block';document.getElementById('scv').textContent=sc+'/8';
+  var msgs=['Revise os conceitos vetoriais!','Bom início! Pratique mais.','Indo bem!','Ótimo domínio de vetores!','Perfeito! '];
+  var idx=sc<=2?0:sc<=4?1:sc<=5?2:sc<=7?3:4;document.getElementById('scm').textContent=msgs[idx];
+  var cols=['#ff4488','#ffcc00','#ffcc00','#44ff99','#0088ff'];
+  document.getElementById('scv').style.color=cols[idx];document.getElementById('scv').style.textShadow='0 0 20px '+cols[idx];
+  p.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQ(){
+  Object.keys(QA).forEach(function(k){QA[k]=0;});answered=0;updateP();document.getElementById('spanel').style.display='none';
+  ['q1','q2','q3','q4','q5','q6','q7','q8'].forEach(function(id){
+    document.getElementById(id).querySelectorAll('.obt').forEach(function(b){b.disabled=false;b.classList.remove('correct','wrong');});
+    var fb=document.getElementById('f_'+id);fb.className='fb';fb.textContent='';
+  });
+}
+// ══ INIT ══════════════════════════════════════════
+window.addEventListener('load',function(){
+  drawVecExplorer();drawDecomp();drawAdd();drawSub();calcDot();drawLab();
+});
+</script>
+</body>
+</html>

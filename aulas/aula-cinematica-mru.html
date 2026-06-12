@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Introdução à Cinemática — MRU | Aula Interativa</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --main:#0099ee;--vel:#ff9900;--pos:#44ddff;--traj:#ff3399;
+  --grn:#44ff99;--yw:#ffdd00;--pur:#bb66ff;
+  --bg:#020608;--pan:#030c12;--card:#050e16;
+  --bm:rgba(0,153,238,.24);--bv:rgba(255,153,0,.2);--bp:rgba(68,221,255,.2);
+  --dim:#0d4a6e;--txt:#b8e8ff;
+}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:'Rajdhani',sans-serif;font-size:17px;line-height:1.7;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,153,238,.009) 2px,rgba(0,153,238,.009) 4px);pointer-events:none;z-index:9999}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(0,153,238,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,153,238,.025) 1px,transparent 1px);background-size:58px 58px;animation:gm 22s linear infinite;z-index:0}
+@keyframes gm{0%{background-position:0 0}100%{background-position:58px 58px}}
+header{position:relative;z-index:10;text-align:center;padding:78px 20px 54px;border-bottom:1px solid rgba(0,153,238,.22)}
+.htag{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--main);letter-spacing:4px;border:1px solid var(--main);padding:4px 18px;margin-bottom:22px;animation:tp 2.4s ease-in-out infinite}
+@keyframes tp{0%,100%{box-shadow:0 0 4px var(--main),inset 0 0 4px rgba(0,153,238,.1)}50%{box-shadow:0 0 22px var(--main),0 0 55px rgba(0,153,238,.22),inset 0 0 14px rgba(0,153,238,.18)}}
+h1.title{font-family:'Orbitron',monospace;font-size:clamp(1.8rem,6vw,4.4rem);font-weight:900;letter-spacing:.06em;line-height:1.1;color:#fff;text-shadow:0 0 10px var(--main),0 0 40px var(--main),0 0 100px rgba(0,153,238,.35);animation:flk 9s linear infinite}
+@keyframes flk{0%,92%,100%{opacity:1}93%{opacity:.78}94.5%{opacity:1}96%{opacity:.62}97%{opacity:1}}
+.tsub{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:.95rem;color:var(--dim);letter-spacing:7px;text-transform:uppercase;margin-top:10px}
+nav{position:sticky;top:0;z-index:100;background:rgba(2,6,8,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,153,238,.16);display:flex;justify-content:center;gap:6px;padding:10px 18px;flex-wrap:wrap}
+nav a{font-family:'Orbitron',monospace;font-size:.57rem;letter-spacing:2px;color:var(--dim);text-decoration:none;padding:6px 13px;border:1px solid rgba(0,153,238,.17);transition:all .28s}
+nav a:hover{color:var(--main);border-color:var(--main);box-shadow:0 0 12px var(--main);text-shadow:0 0 8px var(--main)}
+main{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:0 22px 80px}
+section{margin-top:78px}
+.sh{display:flex;align-items:center;gap:14px;margin-bottom:34px}
+.sn{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--main);opacity:.6}
+h2.st{font-family:'Orbitron',monospace;font-size:clamp(1.15rem,2.8vw,1.75rem);font-weight:700;color:#fff;letter-spacing:.05em}
+h2.st span{color:var(--main);text-shadow:0 0 12px var(--main)}
+.sl{flex:1;height:1px;background:linear-gradient(90deg,var(--main),transparent);opacity:.38}
+.card{background:var(--card);border:1px solid var(--bm);padding:26px 28px;margin-bottom:18px;position:relative;transition:all .28s}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--main);box-shadow:0 0 10px var(--main)}
+.card:hover{border-color:var(--main);box-shadow:0 0 20px rgba(0,153,238,.1)}
+.card.vel::before{background:var(--vel);box-shadow:0 0 10px var(--vel)}.card.vel{border-color:var(--bv)}.card.vel:hover{border-color:var(--vel)}
+.card.pos::before{background:var(--pos);box-shadow:0 0 10px var(--pos)}.card.pos{border-color:var(--bp)}.card.pos:hover{border-color:var(--pos)}
+.card.grn::before{background:var(--grn);box-shadow:0 0 10px var(--grn)}.card.grn{border-color:rgba(68,255,153,.2)}.card.grn:hover{border-color:var(--grn)}
+.card.traj::before{background:var(--traj);box-shadow:0 0 10px var(--traj)}.card.traj{border-color:rgba(255,51,153,.2)}.card.traj:hover{border-color:var(--traj)}
+.card.yw::before{background:var(--yw);box-shadow:0 0 10px var(--yw)}.card.yw{border-color:rgba(255,221,0,.2)}.card.yw:hover{border-color:var(--yw)}
+h3{font-family:'Orbitron',monospace;font-size:.88rem;color:var(--main);text-shadow:0 0 8px var(--main);margin-bottom:12px;letter-spacing:.05em}
+.card.vel h3{color:var(--vel);text-shadow:0 0 8px var(--vel)}
+.card.pos h3{color:var(--pos);text-shadow:0 0 8px var(--pos)}
+.card.grn h3{color:var(--grn);text-shadow:0 0 8px var(--grn)}
+.card.traj h3{color:var(--traj);text-shadow:0 0 8px var(--traj)}
+.card.yw h3{color:var(--yw);text-shadow:0 0 8px var(--yw)}
+p{color:var(--txt);margin-bottom:10px}
+.law{background:rgba(0,153,238,.05);border:1px solid rgba(0,153,238,.38);border-left:4px solid var(--main);padding:14px 18px;margin:10px 0;font-family:'Share Tech Mono',monospace;font-size:.88rem;color:var(--main);line-height:1.9}
+.law.vel{background:rgba(255,153,0,.05);border-color:rgba(255,153,0,.38);border-left-color:var(--vel);color:var(--vel)}
+.law.pos{background:rgba(68,221,255,.05);border-color:rgba(68,221,255,.38);border-left-color:var(--pos);color:var(--pos)}
+.law.grn{background:rgba(68,255,153,.05);border-color:rgba(68,255,153,.38);border-left-color:var(--grn);color:var(--grn)}
+.law.traj{background:rgba(255,51,153,.05);border-color:rgba(255,51,153,.38);border-left-color:var(--traj);color:var(--traj)}
+.law.yw{background:rgba(255,221,0,.05);border-color:rgba(255,221,0,.38);border-left-color:var(--yw);color:var(--yw)}
+.fhero{text-align:center;padding:28px 18px;margin:18px 0;background:var(--pan);border:1px solid rgba(0,153,238,.28);position:relative;overflow:hidden}
+.fhero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,153,238,.07) 0%,transparent 70%)}
+.fhero .bf{font-family:'Orbitron',monospace;font-size:clamp(1.3rem,3vw,2.2rem);font-weight:700;color:#fff;text-shadow:0 0 14px var(--main),0 0 35px rgba(0,153,238,.42);letter-spacing:.04em;line-height:1.35}
+.fhero .fl{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:3px;margin-top:10px}
+.vis{background:var(--pan);border:1px solid var(--bm);padding:18px;margin:18px 0;overflow:hidden}
+.vis.vel{border-color:var(--bv)}.vis.pos{border-color:var(--bp)}.vis.grn{border-color:rgba(68,255,153,.2)}
+.vis.special{border-color:var(--main);border-width:2px}
+.vtag{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--dim);letter-spacing:3px;margin-bottom:12px;text-transform:uppercase;text-align:center}
+canvas{display:block;margin:0 auto;max-width:100%}
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:18px;margin:18px 0}
+table{width:100%;border-collapse:collapse;margin:12px 0}
+th{background:rgba(0,153,238,.09);color:var(--main);font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:2px;padding:10px 13px;text-align:left;border:1px solid rgba(0,153,238,.18)}
+td{padding:10px 13px;border:1px solid rgba(0,153,238,.1);color:var(--txt);font-size:.92rem}
+tr:hover td{background:rgba(0,153,238,.03)}
+.ctrl-row{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin:10px 0}
+.ctrl{text-align:center}
+.ctrl label{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--main);display:block;margin-bottom:4px;letter-spacing:1px}
+input[type=range]{-webkit-appearance:none;width:190px;height:4px;background:rgba(0,153,238,.2);outline:none;border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--main);border-radius:50%;cursor:pointer;box-shadow:0 0 8px var(--main)}
+.ctrl-val{font-family:'Orbitron',monospace;font-size:.95rem;color:var(--main);text-shadow:0 0 8px var(--main);margin-top:4px}
+.tabs{display:flex;gap:7px;justify-content:center;margin:10px 0;flex-wrap:wrap}
+.tab{font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:2px;color:var(--dim);padding:7px 14px;border:1px solid rgba(0,153,238,.2);background:transparent;cursor:pointer;transition:all .26s}
+.tab:hover{color:var(--main);border-color:var(--main)}
+.tab.active{color:var(--bg);background:var(--main);border-color:var(--main);box-shadow:0 0 14px var(--main)}
+.sbtn{font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:2px;padding:8px 18px;border:1px solid;background:transparent;cursor:pointer;transition:all .26s;margin:4px}
+.sbtn.run{color:var(--grn);border-color:var(--grn)}.sbtn.run:hover,.sbtn.run.on{background:rgba(68,255,153,.12);box-shadow:0 0 12px var(--grn)}
+.sbtn.rst{color:var(--traj);border-color:var(--traj)}.sbtn.rst:hover{background:rgba(255,51,153,.1)}
+.data-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}
+.db{background:rgba(0,0,0,.4);border:1px solid rgba(0,153,238,.2);padding:8px 12px;text-align:center}
+.db-l{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--dim);letter-spacing:1px}
+.db-v{font-family:'Orbitron',monospace;font-size:.95rem;color:var(--main);text-shadow:0 0 6px var(--main);margin-top:2px}
+.step{display:flex;gap:12px;align-items:flex-start;background:rgba(0,153,238,.04);border:1px solid rgba(0,153,238,.12);padding:10px 14px;margin-bottom:7px}
+.sn2{font-family:'Orbitron',monospace;font-size:.75rem;color:var(--main);min-width:22px}
+/* concept cards */
+.concept-box{background:var(--pan);border:1px solid rgba(0,153,238,.22);padding:18px 20px;position:relative}
+.concept-icon{font-size:2rem;margin-bottom:8px;filter:drop-shadow(0 0 8px currentColor)}
+/* quiz */
+.qc{background:var(--card);border:1px solid var(--bm);padding:22px 26px;margin-bottom:14px;transition:all .28s}.qc:hover{border-color:var(--main)}
+.qnum{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--main);letter-spacing:3px;margin-bottom:8px}
+.qtext{font-size:1rem;font-weight:600;color:#fff;margin-bottom:14px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.obt{background:rgba(0,0,0,.4);border:1px solid rgba(0,153,238,.22);color:var(--txt);padding:9px 14px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:.92rem;cursor:pointer;transition:all .24s;display:flex;align-items:flex-start;gap:10px}
+.obt:hover{border-color:var(--main);background:rgba(0,153,238,.07);color:#fff}
+.obt.correct{border-color:var(--grn)!important;background:rgba(68,255,153,.1)!important;color:var(--grn)!important;box-shadow:0 0 12px rgba(68,255,153,.25)!important}
+.obt.wrong{border-color:var(--traj)!important;background:rgba(255,51,153,.1)!important;color:var(--traj)!important}
+.obt:disabled{cursor:not-allowed}
+.ol{font-family:'Orbitron',monospace;font-size:.58rem;color:var(--main);min-width:16px;padding-top:2px}
+.fb{margin-top:10px;padding:10px 13px;font-family:'Share Tech Mono',monospace;font-size:.78rem;display:none;border-left:3px solid;line-height:1.6}
+.fb.show{display:block}.fb.ok{color:var(--grn);border-color:var(--grn);background:rgba(68,255,153,.05)}.fb.err{color:var(--traj);border-color:var(--traj);background:rgba(255,51,153,.05)}
+.sp{background:var(--card);border:1px solid var(--main);padding:26px;text-align:center;box-shadow:0 0 30px rgba(0,153,238,.12);margin-top:26px}
+.scl{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim);letter-spacing:3px;margin-bottom:8px}
+.scv{font-family:'Orbitron',monospace;font-size:2.8rem;font-weight:900;color:var(--main);text-shadow:0 0 20px var(--main)}
+.scm{color:var(--dim);margin-top:7px;font-size:.93rem}
+.rbtn{background:transparent;border:1px solid var(--main);color:var(--main);font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:2px;padding:9px 24px;cursor:pointer;margin-top:13px;transition:all .28s}
+.rbtn:hover{background:rgba(0,153,238,.1);box-shadow:0 0 14px var(--main)}
+.pw{height:4px;background:rgba(0,153,238,.1);margin-top:16px;border-radius:2px;overflow:hidden}
+.pf{height:100%;background:linear-gradient(90deg,var(--main),var(--pos));transition:width .5s ease}
+.ibox{background:linear-gradient(135deg,rgba(0,153,238,.05),rgba(255,153,0,.04));border:1px solid rgba(0,153,238,.2);padding:22px 26px;margin-top:28px;position:relative}
+.ibox::after{content:'v';position:absolute;top:-14px;left:22px;font-size:1.4rem;font-family:Orbitron,monospace;color:var(--main);text-shadow:0 0 10px var(--main);background:var(--bg);padding:0 8px}
+.hl{color:var(--main);font-weight:600}.hlv{color:var(--vel);font-weight:600}
+.hlp{color:var(--pos);font-weight:600}.hlg{color:var(--grn);font-weight:600}
+.hlt{color:var(--traj);font-weight:600}.hly{color:var(--yw);font-weight:600}
+footer{position:relative;z-index:10;text-align:center;padding:34px 20px;border-top:1px solid rgba(0,153,238,.2);font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:2px}
+@media(max-width:600px){header{padding:46px 14px 34px}main{padding:0 13px 58px}.card{padding:16px 18px}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<header>
+  <div class="htag">MÓDULO 01 // CINEMÁTICA // ENSINO MÉDIO</div>
+  <h1 class="title">INTRODUÇÃO À<br>CINEMÁTICA</h1>
+  <p class="tsub">Movimento · MRU · Velocidade · Trajetória</p>
+</header>
+<nav>
+  <a href="#intro">→ Intro</a>
+  <a href="#conceitos">→ Conceitos</a>
+  <a href="#trajetoria">→ Trajetória</a>
+  <a href="#distancia">→ Distância</a>
+  <a href="#velocidade">→ Velocidade</a>
+  <a href="#tipos">→ Tipos</a>
+  <a href="#mru">→ MRU</a>
+  <a href="#graficos">→ Gráficos</a>
+  <a href="#exercicios">→ Exercícios</a>
+</nav>
+<main>
+
+<!-- INTRO -->
+<section id="intro">
+  <div class="sh"><span class="sn">01</span><h2 class="st">O QUE É <span>CINEMÁTICA</span>?</h2><div class="sl"></div></div>
+  <div class="ibox">
+    <p>A <span class="hl">Cinemática</span> é o ramo da Física que estuda o <strong>movimento dos corpos</strong> sem se preocupar com as causas desse movimento (forças). Ela descreve <em>como</em> o corpo se move: posição, deslocamento, velocidade, aceleração e tempo.</p>
+    <p>É a base de toda a Mecânica. Antes de entender <em>por que</em> os corpos se movem (Dinâmica — Leis de Newton), precisamos saber <em>como</em> descrever esse movimento com precisão.</p>
+  </div>
+  <div class="igrid" style="margin-top:18px">
+    <div class="card"><h3>MECÂNICA CLÁSSICA</h3>
+      <p>A Mecânica estuda o movimento e divide-se em:<br>
+      ✦ <span class="hl">Cinemática</span>: descreve o movimento (como?)<br>
+      ✦ <span class="hl">Dinâmica</span>: explica o movimento (por que? — forças)<br>
+      ✦ <span class="hl">Estática</span>: corpos em equilíbrio (sem movimento)</p>
+    </div>
+    <div class="card vel"><h3>O QUE CINEMÁTICA ESTUDA</h3>
+      <p>✦ <span class="hlv">Posição</span> do corpo em cada instante<br>
+         ✦ <span class="hlv">Deslocamento</span> e distância percorrida<br>
+         ✦ <span class="hlv">Velocidade</span> (quão rápido se move)<br>
+         ✦ <span class="hlv">Aceleração</span> (como a velocidade muda)<br>
+         ✦ <span class="hlv">Trajetória</span> (caminho percorrido)</p>
+    </div>
+    <div class="card grn"><h3>GRANDEZAS CINEMÁTICAS</h3>
+      <div class="law grn" style="font-size:.82rem">Posição: s [m] (escalar) ou s⃗ (vetor)<br>Tempo: t [s]<br>Velocidade: v [m/s]<br>Aceleração: a [m/s²]<br>Distância: d [m] (sempre > 0)</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEITOS FUNDAMENTAIS -->
+<section id="conceitos">
+  <div class="sh"><span class="sn">02</span><h2 class="st">CONCEITOS <span>FUNDAMENTAIS</span></h2><div class="sl"></div></div>
+
+  <!-- PONTO MATERIAL -->
+  <div class="card pos">
+    <h3>PONTO MATERIAL</h3>
+    <p>Para simplificar o estudo do movimento, tratamos o corpo como um <span class="hlp">ponto material</span> — um ponto geométrico sem dimensões, com toda a massa concentrada nele. Essa simplificação é válida quando as dimensões do corpo são desprezíveis em relação às distâncias envolvidas no movimento.</p>
+    <div class="igrid" style="margin-top:8px">
+      <div><p><span class="hlp">Quando usar</span>: a Terra no estudo das estações do ano (diâmetro ≈ 12.756 km vs distância ao Sol ≈ 150.000.000 km)</p></div>
+      <div><p><span class="hlt">Quando NÃO usar</span>: estudo da rotação da Terra sobre seu próprio eixo (as dimensões do corpo são o que importa)</p></div>
+    </div>
+  </div>
+
+  <!-- REFERENCIAL -->
+  <div class="card yw">
+    <h3>REFERENCIAL (SISTEMA DE REFERÊNCIA)</h3>
+    <p>O <span class="hly">referencial</span> é o objeto escolhido como padrão para descrever o movimento. <strong>Movimento e repouso são conceitos relativos</strong> — dependem do referencial adotado.</p>
+    <div class="vis yw" style="margin-top:10px;padding:14px">
+      <p class="vtag" style="color:var(--yw)">[ RELATIVIDADE DO MOVIMENTO ]</p>
+      <canvas id="refCanvas" width="700" height="180"></canvas>
+      <div id="refInfo" style="font-family:Share Tech Mono,monospace;font-size:.7rem;color:var(--dim);text-align:center;margin-top:6px">
+        Em relação ao solo: passageiro move-se. Em relação ao ônibus: passageiro está em repouso.
+      </div>
+    </div>
+  </div>
+
+  <!-- REPOUSO E MOVIMENTO -->
+  <div class="card">
+    <h3>REPOUSO E MOVIMENTO</h3>
+    <div class="igrid" style="margin-top:8px">
+      <div>
+        <p><span class="hl">REPOUSO</span>: um corpo está em repouso em relação a um referencial quando sua posição <strong>não muda</strong> com o tempo.</p>
+        <div class="law" style="font-size:.83rem">Repouso: s(t) = constante<br>Δs = 0 para qualquer Δt<br>v = 0 em relação ao referencial</div>
+      </div>
+      <div>
+        <p><span class="hl">MOVIMENTO</span>: um corpo está em movimento em relação a um referencial quando sua posição <strong>muda</strong> com o tempo.</p>
+        <div class="law" style="font-size:.83rem">Movimento: s(t) varia com t<br>Δs != 0 para algum Δt<br>v != 0 em relação ao referencial</div>
+      </div>
+    </div>
+    <p style="margin-top:10px;background:rgba(0,153,238,.06);border-left:3px solid var(--main);padding:10px 14px">
+      <strong>Lembre:</strong> Um corpo pode estar em repouso em relação a um referencial e em movimento em relação a outro, <em>simultaneamente</em>. Não existe repouso ou movimento absoluto — tudo é relativo ao referencial escolhido.
+    </p>
+  </div>
+</section>
+
+<!-- TRAJETÓRIA -->
+<section id="trajetoria">
+  <div class="sh"><span class="sn">03</span><h2 class="st"><span>TRAJETÓRIA</span></h2><div class="sl"></div></div>
+  <div class="card traj">
+    <h3>DEFINIÇÃO</h3>
+    <p>A <span class="hlt">trajetória</span> é o conjunto de todos os pontos pelos quais o corpo passa durante seu movimento. É o "rastro" deixado pelo ponto material no espaço.</p>
+    <p>Importante: a trajetória <span class="hlt">depende do referencial</span>. O mesmo movimento pode ter trajetórias diferentes para observadores em referenciais diferentes.</p>
+  </div>
+  <div class="vis traj">
+    <p class="vtag" style="color:var(--traj)">[ TIPOS DE TRAJETÓRIA ]</p>
+    <canvas id="trajCanvas" width="700" height="220"></canvas>
+  </div>
+  <div class="igrid">
+    <div class="card traj"><h3>RETILÍNEA</h3>
+      <p>Trajetória em linha reta. O corpo move-se sempre na mesma direção. Exemplo: <span class="hlt">carro em estrada reta</span>, objeto em queda livre.</p>
+      <div class="law traj" style="font-size:.82rem">Direção constante<br>Toda velocidade na mesma direção<br>Exemplo: MRU, MRUV</div>
+    </div>
+    <div class="card"><h3>CURVILÍNEA</h3>
+      <p>Trajetória em forma de curva. O corpo muda de direção ao longo do movimento. Exemplo: <span class="hl">lançamento oblíquo</span>, carro em curva.</p>
+      <div class="law" style="font-size:.82rem">Direção varia continuamente<br>Inclui trajetória circular<br>Exemplo: satélite, projétil</div>
+    </div>
+    <div class="card vel"><h3>CIRCULAR</h3>
+      <p>Caso especial de trajetória curvilínea: caminho forma um círculo. O corpo sempre retorna ao ponto de origem. Exemplo: <span class="hlv">roda girando</span>, Terra em torno do Sol (aprox.).</p>
+      <div class="law vel" style="font-size:.82rem">Curva fechada circular<br>Raio constante<br>Exemplo: MCU</div>
+    </div>
+  </div>
+</section>
+
+<!-- DISTÂNCIA PERCORRIDA -->
+<section id="distancia">
+  <div class="sh"><span class="sn">04</span><h2 class="st">DISTÂNCIA PERCORRIDA E <span>DESLOCAMENTO</span></h2><div class="sl"></div></div>
+  <div class="igrid">
+    <div class="card vel">
+      <h3>DISTÂNCIA PERCORRIDA (d)</h3>
+      <p>É o <span class="hlv">comprimento total do caminho</span> percorrido pelo corpo, independentemente da direção. Sempre positiva. É uma <strong>grandeza escalar</strong>.</p>
+      <div class="law vel">d = soma de todos os trechos<br>d >= 0 (sempre)<br>Unidade: metro [m]<br>Depende do CAMINHO tomado</div>
+      <p style="margin-top:8px">Se um corredor dá uma volta completa numa pista de 400 m → d = 400 m</p>
+    </div>
+    <div class="card pos">
+      <h3>DESLOCAMENTO (Δs)</h3>
+      <p>É a <span class="hlp">variação de posição</span> entre o ponto final e o ponto inicial. Pode ser positivo, negativo ou zero. É uma <strong>grandeza vetorial</strong>.</p>
+      <div class="law pos">ΔS = S<sub></sub> - S<sub>0</sub><br>Pode ser negativo!<br>ΔS = 0 se voltar ao início<br>Depende apenas das posições</div>
+      <p style="margin-top:8px">Se o corredor volta ao ponto de partida → ΔS = 0, mas d = 400 m</p>
+    </div>
+  </div>
+  <!-- DISTANCE VS DISPLACEMENT CANVAS -->
+  <div class="vis">
+    <p class="vtag">[ DISTÂNCIA × DESLOCAMENTO ]</p>
+    <canvas id="distCanvas" width="700" height="200"></canvas>
+    <div style="font-family:Share Tech Mono,monospace;font-size:.7rem;color:var(--dim);text-align:center;margin-top:6px">
+      Distância (laranja) = caminho total percorrido &nbsp;|&nbsp; Deslocamento (azul) = reta entre início e fim
+    </div>
+  </div>
+  <div class="card grn">
+    <h3>QUANDO d = |ΔS|?</h3>
+    <p>A distância percorrida é igual ao módulo do deslocamento apenas quando o corpo se move <span class="hlg">em linha reta e em um único sentido</span> (sem inverter o movimento). Em qualquer outro caso, d ≥ |ΔS|.</p>
+    <table>
+      <tr><th>SITUAÇÃO</th><th>DISTÂNCIA d</th><th>DESLOCAMENTO ΔS</th></tr>
+      <tr><td>Vai de A até B (reta, 1 sentido)</td><td>10 m</td><td>+10 m</td></tr>
+      <tr><td>Vai de A até B e volta a A</td><td>20 m</td><td>0 m</td></tr>
+      <tr><td>Vai 10 m, volta 4 m</td><td>14 m</td><td>+6 m</td></tr>
+      <tr><td>Vai 5 m para trás</td><td>5 m</td><td>-5 m</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- VELOCIDADE -->
+<section id="velocidade">
+  <div class="sh"><span class="sn">05</span><h2 class="st"><span>VELOCIDADE</span></h2><div class="sl"></div></div>
+  <div class="card vel">
+    <h3>VELOCIDADE ESCALAR MÉDIA</h3>
+    <p>A <span class="hlv">velocidade escalar média</span> é a razão entre a distância total percorrida e o intervalo de tempo. Indica "quão rápido" o corpo se moveu em média, sem considerar a direção.</p>
+  </div>
+  <div class="fhero" style="border-color:rgba(255,153,0,.3)">
+    <div class="bf" style="text-shadow:0 0 14px var(--vel),0 0 35px rgba(255,153,0,.42)">v<sub>m</sub> = d / Δt </div>
+    <div class="fl" style="color:var(--vel)">v<sub>m</sub> [m/s] &nbsp;|&nbsp; d = distância percorrida [m] &nbsp;|&nbsp; Δt = intervalo de tempo [s]</div>
+  </div>
+  <div class="igrid">
+    <div class="card vel"><h3>VELOCIDADE VETORIAL MÉDIA</h3>
+      <p>A <span class="hlv">velocidade vetorial média</span> é a razão entre o deslocamento (vetor) e o intervalo de tempo. Tem módulo, direção e sentido.</p>
+      <div class="law vel">v<sub>m</sub> = ΔS / Δt<br>Pode ser positiva, negativa ou zero<br>Positiva: mesmo sentido de referência<br>Negativa: sentido oposto</div>
+    </div>
+    <div class="card"><h3>UNIDADES DE VELOCIDADE</h3>
+      <div class="law" style="font-size:.83rem">SI: m/s (metro por segundo)<br>Cotidiano: km/h<br><br>Conversao: 1 m/s = 3,6 km/h<br>Para m/s: divida por 3,6<br>Para km/h: multiplique por 3,6<br><br>Exemplo: 72 km/h = 20 m/s</div>
+    </div>
+    <div class="card grn"><h3>EXEMPLO RESOLVIDO</h3>
+      <p>Um carro percorre 180 km em 2 horas. Qual é a velocidade média?</p>
+      <div class="step"><div class="sn2">1</div><p>v_m = d / Δt = 180 km / 2 h = 90 km/h</p></div>
+      <div class="step"><div class="sn2">2</div><p>Em m/s: 90 / 3,6 = <span class="hlg">25 m/s</span></p></div>
+    </div>
+  </div>
+  <!-- VELOCITY CALCULATOR -->
+  <div class="vis vel">
+    <p class="vtag" style="color:var(--vel)">[ CALCULADORA — VELOCIDADE, DISTÂNCIA, TEMPO ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>DISTÂNCIA d (m)</label>
+        <input type="range" id="vD" min="10" max="1000" value="200" oninput="calcVel()">
+        <div class="ctrl-val" id="vDV">200 m</div>
+      </div>
+      <div class="ctrl"><label>TEMPO Δt (s)</label>
+        <input type="range" id="vT" min="1" max="120" value="20" oninput="calcVel()">
+        <div class="ctrl-val" id="vTV">20 s</div>
+      </div>
+    </div>
+    <canvas id="velCanvas" width="700" height="200"></canvas>
+    <div id="velResult" style="font-family:Orbitron,monospace;font-size:1rem;text-align:center;margin-top:6px;color:var(--vel);text-shadow:0 0 8px var(--vel)">v = — m/s</div>
+  </div>
+</section>
+
+<!-- TIPOS DE MOVIMENTO -->
+<section id="tipos">
+  <div class="sh"><span class="sn">06</span><h2 class="st">TIPOS DE <span>MOVIMENTO</span></h2><div class="sl"></div></div>
+  <div class="igrid">
+    <div class="card">
+      <h3>POR TRAJETÓRIA</h3>
+      <p>✦ <span class="hl">Retilíneo</span>: trajetória em linha reta<br>
+         ✦ <span class="hl">Curvilíneo</span>: trajetória em curva<br>
+         ✦ <span class="hl">Circular</span>: trajetória circular</p>
+    </div>
+    <div class="card vel">
+      <h3>POR VELOCIDADE</h3>
+      <p>✦ <span class="hlv">Uniforme</span>: velocidade constante (a = 0)<br>
+         ✦ <span class="hlv">Variado</span>: velocidade muda (a ≠ 0)<br>
+         &nbsp;&nbsp;— Acelerado: velocidade aumenta<br>
+         &nbsp;&nbsp;— Retardado: velocidade diminui</p>
+    </div>
+    <div class="card pos">
+      <h3>COMBINAÇÕES</h3>
+      <p>✦ <span class="hlp">MRU</span>: Retilíneo + Uniforme<br>
+         ✦ <span class="hlp">MRUV</span>: Retilíneo + Uniformemente Variado<br>
+         ✦ <span class="hlp">MCU</span>: Circular + Uniforme<br>
+         ✦ <span class="hlp">Livre</span>: Curvilíneo + Variado</p>
+    </div>
+  </div>
+  <table>
+    <tr><th>MOVIMENTO</th><th>TRAJETÓRIA</th><th>VELOCIDADE</th><th>ACELERAÇÃO</th><th>EXEMPLO</th></tr>
+    <tr><td>MRU</td><td>Reta</td><td>Constante</td><td>a = 0</td><td>Carro em vel. cte. em reta</td></tr>
+    <tr><td>MRUV</td><td>Reta</td><td>Varia uniformemente</td><td>a = cte ≠ 0</td><td>Queda livre, frenagem</td></tr>
+    <tr><td>MCU</td><td>Circular</td><td>Módulo constante</td><td>Centripeta</td><td>Roda girando</td></tr>
+    <tr><td>Curvilíneo variado</td><td>Curva</td><td>Varia</td><td>Varia</td><td>Lançamento oblíquo</td></tr>
+  </table>
+</section>
+
+<!-- MRU -->
+<section id="mru">
+  <div class="sh"><span class="sn">07</span><h2 class="st">MOVIMENTO RETILÍNEO <span>UNIFORME</span></h2><div class="sl"></div></div>
+  <div class="card">
+    <h3>DEFINIÇÃO DO MRU</h3>
+    <p>No <span class="hl">MRU</span>, o corpo percorre <span class="hl">distâncias iguais em tempos iguais</span>. A velocidade é constante (nem aumenta nem diminui), a trajetória é uma linha reta, e a aceleração é zero.</p>
+    <p>Condição para MRU: <span class="hl">força resultante nula</span> (relação com a 1ª Lei de Newton — sem força, sem mudança de velocidade).</p>
+  </div>
+  <div class="fhero">
+    <div class="bf">S = S₀ + v · t</div>
+    <div class="fl">S [m] posição atual &nbsp;|&nbsp; S₀ [m] posição inicial &nbsp;|&nbsp; v [m/s] velocidade (constante) &nbsp;|&nbsp; t [s] tempo</div>
+  </div>
+  <div class="igrid">
+    <div class="card"><h3>PROPRIEDADES DO MRU</h3>
+      <p>✦ Velocidade <span class="hl">constante</span> (módulo, direção e sentido)<br>
+         ✦ Aceleração <span class="hl">nula</span> (a = 0)<br>
+         ✦ Trajetória <span class="hl">retilínea</span><br>
+         ✦ Força resultante <span class="hl">nula</span><br>
+         ✦ Distâncias iguais em tempos iguais</p>
+    </div>
+    <div class="card vel"><h3>EQUAÇÃO HORÁRIA</h3>
+      <div class="law vel" style="line-height:2">S = S₀ + v·t<br>v = (S - S₀) / t = DS/Dt<br>DS = v·t  (deslocamento)<br><br>v > 0: movimento no sentido +<br>v < 0: movimento no sentido -</div>
+    </div>
+    <div class="card grn"><h3>EXEMPLO RESOLVIDO</h3>
+      <p>Carro com S₀ = 20 m, v = 15 m/s. Qual a posição após t = 4 s?</p>
+      <div class="step"><div class="sn2">1</div><p>S = S₀ + v·t</p></div>
+      <div class="step"><div class="sn2">2</div><p>S = 20 + 15×4 = 20 + 60</p></div>
+      <div class="step"><div class="sn2">3</div><p>S = <span class="hlg">80 m</span></p></div>
+    </div>
+  </div>
+  <!-- MRU MAIN SIMULATION -->
+  <div class="vis special">
+    <p class="vtag" style="color:var(--main);letter-spacing:4px">[ ★ SIMULAÇÃO — MRU EM TEMPO REAL ★ ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>POSIÇÃO INICIAL S₀ (m)</label>
+        <input type="range" id="mruS0" min="-100" max="100" value="0" oninput="onMruSlide()">
+        <div class="ctrl-val" id="mruS0V">0 m</div>
+      </div>
+      <div class="ctrl"><label>VELOCIDADE v (m/s)</label>
+        <input type="range" id="mruV" min="-30" max="30" value="10" oninput="onMruSlide()">
+        <div class="ctrl-val" id="mruVV">10 m/s</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
+      <button class="sbtn run" id="mruRunBtn" onclick="toggleMRU()">▶ INICIAR</button>
+      <button class="sbtn rst" onclick="resetMRU()">↺ REINICIAR</button>
+    </div>
+    <canvas id="mruCanvas" width="700" height="180"></canvas>
+    <div class="data-row" id="mruData"></div>
+  </div>
+</section>
+
+<!-- GRÁFICOS DO MRU -->
+<section id="graficos">
+  <div class="sh"><span class="sn">08</span><h2 class="st">GRÁFICOS DO <span>MRU</span></h2><div class="sl"></div></div>
+  <div class="card pos">
+    <h3>GRÁFICO S×t (POSIÇÃO × TEMPO)</h3>
+    <p>No MRU, o gráfico S×t é uma <span class="hlp">reta oblíqua</span>. A inclinação (coeficiente angular) da reta representa a velocidade v. Quanto mais inclinada a reta, maior a velocidade.</p>
+    <div class="law pos">Coef. angular = tan(theta) = DS/Dt = v<br>Reta crescente: v > 0<br>Reta decrescente: v < 0<br>Reta horizontal: v = 0 (repouso)</div>
+  </div>
+  <div class="card vel">
+    <h3>GRÁFICO v×t (VELOCIDADE × TEMPO)</h3>
+    <p>No MRU, o gráfico v×t é uma <span class="hlv">reta horizontal</span> (velocidade constante). A área sob a curva v×t representa o deslocamento DS = v·Dt.</p>
+    <div class="law vel">Reta horizontal: v = constante (MRU)<br>Area sob a curva = v * Dt = DS<br>Coeficiente angular = 0 (a = 0)</div>
+  </div>
+  <div class="vis">
+    <p class="vtag">[ GRÁFICOS S×t E v×t DO MRU — INTERATIVO ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>S₀ (m)</label>
+        <input type="range" id="gS0" min="-80" max="80" value="20" oninput="drawGraphs()">
+        <div class="ctrl-val" id="gS0V">20 m</div>
+      </div>
+      <div class="ctrl"><label>VELOCIDADE v (m/s)</label>
+        <input type="range" id="gV" min="-20" max="20" value="8" oninput="drawGraphs()">
+        <div class="ctrl-val" id="gVV">8 m/s</div>
+      </div>
+    </div>
+    <canvas id="graphCanvas" width="700" height="310"></canvas>
+    <div id="graphInfo" style="font-family:Share Tech Mono,monospace;font-size:.7rem;color:var(--dim);text-align:center;margin-top:6px">
+      Inclinacao do grafico S*t = velocidade v
+    </div>
+  </div>
+  <div class="card grn">
+    <h3>ENCONTRO DE DOIS MÓVEIS</h3>
+    <p>Para encontrar quando dois móveis em MRU se encontram, igualamos suas equações horárias: S<sub>A</sub>(t) = S<sub>B</sub>(t). O instante t onde as equações se igualam é o momento do encontro.</p>
+    <div class="law grn" style="font-size:.83rem">Encontro: S<sub>A</sub> = S<sub>B</sub><br>S<sub>0A</sub> + v<sub>A</sub>*t = S<sub>0B</sub> + v<sub>B</sub>*t<br>t<sub>enc</sub> = (S<sub>0B</sub> - S<sub>0A</sub>) / (v<sub>A</sub> - v<sub>B</sub>)</div>
+  </div>
+</section>
+
+<!-- EXERCÍCIOS -->
+<section id="exercicios">
+  <div class="sh"><span class="sn">09</span><h2 class="st">EXERCÍCIOS DE <span>FIXAÇÃO</span></h2><div class="sl"></div></div>
+  <p style="color:var(--dim);font-family:Share Tech Mono,monospace;font-size:.72rem;margin-bottom:22px;letter-spacing:2px">SELECIONE A ALTERNATIVA CORRETA</p>
+  <div class="pw"><div class="pf" id="pBar" style="width:0%"></div></div>
+  <p style="font-family:Share Tech Mono,monospace;font-size:.67rem;color:var(--dim);text-align:right;margin:6px 0 24px" id="pTxt">0 / 8 respondidas</p>
+
+  <div class="qc" id="q1"><div class="qnum">QUESTÃO 01 // REFERENCIAL</div>
+    <div class="qtext">Um passageiro está sentado em um trem em movimento. Em relação a outro passageiro do mesmo vagão, o passageiro está:</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">A</span>Em movimento, pois o trem se move</button>
+      <button class="obt" onclick="ans(this,'q1','correct')"><span class="ol">B</span>Em repouso, pois não muda de posição em relação ao outro passageiro</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">C</span>Em repouso em relação a todos os referenciais</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">D</span>Em movimento acelerado</button>
+    </div><div class="fb" id="f_q1"></div>
+  </div>
+
+  <div class="qc" id="q2"><div class="qnum">QUESTÃO 02 // DISTÂNCIA × DESLOCAMENTO</div>
+    <div class="qtext">Um atleta corre numa pista retangular de 100 m × 50 m e completa exatamente 1 volta. Qual é a distância percorrida e o deslocamento?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">A</span>d = 0 m e Ds = 300 m</button>
+      <button class="obt" onclick="ans(this,'q2','correct')"><span class="ol">B</span>d = 300 m e Ds = 0 m</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">C</span>d = 300 m e Ds = 300 m</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">D</span>d = 150 m e Ds = 0 m</button>
+    </div><div class="fb" id="f_q2"></div>
+  </div>
+
+  <div class="qc" id="q3"><div class="qnum">QUESTÃO 03 // VELOCIDADE MÉDIA</div>
+    <div class="qtext">Um carro percorre 360 km em 4 horas. Qual é sua velocidade média em m/s?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">A</span>90 m/s</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">B</span>36 m/s</button>
+      <button class="obt" onclick="ans(this,'q3','correct')"><span class="ol">C</span>25 m/s</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">D</span>324 m/s</button>
+    </div><div class="fb" id="f_q3"></div>
+  </div>
+
+  <div class="qc" id="q4"><div class="qnum">QUESTÃO 04 // EQUAÇÃO HORÁRIA DO MRU</div>
+    <div class="qtext">Um móvel tem posição inicial S₀ = 40 m e velocidade v = 5 m/s. Qual é sua posição após t = 6 s?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">A</span>30 m</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">B</span>46 m</button>
+      <button class="obt" onclick="ans(this,'q4','correct')"><span class="ol">C</span>70 m</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">D</span>240 m</button>
+    </div><div class="fb" id="f_q4"></div>
+  </div>
+
+  <div class="qc" id="q5"><div class="qnum">QUESTÃO 05 // GRÁFICO S×t</div>
+    <div class="qtext">No gráfico S×t de um MRU, o que representa a inclinação (coeficiente angular) da reta?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">A</span>A posição inicial do móvel</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">B</span>A aceleração do móvel</button>
+      <button class="obt" onclick="ans(this,'q5','correct')"><span class="ol">C</span>A velocidade do móvel</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">D</span>A distância percorrida</button>
+    </div><div class="fb" id="f_q5"></div>
+  </div>
+
+  <div class="qc" id="q6"><div class="qnum">QUESTÃO 06 // CONVERSÃO DE UNIDADES</div>
+    <div class="qtext">Uma moto trafega a 108 km/h. Qual é essa velocidade em m/s?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">A</span>108 m/s</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">B</span>388,8 m/s</button>
+      <button class="obt" onclick="ans(this,'q6','correct')"><span class="ol">C</span>30 m/s</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">D</span>3 m/s</button>
+    </div><div class="fb" id="f_q6"></div>
+  </div>
+
+  <div class="qc" id="q7"><div class="qnum">QUESTÃO 07 // MRU — TEMPO</div>
+    <div class="qtext">Um trem em MRU parte de S₀ = 0 com v = 20 m/s. Em quanto tempo ele atinge S = 500 m?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">A</span>10.000 s</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">B</span>10 s</button>
+      <button class="obt" onclick="ans(this,'q7','correct')"><span class="ol">C</span>25 s</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">D</span>480 s</button>
+    </div><div class="fb" id="f_q7"></div>
+  </div>
+
+  <div class="qc" id="q8"><div class="qnum">QUESTÃO 08 // CONCEITO</div>
+    <div class="qtext">Sobre o MRU, é correto afirmar que:</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">A</span>A velocidade varia linearmente com o tempo</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">B</span>A aceleração é constante e diferente de zero</button>
+      <button class="obt" onclick="ans(this,'q8','correct')"><span class="ol">C</span>O gráfico S×t é uma reta e o gráfico v×t é horizontal</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">D</span>O corpo pode ter qualquer tipo de trajetória</button>
+    </div><div class="fb" id="f_q8"></div>
+  </div>
+
+  <div class="sp" id="spanel" style="display:none">
+    <div class="scl">RESULTADO FINAL</div><div class="scv" id="scv">0/8</div>
+    <div class="scm" id="scm"></div>
+    <button class="rbtn" onclick="resetQ()">REFAZER EXERCÍCIOS</button>
+  </div>
+</section>
+</main>
+<footer>
+  <div>INTRODUÇÃO À CINEMÁTICA — FÍSICA DO ENSINO MÉDIO</div>
+  <div style="margin-top:7px">REFERENCIAL · REPOUSO · TRAJETÓRIA · DISTÂNCIA · VELOCIDADE · MRU</div>
+</footer>
+
+<script>
+// ══ HELPERS ══════════════════════════════════
+function bg(ctx,W,H){ctx.fillStyle='#030c12';ctx.fillRect(0,0,W,H);}
+function ga(ctx,x1,y1,x2,y2,col,lw,blur){
+  lw=lw||2;blur=blur||10;var a=Math.atan2(y2-y1,x2-x1),L=9;
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=blur;ctx.strokeStyle=col;ctx.lineWidth=lw;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-L*Math.cos(a-.42),y2-L*Math.sin(a-.42));
+  ctx.lineTo(x2-L*Math.cos(a+.42),y2-L*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+}
+function lbl(ctx,x,y,txt,col,sz,align){
+  sz=sz||11;align=align||'center';
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=5;ctx.fillStyle=col;
+  ctx.font=sz+'px Share Tech Mono,monospace';ctx.textAlign=align;ctx.fillText(txt,x,y);ctx.restore();
+}
+function drawGnd(ctx,gY,W){
+  ctx.save();ctx.strokeStyle='rgba(0,153,238,.35)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,gY);ctx.lineTo(W,gY);ctx.stroke();
+  for(var x=0;x<W;x+=18){ctx.strokeStyle='rgba(0,153,238,.12)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x,gY);ctx.lineTo(x-7,gY+11);ctx.stroke();}
+  ctx.restore();
+}
+
+// ══ REFERENCIAL ANIMATION (constant, no sliders) ══
+(function animRef(){
+  var t2=0;
+  function step(){
+    t2+=0.008;
+    var cv=document.getElementById('refCanvas');if(!cv){requestAnimationFrame(step);return;}
+    var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+    bg(ctx,W,H);
+    var gY=H-20;
+    // Road
+    drawGnd(ctx,gY,W);
+    // Bus
+    var busX=80+(t2*40)%((W-180));
+    ctx.save();ctx.shadowColor='rgba(0,153,238,.5)';ctx.shadowBlur=10;
+    ctx.fillStyle='rgba(0,153,238,.15)';ctx.strokeStyle='#0099ee';ctx.lineWidth=2;
+    ctx.fillRect(busX,gY-52,140,44);ctx.strokeRect(busX,gY-52,140,44);
+    // Windows
+    ctx.fillStyle='rgba(0,153,238,.3)';ctx.fillRect(busX+10,gY-46,28,22);ctx.fillRect(busX+48,gY-46,28,22);
+    ctx.fillRect(busX+86,gY-46,28,22);ctx.restore();
+    lbl(ctx,busX+70,gY-58,'ONIBUS','rgba(0,153,238,.6)',8);
+    // Passenger inside bus (fixed relative to bus)
+    var passX=busX+30;
+    ctx.save();ctx.shadowColor='#ff9900';ctx.shadowBlur=10;ctx.strokeStyle='#ff9900';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(passX,gY-42,7,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(passX,gY-35);ctx.lineTo(passX,gY-20);
+    ctx.moveTo(passX,gY-30);ctx.lineTo(passX-8,gY-24);ctx.moveTo(passX,gY-30);ctx.lineTo(passX+8,gY-24);
+    ctx.moveTo(passX,gY-20);ctx.lineTo(passX-6,gY-8);ctx.moveTo(passX,gY-20);ctx.lineTo(passX+6,gY-8);
+    ctx.stroke();ctx.restore();
+    lbl(ctx,passX,gY+8,'Passageiro','rgba(255,153,0,.6)',8);
+    // Ground observer
+    ctx.save();ctx.shadowColor='#44ff99';ctx.shadowBlur=10;ctx.strokeStyle='#44ff99';ctx.lineWidth=1.5;
+    var obsX=W-60;
+    ctx.beginPath();ctx.arc(obsX,gY-34,8,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(obsX,gY-26);ctx.lineTo(obsX,gY-8);
+    ctx.moveTo(obsX,gY-18);ctx.lineTo(obsX-9,gY-12);ctx.moveTo(obsX,gY-18);ctx.lineTo(obsX+9,gY-12);
+    ctx.moveTo(obsX,gY-8);ctx.lineTo(obsX-7,gY+4);ctx.moveTo(obsX,gY-8);ctx.lineTo(obsX+7,gY+4);
+    ctx.stroke();ctx.restore();
+    lbl(ctx,obsX,gY+12,'Observador (solo)','rgba(68,255,153,.6)',8);
+    // Labels with arrows
+    lbl(ctx,W/2,18,'REF. SOLO: passageiro se move','rgba(255,153,0,.55)',9);
+    lbl(ctx,W/2,34,'REF. ONIBUS: passageiro em repouso','rgba(0,153,238,.55)',9);
+    requestAnimationFrame(step);
+  }
+  step();
+})();
+
+// ══ TRAJECTORY CANVAS (static) ═══════════════
+(function animTraj(){
+  var tT=0;
+  function step(){
+    tT+=0.012;
+    var cv=document.getElementById('trajCanvas');if(!cv){requestAnimationFrame(step);return;}
+    var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+    bg(ctx,W,H);
+    var sec=W/3;
+    // Section labels
+    lbl(ctx,sec/2,16,'RETILÍNEA','rgba(255,51,153,.7)',9);
+    lbl(ctx,sec+sec/2,16,'CURVILÍNEA','rgba(0,153,238,.7)',9);
+    lbl(ctx,2*sec+sec/2,16,'CIRCULAR','rgba(255,153,0,.7)',9);
+    // Dividers
+    ctx.save();ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;ctx.setLineDash([3,6]);
+    ctx.beginPath();ctx.moveTo(sec,0);ctx.lineTo(sec,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(2*sec,0);ctx.lineTo(2*sec,H);ctx.stroke();
+    ctx.setLineDash([]);ctx.restore();
+
+    // 1) Straight line
+    var phase1=(tT*0.3)%1;
+    var l1x=30+phase1*(sec-60);var l1y=H/2;
+    ctx.save();ctx.strokeStyle='rgba(255,51,153,.3)';ctx.lineWidth=2;ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(30,H/2);ctx.lineTo(sec-30,H/2);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+    ctx.save();ctx.shadowColor='#ff3399';ctx.shadowBlur=14;
+    ctx.beginPath();ctx.arc(l1x,l1y,8,0,Math.PI*2);ctx.fillStyle='#ff3399';ctx.fill();ctx.restore();
+
+    // 2) Curve (parabola-like)
+    var phase2=(tT*0.25)%1;
+    var c2x0=sec+20,c2xEnd=2*sec-20,c2cx=(sec+2*sec)/2,c2cy=H/2-60;
+    ctx.save();ctx.strokeStyle='rgba(0,153,238,.3)';ctx.lineWidth=2;ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(c2x0,H/2);ctx.quadraticCurveTo(c2cx,c2cy,c2xEnd,H/2);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+    var bx=Math.pow(1-phase2,2)*c2x0+2*(1-phase2)*phase2*c2cx+Math.pow(phase2,2)*c2xEnd;
+    var by2=Math.pow(1-phase2,2)*H/2+2*(1-phase2)*phase2*c2cy+Math.pow(phase2,2)*(H/2);
+    ctx.save();ctx.shadowColor='#0099ee';ctx.shadowBlur=14;
+    ctx.beginPath();ctx.arc(bx,by2,8,0,Math.PI*2);ctx.fillStyle='#0099ee';ctx.fill();ctx.restore();
+
+    // 3) Circle
+    var cx3=(2*sec+W)/2,cy3=H/2,r3=50;
+    ctx.save();ctx.strokeStyle='rgba(255,153,0,.3)';ctx.lineWidth=2;ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.arc(cx3,cy3,r3,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+    var ang3=tT*0.6;
+    var c3x=cx3+r3*Math.cos(ang3),c3y=cy3+r3*Math.sin(ang3);
+    ctx.save();ctx.shadowColor='#ff9900';ctx.shadowBlur=14;
+    ctx.beginPath();ctx.arc(c3x,c3y,8,0,Math.PI*2);ctx.fillStyle='#ff9900';ctx.fill();ctx.restore();
+    // center dot
+    ctx.save();ctx.fillStyle='rgba(255,153,0,.3)';ctx.beginPath();ctx.arc(cx3,cy3,3,0,Math.PI*2);ctx.fill();ctx.restore();
+
+    requestAnimationFrame(step);
+  }
+  step();
+})();
+
+// ══ DISTANCE vs DISPLACEMENT CANVAS (static) ══
+function drawDistCanvas(){
+  var cv=document.getElementById('distCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var gY=H-30,y=gY-30;
+  drawGnd(ctx,gY,W);
+  // Path: A -> B -> C (goes forward, then back a bit)
+  var A=80,B=520,C=340;
+  // Curved path (actual path, orange = distance)
+  ctx.save();ctx.strokeStyle='rgba(255,153,0,.5)';ctx.lineWidth=3;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.moveTo(A,y);
+  ctx.bezierCurveTo(A+100,y-40,B-100,y+30,B,y);
+  ctx.bezierCurveTo(B+60,y-20,C+80,y-30,C,y);
+  ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  // Straight displacement arrow (blue)
+  ga(ctx,A,y-8,C,y-8,'#0099ee',2.5,10);
+  // Points
+  ['A','B','C'].forEach(function(n,i){
+    var x=[A,B,C][i];
+    ctx.save();ctx.shadowColor='#44ff99';ctx.shadowBlur=10;
+    ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fillStyle='#44ff99';ctx.fill();ctx.restore();
+    lbl(ctx,x,y+20,n,'rgba(68,255,153,.8)',10);
+  });
+  lbl(ctx,A,y-28,'INÍCIO','rgba(68,255,153,.6)',8);
+  lbl(ctx,C,y+34,'FIM','rgba(68,255,153,.6)',8);
+  // Labels
+  lbl(ctx,(A+B+C)/3,y-58,'Caminho percorrido d (laranja, inclui volta)','rgba(255,153,0,.7)',9);
+  lbl(ctx,(A+C)/2,y-22,'Deslocamento DS = C - A (azul, em linha reta)','rgba(0,153,238,.7)',9);
+  lbl(ctx,W/2,H-10,'d (A->B->C) > |DS| (A->C)  |  A moveu-se para frente e depois voltou','rgba(0,153,238,.35)',8);
+}
+
+// ══ VELOCITY CALCULATOR (static) ═════════════
+function calcVel(){
+  var d=+document.getElementById('vD').value;
+  var t=+document.getElementById('vT').value;
+  document.getElementById('vDV').textContent=d+' m';
+  document.getElementById('vTV').textContent=t+' s';
+  var v=d/t;
+  var vKmh=v*3.6;
+  document.getElementById('velResult').textContent='v = '+d+'/'+t+' = '+v.toFixed(2)+' m/s = '+vKmh.toFixed(1)+' km/h';
+  var cv=document.getElementById('velCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var gY=H-28;drawGnd(ctx,gY,W);
+  // Time bar (full width = max t)
+  var maxT=120,tW=(t/maxT)*(W-80);
+  ctx.fillStyle='rgba(0,0,0,.4)';ctx.strokeStyle='rgba(0,153,238,.2)';ctx.lineWidth=1;
+  ctx.fillRect(40,40,W-80,26);ctx.strokeRect(40,40,W-80,26);
+  ctx.save();ctx.shadowColor='#0099ee';ctx.shadowBlur=8;ctx.fillStyle='#0099ee';
+  ctx.fillRect(40,40,tW,26);ctx.restore();
+  lbl(ctx,40+tW/2,56,'Dt = '+t+' s','rgba(0,153,238,.8)',9);
+  // Distance bar
+  var maxD=1000,dW=(d/maxD)*(W-80);
+  ctx.fillStyle='rgba(0,0,0,.4)';ctx.strokeStyle='rgba(255,153,0,.2)';ctx.lineWidth=1;
+  ctx.fillRect(40,82,W-80,26);ctx.strokeRect(40,82,W-80,26);
+  ctx.save();ctx.shadowColor='#ff9900';ctx.shadowBlur=8;ctx.fillStyle='#ff9900';
+  ctx.fillRect(40,82,dW,26);ctx.restore();
+  lbl(ctx,40+dW/2,98,'d = '+d+' m','rgba(255,153,0,.8)',9);
+  // Speed badge
+  ctx.save();ctx.fillStyle='rgba(0,0,0,.5)';ctx.strokeStyle='rgba(68,255,153,.4)';ctx.lineWidth=1.5;
+  ctx.fillRect(W-170,30,155,72);ctx.strokeRect(W-170,30,155,72);ctx.restore();
+  lbl(ctx,W-93,52,'v = d/Dt','rgba(68,255,153,.6)',9);
+  lbl(ctx,W-93,70,v.toFixed(1)+' m/s','#44ff99',13);
+  lbl(ctx,W-93,90,vKmh.toFixed(0)+' km/h','rgba(68,255,153,.55)',9);
+}
+
+// ══ MRU SIMULATION (time-based, no speed issues) ══
+var mruRunning=false,mruStart=null,mruT=0;
+
+function onMruSlide(){
+  document.getElementById('mruS0V').textContent=document.getElementById('mruS0').value+' m';
+  var v=+document.getElementById('mruV').value;
+  document.getElementById('mruVV').textContent=(v>=0?'+':'')+v+' m/s';
+  if(!mruRunning){mruT=0;drawMRUFrame(0);}
+}
+function toggleMRU(){
+  mruRunning=!mruRunning;
+  var btn=document.getElementById('mruRunBtn');
+  btn.textContent=mruRunning?'⏸ PAUSAR':'▶ INICIAR';
+  btn.classList.toggle('on',mruRunning);
+  if(mruRunning){mruStart=null;animMRU();}
+}
+function resetMRU(){
+  mruRunning=false;mruT=0;mruStart=null;
+  document.getElementById('mruRunBtn').textContent='▶ INICIAR';
+  document.getElementById('mruRunBtn').classList.remove('on');
+  drawMRUFrame(0);
+}
+function animMRU(ts){
+  if(!mruRunning)return;
+  if(!mruStart)mruStart=ts;
+  mruT=(ts-mruStart)/1000; // real seconds
+  if(mruT>20){mruT=0;mruStart=ts;}
+  drawMRUFrame(mruT);
+  requestAnimationFrame(animMRU);
+}
+function drawMRUFrame(t){
+  var S0=+document.getElementById('mruS0').value;
+  var v=+document.getElementById('mruV').value;
+  var S=S0+v*t;
+  var cv=document.getElementById('mruCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var gY=H-28,trackY=gY-22;
+  drawGnd(ctx,gY,W);
+  // Track ruler
+  var origin=W/2;
+  for(var i=-10;i<=10;i++){
+    var rx=origin+i*40;if(rx<10||rx>W-10)continue;
+    ctx.save();ctx.strokeStyle='rgba(0,153,238,.2)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(rx,gY-4);ctx.lineTo(rx,gY+4);ctx.stroke();ctx.restore();
+    lbl(ctx,rx,gY+14,(i*10)+'m','rgba(0,153,238,.3)',7);
+  }
+  // Scale: 40px = 10m → 4px/m
+  var sc=4;
+  var objX=origin+S*sc;
+  objX=Math.max(20,Math.min(W-20,objX));
+  // Object (car/block)
+  ctx.save();ctx.shadowColor='#0099ee';ctx.shadowBlur=16;
+  ctx.fillStyle='rgba(0,153,238,.2)';ctx.strokeStyle='#0099ee';ctx.lineWidth=2;
+  ctx.fillRect(objX-22,trackY-18,44,32);ctx.strokeRect(objX-22,trackY-18,44,32);
+  // Wheels
+  ctx.fillStyle='#0099ee';
+  ctx.beginPath();ctx.arc(objX-12,trackY+14,6,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(objX+12,trackY+14,6,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+  // Velocity arrow
+  if(Math.abs(v)>0.2){
+    var vLen=Math.min(80,Math.abs(v)*4);
+    ga(ctx,objX,trackY-2,objX+(v>0?vLen:-vLen),trackY-2,'#ff9900',2.5,12);
+    lbl(ctx,objX+(v>0?vLen/2:-vLen/2),trackY-18,'v='+v+' m/s','rgba(255,153,0,.8)',9);
+  }
+  // Data
+  var ds=v*t;
+  var items=[
+    {l:'t (s)',v:t.toFixed(1),c:'#44ff99'},
+    {l:'S₀ (m)',v:S0,c:'#0099ee'},
+    {l:'v (m/s)',v:(v>=0?'+':'')+v,c:'#ff9900'},
+    {l:'S (m)',v:S.toFixed(1),c:'#44ddff'},
+    {l:'DS (m)',v:ds.toFixed(1),c:'rgba(68,255,153,.7)'},
+  ];
+  var panel=document.getElementById('mruData');
+  if(panel){
+    panel.innerHTML=items.map(function(it){
+      return '<div class="db"><div class="db-l">'+it.l+'</div><div class="db-v" style="color:'+it.c+';text-shadow:0 0 6px '+it.c+'">'+it.v+'</div></div>';
+    }).join('');
+  }
+}
+
+// ══ S×t AND v×t GRAPHS ════════════════════════
+function drawGraphs(){
+  var S0=+document.getElementById('gS0').value;
+  var v=+document.getElementById('gV').value;
+  document.getElementById('gS0V').textContent=S0+' m';
+  document.getElementById('gVV').textContent=(v>=0?'+':'')+v+' m/s';
+  var cv=document.getElementById('graphCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var tMax=10,pad=52;
+  var gW=(W-pad*2)/2-14,gH=H-70;
+  var ox1=pad,oy1=H-40;
+  var ox2=pad+gW+28,oy2=H-40;
+  // ── S×t graph ──
+  var Smin=S0,Smax=S0+v*tMax;if(Smin>Smax){var tmp=Smin;Smin=Smax;Smax=tmp;}
+  Smin=Math.min(Smin,-20);Smax=Math.max(Smax,20);
+  var Srange=Math.max(Smax-Smin,40);
+  var scSt=gH/Srange;
+  function toSy(s){return oy1-(s-Smin)*scSt;}
+  // Axes
+  ctx.save();ctx.strokeStyle='rgba(68,221,255,.3)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(ox1,oy1-gH-10);ctx.lineTo(ox1,oy1+5);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ox1-5,oy1);ctx.lineTo(ox1+gW+10,oy1);ctx.stroke();
+  ctx.restore();
+  ga(ctx,ox1,oy1-gH-2,ox1,oy1-gH-14,'rgba(68,221,255,.5)',1.5,4);
+  ga(ctx,ox1+gW+2,oy1,ox1+gW+14,oy1,'rgba(68,221,255,.5)',1.5,4);
+  lbl(ctx,ox1-10,oy1-gH-16,'S(m)','rgba(68,221,255,.6)',9,'right');
+  lbl(ctx,ox1+gW+18,oy1+4,'t(s)','rgba(68,221,255,.6)',9,'left');
+  lbl(ctx,ox1+gW/2,H-12,'S x t','rgba(68,221,255,.5)',9);
+  // Tick marks
+  for(var i=0;i<=tMax;i+=2){var tx=ox1+i/tMax*gW;lbl(ctx,tx,oy1+14,i,'rgba(68,221,255,.3)',8);}
+  // S=0 line if in range
+  var y0=toSy(0);
+  if(y0>oy1-gH&&y0<oy1){ctx.save();ctx.strokeStyle='rgba(68,221,255,.12)';ctx.lineWidth=1;ctx.setLineDash([3,6]);
+    ctx.beginPath();ctx.moveTo(ox1,y0);ctx.lineTo(ox1+gW,y0);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+    lbl(ctx,ox1-6,y0+3,'0','rgba(68,221,255,.3)',8,'right');}
+  // S₀ dot
+  ctx.save();ctx.shadowColor='#44ddff';ctx.shadowBlur=10;
+  ctx.beginPath();ctx.arc(ox1,toSy(S0),5,0,Math.PI*2);ctx.fillStyle='#44ddff';ctx.fill();ctx.restore();
+  lbl(ctx,ox1-14,toSy(S0)+3,'S₀','rgba(68,221,255,.7)',8,'right');
+  // Line
+  ctx.save();ctx.shadowColor='#44ddff';ctx.shadowBlur=10;ctx.strokeStyle='#44ddff';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(ox1,toSy(S0));ctx.lineTo(ox1+gW,toSy(S0+v*tMax));ctx.stroke();ctx.restore();
+  // Angle label
+  if(Math.abs(v)>0.5)lbl(ctx,ox1+gW/2+10,toSy(S0+v*tMax/2)-14,'tan=v='+v,'rgba(68,221,255,.55)',8);
+
+  // ── v×t graph ──
+  var vRange=Math.max(Math.abs(v)*2,10);
+  var scVt=gH/(vRange*2);
+  function toVy(vel){return oy2-vel*scVt;}
+  // Axes
+  ctx.save();ctx.strokeStyle='rgba(255,153,0,.3)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(ox2,oy2-gH-10);ctx.lineTo(ox2,oy2+5);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ox2-5,oy2);ctx.lineTo(ox2+gW+10,oy2);ctx.stroke();
+  ctx.restore();
+  ga(ctx,ox2,oy2-gH-2,ox2,oy2-gH-14,'rgba(255,153,0,.5)',1.5,4);
+  ga(ctx,ox2+gW+2,oy2,ox2+gW+14,oy2,'rgba(255,153,0,.5)',1.5,4);
+  lbl(ctx,ox2-10,oy2-gH-16,'v(m/s)','rgba(255,153,0,.6)',9,'right');
+  lbl(ctx,ox2+gW+18,oy2+4,'t(s)','rgba(255,153,0,.6)',9,'left');
+  lbl(ctx,ox2+gW/2,H-12,'v x t','rgba(255,153,0,.5)',9);
+  for(var i=0;i<=tMax;i+=2){var tx=ox2+i/tMax*gW;lbl(ctx,tx,oy2+14,i,'rgba(255,153,0,.3)',8);}
+  // v=0 line
+  ctx.save();ctx.strokeStyle='rgba(255,153,0,.12)';ctx.lineWidth=1;ctx.setLineDash([3,6]);
+  ctx.beginPath();ctx.moveTo(ox2,oy2);ctx.lineTo(ox2+gW,oy2);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  lbl(ctx,ox2-6,oy2+3,'0','rgba(255,153,0,.3)',8,'right');
+  // Horizontal line (MRU: constant v)
+  var vy=toVy(v);
+  vy=Math.max(oy2-gH,Math.min(oy2,vy));
+  ctx.save();ctx.shadowColor='#ff9900';ctx.shadowBlur=12;ctx.strokeStyle='#ff9900';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(ox2,vy);ctx.lineTo(ox2+gW,vy);ctx.stroke();ctx.restore();
+  lbl(ctx,ox2-6,vy+3,(v>=0?'+':'')+v,'rgba(255,153,0,.8)',8,'right');
+  // Shaded area (displacement)
+  if(Math.abs(v)>0.1){
+    ctx.save();ctx.globalAlpha=.12;ctx.fillStyle='#ff9900';
+    ctx.fillRect(ox2,Math.min(vy,oy2),gW,Math.abs(vy-oy2));ctx.restore();
+    lbl(ctx,ox2+gW/2,(vy+oy2)/2,'Area = DS = v*t','rgba(255,153,0,.5)',9);
+  }
+  lbl(ctx,ox2+gW/2,(oy2-gH/2),'a=0 (reta horizontal)','rgba(255,153,0,.35)',8);
+  document.getElementById('graphInfo').textContent=
+    'S(t) = '+S0+' + ('+v+')t  |  v = '+v+' m/s (constante)  |  a = 0  |  Inclicao S*t = '+v;
+}
+
+// ══ QUIZ ══════════════════════════════════════
+var QA={q1:0,q2:0,q3:0,q4:0,q5:0,q6:0,q7:0,q8:0};
+var FB={
+  q1:{c:'CORRETO! Movimento e repouso sao relativos ao referencial. Em relacao ao outro passageiro (mesmo referencial), o passageiro nao muda de posicao — esta em repouso.',w:'ERRADO. O referencial importa! Em relacao ao outro passageiro, a posicao nao muda — logo esta em repouso nesse referencial.'},
+  q2:{c:'CORRETO! Perimetro = 2*(100+50) = 300 m. Distancia percorrida = 300 m. Voltou ao ponto de partida, entao deslocamento DS = 0.',w:'ERRADO. Perimetro = 2*(100+50) = 300 m = distancia. Mas voltou ao ponto de partida, logo DS = 0.'},
+  q3:{c:'CORRETO! v = 360 km/4 h = 90 km/h. Para m/s: 90/3,6 = 25 m/s.',w:'ERRADO. v = 360/4 = 90 km/h. Convertendo: 90/3,6 = 25 m/s.'},
+  q4:{c:'CORRETO! S = S0 + v*t = 40 + 5*6 = 40 + 30 = 70 m.',w:'ERRADO. S = S0 + v*t = 40 + 5*6 = 40 + 30 = 70 m.'},
+  q5:{c:'CORRETO! A inclinacao (coeficiente angular) do grafico S*t representa a velocidade: tan(theta) = DS/Dt = v.',w:'ERRADO. A inclinacao (coeficiente angular) do grafico S*t = velocidade v. S0 e o valor inicial (intersecao com o eixo S).'},
+  q6:{c:'CORRETO! Para converter km/h para m/s, divide-se por 3,6. 108/3,6 = 30 m/s.',w:'ERRADO. Para converter km/h -> m/s, divide por 3,6. 108/3,6 = 30 m/s.'},
+  q7:{c:'CORRETO! S = S0 + v*t -> 500 = 0 + 20*t -> t = 500/20 = 25 s.',w:'ERRADO. S = S0 + v*t -> 500 = 0 + 20t -> t = 500/20 = 25 s.'},
+  q8:{c:'CORRETO! No MRU: S*t e reta obliqua (inclinacao = v) e v*t e reta horizontal (v = constante).',w:'ERRADO. No MRU: v e constante (a=0), S*t e reta obliqua e v*t e horizontal. O corpo segue trajeto retilineo.'}
+};
+var answered=0;
+function ans(btn,qId,result){
+  var card=document.getElementById(qId);card.querySelectorAll('.obt').forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('f_'+qId);
+  if(result==='correct'){btn.classList.add('correct');fb.textContent=FB[qId].c;fb.className='fb show ok';QA[qId]=1;}
+  else{btn.classList.add('wrong');fb.textContent=FB[qId].w;fb.className='fb show err';
+    card.querySelectorAll('.obt').forEach(function(b){if(b.getAttribute('onclick').indexOf("'correct'")>-1)b.classList.add('correct');});}
+  answered++;updateP();if(answered===8)showScore();
+}
+function updateP(){document.getElementById('pBar').style.width=(answered/8*100)+'%';document.getElementById('pTxt').textContent=answered+' / 8 respondidas';}
+function showScore(){
+  var sc=0;Object.values(QA).forEach(function(v){sc+=v;});
+  var p=document.getElementById('spanel');p.style.display='block';document.getElementById('scv').textContent=sc+'/8';
+  var msgs=['Revise os conceitos!','Bom inicio!','Indo bem!','Otimo dominio de cinematica!','Perfeito!'];
+  var idx=sc<=2?0:sc<=4?1:sc<=5?2:sc<=7?3:4;document.getElementById('scm').textContent=msgs[idx];
+  var cols=['#ff3399','#ff9900','#ff9900','#44ff99','#0099ee'];
+  document.getElementById('scv').style.color=cols[idx];document.getElementById('scv').style.textShadow='0 0 20px '+cols[idx];
+  p.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQ(){
+  Object.keys(QA).forEach(function(k){QA[k]=0;});answered=0;updateP();document.getElementById('spanel').style.display='none';
+  ['q1','q2','q3','q4','q5','q6','q7','q8'].forEach(function(id){
+    document.getElementById(id).querySelectorAll('.obt').forEach(function(b){b.disabled=false;b.classList.remove('correct','wrong');});
+    var fb=document.getElementById('f_'+id);fb.className='fb';fb.textContent='';
+  });
+}
+window.addEventListener('load',function(){
+  drawDistCanvas();calcVel();drawMRUFrame(0);drawGraphs();
+});
+</script>
+</body>
+</html>

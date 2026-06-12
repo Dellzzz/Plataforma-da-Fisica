@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Trabalho e Energia | Aula Interativa</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --em:#00cc66;--ec:#ffdd00;--ep:#00aaff;--pw:#ff7700;
+  --fr:#ff2255;--pur:#bb44ff;--wh:#ccffe8;
+  --bg:#020a04;--pan:#04100a;--card:#061410;
+  --bm:rgba(0,204,102,.24);--bc:rgba(255,221,0,.2);
+  --bp:rgba(0,170,255,.2);--bw:rgba(255,119,0,.2);
+  --dim:#1a6640;--txt:#b0f0d0;
+}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:'Rajdhani',sans-serif;font-size:17px;line-height:1.7;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,204,102,.009) 2px,rgba(0,204,102,.009) 4px);pointer-events:none;z-index:9999}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(0,204,102,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,204,102,.025) 1px,transparent 1px);background-size:58px 58px;animation:gm 22s linear infinite;z-index:0}
+@keyframes gm{0%{background-position:0 0}100%{background-position:58px 58px}}
+header{position:relative;z-index:10;text-align:center;padding:78px 20px 54px;border-bottom:1px solid rgba(0,204,102,.22)}
+.htag{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--em);letter-spacing:4px;border:1px solid var(--em);padding:4px 18px;margin-bottom:22px;animation:tp 2.4s ease-in-out infinite}
+@keyframes tp{0%,100%{box-shadow:0 0 4px var(--em),inset 0 0 4px rgba(0,204,102,.1)}50%{box-shadow:0 0 22px var(--em),0 0 55px rgba(0,204,102,.22),inset 0 0 14px rgba(0,204,102,.18)}}
+h1.title{font-family:'Orbitron',monospace;font-size:clamp(2rem,7vw,4.8rem);font-weight:900;letter-spacing:.07em;line-height:1;color:#fff;text-shadow:0 0 10px var(--em),0 0 40px var(--em),0 0 100px rgba(0,204,102,.35);animation:flk 9s linear infinite}
+@keyframes flk{0%,92%,100%{opacity:1}93%{opacity:.78}94.5%{opacity:1}96%{opacity:.62}97%{opacity:1}}
+.tsub{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:.95rem;color:var(--dim);letter-spacing:7px;text-transform:uppercase;margin-top:10px}
+.energy-deco{display:flex;justify-content:center;gap:14px;margin-top:20px;align-items:center}
+.ebar{height:32px;border-radius:3px;animation:epulse 2s ease-in-out infinite}
+@keyframes epulse{0%,100%{opacity:.6;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.18)}}
+nav{position:sticky;top:0;z-index:100;background:rgba(2,10,4,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,204,102,.16);display:flex;justify-content:center;gap:6px;padding:10px 18px;flex-wrap:wrap}
+nav a{font-family:'Orbitron',monospace;font-size:.57rem;letter-spacing:2px;color:var(--dim);text-decoration:none;padding:6px 13px;border:1px solid rgba(0,204,102,.17);transition:all .28s}
+nav a:hover{color:var(--em);border-color:var(--em);box-shadow:0 0 12px var(--em),inset 0 0 8px rgba(0,204,102,.1);text-shadow:0 0 8px var(--em)}
+main{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:0 22px 80px}
+section{margin-top:78px}
+.sh{display:flex;align-items:center;gap:14px;margin-bottom:34px}
+.sn{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--em);opacity:.6}
+h2.st{font-family:'Orbitron',monospace;font-size:clamp(1.15rem,2.8vw,1.75rem);font-weight:700;color:#fff;letter-spacing:.05em}
+h2.st span{color:var(--em);text-shadow:0 0 12px var(--em)}
+.sl{flex:1;height:1px;background:linear-gradient(90deg,var(--em),transparent);opacity:.38}
+.card{background:var(--card);border:1px solid var(--bm);padding:28px 30px;margin-bottom:20px;position:relative;transition:all .28s}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--em);box-shadow:0 0 10px var(--em)}
+.card:hover{border-color:var(--em);box-shadow:0 0 22px rgba(0,204,102,.1)}
+.card.ec::before{background:var(--ec);box-shadow:0 0 10px var(--ec)}.card.ec{border-color:var(--bc)}.card.ec:hover{border-color:var(--ec)}
+.card.ep::before{background:var(--ep);box-shadow:0 0 10px var(--ep)}.card.ep{border-color:var(--bp)}.card.ep:hover{border-color:var(--ep)}
+.card.pw::before{background:var(--pw);box-shadow:0 0 10px var(--pw)}.card.pw{border-color:var(--bw)}.card.pw:hover{border-color:var(--pw)}
+.card.fr::before{background:var(--fr);box-shadow:0 0 10px var(--fr)}.card.fr{border-color:rgba(255,34,85,.2)}.card.fr:hover{border-color:var(--fr)}
+.card.pur::before{background:var(--pur);box-shadow:0 0 10px var(--pur)}.card.pur{border-color:rgba(187,68,255,.2)}.card.pur:hover{border-color:var(--pur)}
+h3{font-family:'Orbitron',monospace;font-size:.88rem;color:var(--em);text-shadow:0 0 8px var(--em);margin-bottom:12px;letter-spacing:.05em}
+.card.ec h3{color:var(--ec);text-shadow:0 0 8px var(--ec)}
+.card.ep h3{color:var(--ep);text-shadow:0 0 8px var(--ep)}
+.card.pw h3{color:var(--pw);text-shadow:0 0 8px var(--pw)}
+.card.fr h3{color:var(--fr);text-shadow:0 0 8px var(--fr)}
+.card.pur h3{color:var(--pur);text-shadow:0 0 8px var(--pur)}
+p{color:var(--txt);margin-bottom:10px}
+.law{background:rgba(0,204,102,.05);border:1px solid rgba(0,204,102,.38);border-left:4px solid var(--em);padding:16px 20px;margin:12px 0;font-family:'Share Tech Mono',monospace;font-size:.88rem;color:var(--em);line-height:1.9}
+.law.ec{background:rgba(255,221,0,.05);border-color:rgba(255,221,0,.38);border-left-color:var(--ec);color:var(--ec)}
+.law.ep{background:rgba(0,170,255,.05);border-color:rgba(0,170,255,.38);border-left-color:var(--ep);color:var(--ep)}
+.law.pw{background:rgba(255,119,0,.05);border-color:rgba(255,119,0,.38);border-left-color:var(--pw);color:var(--pw)}
+.law.fr{background:rgba(255,34,85,.05);border-color:rgba(255,34,85,.38);border-left-color:var(--fr);color:var(--fr)}
+.law.pur{background:rgba(187,68,255,.05);border-color:rgba(187,68,255,.38);border-left-color:var(--pur);color:var(--pur)}
+.fhero{text-align:center;padding:28px 18px;margin:20px 0;background:var(--pan);border:1px solid rgba(0,204,102,.28);position:relative;overflow:hidden}
+.fhero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,204,102,.07) 0%,transparent 70%)}
+.fhero .bf{font-family:'Orbitron',monospace;font-size:clamp(1.2rem,2.8vw,2rem);font-weight:700;color:#fff;text-shadow:0 0 14px var(--em),0 0 35px rgba(0,204,102,.42);letter-spacing:.04em;line-height:1.4}
+.fhero .fl{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:3px;margin-top:10px}
+.vis{background:var(--pan);border:1px solid var(--bm);padding:20px;margin:20px 0;overflow:hidden}
+.vis.ec{border-color:var(--bc)}.vis.ep{border-color:var(--bp)}.vis.pw{border-color:var(--bw)}
+.vis.special{border-color:var(--em);border-width:2px}
+.vtag{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--dim);letter-spacing:3px;margin-bottom:14px;text-transform:uppercase;text-align:center}
+canvas{display:block;margin:0 auto;max-width:100%}
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:18px;margin:18px 0}
+table{width:100%;border-collapse:collapse;margin:14px 0}
+th{background:rgba(0,204,102,.09);color:var(--em);font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:2px;padding:10px 13px;text-align:left;border:1px solid rgba(0,204,102,.18)}
+td{padding:10px 13px;border:1px solid rgba(0,204,102,.1);color:var(--txt);font-size:.92rem}
+tr:hover td{background:rgba(0,204,102,.03)}
+.ctrl-row{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin:12px 0}
+.ctrl{text-align:center}
+.ctrl label{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--em);display:block;margin-bottom:5px;letter-spacing:1px}
+input[type=range]{-webkit-appearance:none;width:190px;height:4px;background:rgba(0,204,102,.2);outline:none;border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--em);border-radius:50%;cursor:pointer;box-shadow:0 0 8px var(--em)}
+.ctrl-val{font-family:'Orbitron',monospace;font-size:.95rem;color:var(--em);text-shadow:0 0 8px var(--em);margin-top:4px}
+.tabs{display:flex;gap:7px;justify-content:center;margin:12px 0;flex-wrap:wrap}
+.tab{font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:2px;color:var(--dim);padding:7px 14px;border:1px solid rgba(0,204,102,.2);background:transparent;cursor:pointer;transition:all .26s}
+.tab:hover{color:var(--em);border-color:var(--em)}
+.tab.active{color:var(--bg);background:var(--em);border-color:var(--em);box-shadow:0 0 14px var(--em)}
+.sbtn{font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:2px;padding:8px 18px;border:1px solid;background:transparent;cursor:pointer;transition:all .26s;margin:4px}
+.sbtn.grn{color:var(--em);border-color:var(--em)}.sbtn.grn:hover,.sbtn.grn.on{background:rgba(0,204,102,.12);box-shadow:0 0 12px var(--em)}
+.sbtn.rst{color:var(--fr);border-color:var(--fr)}.sbtn.rst:hover{background:rgba(255,34,85,.12)}
+.sbtn.yel{color:var(--ec);border-color:rgba(255,221,0,.4)}.sbtn.yel:hover,.sbtn.yel.on{background:rgba(255,221,0,.1);border-color:var(--ec);box-shadow:0 0 10px var(--ec)}
+/* energy bars */
+.ebar-wrap{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin:10px 0;font-family:'Share Tech Mono',monospace;font-size:.7rem}
+.ebar-item{text-align:center;min-width:60px}
+.ebar-track{width:44px;height:140px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);margin:6px auto;position:relative;overflow:hidden;border-radius:2px}
+.ebar-fill{position:absolute;bottom:0;left:0;width:100%;transition:height .06s;border-radius:2px 2px 0 0}
+.ebar-num{font-family:'Orbitron',monospace;font-size:.72rem;margin-top:4px}
+/* step */
+.step{display:flex;gap:14px;align-items:flex-start;background:rgba(0,204,102,.04);border:1px solid rgba(0,204,102,.12);padding:12px 16px;margin-bottom:8px}
+.sn2{font-family:'Orbitron',monospace;font-size:.75rem;color:var(--em);min-width:22px}
+/* quiz */
+.qc{background:var(--card);border:1px solid var(--bm);padding:24px 28px;margin-bottom:16px;transition:all .28s}.qc:hover{border-color:var(--em)}
+.qnum{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--em);letter-spacing:3px;margin-bottom:8px}
+.qtext{font-size:1rem;font-weight:600;color:#fff;margin-bottom:16px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.obt{background:rgba(0,0,0,.4);border:1px solid rgba(0,204,102,.22);color:var(--txt);padding:10px 15px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:.92rem;cursor:pointer;transition:all .24s;display:flex;align-items:flex-start;gap:11px}
+.obt:hover{border-color:var(--em);background:rgba(0,204,102,.07);color:#fff}
+.obt.correct{border-color:var(--em)!important;background:rgba(0,204,102,.12)!important;color:var(--em)!important;box-shadow:0 0 12px rgba(0,204,102,.28)!important}
+.obt.wrong{border-color:var(--fr)!important;background:rgba(255,34,85,.1)!important;color:var(--fr)!important}
+.obt:disabled{cursor:not-allowed}
+.ol{font-family:'Orbitron',monospace;font-size:.58rem;color:var(--em);min-width:17px;padding-top:2px}
+.fb{margin-top:11px;padding:10px 13px;font-family:'Share Tech Mono',monospace;font-size:.78rem;display:none;border-left:3px solid;line-height:1.6}
+.fb.show{display:block}.fb.ok{color:var(--em);border-color:var(--em);background:rgba(0,204,102,.05)}.fb.err{color:var(--fr);border-color:var(--fr);background:rgba(255,34,85,.05)}
+.sp{background:var(--card);border:1px solid var(--em);padding:26px;text-align:center;box-shadow:0 0 30px rgba(0,204,102,.12);margin-top:26px}
+.scl{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim);letter-spacing:3px;margin-bottom:8px}
+.scv{font-family:'Orbitron',monospace;font-size:2.8rem;font-weight:900;color:var(--em);text-shadow:0 0 20px var(--em)}
+.scm{color:var(--dim);margin-top:7px;font-size:.93rem}
+.rbtn{background:transparent;border:1px solid var(--em);color:var(--em);font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:2px;padding:9px 24px;cursor:pointer;margin-top:13px;transition:all .28s}
+.rbtn:hover{background:rgba(0,204,102,.1);box-shadow:0 0 14px var(--em)}
+.pw2{height:4px;background:rgba(0,204,102,.1);margin-top:16px;border-radius:2px;overflow:hidden}
+.pf2{height:100%;background:linear-gradient(90deg,var(--em),var(--ec));transition:width .5s ease;box-shadow:0 0 10px var(--em)}
+.ibox{background:linear-gradient(135deg,rgba(0,204,102,.05),rgba(0,170,255,.04));border:1px solid rgba(0,204,102,.2);padding:24px 28px;margin-top:32px;position:relative}
+.ibox::after{content:'⚡';position:absolute;top:-14px;left:22px;font-size:1.1rem;background:var(--bg);padding:0 8px}
+.hl{color:var(--em);font-weight:600}.hlc{color:var(--ec);font-weight:600}
+.hlp{color:var(--ep);font-weight:600}.hlw{color:var(--pw);font-weight:600}.hlf{color:var(--fr);font-weight:600}
+footer{position:relative;z-index:10;text-align:center;padding:34px 20px;border-top:1px solid rgba(0,204,102,.2);font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:2px}
+@media(max-width:600px){header{padding:46px 14px 34px}main{padding:0 13px 58px}.card{padding:16px 18px}.fhero .bf{font-size:1.1rem}.ebar-wrap{gap:10px}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<header>
+  <div class="htag">MÓDULO 12 // MECÂNICA // ENSINO MÉDIO</div>
+  <h1 class="title">TRABALHO E ENERGIA</h1>
+  <p class="tsub">Trabalho · Energia · Potência · Conservação</p>
+  <div class="energy-deco">
+    <div class="ebar" style="width:18px;background:var(--ep);animation-delay:0s;height:36px"></div>
+    <div class="ebar" style="width:18px;background:var(--em);animation-delay:.25s;height:28px"></div>
+    <div class="ebar" style="width:18px;background:var(--ec);animation-delay:.5s;height:42px"></div>
+    <div class="ebar" style="width:18px;background:var(--em);animation-delay:.75s;height:24px"></div>
+    <div class="ebar" style="width:18px;background:var(--pw);animation-delay:1s;height:38px"></div>
+    <div class="ebar" style="width:18px;background:var(--em);animation-delay:1.25s;height:26px"></div>
+    <div class="ebar" style="width:18px;background:var(--ep);animation-delay:1.5s;height:34px"></div>
+  </div>
+</header>
+<nav>
+  <a href="#forcas">⚡ Forças</a>
+  <a href="#trabalho">⚡ Trabalho</a>
+  <a href="#teo-energia">⚡ Teo. Energia</a>
+  <a href="#ec">⚡ E. Cinética</a>
+  <a href="#ep">⚡ E. Potencial</a>
+  <a href="#conservacao">⚡ Conservação</a>
+  <a href="#potencia">⚡ Potência</a>
+  <a href="#simulacao">⚡ Simulação</a>
+  <a href="#exercicios">⚡ Exercícios</a>
+</nav>
+<main>
+
+<!-- FORÇAS -->
+<section id="forcas">
+  <div class="sh"><span class="sn">01</span><h2 class="st">FORÇAS E <span>TRABALHO</span></h2><div class="sl"></div></div>
+  <div class="ibox">
+    <p>Antes de estudar Trabalho e Energia, é essencial entender as <span class="hl">forças</span> que atuam nos sistemas mecânicos. O <span class="hl">trabalho</span> é realizado por forças — e depende diretamente de qual força age e em que direção ela age em relação ao deslocamento.</p>
+  </div>
+  <div class="igrid" style="margin-top:20px">
+    <div class="card"><h3>FORÇA PESO (P)</h3>
+      <p>✦ <span class="hl">P = mg</span> — sempre vertical, para baixo<br>✦ <span class="hl">Força conservativa</span>: o trabalho depende apenas da variação de altura, não da trajetória<br>✦ τ_P = mgh (positivo ao descer, negativo ao subir)</p>
+      <div class="law" style="font-size:.82rem">P = m·g [N]<br>τ_P = m·g·h (variação de altura h)</div>
+    </div>
+    <div class="card ep"><h3>FORÇA NORMAL (N)</h3>
+      <p>✦ Sempre <span class="hlp">perpendicular</span> à superfície de contato<br>✦ Perpendicular ao deslocamento → <span class="hlp">τ_N = 0 sempre</span><br>✦ Não realiza trabalho — não altera energia cinética</p>
+      <div class="law ep" style="font-size:.82rem">N ⊥ deslocamento<br>τ_N = N·d·cos(90°) = 0</div>
+    </div>
+    <div class="card fr"><h3>FORÇA DE ATRITO (f)</h3>
+      <p>✦ Sempre <span class="hlf">oposta ao movimento</span> → θ = 180°<br>✦ Realiza <span class="hlf">trabalho negativo</span> sempre: τ_f = -f·d<br>✦ Converte energia mecânica em calor (força dissipativa)</p>
+      <div class="law fr" style="font-size:.82rem">f = μ·N<br>τ_f = -f·d = -μ·N·d &lt; 0</div>
+    </div>
+    <div class="card ec"><h3>FORÇA ELÁSTICA (F_e)</h3>
+      <p>✦ Força de uma mola: <span class="hlc">F = kx</span> (Lei de Hooke)<br>✦ <span class="hlc">Força conservativa</span>: o trabalho da mola é armazenado como energia potencial elástica<br>✦ τ_e = ½kx² (ao comprimir ou esticar)</p>
+      <div class="law ec" style="font-size:.82rem">F_e = k·x<br>τ_e = ½·k·x² [J]</div>
+    </div>
+  </div>
+  <table>
+    <tr><th>FORÇA</th><th>ÂNGULO COM d</th><th>TRABALHO</th><th>TIPO</th></tr>
+    <tr><td>Peso (descendo)</td><td>0°</td><td>τ = mgh > 0</td><td>Conservativa</td></tr>
+    <tr><td>Peso (subindo)</td><td>180°</td><td>τ = -mgh < 0</td><td>Conservativa</td></tr>
+    <tr><td>Normal</td><td>90°</td><td>τ = 0</td><td>Não realiza τ</td></tr>
+    <tr><td>Atrito cinético</td><td>180°</td><td>τ = -f·d < 0</td><td>Dissipativa</td></tr>
+    <tr><td>Força aplicada</td><td>θ qualquer</td><td>τ = F·d·cosθ</td><td>Pode ser ± ou 0</td></tr>
+    <tr><td>Elástica (mola)</td><td>variável</td><td>τ = ½kx²</td><td>Conservativa</td></tr>
+  </table>
+</section>
+
+<!-- TRABALHO -->
+<section id="trabalho">
+  <div class="sh"><span class="sn">02</span><h2 class="st">TRABALHO DE UMA <span>FORÇA</span></h2><div class="sl"></div></div>
+  <div class="card"><h3>DEFINIÇÃO</h3>
+    <p>O <span class="hl">trabalho</span> de uma força F que desloca um objeto de uma distância d, com ângulo θ entre a força e o deslocamento, é uma grandeza <strong>escalar</strong> que mede a quantidade de energia transferida.</p>
+    <p>Só a <span class="hl">componente paralela</span> ao deslocamento realiza trabalho. A componente perpendicular não contribui.</p>
+  </div>
+  <div class="fhero">
+    <div class="bf">τ = F · d · cosθ</div>
+    <div class="fl">τ [J = N·m] &nbsp;|&nbsp; F [N] &nbsp;|&nbsp; d [m] &nbsp;|&nbsp; θ = ângulo entre F e deslocamento</div>
+  </div>
+  <div class="igrid">
+    <div class="card"><h3>SINAL DO TRABALHO</h3>
+      <p>✦ <span class="hl">τ > 0</span>: força e deslocamento no mesmo sentido (0° < θ < 90°) — energia transferida ao objeto<br>
+         ✦ <span class="hl">τ = 0</span>: força perpendicular (θ = 90°) — sem transferência de energia<br>
+         ✦ <span class="hlf">τ < 0</span>: força oposta ao deslocamento (90° < θ ≤ 180°) — força "freia" o objeto</p>
+    </div>
+    <div class="card grn"><h3>TRABALHO RESULTANTE</h3>
+      <p>O trabalho da resultante das forças equivale à soma dos trabalhos individuais:</p>
+      <div class="law" style="font-size:.83rem">τ_res = Σ τᵢ = τ_F + τ_P + τ_N + τ_f + ...<br>τ_N = 0 (sempre)<br>τ_res = τ_F + τ_P + τ_f</div>
+    </div>
+  </div>
+  <!-- INTERACTIVE WORK VISUALIZATION -->
+  <div class="vis">
+    <p class="vtag">[ SIMULAÇÃO — TRABALHO DE UMA FORÇA ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>FORÇA F (N)</label>
+        <input type="range" id="wF" min="10" max="200" value="80" oninput="drawWork()">
+        <div class="ctrl-val" id="wFV">80 N</div>
+      </div>
+      <div class="ctrl"><label>ÂNGULO θ (°)</label>
+        <input type="range" id="wA" min="0" max="180" value="30" oninput="drawWork()">
+        <div class="ctrl-val" id="wAV">30°</div>
+      </div>
+      <div class="ctrl"><label>DESLOCAMENTO d (m)</label>
+        <input type="range" id="wD" min="1" max="20" value="8" oninput="drawWork()">
+        <div class="ctrl-val" id="wDV">8 m</div>
+      </div>
+    </div>
+    <canvas id="workCanvas" width="700" height="280"></canvas>
+    <div id="workResult" style="font-family:Orbitron,monospace;font-size:1.1rem;text-align:center;margin-top:8px;color:var(--em);text-shadow:0 0 10px var(--em)">τ = — J</div>
+  </div>
+  <div class="igrid">
+    <div class="card grn"><h3>EXEMPLO RESOLVIDO</h3>
+      <p>Uma força de 60 N age a 53° sobre um bloco que se desloca 5 m. (cos53°≈0,6)</p>
+      <div class="step"><div class="sn2">1</div><p>τ = F·d·cosθ = 60 × 5 × cos53°</p></div>
+      <div class="step"><div class="sn2">2</div><p>τ = 60 × 5 × 0,6 = <span class="hl">180 J</span></p></div>
+    </div>
+    <div class="card ec"><h3>UNIDADES DE TRABALHO</h3>
+      <div class="law ec" style="font-size:.82rem">1 J = 1 N·m = 1 kg·m²/s²<br>1 kJ = 1000 J<br>1 cal = 4,18 J<br>1 kWh = 3,6×10⁶ J</div>
+    </div>
+  </div>
+</section>
+
+<!-- TEOREMA TRABALHO-ENERGIA -->
+<section id="teo-energia">
+  <div class="sh"><span class="sn">03</span><h2 class="st">TEOREMA <span>TRABALHO-ENERGIA</span></h2><div class="sl"></div></div>
+  <div class="card ec"><h3>ENUNCIADO</h3>
+    <p>O <span class="hlc">trabalho total</span> realizado sobre um objeto é igual à <span class="hlc">variação de sua energia cinética</span>. Este teorema conecta o conceito de força (trabalho) ao movimento (energia cinética).</p>
+  </div>
+  <div class="fhero" style="border-color:rgba(255,221,0,.3)">
+    <div class="bf" style="text-shadow:0 0 14px var(--ec),0 0 35px rgba(255,221,0,.42)">τ_total = ΔEc = Ec_f - Ec_i = ½mv_f² - ½mv_i²</div>
+    <div class="fl" style="color:var(--ec)">τ_total [J] &nbsp;|&nbsp; m [kg] &nbsp;|&nbsp; v_f e v_i [m/s]</div>
+  </div>
+  <div class="igrid">
+    <div class="card ec"><h3>INTERPRETAÇÃO FÍSICA</h3>
+      <p>✦ τ_total > 0 → v aumenta → objeto acelera<br>
+         ✦ τ_total = 0 → v constante (MCU, MRU)<br>
+         ✦ τ_total < 0 → v diminui → objeto desacelera até parar<br>
+         ✦ Independe do caminho percorrido — depende apenas de v_i e v_f</p>
+    </div>
+    <div class="card grn"><h3>EXEMPLO RESOLVIDO</h3>
+      <p>Um carro (m=1000 kg) parte do repouso e atinge v=20 m/s. Qual o trabalho total?</p>
+      <div class="step"><div class="sn2">1</div><p>Ec_i = ½×1000×0² = 0 J</p></div>
+      <div class="step"><div class="sn2">2</div><p>Ec_f = ½×1000×20² = 200.000 J</p></div>
+      <div class="step"><div class="sn2">3</div><p>τ_total = 200.000 - 0 = <span class="hl">200 kJ</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ENERGIA CINÉTICA -->
+<section id="ec">
+  <div class="sh"><span class="sn">04</span><h2 class="st">ENERGIA <span>CINÉTICA</span></h2><div class="sl"></div></div>
+  <div class="fhero" style="border-color:rgba(255,221,0,.3)">
+    <div class="bf" style="text-shadow:0 0 14px var(--ec),0 0 35px rgba(255,221,0,.42)">Ec = ½ · m · v²</div>
+    <div class="fl" style="color:var(--ec)">Ec [J] &nbsp;|&nbsp; m [kg] &nbsp;|&nbsp; v [m/s] &nbsp;|&nbsp; Ec sempre ≥ 0</div>
+  </div>
+  <div class="igrid">
+    <div class="card ec"><h3>PROPRIEDADES</h3>
+      <p>✦ Sempre <span class="hlc">não negativa</span> (Ec ≥ 0)<br>
+         ✦ Escalar — não tem direção<br>
+         ✦ Dobrar v → Ec quadruplica (v²!)<br>
+         ✦ Ec = 0 somente quando v = 0 (repouso)</p>
+    </div>
+    <div class="card"><h3>VARIAÇÃO DE VELOCIDADE</h3>
+      <p>Como Ec ∝ v², pequenas variações de velocidade causam grandes variações de energia cinética:</p>
+      <table>
+        <tr><th>v (m/s)</th><th>Ec (m=1 kg)</th><th>Razão Ec/v²</th></tr>
+        <tr><td>10</td><td>50 J</td><td>0,5</td></tr>
+        <tr><td>20</td><td>200 J</td><td>0,5</td></tr>
+        <tr><td>30</td><td>450 J</td><td>0,5</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="vis ec">
+    <p class="vtag" style="color:var(--ec)">[ CALCULADORA — ENERGIA CINÉTICA ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>MASSA m (kg)</label>
+        <input type="range" id="ecM" min="1" max="2000" value="70" oninput="calcEc()">
+        <div class="ctrl-val" id="ecMV">70 kg</div>
+      </div>
+      <div class="ctrl"><label>VELOCIDADE v (m/s)</label>
+        <input type="range" id="ecV" min="0" max="100" value="10" oninput="calcEc()">
+        <div class="ctrl-val" id="ecVV">10 m/s</div>
+      </div>
+    </div>
+    <canvas id="ecCanvas" width="700" height="220"></canvas>
+    <div id="ecResult" style="font-family:Orbitron,monospace;font-size:1.2rem;text-align:center;margin-top:8px;color:var(--ec);text-shadow:0 0 10px var(--ec)">Ec = — J</div>
+  </div>
+</section>
+
+<!-- ENERGIA POTENCIAL -->
+<section id="ep">
+  <div class="sh"><span class="sn">05</span><h2 class="st">ENERGIA <span>POTENCIAL</span></h2><div class="sl"></div></div>
+  <div class="igrid">
+    <div class="card ep">
+      <h3>E. POTENCIAL GRAVITACIONAL</h3>
+      <p>Energia armazenada em função da posição vertical. Depende da <span class="hlp">altura relativa</span> a um nível de referência (normalmente o solo).</p>
+      <div class="fhero" style="border-color:rgba(0,170,255,.3);margin:12px 0">
+        <div class="bf" style="font-size:1.6rem;text-shadow:0 0 14px var(--ep)">Ep = m · g · h</div>
+        <div class="fl" style="color:var(--ep)">m [kg] · g ≈ 10 m/s² · h [m acima do referencial]</div>
+      </div>
+      <p>✦ Ep é relativa ao nível de referência escolhido<br>
+         ✦ Pode ser negativa (abaixo do referencial)<br>
+         ✦ τ_P = -ΔEp = -(Ep_f - Ep_i)</p>
+    </div>
+    <div class="card pur">
+      <h3>E. POTENCIAL ELÁSTICA</h3>
+      <p>Energia armazenada em uma mola deformada de x em relação à posição de equilíbrio. Sempre positiva.</p>
+      <div class="fhero" style="border-color:rgba(187,68,255,.3);margin:12px 0">
+        <div class="bf" style="font-size:1.6rem;text-shadow:0 0 14px var(--pur)">Ee = ½ · k · x²</div>
+        <div class="fl" style="color:var(--pur)">k [N/m] constante da mola · x [m] deformação</div>
+      </div>
+      <p>✦ Ee ≥ 0 sempre (x² é sempre positivo)<br>
+         ✦ Mesma forma que Ec (½ × constante × variável²)<br>
+         ✦ τ_e = Ee_i - Ee_f = ½k(x_i²-x_f²)</p>
+    </div>
+  </div>
+  <!-- POTENTIAL ENERGY INTERACTIVE -->
+  <div class="vis ep">
+    <p class="vtag" style="color:var(--ep)">[ ENERGIA POTENCIAL GRAVITACIONAL — INTERATIVO ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>MASSA m (kg)</label>
+        <input type="range" id="epM" min="1" max="100" value="10" oninput="drawEp()">
+        <div class="ctrl-val" id="epMV">10 kg</div>
+      </div>
+      <div class="ctrl"><label>ALTURA h (m)</label>
+        <input type="range" id="epH" min="0" max="100" value="20" oninput="drawEp()">
+        <div class="ctrl-val" id="epHV">20 m</div>
+      </div>
+    </div>
+    <canvas id="epCanvas" width="700" height="240"></canvas>
+    <div id="epResult" style="font-family:Orbitron,monospace;font-size:1.2rem;text-align:center;margin-top:8px;color:var(--ep);text-shadow:0 0 10px var(--ep)">Ep = — J</div>
+  </div>
+</section>
+
+<!-- CONSERVAÇÃO DE ENERGIA -->
+<section id="conservacao">
+  <div class="sh"><span class="sn">06</span><h2 class="st">CONSERVAÇÃO DE <span>ENERGIA MECÂNICA</span></h2><div class="sl"></div></div>
+  <div class="card"><h3>PRINCÍPIO DA CONSERVAÇÃO</h3>
+    <p>Na ausência de forças dissipativas (atrito), a <span class="hl">energia mecânica total</span> (Ec + Ep) é constante. Energia cinética e potencial trocam entre si, mas a soma permanece a mesma.</p>
+  </div>
+  <div class="fhero">
+    <div class="bf">Em = Ec + Ep = constante &nbsp;|&nbsp; Ec_i + Ep_i = Ec_f + Ep_f</div>
+    <div class="fl">Válido quando: sem atrito, sem forças dissipativas · Em [J]</div>
+  </div>
+  <div class="card fr"><h3>COM ATRITO (ENERGIA DISSIPADA)</h3>
+    <p>Quando há atrito, parte da energia mecânica é convertida em calor. A diferença entre a energia inicial e final é a <span class="hlf">energia dissipada pelo atrito</span>.</p>
+    <div class="law fr" style="font-size:.83rem">Em_f = Em_i + τ_atrito<br>ΔEm = τ_atrito = -f·d (negativo)<br>Q_calor = |τ_atrito| = f·d</div>
+  </div>
+
+  <!-- PENDULUM / ENERGY SIMULATION -->
+  <div class="vis special">
+    <p class="vtag" style="color:var(--em);font-size:.74rem;letter-spacing:4px">[ ★ SIMULAÇÃO — PÊNDULO & CONSERVAÇÃO DE ENERGIA ★ ]</p>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
+      <button class="sbtn grn" id="pendRunBtn" onclick="togglePend()">▶ INICIAR</button>
+      <button class="sbtn rst" onclick="resetPend()">↺ REINICIAR</button>
+      <button class="sbtn yel" id="pendFricBtn" onclick="toggleFric()">◆ ATRITO: OFF</button>
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>ÂNGULO INICIAL θ₀ (°)</label>
+        <input type="range" id="pendAng" min="5" max="75" value="45" oninput="onPendSlide()">
+        <div class="ctrl-val" id="pendAngV">45°</div>
+      </div>
+      <div class="ctrl"><label>MASSA (kg)</label>
+        <input type="range" id="pendMass" min="1" max="20" value="5" oninput="onPendSlide()">
+        <div class="ctrl-val" id="pendMassV">5 kg</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:0;align-items:flex-start;flex-wrap:wrap;justify-content:center">
+      <canvas id="pendCanvas" width="460" height="360"></canvas>
+      <div style="padding:12px 0 0 14px;min-width:190px">
+        <div style="font-family:Share Tech Mono,monospace;font-size:.65rem;color:var(--dim);letter-spacing:2px;margin-bottom:12px;text-align:center">ENERGIA (J)</div>
+        <div class="ebar-wrap" style="flex-direction:column;gap:10px;align-items:flex-start">
+          <div style="display:flex;align-items:center;gap:10px;width:100%">
+            <div style="font-family:Share Tech Mono,monospace;font-size:.62rem;color:var(--ec);width:28px">Ec</div>
+            <div style="flex:1;height:22px;background:rgba(0,0,0,.4);border:1px solid rgba(255,221,0,.2);border-radius:2px;overflow:hidden">
+              <div id="barEc" style="height:100%;background:var(--ec);width:0%;transition:width .05s;box-shadow:0 0 6px var(--ec)"></div>
+            </div>
+            <div id="lblEc" style="font-family:Orbitron,monospace;font-size:.68rem;color:var(--ec);width:54px;text-align:right">0 J</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;width:100%">
+            <div style="font-family:Share Tech Mono,monospace;font-size:.62rem;color:var(--ep);width:28px">Ep</div>
+            <div style="flex:1;height:22px;background:rgba(0,0,0,.4);border:1px solid rgba(0,170,255,.2);border-radius:2px;overflow:hidden">
+              <div id="barEp" style="height:100%;background:var(--ep);width:100%;transition:width .05s;box-shadow:0 0 6px var(--ep)"></div>
+            </div>
+            <div id="lblEp" style="font-family:Orbitron,monospace;font-size:.68rem;color:var(--ep);width:54px;text-align:right">0 J</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;width:100%">
+            <div style="font-family:Share Tech Mono,monospace;font-size:.62rem;color:var(--em);width:28px">Em</div>
+            <div style="flex:1;height:22px;background:rgba(0,0,0,.4);border:1px solid rgba(0,204,102,.2);border-radius:2px;overflow:hidden">
+              <div id="barEm" style="height:100%;background:var(--em);width:100%;transition:width .05s;box-shadow:0 0 6px var(--em)"></div>
+            </div>
+            <div id="lblEm" style="font-family:Orbitron,monospace;font-size:.68rem;color:var(--em);width:54px;text-align:right">0 J</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;width:100%">
+            <div style="font-family:Share Tech Mono,monospace;font-size:.62rem;color:var(--fr);width:28px">Q</div>
+            <div style="flex:1;height:22px;background:rgba(0,0,0,.4);border:1px solid rgba(255,34,85,.2);border-radius:2px;overflow:hidden">
+              <div id="barQ" style="height:100%;background:var(--fr);width:0%;transition:width .05s;box-shadow:0 0 6px var(--fr)"></div>
+            </div>
+            <div id="lblQ" style="font-family:Orbitron,monospace;font-size:.68rem;color:var(--fr);width:54px;text-align:right">0 J</div>
+          </div>
+        </div>
+        <div id="pendInfo" style="font-family:Share Tech Mono,monospace;font-size:.65rem;color:var(--dim);margin-top:16px;line-height:1.8"></div>
+      </div>
+    </div>
+  </div>
+  <div class="igrid">
+    <div class="card ep"><h3>EXEMPLO — QUEDA LIVRE</h3>
+      <p>Uma bola (m=2 kg) cai de h=5 m. Qual é v ao atingir o solo? (g=10)</p>
+      <div class="step"><div class="sn2">1</div><p>Em_i = Ep_i = mgh = 2×10×5 = 100 J</p></div>
+      <div class="step"><div class="sn2">2</div><p>Em_f = Ec_f = ½mv² = 100 J</p></div>
+      <div class="step"><div class="sn2">3</div><p>v² = 200/2 = 100 → v = <span class="hl">10 m/s</span></p></div>
+    </div>
+    <div class="card fr"><h3>EXEMPLO — COM ATRITO</h3>
+      <p>Bloco (m=2 kg, h=5 m) desce inclinada com τ_atrito = -20 J. Qual é v final?</p>
+      <div class="step"><div class="sn2">1</div><p>Em_i = mgh = 100 J</p></div>
+      <div class="step"><div class="sn2">2</div><p>Em_f = Em_i + τ_atrito = 100-20 = 80 J</p></div>
+      <div class="step"><div class="sn2">3</div><p>Ec_f = ½mv² = 80 → v = √80 ≈ <span class="hlf">8,9 m/s</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- POTÊNCIA -->
+<section id="potencia">
+  <div class="sh"><span class="sn">07</span><h2 class="st"><span>POTÊNCIA</span> E RENDIMENTO</h2><div class="sl"></div></div>
+  <div class="card pw"><h3>POTÊNCIA MÉDIA</h3>
+    <p>A <span class="hlw">potência</span> mede a <strong>taxa de realização de trabalho</strong> — quão rápido a energia é transferida. Dois motores podem realizar o mesmo trabalho, mas em tempos diferentes → potências diferentes.</p>
+  </div>
+  <div class="fhero" style="border-color:rgba(255,119,0,.3)">
+    <div class="bf" style="text-shadow:0 0 14px var(--pw),0 0 35px rgba(255,119,0,.42)">P = τ / t = F · v</div>
+    <div class="fl" style="color:var(--pw)">P [W = J/s] &nbsp;|&nbsp; τ [J] &nbsp;|&nbsp; t [s] &nbsp;|&nbsp; F [N] &nbsp;|&nbsp; v [m/s velocidade média]</div>
+  </div>
+  <div class="igrid">
+    <div class="card pw"><h3>UNIDADES DE POTÊNCIA</h3>
+      <div class="law pw" style="font-size:.83rem">1 W = 1 J/s = 1 N·m/s<br>1 kW = 1000 W<br>1 MW = 10⁶ W<br>1 cv (cavalo-vapor) = 736 W<br>1 hp (horse power) = 746 W</div>
+    </div>
+    <div class="card pur"><h3>RENDIMENTO (η)</h3>
+      <p>Nenhuma máquina converte 100% da energia recebida em trabalho útil. O <span class="hlr">rendimento</span> mede essa eficiência:</p>
+      <div class="law pur" style="font-size:.83rem">η = P_útil / P_total × 100%<br>η = τ_útil / τ_total × 100%<br><br>0% &lt; η &lt; 100% (na prática)<br>Motor elétrico: η ≈ 90-95%<br>Motor a combustão: η ≈ 25-40%</div>
+    </div>
+    <div class="card grn"><h3>EXEMPLO RESOLVIDO</h3>
+      <p>Um motor eleva m=200 kg em h=10 m em t=5 s. Calcule τ, P e η (P_total=5 kW).</p>
+      <div class="step"><div class="sn2">1</div><p>τ_útil = mgh = 200×10×10 = 20.000 J</p></div>
+      <div class="step"><div class="sn2">2</div><p>P_útil = τ/t = 20.000/5 = <span class="hl">4.000 W = 4 kW</span></p></div>
+      <div class="step"><div class="sn2">3</div><p>η = 4/5 × 100% = <span class="hl">80%</span></p></div>
+    </div>
+  </div>
+  <!-- POWER CALCULATOR -->
+  <div class="vis pw">
+    <p class="vtag" style="color:var(--pw)">[ CALCULADORA — POTÊNCIA E RENDIMENTO ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>TRABALHO τ (J)</label>
+        <input type="range" id="pwT" min="100" max="100000" value="10000" step="100" oninput="calcPow()">
+        <div class="ctrl-val" id="pwTV">10000 J</div>
+      </div>
+      <div class="ctrl"><label>TEMPO t (s)</label>
+        <input type="range" id="pwTm" min="1" max="120" value="10" oninput="calcPow()">
+        <div class="ctrl-val" id="pwTmV">10 s</div>
+      </div>
+      <div class="ctrl"><label>RENDIMENTO η (%)</label>
+        <input type="range" id="pwEta" min="10" max="100" value="80" oninput="calcPow()">
+        <div class="ctrl-val" id="pwEtaV">80%</div>
+      </div>
+    </div>
+    <canvas id="pwCanvas" width="700" height="220"></canvas>
+    <div id="pwResult" style="font-family:Orbitron,monospace;font-size:.9rem;text-align:center;margin-top:8px;color:var(--pw);text-shadow:0 0 8px var(--pw)">— </div>
+  </div>
+</section>
+
+<!-- SIMULAÇÃO UNIFICADA -->
+<section id="simulacao">
+  <div class="sh"><span class="sn">08</span><h2 class="st">SIMULAÇÃO — <span>RAMPA DE ENERGIA</span></h2><div class="sl"></div></div>
+  <div class="vis special">
+    <p class="vtag" style="color:var(--em);letter-spacing:4px">[ ★ TRANSFORMAÇÕES DE ENERGIA EM TEMPO REAL ★ ]</p>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px">
+      <button class="sbtn grn" id="rampRunBtn" onclick="toggleRamp()">▶ LANÇAR</button>
+      <button class="sbtn rst" onclick="resetRamp()">↺ REINICIAR</button>
+      <button class="sbtn yel" id="rampFricBtn" onclick="toggleRampFric()">◆ ATRITO: OFF</button>
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>MASSA m (kg)</label>
+        <input type="range" id="rampM" min="1" max="50" value="10" oninput="onRampSlide()">
+        <div class="ctrl-val" id="rampMV">10 kg</div>
+      </div>
+      <div class="ctrl"><label>ALTURA h (m)</label>
+        <input type="range" id="rampH" min="5" max="80" value="40" oninput="onRampSlide()">
+        <div class="ctrl-val" id="rampHV">40 m</div>
+      </div>
+      <div class="ctrl" id="rampMuCtrl" style="display:none"><label>COEF. ATRITO μ</label>
+        <input type="range" id="rampMu" min="1" max="30" value="10" oninput="onRampSlide()">
+        <div class="ctrl-val" id="rampMuV">0.10</div>
+      </div>
+    </div>
+    <canvas id="rampCanvas" width="700" height="380"></canvas>
+    <div id="rampInfo" style="font-family:Orbitron,monospace;font-size:.75rem;text-align:center;margin-top:8px;color:var(--em);letter-spacing:1px">Clique em LANÇAR para iniciar</div>
+  </div>
+</section>
+
+<!-- EXERCÍCIOS -->
+<section id="exercicios">
+  <div class="sh"><span class="sn">09</span><h2 class="st">EXERCÍCIOS DE <span>FIXAÇÃO</span></h2><div class="sl"></div></div>
+  <p style="color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:.72rem;margin-bottom:22px;letter-spacing:2px">SELECIONE A ALTERNATIVA CORRETA</p>
+  <div class="pw2"><div class="pf2" id="pBar" style="width:0%"></div></div>
+  <p style="font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--dim);text-align:right;margin:6px 0 24px" id="pTxt">0 / 8 respondidas</p>
+
+  <div class="qc" id="q1"><div class="qnum">QUESTÃO 01 // TRABALHO</div>
+    <div class="qtext">Uma força de 50 N age paralelamente ao deslocamento de 4 m. Qual é o trabalho realizado?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">A</span>12,5 J</button>
+      <button class="obt" onclick="ans(this,'q1','correct')"><span class="ol">B</span>200 J</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">C</span>54 J</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">D</span>100 J</button>
+    </div><div class="fb" id="f_q1"></div>
+  </div>
+
+  <div class="qc" id="q2"><div class="qnum">QUESTÃO 02 // FORÇA NORMAL</div>
+    <div class="qtext">Um bloco desliza horizontalmente sobre uma superfície. O trabalho realizado pela força normal é:</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">A</span>Positivo — a normal sustenta o bloco</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">B</span>Negativo — a normal opõe-se ao peso</button>
+      <button class="obt" onclick="ans(this,'q2','correct')"><span class="ol">C</span>Zero — a normal é sempre perpendicular ao deslocamento</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">D</span>Depende da velocidade do bloco</button>
+    </div><div class="fb" id="f_q2"></div>
+  </div>
+
+  <div class="qc" id="q3"><div class="qnum">QUESTÃO 03 // ENERGIA CINÉTICA</div>
+    <div class="qtext">Um carro de 1000 kg vai a 20 m/s. Qual é sua energia cinética?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">A</span>10.000 J</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">B</span>100.000 J</button>
+      <button class="obt" onclick="ans(this,'q3','correct')"><span class="ol">C</span>200.000 J</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">D</span>400.000 J</button>
+    </div><div class="fb" id="f_q3"></div>
+  </div>
+
+  <div class="qc" id="q4"><div class="qnum">QUESTÃO 04 // TEOREMA TRABALHO-ENERGIA</div>
+    <div class="qtext">Um objeto (m=4 kg) tem velocidade inicial 3 m/s e final 5 m/s. Qual foi o trabalho total realizado?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">A</span>8 J</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">B</span>16 J</button>
+      <button class="obt" onclick="ans(this,'q4','correct')"><span class="ol">C</span>32 J</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">D</span>64 J</button>
+    </div><div class="fb" id="f_q4"></div>
+  </div>
+
+  <div class="qc" id="q5"><div class="qnum">QUESTÃO 05 // CONSERVAÇÃO DE ENERGIA</div>
+    <div class="qtext">Uma pedra (m=2 kg) é solta do repouso de h=20 m. Qual é sua velocidade ao atingir o solo? (g=10, sem atrito)</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">A</span>10 m/s</button>
+      <button class="obt" onclick="ans(this,'q5','correct')"><span class="ol">B</span>20 m/s</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">C</span>40 m/s</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">D</span>200 m/s</button>
+    </div><div class="fb" id="f_q5"></div>
+  </div>
+
+  <div class="qc" id="q6"><div class="qnum">QUESTÃO 06 // POTÊNCIA</div>
+    <div class="qtext">Um motor realiza 60.000 J de trabalho em 2 minutos. Qual é sua potência?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">A</span>30.000 W</button>
+      <button class="obt" onclick="ans(this,'q6','correct')"><span class="ol">B</span>500 W</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">C</span>120.000 W</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">D</span>1000 W</button>
+    </div><div class="fb" id="f_q6"></div>
+  </div>
+
+  <div class="qc" id="q7"><div class="qnum">QUESTÃO 07 // RENDIMENTO</div>
+    <div class="qtext">Um motor elétrico recebe 500 J e realiza 400 J de trabalho útil. Qual é seu rendimento?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">A</span>50%</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">B</span>125%</button>
+      <button class="obt" onclick="ans(this,'q7','correct')"><span class="ol">C</span>80%</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">D</span>100%</button>
+    </div><div class="fb" id="f_q7"></div>
+  </div>
+
+  <div class="qc" id="q8"><div class="qnum">QUESTÃO 08 // INTEGRAÇÃO</div>
+    <div class="qtext">Um bloco desce uma rampa (h=5 m, m=3 kg) com atrito. Chega ao fim com Ec=100 J. Qual foi a energia dissipada pelo atrito? (g=10)</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">A</span>50 J</button>
+      <button class="obt" onclick="ans(this,'q8','correct')"><span class="ol">B</span>50 J — τ_atrito = |Em_f - Em_i| = |100 - 150| = 50 J</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">C</span>150 J</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">D</span>250 J</button>
+    </div><div class="fb" id="f_q8"></div>
+  </div>
+
+  <div class="sp" id="spanel" style="display:none">
+    <div class="scl">RESULTADO FINAL</div><div class="scv" id="scv">0/8</div>
+    <div class="scm" id="scm"></div>
+    <button class="rbtn" onclick="resetQ()">REFAZER EXERCÍCIOS</button>
+  </div>
+</section>
+</main>
+<footer>
+  <div>TRABALHO E ENERGIA — FÍSICA DO ENSINO MÉDIO</div>
+  <div style="margin-top:7px">TRABALHO · ENERGIA CINÉTICA · ENERGIA POTENCIAL · CONSERVAÇÃO · POTÊNCIA</div>
+</footer>
+
+<script>
+var g=10;
+function bg(ctx,W,H){ctx.fillStyle='#04100a';ctx.fillRect(0,0,W,H);}
+function ga(ctx,x1,y1,x2,y2,col,lw,blur){
+  lw=lw||2;blur=blur||10;var a=Math.atan2(y2-y1,x2-x1),L=9;
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=blur;ctx.strokeStyle=col;ctx.lineWidth=lw;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(x2,y2);
+  ctx.lineTo(x2-L*Math.cos(a-.42),y2-L*Math.sin(a-.42));
+  ctx.lineTo(x2-L*Math.cos(a+.42),y2-L*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+}
+function lbl(ctx,x,y,txt,col,sz,align){
+  sz=sz||11;align=align||'center';
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=6;ctx.fillStyle=col;
+  ctx.font=sz+'px Share Tech Mono,monospace';ctx.textAlign=align;ctx.fillText(txt,x,y);ctx.restore();
+}
+function ground(ctx,gY,W){
+  ctx.save();ctx.strokeStyle='rgba(0,204,102,.35)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,gY);ctx.lineTo(W,gY);ctx.stroke();
+  for(var x=0;x<W;x+=18){ctx.strokeStyle='rgba(0,204,102,.12)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x,gY);ctx.lineTo(x-7,gY+12);ctx.stroke();}
+  ctx.restore();
+}
+
+// ══ WORK VISUALIZATION ════════════════════════
+function drawWork(){
+  var F=+document.getElementById('wF').value;
+  var A=+document.getElementById('wA').value;
+  var D=+document.getElementById('wD').value;
+  document.getElementById('wFV').textContent=F+' N';
+  document.getElementById('wAV').textContent=A+'°';
+  document.getElementById('wDV').textContent=D+' m';
+  var tau=F*D*Math.cos(A*Math.PI/180);
+  var col=tau>0.1?'#00cc66':tau<-0.1?'#ff2255':'#ffdd00';
+  document.getElementById('workResult').textContent='τ = F·d·cos'+A+'° = '+F+'×'+D+'×'+Math.cos(A*Math.PI/180).toFixed(2)+' = '+tau.toFixed(1)+' J';
+  document.getElementById('workResult').style.color=col;
+  document.getElementById('workResult').style.textShadow='0 0 10px '+col;
+  var cv=document.getElementById('workCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var gY=H-40,ox=60,scD=Math.min((W-120)/D,18);
+  ground(ctx,gY,W);
+  // Object (block)
+  var bx=ox+D*scD/2, bw=40, bh=30, by=gY-bh;
+  ctx.save();ctx.shadowColor='#00cc66';ctx.shadowBlur=12;
+  ctx.fillStyle='rgba(0,204,102,.2)';ctx.strokeStyle='#00cc66';ctx.lineWidth=1.5;
+  ctx.fillRect(bx-bw/2,by,bw,bh);ctx.strokeRect(bx-bw/2,by,bw,bh);ctx.restore();
+  lbl(ctx,bx,by+18,'m','rgba(0,204,102,.7)',9);
+  // Displacement arrow
+  ga(ctx,ox,gY-5,ox+D*scD,gY-5,'rgba(0,204,102,.45)',1.5,6);
+  lbl(ctx,ox+D*scD/2,gY+14,'d = '+D+' m','rgba(0,204,102,.5)',9);
+  // Force arrow at angle
+  var rad=A*Math.PI/180;
+  var fScale=Math.min(110,F*0.7);
+  var fx=bx+Math.cos(-rad)*fScale, fy=by+bh/2-Math.sin(-rad)*fScale;
+  ga(ctx,bx,by+bh/2,fx,fy,col,3,14);
+  lbl(ctx,fx+10,fy-10,'F='+F+'N, θ='+A+'°',col,9,'left');
+  // Parallel component (dashed)
+  var fPar=F*Math.cos(rad);
+  var fParPx=Math.abs(fPar)*Math.min(100,Math.abs(fPar)*0.7)/Math.max(Math.abs(fPar),1);
+  ctx.save();ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(0,204,102,.5)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(bx,by+bh/2);ctx.lineTo(bx+(fPar>0?1:-1)*fParPx,by+bh/2);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+  lbl(ctx,bx+(fPar>0?fParPx/2:-fParPx/2),by+bh/2-14,'F_par='+fPar.toFixed(1)+'N','rgba(0,204,102,.7)',9);
+  // Angle arc
+  ctx.save();ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.arc(bx,by+bh/2,28,0,-rad,rad>0);ctx.stroke();ctx.restore();
+  if(A>0&&A<180)lbl(ctx,bx+38,by+bh/2-4,A+'°','rgba(255,255,255,.4)',9,'left');
+  // Work annotation in top-right
+  ctx.save();ctx.fillStyle='rgba(0,0,0,.55)';ctx.strokeStyle=col;ctx.lineWidth=1;
+  ctx.fillRect(W-200,14,185,52);ctx.strokeRect(W-200,14,185,52);ctx.restore();
+  lbl(ctx,W-108,32,'τ = '+tau.toFixed(1)+' J',col,11);
+  var sign=tau>0.1?'POSITIVO (acelera)':tau<-0.1?'NEGATIVO (freia)':'NULO (⊥)';
+  lbl(ctx,W-108,50,sign,'rgba(255,255,255,.4)',8);
+}
+
+// ══ KINETIC ENERGY CANVAS ══════════════════════
+function calcEc(){
+  var m=+document.getElementById('ecM').value;
+  var v=+document.getElementById('ecV').value;
+  document.getElementById('ecMV').textContent=m+' kg';
+  document.getElementById('ecVV').textContent=v+' m/s';
+  var ec=0.5*m*v*v;
+  document.getElementById('ecResult').textContent='Ec = ½×'+m+'×'+v+'² = '+ec.toLocaleString('pt-BR')+' J';
+  var cv=document.getElementById('ecCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  // Bar for Ec
+  var maxEc=0.5*2000*100*100;
+  var barW=Math.min((W-120)*(ec/maxEc)*4,W-120);barW=Math.max(barW,4);
+  var barH=44,by=H/2-22,bx=80;
+  // Background bar
+  ctx.fillStyle='rgba(0,0,0,.4)';ctx.strokeStyle='rgba(255,221,0,.2)';ctx.lineWidth=1;
+  ctx.fillRect(bx,by,W-120,barH);ctx.strokeRect(bx,by,W-120,barH);
+  // Fill
+  ctx.save();ctx.shadowColor='#ffdd00';ctx.shadowBlur=14;
+  var g2=ctx.createLinearGradient(bx,0,bx+barW,0);
+  g2.addColorStop(0,'#ffdd00');g2.addColorStop(1,'#ff8800');
+  ctx.fillStyle=g2;ctx.fillRect(bx,by,barW,barH);ctx.restore();
+  // Labels
+  lbl(ctx,bx-10,by+barH/2+4,'0','rgba(255,221,0,.4)',9,'right');
+  lbl(ctx,W-30,by+barH/2+4,'MAX','rgba(255,221,0,.4)',8);
+  lbl(ctx,bx+barW+8,by+barH/2+4,ec.toLocaleString('pt-BR')+' J','#ffdd00',10,'left');
+  // Ball visualization
+  var bRad=Math.min(45,6+Math.sqrt(m)*1.8);
+  var ballX=80+barW,ballY=by-bRad-10;
+  if(ballX>W-60)ballX=W-60;
+  // Speed lines
+  if(v>2){
+    for(var k=0;k<3;k++){
+      var lx=ballX-bRad-8-k*12;
+      ctx.save();ctx.globalAlpha=(.5-k*.15);ctx.strokeStyle='#ffdd00';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(lx,ballY-bRad*.4);ctx.lineTo(lx-14,ballY-bRad*.4);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(lx,ballY+bRad*.4);ctx.lineTo(lx-14,ballY+bRad*.4);ctx.stroke();
+      ctx.restore();
+    }
+  }
+  ctx.save();ctx.shadowColor='#ffdd00';ctx.shadowBlur=16;
+  var bg3=ctx.createRadialGradient(ballX-bRad*.3,ballY-bRad*.3,1,ballX,ballY,bRad);
+  bg3.addColorStop(0,'#fff');bg3.addColorStop(.4,'#ffdd00');bg3.addColorStop(1,'rgba(255,100,0,.5)');
+  ctx.beginPath();ctx.arc(ballX,ballY,bRad,0,Math.PI*2);ctx.fillStyle=bg3;ctx.fill();ctx.restore();
+  lbl(ctx,W/2,H-12,'Ec = ½·m·v² = ½×'+m+'×'+v+'² = '+ec.toLocaleString('pt-BR')+' J','rgba(255,221,0,.5)',9);
+}
+
+// ══ POTENTIAL ENERGY CANVAS ═══════════════════
+function drawEp(){
+  var m=+document.getElementById('epM').value;
+  var h=+document.getElementById('epH').value;
+  document.getElementById('epMV').textContent=m+' kg';
+  document.getElementById('epHV').textContent=h+' m';
+  var ep=m*g*h;
+  document.getElementById('epResult').textContent='Ep = '+m+'×10×'+h+' = '+ep.toLocaleString('pt-BR')+' J';
+  var cv=document.getElementById('epCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var gY=H-28,sc=Math.min((gY-60)/Math.max(h,1),.9*(gY-60)/Math.max(h,1));
+  ground(ctx,gY,W);
+  var bx=W/2-20,bw=40,bh=30;
+  var objY=gY-h*sc-bh;
+  // Height bar (left side)
+  var hbX=80;
+  ctx.save();ctx.fillStyle='rgba(0,170,255,.1)';ctx.strokeStyle='rgba(0,170,255,.3)';ctx.lineWidth=1;ctx.setLineDash([3,4]);
+  ctx.beginPath();ctx.moveTo(hbX,gY);ctx.lineTo(hbX,objY+bh);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  ctx.save();ctx.strokeStyle='rgba(0,170,255,.4)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(hbX-6,gY);ctx.lineTo(hbX+6,gY);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(hbX-6,objY+bh);ctx.lineTo(hbX+6,objY+bh);ctx.stroke();ctx.restore();
+  lbl(ctx,hbX-24,(gY+objY+bh)/2,'h='+h+'m','rgba(0,170,255,.7)',9);
+  // Ep bar (right side)
+  var maxEp=100*g*100;
+  var epFrac=Math.min(1,ep/maxEp*2);
+  var epBH=(gY-40)*epFrac;var epBX=W-100;
+  ctx.fillStyle='rgba(0,0,0,.4)';ctx.strokeStyle='rgba(0,170,255,.2)';ctx.lineWidth=1;
+  ctx.fillRect(epBX,gY-gY+20,40,gY-20);ctx.strokeRect(epBX,gY-(gY-20),40,gY-20);
+  ctx.save();ctx.shadowColor='#00aaff';ctx.shadowBlur=10;
+  ctx.fillStyle='#00aaff';ctx.fillRect(epBX,gY-epBH,40,epBH);ctx.restore();
+  lbl(ctx,epBX+20,gY+14,'Ep','rgba(0,170,255,.6)',9);
+  lbl(ctx,epBX+20,gY-epBH-10,ep.toLocaleString('pt-BR')+'J','#00aaff',9);
+  // Object (block at height h)
+  ctx.save();ctx.shadowColor='#00aaff';ctx.shadowBlur=14;
+  ctx.fillStyle='rgba(0,170,255,.2)';ctx.strokeStyle='#00aaff';ctx.lineWidth=1.5;
+  ctx.fillRect(bx,objY,bw,bh);ctx.strokeRect(bx,objY,bw,bh);ctx.restore();
+  lbl(ctx,bx+bw/2,objY+bh/2+4,'m='+m,'rgba(0,170,255,.8)',9);
+  // Reference label
+  lbl(ctx,W/2,gY+14,'nível de referência (h=0)','rgba(0,204,102,.4)',9);
+  // Potential energy label
+  ga(ctx,bx+bw/2+26,objY+bh/2,bx+bw/2+26,gY,'rgba(0,170,255,.4)',1.5,4);
+  lbl(ctx,bx+bw/2+50,(objY+bh/2+gY)/2,'Ep','rgba(0,170,255,.5)',11,'left');
+}
+
+// ══ PENDULUM SIMULATION ═══════════════════════
+var pendTheta=Math.PI/4,pendOmega=0,pendRunning=false,pendFric=false,pendEm0=0,pendHeat=0;
+function onPendSlide(){
+  var ang=+document.getElementById('pendAng').value;
+  document.getElementById('pendAngV').textContent=ang+'°';
+  document.getElementById('pendMassV').textContent=+document.getElementById('pendMass').value+' kg';
+  if(!pendRunning){pendTheta=ang*Math.PI/180;pendOmega=0;pendHeat=0;drawPend();}
+}
+function togglePend(){
+  pendRunning=!pendRunning;
+  var btn=document.getElementById('pendRunBtn');
+  btn.textContent=pendRunning?'⏸ PAUSAR':'▶ INICIAR';
+  btn.classList.toggle('on',pendRunning);
+  if(pendRunning){
+    var ang=+document.getElementById('pendAng').value;
+    var m=+document.getElementById('pendMass').value;
+    pendEm0=m*g*0.4*(1-Math.cos(pendTheta));
+    pendHeat=0;
+    animPend();
+  }
+}
+function resetPend(){
+  pendRunning=false;pendOmega=0;pendHeat=0;
+  pendTheta=+document.getElementById('pendAng').value*Math.PI/180;
+  document.getElementById('pendRunBtn').textContent='▶ INICIAR';
+  document.getElementById('pendRunBtn').classList.remove('on');
+  drawPend();
+}
+function toggleFric(){
+  pendFric=!pendFric;
+  var btn=document.getElementById('pendFricBtn');
+  btn.textContent='◆ ATRITO: '+(pendFric?'ON':'OFF');
+  btn.classList.toggle('on',pendFric);
+}
+var pendDT=0.03;
+function stepPend(){
+  var L=0.4; // pendulum length (meters, scaled)
+  var b=pendFric?0.08:0;
+  var alpha=-(g/L)*Math.sin(pendTheta)-b*pendOmega;
+  pendOmega+=alpha*pendDT;
+  pendTheta+=pendOmega*pendDT;
+}
+function drawPend(){
+  var cv=document.getElementById('pendCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var m=+document.getElementById('pendMass').value;
+  var L=0.4,Lpx=H-80;
+  var pivX=W/2,pivY=40;
+  var bx=pivX+Lpx*Math.sin(pendTheta);
+  var by=pivY+Lpx*Math.cos(pendTheta);
+  // Equilibrium line
+  ctx.save();ctx.strokeStyle='rgba(0,204,102,.12)';ctx.lineWidth=1;ctx.setLineDash([4,6]);
+  ctx.beginPath();ctx.moveTo(pivX,pivY);ctx.lineTo(pivX,pivY+Lpx+20);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  // String
+  ctx.save();ctx.shadowColor='rgba(0,204,102,.4)';ctx.shadowBlur=6;ctx.strokeStyle='rgba(0,204,102,.5)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(pivX,pivY);ctx.lineTo(bx,by);ctx.stroke();ctx.restore();
+  // Pivot
+  ctx.save();ctx.shadowColor='#00cc66';ctx.shadowBlur=10;
+  ctx.beginPath();ctx.arc(pivX,pivY,6,0,Math.PI*2);ctx.fillStyle='#00cc66';ctx.fill();ctx.restore();
+  // Height annotation
+  var hNow=L*(1-Math.cos(pendTheta));
+  var hRef=pivY+Lpx;
+  var hPx=hNow/L*Lpx;
+  if(hPx>5){
+    ctx.save();ctx.strokeStyle='rgba(0,170,255,.35)';ctx.lineWidth=1;ctx.setLineDash([3,5]);
+    ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx,hRef);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+    lbl(ctx,bx-28,(by+hRef)/2,'h','rgba(0,170,255,.6)',9,'right');
+  }
+  // Bob
+  var bRad=Math.max(8,Math.min(20,4+Math.sqrt(m)*2.5));
+  ctx.save();ctx.shadowColor='#ffdd00';ctx.shadowBlur=20;
+  var bg4=ctx.createRadialGradient(bx-bRad*.3,by-bRad*.3,1,bx,by,bRad);
+  bg4.addColorStop(0,'#fff');bg4.addColorStop(.4,'#ffdd00');bg4.addColorStop(1,'rgba(255,100,0,.5)');
+  ctx.beginPath();ctx.arc(bx,by,bRad,0,Math.PI*2);ctx.fillStyle=bg4;ctx.fill();ctx.restore();
+  // Velocity vector
+  var v=Math.abs(pendOmega)*Lpx/100; // scaled
+  if(v>0.3){
+    var vDirX=Math.cos(pendTheta)*pendOmega;
+    var vDirY=-Math.sin(pendTheta)*pendOmega;
+    var vScale=Math.min(60,v*15);
+    ga(ctx,bx,by,bx+vDirX*vScale*2,by+vDirY*vScale*2,'rgba(255,221,0,.7)',2,8);
+  }
+  // Energies
+  var hM=L*(1-Math.cos(pendTheta));
+  var ec=0.5*m*(pendOmega*L)*(pendOmega*L);
+  var ep=m*g*hM;
+  var em=ec+ep;
+  if(pendEm0<0.001)pendEm0=em;
+  var maxE=Math.max(pendEm0,0.01);
+  document.getElementById('barEc').style.width=Math.min(100,ec/maxE*100)+'%';
+  document.getElementById('barEp').style.width=Math.min(100,ep/maxE*100)+'%';
+  document.getElementById('barEm').style.width=Math.min(100,em/maxE*100)+'%';
+  document.getElementById('barQ').style.width=Math.min(100,pendHeat/maxE*100)+'%';
+  document.getElementById('lblEc').textContent=ec.toFixed(2)+' J';
+  document.getElementById('lblEp').textContent=ep.toFixed(2)+' J';
+  document.getElementById('lblEm').textContent=em.toFixed(2)+' J';
+  document.getElementById('lblQ').textContent=pendHeat.toFixed(2)+' J';
+  document.getElementById('pendInfo').innerHTML=
+    'θ = '+(pendTheta*180/Math.PI).toFixed(1)+'°<br>'+
+    'v = '+(Math.abs(pendOmega*L)).toFixed(2)+' m/s<br>'+
+    'h = '+hM.toFixed(3)+' m<br>'+
+    'Em₀ = '+pendEm0.toFixed(2)+' J';
+}
+function animPend(){
+  if(!pendRunning)return;
+  for(var i=0;i<1;i++){
+    var emBefore=0.5*+document.getElementById('pendMass').value*(pendOmega*0.4)*(pendOmega*0.4)+
+                 +document.getElementById('pendMass').value*g*0.4*(1-Math.cos(pendTheta));
+    stepPend();
+    var emAfter=0.5*+document.getElementById('pendMass').value*(pendOmega*0.4)*(pendOmega*0.4)+
+                +document.getElementById('pendMass').value*g*0.4*(1-Math.cos(pendTheta));
+    if(pendFric)pendHeat+=Math.max(0,emBefore-emAfter);
+  }
+  drawPend();
+  requestAnimationFrame(animPend);
+}
+
+// ══ POWER CANVAS ══════════════════════════════
+function calcPow(){
+  var tau=+document.getElementById('pwT').value;
+  var t=+document.getElementById('pwTm').value;
+  var eta=+document.getElementById('pwEta').value;
+  document.getElementById('pwTV').textContent=tau.toLocaleString('pt-BR')+' J';
+  document.getElementById('pwTmV').textContent=t+' s';
+  document.getElementById('pwEtaV').textContent=eta+'%';
+  var pUtil=tau/t, pTotal=pUtil/(eta/100);
+  document.getElementById('pwResult').textContent=
+    'P_útil = '+pUtil.toFixed(1)+' W = '+( pUtil/1000).toFixed(3)+' kW  |  P_total = '+pTotal.toFixed(1)+' W  |  Perdas = '+(pTotal-pUtil).toFixed(1)+' W';
+  var cv=document.getElementById('pwCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var maxW=W-80,barH=42,by=H/2-40;
+  var totalW=maxW,utilW=maxW*(eta/100);
+  // Total bar
+  ctx.fillStyle='rgba(0,0,0,.4)';ctx.strokeStyle='rgba(255,119,0,.2)';ctx.lineWidth=1;
+  ctx.fillRect(50,by,totalW,barH);ctx.strokeRect(50,by,totalW,barH);
+  ctx.save();ctx.shadowColor='#ff7700';ctx.shadowBlur=8;ctx.fillStyle='rgba(255,119,0,.5)';
+  ctx.fillRect(50,by,totalW,barH);ctx.restore();
+  // Useful bar
+  ctx.save();ctx.shadowColor='#00cc66';ctx.shadowBlur=10;ctx.fillStyle='#00cc66';
+  ctx.fillRect(50,by,utilW,barH);ctx.restore();
+  // Loss stripe
+  if(utilW<totalW-4){
+    ctx.save();ctx.fillStyle='rgba(255,34,85,.4)';ctx.fillRect(50+utilW,by,totalW-utilW,barH);ctx.restore();
+  }
+  // Labels
+  lbl(ctx,50+utilW/2,by+barH/2+5,'P_útil = '+pUtil.toFixed(0)+' W','#00cc66',10);
+  if(totalW-utilW>60)lbl(ctx,50+utilW+(totalW-utilW)/2,by+barH/2+5,'Perdas','rgba(255,34,85,.7)',9);
+  lbl(ctx,50+totalW+6,by+barH/2+5,'P_tot='+pTotal.toFixed(0)+'W','rgba(255,119,0,.6)',9,'left');
+  // η arc
+  var arcX=W/2,arcY=by+barH+55,arcR=38;
+  ctx.save();ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=8;
+  ctx.beginPath();ctx.arc(arcX,arcY,arcR,-Math.PI*0.75,Math.PI*0.75);ctx.stroke();ctx.restore();
+  ctx.save();ctx.shadowColor='#00cc66';ctx.shadowBlur=8;ctx.strokeStyle='#00cc66';ctx.lineWidth=8;ctx.lineCap='round';
+  var arcEnd=-Math.PI*0.75+(Math.PI*1.5)*(eta/100);
+  ctx.beginPath();ctx.arc(arcX,arcY,arcR,-Math.PI*0.75,arcEnd);ctx.stroke();ctx.restore();
+  lbl(ctx,arcX,arcY+5,eta+'%','#00cc66',13);
+  lbl(ctx,arcX,arcY+20,'η','rgba(0,204,102,.5)',9);
+  // Power over time bar
+  var yBy=by-42;
+  ctx.fillStyle='rgba(0,0,0,.3)';ctx.strokeStyle='rgba(255,221,0,.18)';ctx.lineWidth=1;
+  ctx.fillRect(50,yBy,totalW,26);ctx.strokeRect(50,yBy,totalW,26);
+  for(var i=0;i<totalW;i+=3){
+    var pct=i/totalW;
+    ctx.save();ctx.globalAlpha=0.6+0.4*Math.sin(pct*Math.PI);
+    ctx.fillStyle='rgba(255,221,0,'+(0.1+pct*0.3)+')';
+    ctx.fillRect(50+i,yBy,2,26);ctx.restore();
+  }
+  lbl(ctx,50+totalW/2,yBy+16,'τ = '+tau.toLocaleString('pt-BR')+' J  em  t = '+t+' s','rgba(255,221,0,.5)',9);
+}
+
+// ══ RAMP SIMULATION ═══════════════════════════
+var rampRunning=false,rampFric=false,rampY=0,rampVY=0,rampX=0,rampDist=0;
+function onRampSlide(){
+  document.getElementById('rampMV').textContent=+document.getElementById('rampM').value+' kg';
+  document.getElementById('rampHV').textContent=+document.getElementById('rampH').value+' m';
+  document.getElementById('rampMuV').textContent=(+document.getElementById('rampMu').value/100).toFixed(2);
+  if(!rampRunning)drawRamp(0,0,0,0);
+}
+function toggleRamp(){
+  if(!rampRunning){
+    rampRunning=true;
+    var h=+document.getElementById('rampH').value;
+    var m=+document.getElementById('rampM').value;
+    rampY=h;rampVY=0;rampX=0;rampDist=0;
+    document.getElementById('rampRunBtn').textContent='⏸ PAUSAR';
+    document.getElementById('rampRunBtn').classList.add('on');
+    animRamp();
+  } else {
+    rampRunning=false;
+    document.getElementById('rampRunBtn').textContent='▶ LANÇAR';
+    document.getElementById('rampRunBtn').classList.remove('on');
+  }
+}
+function resetRamp(){
+  rampRunning=false;rampY=0;rampVY=0;rampX=0;rampDist=0;
+  document.getElementById('rampRunBtn').textContent='▶ LANÇAR';
+  document.getElementById('rampRunBtn').classList.remove('on');
+  drawRamp(0,0,0,0);
+}
+function toggleRampFric(){
+  rampFric=!rampFric;
+  var btn=document.getElementById('rampFricBtn');
+  btn.textContent='◆ ATRITO: '+(rampFric?'ON':'OFF');
+  btn.classList.toggle('on',rampFric);
+  document.getElementById('rampMuCtrl').style.display=rampFric?'block':'none';
+}
+var rampDT=0.036;
+function animRamp(){
+  if(!rampRunning)return;
+  var m=+document.getElementById('rampM').value;
+  var h=+document.getElementById('rampH').value;
+  var mu=rampFric?+document.getElementById('rampMu').value/100:0;
+  // Ramp angle: assume 30° ramp
+  var theta=Math.PI/6;
+  var sinT=Math.sin(theta),cosT=Math.cos(theta);
+  // Forces along ramp: g*sin(theta) - mu*g*cos(theta)
+  var a=g*sinT-mu*g*cosT;
+  if(a<0)a=0; // doesn't slide if friction too strong
+  for(var i=0;i<1;i++){
+    rampVY+=a*rampDT;
+    var ds=rampVY*rampDT;
+    rampY-=ds*sinT;
+    rampX+=ds*cosT;
+    rampDist+=ds;
+    if(rampY<=0){rampY=0;rampVY=0;rampRunning=false;
+      document.getElementById('rampRunBtn').textContent='▶ LANÇAR';
+      document.getElementById('rampRunBtn').classList.remove('on');
+      break;
+    }
+  }
+  var ec=0.5*m*rampVY*rampVY;
+  var ep=m*g*rampY;
+  var eFric=m*g*h-ec-ep;eFric=Math.max(0,eFric);
+  drawRamp(rampY,rampVY,ec,ep,eFric,m,h,mu,rampDist);
+  if(rampRunning)requestAnimationFrame(animRamp);
+}
+function drawRamp(y,v,ec,ep,eFric,m,h,mu,dist){
+  m=m||+document.getElementById('rampM').value;
+  h=h||+document.getElementById('rampH').value;
+  mu=mu||0;dist=dist||0;
+  var cv=document.getElementById('rampCanvas');if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var gY=H-36,rampL=W-80;
+  var theta=Math.PI/6,sinT=Math.sin(theta),cosT=Math.cos(theta);
+  var rampTopX=40,rampTopY=gY-rampL*sinT;
+  var rampBotX=40+rampL*cosT,rampBotY=gY;
+  // Scale factor: screen pixels per meter
+  var sc=rampL*cosT/Math.max(rampL*cosT/g,1);
+  var scM=(rampBotX-rampTopX)/(h/Math.tan(theta));
+  // Ramp surface
+  ctx.save();ctx.shadowColor='rgba(0,204,102,.4)';ctx.shadowBlur=8;ctx.strokeStyle='#00cc66';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(rampTopX,rampTopY);ctx.lineTo(rampBotX,rampBotY);ctx.stroke();
+  ground(ctx,gY,W);
+  ctx.strokeStyle='rgba(0,204,102,.2)';ctx.lineWidth=1;ctx.setLineDash([4,5]);
+  ctx.beginPath();ctx.moveTo(rampTopX,rampTopY);ctx.lineTo(rampTopX,gY);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+  // Height label
+  lbl(ctx,rampTopX-22,(rampTopY+gY)/2,'h='+h+'m','rgba(0,170,255,.5)',9,'right');
+  // Object on ramp
+  var fracDown=1-(y/h);
+  var objX=rampTopX+(rampBotX-rampTopX)*fracDown;
+  var objY=rampTopY+(gY-rampTopY)*fracDown;
+  var bRad=12;
+  ctx.save();ctx.shadowColor='#ffdd00';ctx.shadowBlur=16;
+  var bg5=ctx.createRadialGradient(objX-bRad*.3,objY-bRad*.3,1,objX,objY,bRad);
+  bg5.addColorStop(0,'#fff');bg5.addColorStop(.4,'#ffdd00');bg5.addColorStop(1,'rgba(255,100,0,.5)');
+  ctx.beginPath();ctx.arc(objX,objY,bRad,0,Math.PI*2);ctx.fillStyle=bg5;ctx.fill();ctx.restore();
+  lbl(ctx,objX,objY+bRad+14,'m='+m+'kg','rgba(255,221,0,.6)',9);
+  // Velocity arrow along ramp
+  if(v>0.3){
+    var vScale=Math.min(60,v*4);
+    ga(ctx,objX,objY,objX+cosT*vScale,objY+sinT*vScale,'rgba(0,204,102,.8)',2,10);
+    lbl(ctx,objX+cosT*vScale+8,objY+sinT*vScale,'v='+v.toFixed(1)+'m/s','rgba(0,204,102,.7)',9,'left');
+  }
+  // Energy bar chart (right panel)
+  var Em0=m*g*h;
+  var barX=W-130,barTop=rampTopY,barBot=gY,barH2=barBot-barTop,barW2=34;
+  var ecH=Math.min(barH2,barH2*(ec/Em0));
+  var epH=Math.min(barH2,barH2*(ep/Em0));
+  var efH=Math.min(barH2,barH2*(eFric/Em0));
+  // Background
+  ctx.fillStyle='rgba(0,0,0,.4)';ctx.strokeStyle='rgba(0,204,102,.15)';ctx.lineWidth=1;
+  ctx.fillRect(barX,barTop,barW2,barH2);ctx.strokeRect(barX,barTop,barW2,barH2);
+  // Ep (bottom to height)
+  ctx.save();ctx.shadowColor='#00aaff';ctx.shadowBlur=8;ctx.fillStyle='#00aaff';
+  ctx.fillRect(barX,barTop+barH2-epH,barW2,epH);ctx.restore();
+  // Ec (above Ep)
+  ctx.save();ctx.shadowColor='#ffdd00';ctx.shadowBlur=8;ctx.fillStyle='#ffdd00';
+  ctx.fillRect(barX,barTop+barH2-epH-ecH,barW2,ecH);ctx.restore();
+  // Friction heat
+  if(efH>2){ctx.save();ctx.shadowColor='#ff2255';ctx.shadowBlur=8;ctx.fillStyle='rgba(255,34,85,.6)';
+    ctx.fillRect(barX,barTop+barH2-epH-ecH-efH,barW2,efH);ctx.restore();}
+  lbl(ctx,barX+barW2/2,barBot+14,'Em','rgba(0,204,102,.5)',8);
+  // Labels
+  lbl(ctx,barX-38,barTop+barH2-epH/2-ecH/2,'Ec','rgba(255,221,0,.7)',9,'right');
+  lbl(ctx,barX-38,barBot-epH/2,'Ep','rgba(0,170,255,.7)',9,'right');
+  if(efH>8)lbl(ctx,barX-38,barTop+barH2-epH-ecH-efH/2,'Q','rgba(255,34,85,.7)',9,'right');
+  // Info
+  document.getElementById('rampInfo').textContent=
+    'Ec = '+ec.toFixed(1)+' J  |  Ep = '+ep.toFixed(1)+' J  |  Em = '+(ec+ep).toFixed(1)+' J  |  Q_atrito = '+(eFric||0).toFixed(1)+' J';
+}
+
+// ══ QUIZ ══════════════════════════════════════
+var QA={q1:0,q2:0,q3:0,q4:0,q5:0,q6:0,q7:0,q8:0};
+var FB={
+  q1:{c:'CORRETO! τ = F·d·cosθ = 50×4×cos0° = 50×4×1 = 200 J. θ=0° → cosθ=1.',w:'ERRADO. τ = F·d·cos0° = 50×4×1 = 200 J.'},
+  q2:{c:'CORRETO! A força normal é sempre perpendicular à superfície, e para movimento horizontal ela é perpendicular ao deslocamento (θ=90°). τ_N = N·d·cos90° = 0.',w:'ERRADO. Normal é perpendicular ao deslocamento → cos90° = 0 → τ_N = 0. A normal nunca realiza trabalho em superfícies planas.'},
+  q3:{c:'CORRETO! Ec = ½mv² = ½×1000×400 = 200.000 J = 200 kJ.',w:'ERRADO. Ec = ½mv² = ½×1000×(20)² = ½×1000×400 = 200.000 J.'},
+  q4:{c:'CORRETO! τ_total = ΔEc = ½m(v_f²-v_i²) = ½×4×(25-9) = ½×4×16 = 32 J.',w:'ERRADO. τ = ΔEc = ½×4×(5²-3²) = ½×4×(25-9) = 2×16 = 32 J.'},
+  q5:{c:'CORRETO! Conservação: mgh = ½mv² → v = √(2gh) = √(2×10×20) = √400 = 20 m/s.',w:'ERRADO. mgh = ½mv² → v = √(2gh) = √(2×10×20) = √400 = 20 m/s.'},
+  q6:{c:'CORRETO! t = 2 min = 120 s. P = τ/t = 60.000/120 = 500 W.',w:'ERRADO. Atenção: t = 2 min = 120 s. P = 60.000/120 = 500 W. Nunca esqueça de converter minutos para segundos!'},
+  q7:{c:'CORRETO! η = τ_útil/τ_total × 100% = 400/500 × 100% = 80%.',w:'ERRADO. η = (400/500)×100% = 80%.'},
+  q8:{c:'CORRETO! Em_i = mgh = 3×10×5 = 150 J. Em_f = Ec_f = 100 J (chegou ao solo com Ep=0). ΔEm = τ_atrito → 100 - 150 = -50 J. Energia dissipada = 50 J.',w:'ERRADO. Em_i = mgh = 150 J. Em_f = 100 J. |ΔEm| = |τ_atrito| = 50 J.'}
+};
+var answered=0;
+function ans(btn,qId,result){
+  var card=document.getElementById(qId);card.querySelectorAll('.obt').forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('f_'+qId);
+  if(result==='correct'){btn.classList.add('correct');fb.textContent=FB[qId].c;fb.className='fb show ok';QA[qId]=1;}
+  else{btn.classList.add('wrong');fb.textContent=FB[qId].w;fb.className='fb show err';
+    card.querySelectorAll('.obt').forEach(function(b){if(b.getAttribute('onclick').indexOf("'correct'")>-1)b.classList.add('correct');});}
+  answered++;updateP();if(answered===8)showScore();
+}
+function updateP(){document.getElementById('pBar').style.width=(answered/8*100)+'%';document.getElementById('pTxt').textContent=answered+' / 8 respondidas';}
+function showScore(){
+  var sc=0;Object.values(QA).forEach(function(v){sc+=v;});
+  var p=document.getElementById('spanel');p.style.display='block';document.getElementById('scv').textContent=sc+'/8';
+  var msgs=['Revise os conceitos e tente novamente!','Bom início! Continue estudando.','Indo bem! Pratique mais.','Ótimo domínio de Energia!','Perfeito! ⚡ Resultado impecável!'];
+  var idx=sc<=2?0:sc<=4?1:sc<=5?2:sc<=7?3:4;document.getElementById('scm').textContent=msgs[idx];
+  var cols=['#ff2255','#ff7700','#ff7700','#00cc66','#ffdd00'];
+  document.getElementById('scv').style.color=cols[idx];document.getElementById('scv').style.textShadow='0 0 20px '+cols[idx];
+  p.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQ(){
+  Object.keys(QA).forEach(function(k){QA[k]=0;});answered=0;updateP();document.getElementById('spanel').style.display='none';
+  ['q1','q2','q3','q4','q5','q6','q7','q8'].forEach(function(id){
+    document.getElementById(id).querySelectorAll('.obt').forEach(function(b){b.disabled=false;b.classList.remove('correct','wrong');});
+    var fb=document.getElementById('f_'+id);fb.className='fb';fb.textContent='';
+  });
+}
+window.addEventListener('load',function(){
+  drawWork();calcEc();drawEp();calcPow();
+  drawPend();drawRamp(0,0,0,0,0);
+});
+</script>
+</body>
+</html>

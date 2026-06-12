@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Gravitação | Aula Interativa</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p1:#aa44ff;--p2:#cc66ff;--p3:#7700cc;--pk:#ff44cc;
+  --gd:#ffaa00;--cy:#44aaff;--gr:#44ffaa;--wh:#f0e8ff;
+  --bg:#020008;--pan:#04000e;--card:#07001a;
+  --b1:rgba(170,68,255,.24);--b2:rgba(255,68,204,.2);--bg2:rgba(255,170,0,.2);
+  --dim:#5a2a8a;--txt:#d0b0ff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#020008;color:#d0b0ff;font-family:'Rajdhani',sans-serif;font-size:17px;line-height:1.7;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(170,68,255,.01) 2px,rgba(170,68,255,.01) 4px);pointer-events:none;z-index:9999}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(170,68,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(170,68,255,.028) 1px,transparent 1px);background-size:58px 58px;animation:gm 24s linear infinite;z-index:0}
+@keyframes gm{0%{background-position:0 0}100%{background-position:58px 58px}}
+#bgStars{position:fixed;inset:0;z-index:1;pointer-events:none}
+header{position:relative;z-index:10;text-align:center;padding:82px 20px 58px;border-bottom:1px solid rgba(170,68,255,.24)}
+.htag{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--p1);letter-spacing:4px;border:1px solid var(--p1);padding:4px 18px;margin-bottom:22px;animation:tp 2.4s ease-in-out infinite}
+@keyframes tp{0%,100%{box-shadow:0 0 4px var(--p1),inset 0 0 4px rgba(170,68,255,.1)}50%{box-shadow:0 0 22px var(--p1),0 0 60px rgba(170,68,255,.22),inset 0 0 14px rgba(170,68,255,.18)}}
+h1.title{font-family:'Orbitron',monospace;font-size:clamp(2rem,7vw,5rem);font-weight:900;letter-spacing:.07em;line-height:1;color:#fff;text-shadow:0 0 10px var(--p1),0 0 40px var(--p1),0 0 100px rgba(170,68,255,.35);animation:flk 9s linear infinite}
+@keyframes flk{0%,92%,100%{opacity:1}93%{opacity:.78}94.5%{opacity:1}96%{opacity:.62}97%{opacity:1}}
+.tsub{font-family:'Rajdhani',sans-serif;font-weight:300;font-size:.95rem;color:var(--dim);letter-spacing:7px;text-transform:uppercase;margin-top:10px}
+.orbit-deco{display:flex;justify-content:center;margin-top:18px}
+.orbit-deco svg{animation:orbitSpin 12s linear infinite;filter:drop-shadow(0 0 8px #aa44ff)}
+@keyframes orbitSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+nav{position:sticky;top:0;z-index:100;background:rgba(2,0,8,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(170,68,255,.16);display:flex;justify-content:center;gap:6px;padding:10px 18px;flex-wrap:wrap}
+nav a{font-family:'Orbitron',monospace;font-size:.57rem;letter-spacing:2px;color:var(--dim);text-decoration:none;padding:6px 13px;border:1px solid rgba(170,68,255,.17);transition:all .28s}
+nav a:hover{color:var(--p1);border-color:var(--p1);box-shadow:0 0 12px var(--p1),inset 0 0 8px rgba(170,68,255,.1);text-shadow:0 0 8px var(--p1)}
+main{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:0 22px 80px}
+section{margin-top:78px}
+.sh{display:flex;align-items:center;gap:14px;margin-bottom:34px}
+.sn{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--p1);opacity:.6}
+h2.st{font-family:'Orbitron',monospace;font-size:clamp(1.15rem,2.8vw,1.75rem);font-weight:700;color:#fff;letter-spacing:.05em}
+h2.st span{color:var(--p1);text-shadow:0 0 12px var(--p1)}
+.sl{flex:1;height:1px;background:linear-gradient(90deg,var(--p1),transparent);opacity:.38}
+.card{background:var(--card);border:1px solid var(--b1);padding:28px 30px;margin-bottom:20px;position:relative;transition:all .28s}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--p1);box-shadow:0 0 10px var(--p1)}
+.card:hover{border-color:var(--p1);box-shadow:0 0 22px rgba(170,68,255,.1),inset 0 0 22px rgba(170,68,255,.03)}
+.card.pk::before{background:var(--pk);box-shadow:0 0 10px var(--pk)}.card.pk{border-color:var(--b2)}.card.pk:hover{border-color:var(--pk)}
+.card.gd::before{background:var(--gd);box-shadow:0 0 10px var(--gd)}.card.gd{border-color:var(--bg2)}.card.gd:hover{border-color:var(--gd)}
+.card.cy::before{background:var(--cy);box-shadow:0 0 10px var(--cy)}.card.cy{border-color:rgba(68,170,255,.2)}.card.cy:hover{border-color:var(--cy)}
+.card.gr::before{background:var(--gr);box-shadow:0 0 10px var(--gr)}.card.gr{border-color:rgba(68,255,170,.2)}.card.gr:hover{border-color:var(--gr)}
+h3{font-family:'Orbitron',monospace;font-size:.88rem;color:var(--p1);text-shadow:0 0 8px var(--p1);margin-bottom:12px;letter-spacing:.05em}
+.card.pk h3{color:var(--pk);text-shadow:0 0 8px var(--pk)}.card.gd h3{color:var(--gd);text-shadow:0 0 8px var(--gd)}
+.card.cy h3{color:var(--cy);text-shadow:0 0 8px var(--cy)}.card.gr h3{color:var(--gr);text-shadow:0 0 8px var(--gr)}
+p{color:var(--txt);margin-bottom:10px}
+.law{background:rgba(170,68,255,.05);border:1px solid rgba(170,68,255,.38);border-left:4px solid var(--p1);padding:16px 20px;margin:12px 0;font-family:'Share Tech Mono',monospace;font-size:.88rem;color:var(--p1);text-shadow:0 0 4px rgba(170,68,255,.3);line-height:1.9}
+.law.pk{background:rgba(255,68,204,.05);border-color:rgba(255,68,204,.38);border-left-color:var(--pk);color:var(--pk)}
+.law.gd{background:rgba(255,170,0,.05);border-color:rgba(255,170,0,.38);border-left-color:var(--gd);color:var(--gd)}
+.law.cy{background:rgba(68,170,255,.05);border-color:rgba(68,170,255,.38);border-left-color:var(--cy);color:var(--cy)}
+.law.gr{background:rgba(68,255,170,.05);border-color:rgba(68,255,170,.38);border-left-color:var(--gr);color:var(--gr)}
+.fhero{text-align:center;padding:30px 18px;margin:20px 0;background:var(--pan);border:1px solid rgba(170,68,255,.28);position:relative;overflow:hidden}
+.fhero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(170,68,255,.08) 0%,transparent 70%)}
+.fhero .bf{font-family:'Orbitron',monospace;font-size:clamp(1.3rem,3.2vw,2.3rem);font-weight:700;color:#fff;text-shadow:0 0 14px var(--p1),0 0 35px rgba(170,68,255,.42);letter-spacing:.04em;line-height:1.35}
+.fhero .fl{font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:3px;margin-top:10px}
+.vis{background:var(--pan);border:1px solid var(--b1);padding:20px;margin:20px 0;overflow:hidden}
+.vis.pk{border-color:var(--b2)}.vis.gd{border-color:var(--bg2);border-width:2px}
+.vis.cy{border-color:rgba(68,170,255,.2)}
+.vtag{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:var(--dim);letter-spacing:3px;margin-bottom:14px;text-transform:uppercase;text-align:center}
+canvas{display:block;margin:0 auto;max-width:100%}
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:18px;margin:18px 0}
+table{width:100%;border-collapse:collapse;margin:14px 0}
+th{background:rgba(170,68,255,.09);color:var(--p1);font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:2px;padding:10px 13px;text-align:left;border:1px solid rgba(170,68,255,.18)}
+td{padding:10px 13px;border:1px solid rgba(170,68,255,.1);color:var(--txt);font-size:.92rem}
+tr:hover td{background:rgba(170,68,255,.03)}
+.ctrl-row{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;margin:14px 0}
+.ctrl{text-align:center}
+.ctrl label{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--p1);display:block;margin-bottom:5px;letter-spacing:1px}
+input[type=range]{-webkit-appearance:none;width:180px;height:4px;background:rgba(170,68,255,.2);outline:none;border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--p1);border-radius:50%;cursor:pointer;box-shadow:0 0 8px var(--p1)}
+.ctrl-val{font-family:'Orbitron',monospace;font-size:1rem;color:var(--p1);text-shadow:0 0 8px var(--p1);margin-top:5px}
+.tabs{display:flex;gap:7px;justify-content:center;margin:12px 0;flex-wrap:wrap}
+.tab{font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:2px;color:var(--dim);padding:7px 16px;border:1px solid rgba(170,68,255,.2);background:transparent;cursor:pointer;transition:all .26s}
+.tab:hover{color:var(--p1);border-color:var(--p1)}
+.tab.active{color:#020008;background:var(--p1);border-color:var(--p1);box-shadow:0 0 14px var(--p1)}
+.step{display:flex;gap:14px;align-items:flex-start;background:rgba(170,68,255,.04);border:1px solid rgba(170,68,255,.12);padding:12px 16px;margin-bottom:8px}
+.sn2{font-family:'Orbitron',monospace;font-size:.75rem;color:var(--p1);min-width:22px}
+/* CHALLENGE */
+.challenge-box{background:linear-gradient(135deg,rgba(170,68,255,.08),rgba(255,170,0,.06));border:2px solid rgba(255,170,0,.5);padding:0;margin:20px 0;position:relative;overflow:hidden}
+.challenge-header{background:linear-gradient(90deg,rgba(255,170,0,.15),rgba(170,68,255,.15));padding:18px 24px;border-bottom:1px solid rgba(255,170,0,.3);display:flex;align-items:center;gap:14px}
+.challenge-icon{font-size:1.8rem;filter:drop-shadow(0 0 10px #ffaa00)}
+.challenge-title{font-family:'Orbitron',monospace;font-size:1rem;color:#ffaa00;text-shadow:0 0 12px #ffaa00;letter-spacing:.05em}
+.challenge-body{padding:22px 24px}
+.sim-controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+.sim-btn{font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:2px;padding:9px 20px;border:1px solid;background:transparent;cursor:pointer;transition:all .28s}
+.sim-btn.main{color:#ffaa00;border-color:#ffaa00}.sim-btn.main:hover{background:rgba(255,170,0,.12);box-shadow:0 0 14px #ffaa00}
+.sim-btn.sec{color:var(--p1);border-color:var(--p1)}.sim-btn.sec:hover{background:rgba(170,68,255,.12);box-shadow:0 0 14px var(--p1)}
+.sim-btn.danger{color:var(--pk);border-color:var(--pk)}.sim-btn.danger:hover{background:rgba(255,68,204,.12);box-shadow:0 0 14px var(--pk)}
+.planet-selector{display:flex;gap:14px;justify-content:center;margin:10px 0}
+.psel{font-family:'Share Tech Mono',monospace;font-size:.72rem;letter-spacing:1px;padding:8px 18px;border:1px solid;cursor:pointer;transition:all .28s;display:flex;align-items:center;gap:8px}
+.psel .pdot{width:12px;height:12px;border-radius:50%}
+.psel.p1sel{color:#44aaff;border-color:rgba(68,170,255,.4)}.psel.p1sel.active{background:rgba(68,170,255,.15);border-color:#44aaff;box-shadow:0 0 10px #44aaff}
+.psel.p2sel{color:#ff4488;border-color:rgba(255,68,136,.4)}.psel.p2sel.active{background:rgba(255,68,136,.15);border-color:#ff4488;box-shadow:0 0 10px #ff4488}
+#simCanvas{cursor:crosshair;border:1px solid rgba(170,68,255,.2)}
+#simInfo{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--dim);text-align:center;margin-top:10px;letter-spacing:1px;min-height:20px}
+.planet-data{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.pd-box{background:rgba(0,0,0,.4);border:1px solid;padding:10px 14px}
+.pd-box.p1{border-color:rgba(68,170,255,.35)}.pd-box.p2{border-color:rgba(255,68,136,.35)}
+.pd-title{font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:2px;margin-bottom:6px}
+.pd-title.p1{color:#44aaff}.pd-title.p2{color:#ff4488}
+.pd-val{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--txt);line-height:1.7}
+/* quiz */
+.qc{background:var(--card);border:1px solid var(--b1);padding:24px 28px;margin-bottom:16px;transition:all .28s}
+.qc:hover{border-color:var(--p1)}
+.qnum{font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--p1);letter-spacing:3px;margin-bottom:8px}
+.qtext{font-size:1rem;font-weight:600;color:#fff;margin-bottom:16px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.obt{background:rgba(0,0,0,.4);border:1px solid rgba(170,68,255,.22);color:var(--txt);padding:10px 15px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:.92rem;cursor:pointer;transition:all .24s;display:flex;align-items:flex-start;gap:11px}
+.obt:hover{border-color:var(--p1);background:rgba(170,68,255,.07);color:#fff}
+.obt.correct{border-color:var(--gr)!important;background:rgba(68,255,170,.1)!important;color:var(--gr)!important;box-shadow:0 0 12px rgba(68,255,170,.25)!important}
+.obt.wrong{border-color:var(--pk)!important;background:rgba(255,68,204,.1)!important;color:var(--pk)!important}
+.obt:disabled{cursor:not-allowed}
+.ol{font-family:'Orbitron',monospace;font-size:.58rem;color:var(--p1);min-width:17px;padding-top:2px}
+.fb{margin-top:11px;padding:10px 13px;font-family:'Share Tech Mono',monospace;font-size:.78rem;display:none;border-left:3px solid;line-height:1.6}
+.fb.show{display:block}
+.fb.ok{color:var(--gr);border-color:var(--gr);background:rgba(68,255,170,.05)}
+.fb.err{color:var(--pk);border-color:var(--pk);background:rgba(255,68,204,.05)}
+.sp{background:var(--card);border:1px solid var(--p1);padding:26px;text-align:center;box-shadow:0 0 30px rgba(170,68,255,.12);margin-top:26px}
+.scl{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim);letter-spacing:3px;margin-bottom:8px}
+.scv{font-family:'Orbitron',monospace;font-size:2.8rem;font-weight:900;color:var(--p1);text-shadow:0 0 20px var(--p1)}
+.scm{color:var(--dim);margin-top:7px;font-size:.93rem}
+.rbtn{background:transparent;border:1px solid var(--p1);color:var(--p1);font-family:'Orbitron',monospace;font-size:.62rem;letter-spacing:2px;padding:9px 24px;cursor:pointer;margin-top:13px;transition:all .28s}
+.rbtn:hover{background:rgba(170,68,255,.1);box-shadow:0 0 14px var(--p1)}
+.pw{height:4px;background:rgba(170,68,255,.1);margin-top:16px;border-radius:2px;overflow:hidden}
+.pf{height:100%;background:linear-gradient(90deg,var(--p1),var(--pk));transition:width .5s ease;box-shadow:0 0 10px var(--p1)}
+.ibox{background:linear-gradient(135deg,rgba(170,68,255,.05),rgba(255,68,204,.04));border:1px solid rgba(170,68,255,.2);padding:24px 28px;margin-top:32px;position:relative}
+.ibox::after{content:'★';position:absolute;top:-14px;left:22px;font-size:1.2rem;color:var(--p1);text-shadow:0 0 10px var(--p1);background:#020008;padding:0 8px}
+.dlbtn{display:inline-block;font-family:'Orbitron',monospace;font-size:.67rem;letter-spacing:3px;color:var(--p1);border:1px solid var(--p1);padding:13px 38px;text-decoration:none;transition:all .28s;box-shadow:0 0 10px rgba(170,68,255,.14)}
+.dlbtn:hover{background:rgba(170,68,255,.1);box-shadow:0 0 24px var(--p1)}
+.hl{color:var(--p1);font-weight:600}.hlk{color:var(--pk);font-weight:600}
+.hlg{color:var(--gd);font-weight:600}.hlc{color:var(--cy);font-weight:600}.hlr{color:var(--gr);font-weight:600}
+footer{position:relative;z-index:10;text-align:center;padding:34px 20px;border-top:1px solid rgba(170,68,255,.22);font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:2px}
+@media(max-width:600px){header{padding:46px 14px 34px}main{padding:0 13px 58px}.card{padding:16px 18px}.fhero .bf{font-size:1.3rem}.planet-data{grid-template-columns:1fr}}
+
+/* ── SIMULATION v2 STYLES ── */
+.sim-panel{background:rgba(0,0,0,.5);border:1px solid rgba(170,68,255,.3);padding:18px 22px;margin-bottom:0}
+.sim-row{display:flex;gap:24px;align-items:flex-end;flex-wrap:wrap;justify-content:center}
+.spc{text-align:center;min-width:160px}
+.spc label{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:#aa44ff;letter-spacing:2px;display:block;margin-bottom:5px}
+.spc .sv{font-family:'Orbitron',monospace;font-size:.9rem;color:#aa44ff;text-shadow:0 0 8px #aa44ff;margin-top:4px}
+.sim-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.sbtn{font-family:'Orbitron',monospace;font-size:.58rem;letter-spacing:2px;padding:8px 16px;border:1px solid;background:transparent;cursor:pointer;transition:all .26s}
+.sbtn.run{color:#44ffaa;border-color:#44ffaa}.sbtn.run:hover,.sbtn.run.on{background:rgba(68,255,170,.12);box-shadow:0 0 12px #44ffaa}
+.sbtn.rst{color:#ff4488;border-color:#ff4488}.sbtn.rst:hover{background:rgba(255,68,136,.12);box-shadow:0 0 12px #ff4488}
+.sbtn.tog{color:#aa44ff;border-color:rgba(170,68,255,.45)}.sbtn.tog:hover,.sbtn.tog.on{background:rgba(170,68,255,.14);border-color:#aa44ff;box-shadow:0 0 10px #aa44ff}
+.sbtn.gd{color:#ffaa00;border-color:rgba(255,170,0,.45)}.sbtn.gd:hover,.sbtn.gd.on{background:rgba(255,170,0,.12);border-color:#ffaa00;box-shadow:0 0 10px #ffaa00}
+#simStatus{font-family:'Share Tech Mono',monospace;font-size:.72rem;text-align:center;margin:10px 0 4px;letter-spacing:1px;min-height:18px;color:#aa44ff}
+.sim-hint{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:rgba(170,68,255,.5);text-align:center;margin-top:6px;letter-spacing:1px}
+.body-panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px}
+.bp-box{background:rgba(0,0,0,.5);border:1px solid;padding:10px 14px;font-family:'Share Tech Mono',monospace;font-size:.72rem;line-height:1.8}
+.bp-box.star{border-color:rgba(255,170,0,.35);color:#ffaa00}
+.bp-box.p1c{border-color:rgba(68,170,255,.35);color:#44aaff}
+.bp-box.p2c{border-color:rgba(255,68,136,.35);color:#ff4488}
+.bp-box.p3c{border-color:rgba(68,255,170,.35);color:#44ffaa}
+.bp-name{font-family:'Orbitron',monospace;font-size:.65rem;letter-spacing:2px;margin-bottom:4px}
+.clog{background:rgba(0,0,0,.5);border:1px solid rgba(255,68,136,.25);padding:10px 14px;margin-top:10px;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:rgba(255,68,136,.7);max-height:72px;overflow-y:auto}
+.clog-title{color:#ff4488;letter-spacing:2px;margin-bottom:4px;font-family:'Orbitron',monospace;font-size:.6rem}
+.mass-preview{display:inline-flex;align-items:center;gap:8px;margin-top:6px;justify-content:center}
+.mp-dot{border-radius:50%;display:inline-block;box-shadow:0 0 8px currentColor;transition:all .3s}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<canvas id="bgStars"></canvas>
+
+<header>
+  <div class="htag">MÓDULO 08 // GRAVITAÇÃO // ENSINO MÉDIO</div>
+  <h1 class="title">GRAVITAÇÃO</h1>
+  <p class="tsub">Kepler · Newton · Gravitação Universal</p>
+  <div class="orbit-deco">
+    <svg width="120" height="60" viewBox="0 0 120 60">
+      <ellipse cx="60" cy="30" rx="55" ry="22" stroke="#aa44ff" stroke-width="1.5" fill="none" opacity=".6"/>
+      <circle cx="36" cy="30" r="5" fill="#ffaa00" opacity=".9"/>
+      <circle cx="112" cy="30" r="7" fill="#aa44ff" opacity=".8"/>
+    </svg>
+  </div>
+</header>
+
+<nav>
+  <a href="#intro">★ Intro</a>
+  <a href="#kepler1">★ Kepler I</a>
+  <a href="#kepler2">★ Kepler II</a>
+  <a href="#kepler3">★ Kepler III</a>
+  <a href="#newton">★ Newton</a>
+  <a href="#desafio">★ Desafio</a>
+  <a href="#exercicios">★ Exercícios</a>
+  <a href="#download">★ PDF</a>
+</nav>
+
+<main>
+
+<!-- INTRO -->
+<section id="intro">
+  <div class="sh"><span class="sn">01</span><h2 class="st">INTRODUÇÃO À <span>GRAVITAÇÃO</span></h2><div class="sl"></div></div>
+  <div class="ibox">
+    <p>A <span class="hl">gravitação</span> é uma das quatro forças fundamentais da natureza e a mais perceptível em grande escala. Ela governa o movimento dos planetas, estrelas, galáxias — e até a trajetória de uma maçã caindo de uma árvore. É a força que mantém a Lua em órbita ao redor da Terra e a Terra ao redor do Sol.</p>
+    <p>Johannes <span class="hlg">Kepler</span> (1571–1630) descreveu matematicamente as órbitas planetárias em suas três leis. Isaac <span class="hl">Newton</span> (1643–1727) foi além: explicou <em>por que</em> os planetas seguem essas trajetórias, formulando a Lei da Gravitação Universal.</p>
+  </div>
+  <div class="igrid" style="margin-top:22px">
+    <div class="card"><h3>CONTEXTO HISTÓRICO</h3>
+      <p>✦ <span class="hl">Ptolomeu</span> (séc. II): modelo geocêntrico — Terra no centro<br>
+         ✦ <span class="hlg">Copérnico</span> (1543): modelo heliocêntrico — Sol no centro<br>
+         ✦ <span class="hlg">Kepler</span> (1609–1619): três leis das órbitas planetárias<br>
+         ✦ <span class="hl">Galileu</span> (1610): confirmação com telescópio<br>
+         ✦ <span class="hl">Newton</span> (1687): Lei da Gravitação Universal</p>
+    </div>
+    <div class="card gd">
+      <h3>FORÇA GRAVITACIONAL</h3>
+      <p>Toda massa atrai toda outra massa. A força é <span class="hlg">sempre atrativa</span>, nunca repulsiva. É de alcance infinito, mas decresce com o quadrado da distância.</p>
+      <div class="law gd" style="font-size:.83rem">F = G · m₁ · m₂ / r²<br>G = 6,674 × 10⁻¹¹ N·m²/kg²</div>
+    </div>
+    <div class="card cy">
+      <h3>EFEITOS DA GRAVITAÇÃO</h3>
+      <p>✦ <span class="hlc">Órbitas</span> de planetas, satélites, cometas<br>
+         ✦ <span class="hlc">Marés</span> oceânicas (Lua + Sol)<br>
+         ✦ <span class="hlc">Peso</span> dos objetos (campo gravitacional terrestre)<br>
+         ✦ <span class="hlc">Formação</span> de estrelas e galáxias<br>
+         ✦ <span class="hlc">Buracos negros</span> (gravitação extrema)</p>
+    </div>
+  </div>
+</section>
+
+<!-- KEPLER 1 -->
+<section id="kepler1">
+  <div class="sh"><span class="sn">02</span><h2 class="st">1ª LEI DE KEPLER — <span>ÓRBITAS ELÍPTICAS</span></h2><div class="sl"></div></div>
+  <div class="card">
+    <h3>ENUNCIADO</h3>
+    <p>Cada planeta descreve uma <span class="hl">órbita elíptica</span> ao redor do Sol, com o Sol ocupando um dos <span class="hl">focos</span> da elipse. A órbita não é um círculo perfeito — é uma elipse (círculo achatado), com dois pontos especiais chamados focos.</p>
+  </div>
+  <div class="fhero">
+    <div class="bf">Órbita = ELIPSE &nbsp;|&nbsp; Sol em um dos FOCOS</div>
+    <div class="fl">Periélio: ponto mais próximo do Sol  |  Afélio: ponto mais distante</div>
+  </div>
+  <div class="vis">
+    <p class="vtag">[ ANIMAÇÃO — 1ª LEI DE KEPLER ]</p>
+    <canvas id="k1Canvas" width="700" height="310"></canvas>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim);text-align:center;margin-top:6px">
+      O Sol fica em um dos focos da elipse — NÃO no centro geométrico
+    </div>
+  </div>
+  <div class="igrid">
+    <div class="card"><h3>ELIPSE</h3>
+      <p>Uma elipse é definida por seus dois focos F₁ e F₂. Para qualquer ponto P na elipse: <span class="hl">PF₁ + PF₂ = 2a</span> (constante), onde a é o semi-eixo maior.</p>
+      <div class="law" style="font-size:.82rem">a = semi-eixo maior<br>b = semi-eixo menor<br>c = distância foco-centro: c² = a² − b²<br>e = excentricidade: e = c/a (0 = círculo)</div>
+    </div>
+    <div class="card pk"><h3>PERIÉLIO E AFÉLIO</h3>
+      <p>✦ <span class="hlk">Periélio</span>: ponto mais próximo do Sol (r_min = a−c = a(1−e))<br>
+         ✦ <span class="hlk">Afélio</span>: ponto mais distante (r_max = a+c = a(1+e))<br>
+         ✦ Terra: e ≈ 0,017 (quase circular)<br>
+         ✦ Plutão: e ≈ 0,25 (bem elíptica)</p>
+    </div>
+  </div>
+</section>
+
+<!-- KEPLER 2 -->
+<section id="kepler2">
+  <div class="sh"><span class="sn">03</span><h2 class="st">2ª LEI DE KEPLER — <span>LEI DAS ÁREAS</span></h2><div class="sl"></div></div>
+  <div class="card pk">
+    <h3>ENUNCIADO</h3>
+    <p>O segmento que une o Sol a um planeta (raio vetor) varre <span class="hlk">áreas iguais em tempos iguais</span>. Isso implica que o planeta se move mais <span class="hlk">rápido quando está próximo do Sol</span> (periélio) e mais <span class="hlk">lento quando está distante</span> (afélio).</p>
+  </div>
+  <div class="fhero" style="border-color:rgba(255,68,204,.3)">
+    <div class="bf" style="text-shadow:0 0 14px var(--pk),0 0 35px rgba(255,68,204,.42)">
+      ΔA/Δt = constante &nbsp;|&nbsp; v_periélio > v_afélio
+    </div>
+    <div class="fl" style="color:var(--pk)">Conservação do momento angular: L = m·r·v⊥ = constante</div>
+  </div>
+  <div class="vis pk">
+    <p class="vtag" style="color:var(--pk)">[ ANIMAÇÃO — 2ª LEI DE KEPLER (ÁREAS IGUAIS) ]</p>
+    <canvas id="k2Canvas" width="700" height="320"></canvas>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--dim);text-align:center;margin-top:6px">
+      Áreas verdes (periélio) e roxas (afélio) varridas no mesmo intervalo de tempo são IGUAIS
+    </div>
+  </div>
+  <div class="igrid">
+    <div class="card pk"><h3>CONSERVAÇÃO DO MOMENTO ANGULAR</h3>
+      <p>A 2ª Lei de Kepler é consequência direta da <span class="hlk">conservação do momento angular</span> (L = m·r×v = cte). Como não há torque externo, L é constante, o que implica que r·v⊥ = cte.</p>
+      <div class="law pk" style="font-size:.83rem">r₁·v₁ = r₂·v₂<br>v_max no periélio (r mínimo)<br>v_min no afélio (r máximo)</div>
+    </div>
+    <div class="card"><h3>EXEMPLO PRÁTICO</h3>
+      <p>A Terra está mais próxima do Sol em <span class="hl">janeiro</span> (periélio: ~147 M km) e mais distante em <span class="hl">julho</span> (afélio: ~152 M km). Por isso, o verão do hemisfério sul é ligeiramente mais curto e quente.</p>
+    </div>
+  </div>
+</section>
+
+<!-- KEPLER 3 -->
+<section id="kepler3">
+  <div class="sh"><span class="sn">04</span><h2 class="st">3ª LEI DE KEPLER — <span>LEI DOS PERÍODOS</span></h2><div class="sl"></div></div>
+  <div class="card gd">
+    <h3>ENUNCIADO</h3>
+    <p>O quadrado do período orbital de qualquer planeta é <span class="hlg">diretamente proporcional ao cubo do semi-eixo maior</span> da órbita. A constante de proporcionalidade é a mesma para todos os planetas de um mesmo sistema.</p>
+  </div>
+  <div class="fhero" style="border-color:rgba(255,170,0,.3)">
+    <div class="bf" style="text-shadow:0 0 14px var(--gd),0 0 35px rgba(255,170,0,.42)">T² / a³ = k &nbsp;|&nbsp; T² = (4π²/GM) · a³</div>
+    <div class="fl" style="color:var(--gd)">T [s] período orbital  |  a [m] semi-eixo maior  |  M [kg] massa da estrela  |  G = 6,674×10⁻¹¹</div>
+  </div>
+  <div class="vis gd">
+    <p class="vtag" style="color:var(--gd)">[ ANIMAÇÃO + CALCULADORA — 3ª LEI DE KEPLER ]</p>
+    <canvas id="k3Canvas" width="700" height="260"></canvas>
+    <div class="ctrl-row" style="margin-top:14px">
+      <div class="ctrl"><label>SEMI-EIXO MAIOR a (UA)</label><input type="range" id="k3a" min=".5" max="10" value="1" step=".1" oninput="calcK3()"><div class="ctrl-val" id="k3av">1.0</div></div>
+    </div>
+    <div id="k3Result" style="font-family:'Orbitron',monospace;font-size:1.1rem;color:var(--gd);text-shadow:0 0 10px var(--gd);text-align:center;margin-top:6px">
+      T = 1,00 anos (para a = 1,0 UA — Terra)
+    </div>
+  </div>
+  <table>
+    <tr><th>PLANETA</th><th>a (UA)</th><th>T (anos)</th><th>T²/a³</th></tr>
+    <tr><td>Mercúrio</td><td>0,387</td><td>0,241</td><td>≈ 1,000</td></tr>
+    <tr><td>Vênus</td><td>0,723</td><td>0,615</td><td>≈ 1,000</td></tr>
+    <tr><td>Terra</td><td>1,000</td><td>1,000</td><td>= 1,000</td></tr>
+    <tr><td>Marte</td><td>1,524</td><td>1,881</td><td>≈ 1,000</td></tr>
+    <tr><td>Júpiter</td><td>5,203</td><td>11,862</td><td>≈ 1,000</td></tr>
+    <tr><td>Saturno</td><td>9,537</td><td>29,457</td><td>≈ 1,000</td></tr>
+  </table>
+</section>
+
+<!-- NEWTON -->
+<section id="newton">
+  <div class="sh"><span class="sn">05</span><h2 class="st">GRAVITAÇÃO <span>UNIVERSAL</span></h2><div class="sl"></div></div>
+  <div class="card">
+    <h3>LEI DE NEWTON</h3>
+    <p>Newton unificou os fenômenos celestes e terrestres: a mesma força que faz uma maçã cair atrai a Lua à Terra. A força gravitacional é <span class="hl">mútua, atrativa e de longo alcance</span>.</p>
+  </div>
+  <div class="fhero">
+    <div class="bf">F = G · m₁ · m₂ / r²</div>
+    <div class="fl">G = 6,674 × 10⁻¹¹ N·m²/kg² &nbsp;|&nbsp; r = distância entre os centros das massas</div>
+  </div>
+  <div class="vis">
+    <p class="vtag">[ CALCULADORA — FORÇA GRAVITACIONAL ]</p>
+    <div class="ctrl-row">
+      <div class="ctrl"><label>MASSA m₁ (× 10²⁴ kg)</label><input type="range" id="gm1" min="1" max="20" value="6" oninput="calcGrav()"><div class="ctrl-val" id="gm1v">6</div></div>
+      <div class="ctrl"><label>MASSA m₂ (× 10²⁴ kg)</label><input type="range" id="gm2" min="1" max="20" value="7" oninput="calcGrav()"><div class="ctrl-val" id="gm2v">7</div></div>
+      <div class="ctrl"><label>DISTÂNCIA r (× 10⁶ km)</label><input type="range" id="gr" min="1" max="30" value="10" oninput="calcGrav()"><div class="ctrl-val" id="grv">10</div></div>
+    </div>
+    <canvas id="gravCanvas" width="700" height="200"></canvas>
+    <div id="gravResult" style="font-family:'Orbitron',monospace;font-size:1.2rem;color:var(--p1);text-shadow:0 0 10px var(--p1);text-align:center;margin-top:8px">F = — N</div>
+  </div>
+  <div class="igrid">
+    <div class="card pk"><h3>ACELERAÇÃO DA GRAVIDADE</h3>
+      <p>Na superfície de um astro de massa M e raio R, a aceleração gravitacional é:</p>
+      <div class="law pk" style="font-size:.83rem">g = G · M / R²<br><br>Terra: g ≈ 9,8 m/s²<br>Lua: g ≈ 1,6 m/s² (1/6 da Terra)<br>Sol: g ≈ 274 m/s²</div>
+    </div>
+    <div class="card cy"><h3>VELOCIDADE ORBITAL</h3>
+      <p>Para uma órbita circular de raio r ao redor de uma massa M:</p>
+      <div class="law cy" style="font-size:.83rem">v = √(G·M/r)<br>T = 2π·√(r³/(G·M))<br><br>ISS: v ≈ 7,7 km/s, T ≈ 92 min<br>Terra ao redor do Sol: v ≈ 30 km/s</div>
+    </div>
+    <div class="card gr"><h3>VELOCIDADE DE ESCAPE</h3>
+      <p>Velocidade mínima para um objeto escapar completamente da gravidade de um astro:</p>
+      <div class="law gr" style="font-size:.83rem">v_esc = √(2·G·M/R) = √(2·g·R)<br><br>Terra: v_esc ≈ 11,2 km/s<br>Lua: v_esc ≈ 2,4 km/s</div>
+    </div>
+  </div>
+  <div class="card gd">
+    <h3>RESUMO DAS FÓRMULAS</h3>
+    <table>
+      <tr><th>GRANDEZA</th><th>FÓRMULA</th><th>UNIDADE</th></tr>
+      <tr><td>Força gravitacional</td><td>F = G·m₁·m₂/r²</td><td>N</td></tr>
+      <tr><td>Aceleração da gravidade</td><td>g = G·M/R²</td><td>m/s²</td></tr>
+      <tr><td>Velocidade orbital circular</td><td>v = √(G·M/r)</td><td>m/s</td></tr>
+      <tr><td>Período orbital</td><td>T = 2π√(r³/GM)</td><td>s</td></tr>
+      <tr><td>Velocidade de escape</td><td>v_esc = √(2GM/R)</td><td>m/s</td></tr>
+      <tr><td>3ª Lei de Kepler</td><td>T² = (4π²/GM)·a³</td><td>—</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- DESAFIO -->
+<section id="desafio">
+  <div class="sh"><span class="sn">06</span><h2 class="st">DESAFIO: <span>SIMULAÇÃO N-CORPOS</span></h2><div class="sl"></div></div>
+
+  <div class="card gd">
+    <h3>COMO USAR O SIMULADOR</h3>
+    <p>Este simulador implementa <span class="hlg">gravitação real N-corpos</span> — todos os objetos atraem todos os outros, podendo causar <span class="hlg">colisões, capturas e colapso orbital</span>. A câmera segue a estrela, que também se move sob influência dos planetas.</p>
+    <div class="igrid" style="margin:12px 0 0">
+      <div style="background:rgba(255,170,0,.05);border:1px solid rgba(255,170,0,.2);padding:14px">
+        <p style="font-family:Orbitron,monospace;font-size:.7rem;color:#ffaa00;margin-bottom:6px">① POSICIONAR</p>
+        <p style="font-size:.9rem">Clique e <strong>segure</strong> no canvas para escolher a posição do planeta. A linha pontilhada mostra a órbita circular de referência.</p>
+      </div>
+      <div style="background:rgba(68,255,170,.05);border:1px solid rgba(68,255,170,.2);padding:14px">
+        <p style="font-family:Orbitron,monospace;font-size:.7rem;color:#44ffaa;margin-bottom:6px">② ARRASTAR = VELOCIDADE</p>
+        <p style="font-size:.9rem">Com o botão pressionado, <strong>arraste</strong> para definir direção e intensidade da velocidade inicial. A seta <span style="color:#44ffaa">verde</span> indica órbita circular perfeita.</p>
+      </div>
+      <div style="background:rgba(170,68,255,.05);border:1px solid rgba(170,68,255,.2);padding:14px">
+        <p style="font-family:Orbitron,monospace;font-size:.7rem;color:#aa44ff;margin-bottom:6px">③ SOLTAR = LANÇAR</p>
+        <p style="font-size:.9rem">Solte o botão para <strong>lançar o planeta</strong>. Se dois objetos colidirem, o menor é absorvido pelo maior (conservação de momento).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROL PANEL -->
+  <div class="sim-panel">
+    <div class="sim-row">
+      <div class="spc">
+        <label>MASSA DO PLANETA</label>
+        <input type="range" id="nMass" min="20" max="2000" value="100" step="20" oninput="onMassChange()">
+        <div class="sv" id="nMassV">100 u</div>
+        <div class="mass-preview">
+          <span style="font-family:Share Tech Mono,monospace;font-size:.62rem;color:rgba(170,68,255,.5)">tamanho:</span>
+          <span class="mp-dot" id="massDot" style="width:10px;height:10px;color:#aa44ff;background:#aa44ff"></span>
+        </div>
+      </div>
+      <div class="spc">
+        <label>VELOCIDADE DA SIMULAÇÃO</label>
+        <input type="range" id="tScale" min="1" max="6" value="2" step="1" oninput="onSpeedChange()">
+        <div class="sv" id="tScaleV">2×</div>
+      </div>
+      <div class="spc">
+        <label>ESTRELA (REFERÊNCIA)</label>
+        <div style="font-family:Share Tech Mono,monospace;font-size:.72rem;color:#ffaa00;margin-top:6px">
+          Massa: <span id="starMassV">8000 u</span><br>
+          <span id="starPosV" style="color:rgba(255,170,0,.5)">posição: 0, 0</span>
+        </div>
+      </div>
+    </div>
+    <div class="sim-btns">
+      <button class="sbtn run" id="runBtn" onclick="toggleRun()">&#9654; INICIAR</button>
+      <button class="sbtn rst" onclick="fullReset()">&#8635; REINICIAR TUDO</button>
+      <button class="sbtn tog" id="trailBtn" onclick="toggleOpt('trail')" >&#9670; RASTROS: ON</button>
+      <button class="sbtn tog" id="forceBtn" onclick="toggleOpt('force')">&#9670; VETORES FORÇA</button>
+      <button class="sbtn gd" id="kepBtn" onclick="toggleOpt('kep')">&#9670; ÁREAS KEPLER II</button>
+    </div>
+    <div id="simStatus">Clique e arraste no canvas para posicionar o Planeta 1</div>
+  </div>
+
+  <canvas id="simCanvas" width="700" height="500" style="cursor:crosshair;display:block;margin:0 auto;max-width:100%;border:1px solid rgba(170,68,255,.2)"></canvas>
+  <div class="sim-hint" id="simHint">Seta branca tracejada = velocidade circular de referência &nbsp;|&nbsp; Verde = órbita circular &nbsp;|&nbsp; Vermelho = vai cair &nbsp;|&nbsp; Laranja = vai escapar</div>
+
+  <div class="body-panel" id="bodyPanel"></div>
+  <div class="clog" id="collLog" style="display:none">
+    <div class="clog-title">COLISÕES</div>
+    <div id="collEntries"></div>
+  </div>
+</section>
+
+<!-- EXERCÍCIOS -->
+<section id="exercicios">
+  <div class="sh"><span class="sn">07</span><h2 class="st">EXERCÍCIOS DE <span>FIXAÇÃO</span></h2><div class="sl"></div></div>
+  <p style="color:var(--dim);font-family:'Share Tech Mono',monospace;font-size:.72rem;margin-bottom:22px;letter-spacing:2px">SELECIONE A ALTERNATIVA CORRETA</p>
+  <div class="pw"><div class="pf" id="pBar" style="width:0%"></div></div>
+  <p style="font-family:'Share Tech Mono',monospace;font-size:.67rem;color:var(--dim);text-align:right;margin:6px 0 24px" id="pTxt">0 / 8 respondidas</p>
+
+  <div class="qc" id="q1">
+    <div class="qnum">QUESTÃO 01 // 1ª LEI DE KEPLER</div>
+    <div class="qtext">Segundo a 1ª Lei de Kepler, a órbita dos planetas ao redor do Sol é:</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">A</span>Circular, com o Sol no centro</button>
+      <button class="obt" onclick="ans(this,'q1','correct')"><span class="ol">B</span>Elíptica, com o Sol em um dos focos</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">C</span>Parabólica, com o Sol no vértice</button>
+      <button class="obt" onclick="ans(this,'q1','wrong')"><span class="ol">D</span>Circular, com o Sol em um dos focos</button>
+    </div><div class="fb" id="f_q1"></div>
+  </div>
+
+  <div class="qc" id="q2">
+    <div class="qnum">QUESTÃO 02 // 2ª LEI DE KEPLER</div>
+    <div class="qtext">Pela 2ª Lei de Kepler, quando um planeta está no periélio (mais próximo do Sol), sua velocidade é:</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">A</span>Mínima, pois a força gravitacional é maior</button>
+      <button class="obt" onclick="ans(this,'q2','correct')"><span class="ol">B</span>Máxima, para conservar o momento angular</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">C</span>Igual à velocidade no afélio</button>
+      <button class="obt" onclick="ans(this,'q2','wrong')"><span class="ol">D</span>Zero, pois o planeta reverte o sentido</button>
+    </div><div class="fb" id="f_q2"></div>
+  </div>
+
+  <div class="qc" id="q3">
+    <div class="qnum">QUESTÃO 03 // 3ª LEI DE KEPLER — CÁLCULO</div>
+    <div class="qtext">Um planeta tem semi-eixo maior a = 4 UA. Qual é seu período orbital? (Use T²/a³ = 1 ano²/UA³)</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">A</span>4 anos</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">B</span>8 anos</button>
+      <button class="obt" onclick="ans(this,'q3','correct')"><span class="ol">C</span>8 anos (T = √(4³) = √64 = 8 anos)</button>
+      <button class="obt" onclick="ans(this,'q3','wrong')"><span class="ol">D</span>16 anos</button>
+    </div><div class="fb" id="f_q3"></div>
+  </div>
+
+  <div class="qc" id="q4">
+    <div class="qnum">QUESTÃO 04 // GRAVITAÇÃO UNIVERSAL</div>
+    <div class="qtext">Se a distância entre dois corpos dobrar, a força gravitacional entre eles se torna:</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">A</span>Metade do valor original</button>
+      <button class="obt" onclick="ans(this,'q4','correct')"><span class="ol">B</span>Um quarto do valor original</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">C</span>O dobro do valor original</button>
+      <button class="obt" onclick="ans(this,'q4','wrong')"><span class="ol">D</span>Não se altera</button>
+    </div><div class="fb" id="f_q4"></div>
+  </div>
+
+  <div class="qc" id="q5">
+    <div class="qnum">QUESTÃO 05 // ACELERAÇÃO DA GRAVIDADE</div>
+    <div class="qtext">Um planeta tem massa 4× maior e raio 2× maior que a Terra. Qual é sua aceleração gravitacional na superfície?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">A</span>g/2 (metade da Terra)</button>
+      <button class="obt" onclick="ans(this,'q5','correct')"><span class="ol">B</span>g (igual à Terra)</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">C</span>2g (dobro da Terra)</button>
+      <button class="obt" onclick="ans(this,'q5','wrong')"><span class="ol">D</span>4g (quatro vezes a Terra)</button>
+    </div><div class="fb" id="f_q5"></div>
+  </div>
+
+  <div class="qc" id="q6">
+    <div class="qnum">QUESTÃO 06 // VELOCIDADE ORBITAL</div>
+    <div class="qtext">Um satélite órbita a Terra a uma altitude h onde o raio orbital é r = 2R (R = raio da Terra). Comparado a um satélite em r = R, sua velocidade orbital é:</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">A</span>Igual</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">B</span>Duas vezes maior</button>
+      <button class="obt" onclick="ans(this,'q6','correct')"><span class="ol">C</span>1/√2 vezes menor (≈ 0,71 v₀)</button>
+      <button class="obt" onclick="ans(this,'q6','wrong')"><span class="ol">D</span>Quatro vezes menor</button>
+    </div><div class="fb" id="f_q6"></div>
+  </div>
+
+  <div class="qc" id="q7">
+    <div class="qnum">QUESTÃO 07 // KEPLER III — RAZÃO</div>
+    <div class="qtext">Dois planetas X e Y orbitam o mesmo Sol. O período de X é o dobro do de Y. Qual é a razão entre os semi-eixos maiores (aX/aY)?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">A</span>2</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">B</span>4</button>
+      <button class="obt" onclick="ans(this,'q7','correct')"><span class="ol">C</span>∛4 ≈ 1,587</button>
+      <button class="obt" onclick="ans(this,'q7','wrong')"><span class="ol">D</span>8</button>
+    </div><div class="fb" id="f_q7"></div>
+  </div>
+
+  <div class="qc" id="q8">
+    <div class="qnum">QUESTÃO 08 // INTEGRAÇÃO</div>
+    <div class="qtext">Qual é a principal diferença entre a contribuição de Kepler e a de Newton para a Gravitação?</div>
+    <div class="opts">
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">A</span>Kepler descobriu a gravidade; Newton calculou as órbitas</button>
+      <button class="obt" onclick="ans(this,'q8','correct')"><span class="ol">B</span>Kepler descreveu matematicamente como as órbitas são; Newton explicou por que são assim (causa física)</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">C</span>Ambos chegaram às mesmas conclusões de forma independente</button>
+      <button class="obt" onclick="ans(this,'q8','wrong')"><span class="ol">D</span>Newton apenas confirmou as leis de Kepler sem adicionar nada novo</button>
+    </div><div class="fb" id="f_q8"></div>
+  </div>
+
+  <div class="sp" id="spanel" style="display:none">
+    <div class="scl">RESULTADO FINAL</div>
+    <div class="scv" id="scv">0/8</div>
+    <div class="scm" id="scm"></div>
+    <button class="rbtn" onclick="resetQ()">REFAZER EXERCÍCIOS</button>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section id="download" style="margin-top:56px">
+  <div class="sh"><span class="sn">08</span><h2 class="st">BAIXAR <span>LISTA</span></h2><div class="sl"></div></div>
+  <div class="card" style="text-align:center;padding:36px 28px">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--dim);letter-spacing:3px;margin-bottom:12px">8 QUESTÕES COM GABARITO E RESOLUÇÃO</div>
+    <div style="font-size:3.5rem;margin-bottom:12px;filter:drop-shadow(0 0 18px var(--p1))">★</div>
+    <p style="margin-bottom:22px;color:var(--dim);font-size:.93rem">Lista completa em PDF com gabarito comentado e fórmulas de referência.</p>
+    <a id="dlBtn" download="lista-gravitacao.pdf" class="dlbtn">BAIXAR LISTA DE EXERCÍCIOS (PDF)</a>
+  </div>
+</section>
+</main>
+<footer>
+  <div>GRAVITAÇÃO — FÍSICA DO ENSINO MÉDIO</div>
+  <div style="margin-top:7px">KEPLER I, II e III · GRAVITAÇÃO UNIVERSAL · VELOCIDADE ORBITAL · SIMULAÇÃO</div>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════
+// BACKGROUND STARS
+// ════════════════════════════════════════════════
+(function(){
+  var c=document.getElementById('bgStars');
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  var ctx=c.getContext('2d');
+  var stars=[];
+  for(var i=0;i<180;i++){
+    stars.push({x:Math.random(),y:Math.random(),r:.5+Math.random()*1.5,
+      t:Math.random()*Math.PI*2,speed:.3+Math.random()*.8,
+      col:Math.random()<.3?'rgba(200,160,255,':'rgba(220,200,255,'});
+  }
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    var now=performance.now()*.001;
+    stars.forEach(function(s){
+      var a=.3+.4*Math.sin(now*s.speed+s.t);
+      ctx.save();ctx.shadowColor=s.col+'0.8)';ctx.shadowBlur=3;
+      ctx.beginPath();ctx.arc(s.x*c.width,s.y*c.height,s.r,0,Math.PI*2);
+      ctx.fillStyle=s.col+a+')';ctx.fill();ctx.restore();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════
+function bg(ctx,W,H,col){ctx.fillStyle=col||'#04000e';ctx.fillRect(0,0,W,H);}
+function ga(ctx,x1,y1,x2,y2,col,lw,blur){
+  lw=lw||2;blur=blur||12;
+  var a=Math.atan2(y2-y1,x2-x1),L=10;
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=blur;
+  ctx.strokeStyle=col;ctx.lineWidth=lw;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.fillStyle=col;ctx.beginPath();
+  ctx.moveTo(x2,y2);ctx.lineTo(x2-L*Math.cos(a-.42),y2-L*Math.sin(a-.42));
+  ctx.lineTo(x2-L*Math.cos(a+.42),y2-L*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+}
+function lbl(ctx,x,y,txt,col,sz,align){
+  sz=sz||12;align=align||'center';
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=7;ctx.fillStyle=col;
+  ctx.font=sz+'px Share Tech Mono,monospace';ctx.textAlign=align;ctx.fillText(txt,x,y);ctx.restore();
+}
+function drawStar(ctx,x,y,t,R){
+  R=R||22;
+  // corona
+  var g=ctx.createRadialGradient(x,y,R*.3,x,y,R*3.5);
+  g.addColorStop(0,'rgba(255,220,80,.4)');g.addColorStop(.4,'rgba(255,120,20,.15)');g.addColorStop(1,'rgba(255,80,0,0)');
+  ctx.beginPath();ctx.arc(x,y,R*3.5,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+  // body
+  ctx.save();ctx.shadowColor='#ffcc00';ctx.shadowBlur=30;
+  var sg=ctx.createRadialGradient(x-R*.3,y-R*.3,R*.08,x,y,R);
+  sg.addColorStop(0,'#fffde0');sg.addColorStop(.45,'#ffcc00');sg.addColorStop(1,'#ff7700');
+  ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.fillStyle=sg;ctx.fill();ctx.restore();
+  // flares
+  for(var i=0;i<8;i++){
+    var ang=i*Math.PI/4+t*.4;
+    var len=R*.6+Math.sin(t*1.2+i)*R*.4;
+    ctx.save();ctx.globalAlpha=.4+.2*Math.sin(t+i);ctx.shadowColor='#ffaa00';ctx.shadowBlur=8;
+    ctx.strokeStyle='#ffaa00';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(x+Math.cos(ang)*R,y+Math.sin(ang)*R);
+    ctx.lineTo(x+Math.cos(ang)*(R+len),y+Math.sin(ang)*(R+len));ctx.stroke();ctx.restore();
+  }
+}
+
+// ════════════════════════════════════════════════
+// KEPLER 1 — ELLIPTICAL ORBIT
+// ════════════════════════════════════════════════
+var k1T=0;
+function animK1(){
+  k1T+=.012;
+  var cv=document.getElementById('k1Canvas');if(!cv){requestAnimationFrame(animK1);return;}
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var cx=W/2-30,cy=H/2;
+  var a=220,b=140,c=Math.sqrt(a*a-b*b);
+  var focX=cx-c,focY=cy; // star at left focus
+  // orbit ellipse
+  ctx.save();ctx.shadowColor='rgba(170,68,255,.4)';ctx.shadowBlur=8;
+  ctx.strokeStyle='rgba(170,68,255,.45)';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);
+  ctx.beginPath();ctx.ellipse(cx,cy,a,b,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  // axes labels
+  ctx.save();ctx.strokeStyle='rgba(170,68,255,.2)';ctx.lineWidth=1;ctx.setLineDash([3,6]);
+  ctx.beginPath();ctx.moveTo(cx-a-14,cy);ctx.lineTo(cx+a+14,cy);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,cy-b-14);ctx.lineTo(cx,cy+b+14);ctx.stroke();
+  ctx.setLineDash([]);ctx.restore();
+  lbl(ctx,cx+a+24,cy+4,'2a','rgba(170,68,255,.5)',9);
+  lbl(ctx,cx+8,cy-b-18,'b','rgba(170,68,255,.5)',9);
+  // foci markers
+  var f2x=cx+c,f2y=cy;
+  ctx.save();ctx.strokeStyle='rgba(170,68,255,.35)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(focX,cy-8);ctx.lineTo(focX,cy+8);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(f2x,cy-8);ctx.lineTo(f2x,cy+8);ctx.stroke();ctx.restore();
+  lbl(ctx,focX,cy+20,'F₁ (Sol)','rgba(255,170,0,.7)',9);
+  lbl(ctx,f2x,cy+20,'F₂ (vazio)','rgba(170,68,255,.5)',9);
+  // center marker
+  ctx.save();ctx.fillStyle='rgba(170,68,255,.3)';ctx.beginPath();ctx.arc(cx,cy,3,0,Math.PI*2);ctx.fill();ctx.restore();
+  lbl(ctx,cx,cy-10,'centro','rgba(170,68,255,.35)',8);
+  // planet on ellipse (parametric)
+  var E=k1T%(Math.PI*2);
+  var px=cx+a*Math.cos(E),py=cy-b*Math.sin(E);
+  // raio vetor (star to planet)
+  ctx.save();ctx.strokeStyle='rgba(255,204,68,.4)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(focX,focY);ctx.lineTo(px,py);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  // perihelio/afelio markers
+  lbl(ctx,cx-a-8,cy-16,'Periélio','rgba(255,68,204,.7)',9);
+  lbl(ctx,cx+a+8,cy-16,'Afélio','rgba(68,170,255,.7)',9);
+  // star
+  drawStar(ctx,focX,focY,k1T,18);
+  // planet
+  ctx.save();ctx.shadowColor='#aa44ff';ctx.shadowBlur=18;
+  var pg=ctx.createRadialGradient(px-3,py-3,1,px,py,10);
+  pg.addColorStop(0,'#ddc8ff');pg.addColorStop(.5,'#aa44ff');pg.addColorStop(1,'#5500aa');
+  ctx.beginPath();ctx.arc(px,py,10,0,Math.PI*2);ctx.fillStyle=pg;ctx.fill();ctx.restore();
+  // info
+  var rVec=Math.sqrt((px-focX)*(px-focX)+(py-focY)*(py-focY));
+  lbl(ctx,W-90,H-12,'r = '+(rVec).toFixed(0)+' px','rgba(255,204,68,.5)',9);
+  requestAnimationFrame(animK1);
+}
+
+// ════════════════════════════════════════════════
+// KEPLER 2 — EQUAL AREAS
+// ════════════════════════════════════════════════
+var k2T=0,k2Phase=0;
+function animK2(){
+  k2T+=.008;k2Phase=(k2Phase+1)%400;
+  var cv=document.getElementById('k2Canvas');if(!cv){requestAnimationFrame(animK2);return;}
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var cx=W/2-20,cy=H/2+10;
+  var a=220,b=130,c=Math.sqrt(a*a-b*b);
+  var sx=cx-c,sy=cy; // star (focus)
+  // orbit
+  ctx.save();ctx.strokeStyle='rgba(170,68,255,.3)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+  ctx.beginPath();ctx.ellipse(cx,cy,a,b,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  // Compute positions at two epochs
+  var dt_arc=0.22; // angle swept in given time
+  // Near perihelion: E1 ≈ 0 (fast)
+  var E_peri=k2T*1.4%(Math.PI*2);
+  var p1x=cx+a*Math.cos(E_peri),p1y=cy-b*Math.sin(E_peri);
+  var p1bx=cx+a*Math.cos(E_peri+dt_arc),p1by=cy-b*Math.sin(E_peri+dt_arc);
+  // Near aphelion: E2 ≈ π (slow)
+  var E_aph=k2T*1.4%(Math.PI*2)+Math.PI;
+  var p2x=cx+a*Math.cos(E_aph),p2y=cy-b*Math.sin(E_aph);
+  var p2bx=cx+a*Math.cos(E_aph+dt_arc*.5),p2by=cy-b*Math.sin(E_aph+dt_arc*.5);
+
+  // Area 1 (perihelion region) - green
+  ctx.save();ctx.globalAlpha=.22;ctx.fillStyle='#44ffaa';ctx.shadowColor='#44ffaa';ctx.shadowBlur=6;
+  ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(p1x,p1y);
+  // arc between two points
+  var a1s=Math.atan2(-(p1y-cy)/b,(p1x-cx)/a);
+  var a1e=Math.atan2(-(p1by-cy)/b,(p1bx-cx)/a);
+  ctx.ellipse(cx,cy,a,b,0,a1s,a1e);ctx.closePath();ctx.fill();ctx.restore();
+  ctx.save();ctx.strokeStyle='rgba(68,255,170,.6)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(p1x,p1y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(p1bx,p1by);ctx.stroke();ctx.restore();
+
+  // Area 2 (aphelion region) - purple
+  ctx.save();ctx.globalAlpha=.22;ctx.fillStyle='#aa44ff';ctx.shadowColor='#aa44ff';ctx.shadowBlur=6;
+  ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(p2x,p2y);
+  var a2s=Math.atan2(-(p2y-cy)/b,(p2x-cx)/a);
+  var a2e=Math.atan2(-(p2by-cy)/b,(p2bx-cx)/a);
+  ctx.ellipse(cx,cy,a,b,0,a2s,a2e);ctx.closePath();ctx.fill();ctx.restore();
+  ctx.save();ctx.strokeStyle='rgba(170,68,255,.6)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(p2x,p2y);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(p2bx,p2by);ctx.stroke();ctx.restore();
+
+  // animate planet along orbit
+  var E_now=k2T*1.4%(Math.PI*2);
+  var pnx=cx+a*Math.cos(E_now),pny=cy-b*Math.sin(E_now);
+  ctx.save();ctx.shadowColor='#aa44ff';ctx.shadowBlur=14;
+  ctx.beginPath();ctx.arc(pnx,pny,9,0,Math.PI*2);
+  ctx.fillStyle='#cc66ff';ctx.fill();ctx.restore();
+  // star
+  drawStar(ctx,sx,sy,k2T,16);
+  // labels
+  lbl(ctx,p1x+18,p1y-14,'PERIÉLIO\nv máx.','rgba(68,255,170,.7)',9);
+  lbl(ctx,p2x-18,p2y+18,'AFÉLIO\nv mín.','rgba(170,68,255,.7)',9);
+  var areaW=W*.42,areaH=22;
+  var ax1=W*.56,ay1=22;
+  ctx.save();ctx.fillStyle='rgba(68,255,170,.15)';ctx.fillRect(ax1,ay1,areaW*.44,areaH);
+  ctx.strokeStyle='rgba(68,255,170,.4)';ctx.lineWidth=1;ctx.strokeRect(ax1,ay1,areaW*.44,areaH);
+  ctx.restore();
+  lbl(ctx,ax1+areaW*.22,ay1+15,'ÁREA PERIÉLIO (igual)','rgba(68,255,170,.6)',8);
+  ctx.save();ctx.fillStyle='rgba(170,68,255,.15)';ctx.fillRect(ax1+areaW*.46,ay1,areaW*.44,areaH);
+  ctx.strokeStyle='rgba(170,68,255,.4)';ctx.lineWidth=1;ctx.strokeRect(ax1+areaW*.46,ay1,areaW*.44,areaH);ctx.restore();
+  lbl(ctx,ax1+areaW*.68,ay1+15,'ÁREA AFÉLIO (igual)','rgba(170,68,255,.6)',8);
+  requestAnimationFrame(animK2);
+}
+
+// ════════════════════════════════════════════════
+// KEPLER 3 — PERIODS CANVAS
+// ════════════════════════════════════════════════
+var k3T=0;
+function animK3(){
+  k3T+=.01;
+  var cv=document.getElementById('k3Canvas');if(!cv){requestAnimationFrame(animK3);return;}
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var sx=W/2,sy=H/2;
+  // two planets with different radii
+  var planets3=[
+    {r:80,col:'#44aaff',label:'Planeta A',speed:1.0},
+    {r:150,col:'#ff44cc',label:'Planeta B',speed:1/Math.pow(150/80,1.5)},
+  ];
+  // draw orbits
+  planets3.forEach(function(p){
+    ctx.save();ctx.strokeStyle=p.col.replace(')',',0.28)').replace('rgb','rgba');ctx.lineWidth=1;ctx.setLineDash([4,5]);
+    ctx.beginPath();ctx.arc(sx,sy,p.r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  });
+  // star
+  drawStar(ctx,sx,sy,k3T,18);
+  // planets
+  planets3.forEach(function(p){
+    var ang=k3T*p.speed*1.5;
+    var px=sx+p.r*Math.cos(ang),py=sy+p.r*Math.sin(ang);
+    // raio vetor
+    ctx.save();ctx.strokeStyle=p.col.replace(')',',0.3)').replace('rgb','rgba');ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(px,py);ctx.stroke();ctx.restore();
+    ctx.save();ctx.shadowColor=p.col;ctx.shadowBlur=14;
+    ctx.beginPath();ctx.arc(px,py,8,0,Math.PI*2);ctx.fillStyle=p.col;ctx.fill();ctx.restore();
+    lbl(ctx,px,py-16,p.label,p.col,9);
+    var T_p=(Math.pow(p.r/80,1.5)).toFixed(2);
+    lbl(ctx,sx+p.r+8,sy-8,'T = '+T_p+' T_A',p.col,8,'left');
+  });
+  // 3rd law badge
+  ctx.save();ctx.fillStyle='rgba(255,170,0,.08)';ctx.strokeStyle='rgba(255,170,0,.3)';ctx.lineWidth=1;
+  ctx.fillRect(14,14,200,46);ctx.strokeRect(14,14,200,46);ctx.restore();
+  lbl(ctx,114,32,'T²/a³ = constante','#ffaa00',10);
+  lbl(ctx,114,50,'para todos os planetas','rgba(255,170,0,.5)',9);
+  requestAnimationFrame(animK3);
+}
+function calcK3(){
+  var a=+document.getElementById('k3a').value;
+  document.getElementById('k3av').textContent=a.toFixed(1);
+  var T=Math.pow(a,1.5);
+  document.getElementById('k3Result').textContent='T = '+T.toFixed(3)+' anos   (a = '+a.toFixed(1)+' UA)   T²/a³ = '+(T*T/(a*a*a)).toFixed(3);
+}
+
+// ════════════════════════════════════════════════
+// GRAVITATIONAL FORCE CALCULATOR
+// ════════════════════════════════════════════════
+function calcGrav(){
+  var m1=+document.getElementById('gm1').value;
+  var m2=+document.getElementById('gm2').value;
+  var r=+document.getElementById('gr').value;
+  document.getElementById('gm1v').textContent=m1;
+  document.getElementById('gm2v').textContent=m2;
+  document.getElementById('grv').textContent=r;
+  var G=6.674e-11;
+  var M1=m1*1e24,M2=m2*1e24,R=r*1e9;
+  var F=G*M1*M2/(R*R);
+  var cv=document.getElementById('gravCanvas');
+  if(!cv)return;
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  bg(ctx,W,H);
+  var cy=H/2,fScale=Math.min(120,Math.log10(F+1)*18);
+  var x1=W/2-r*8-30,x2=W/2+r*8+30;
+  if(x1<60)x1=60;if(x2>W-60)x2=W-60;
+  // distance
+  ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle='rgba(170,68,255,.3)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(x1,cy+48);ctx.lineTo(x2,cy+48);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  lbl(ctx,(x1+x2)/2,cy+64,'r = '+r+' × 10⁶ km','rgba(170,68,255,.55)',10);
+  // force arrows
+  ga(ctx,x1,cy,x1-fScale,cy,'#ffaa00',3);
+  ga(ctx,x2,cy,x2+fScale,cy,'#ffaa00',3);
+  // mass spheres
+  var r1s=Math.sqrt(m1)*3.5,r2s=Math.sqrt(m2)*3.5;
+  ctx.save();ctx.shadowColor='#aa44ff';ctx.shadowBlur=20;
+  ctx.beginPath();ctx.arc(x1,cy,r1s,0,Math.PI*2);
+  ctx.fillStyle='#7700cc';ctx.fill();ctx.strokeStyle='#aa44ff';ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+  lbl(ctx,x1,cy,'m₁','#cc66ff',11);lbl(ctx,x1,cy+r1s+14,m1+'×10²⁴','rgba(170,68,255,.6)',9);
+  ctx.save();ctx.shadowColor='#ff44cc';ctx.shadowBlur=20;
+  ctx.beginPath();ctx.arc(x2,cy,r2s,0,Math.PI*2);
+  ctx.fillStyle='#880044';ctx.fill();ctx.strokeStyle='#ff44cc';ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+  lbl(ctx,x2,cy,'m₂','#ff88dd',11);lbl(ctx,x2,cy+r2s+14,m2+'×10²⁴','rgba(255,68,204,.6)',9);
+  document.getElementById('gravResult').textContent='F = '+F.toExponential(3)+' N';
+}
+
+// ════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// N-BODY ORBITAL SIMULATION (PhET-style)
+// ════════════════════════════════════════════════
+var G_N=1.0, M_STAR=8000, DT_N=0.28, STEPS_N=10;
+var simBodies=[], simFlash=[], collLog=[];
+var simRunning=false;
+var opts={trail:true,force:false,kep:false};
+var placing=false, placeW=null, mouseW=null;
+var bgSt2=[];
+var VDRAG=0.095; // px → velocity units
+
+// planet color palette
+var PCOLS=['#44aaff','#ff4488','#44ffaa'];
+var PCLS2=['p1c','p2c','p3c'];
+
+function initBodies(){
+  simBodies=[{
+    id:0,name:'Estrela',isStar:true,
+    x:0,y:0,vx:0,vy:0,ax:0,ay:0,
+    mass:M_STAR,r:22,color:'#ffcc00',cls:'star',trail:[]
+  }];
+  simFlash=[];collLog=[];placing=false;placeW=null;
+}
+function initBgStars2(){
+  bgSt2=[];
+  for(var i=0;i<140;i++)bgSt2.push({
+    wx:(Math.random()-.5)*2800,wy:(Math.random()-.5)*2200,
+    r:.4+Math.random()*1.4,a:.25+Math.random()*.6
+  });
+}
+
+// ── PHYSICS ──────────────────────────────────────
+function computeAccelsN(){
+  simBodies.forEach(function(b){b.ax=0;b.ay=0;});
+  for(var i=0;i<simBodies.length;i++){
+    for(var j=i+1;j<simBodies.length;j++){
+      var bi=simBodies[i],bj=simBodies[j];
+      var dx=bj.x-bi.x,dy=bj.y-bi.y;
+      var r2=dx*dx+dy*dy,r=Math.sqrt(r2);
+      var soft=10; // softening to avoid singularity
+      var rs=Math.sqrt(r2+soft*soft);
+      var gf=G_N*bi.mass*bj.mass/(rs*rs);
+      var fx=gf*dx/rs,fy=gf*dy/rs;
+      bi.ax+=fx/bi.mass;bi.ay+=fy/bi.mass;
+      bj.ax-=fx/bj.mass;bj.ay-=fy/bj.mass;
+    }
+  }
+}
+
+function stepVerlet(dt){
+  var oax=simBodies.map(function(b){return b.ax;});
+  var oay=simBodies.map(function(b){return b.ay;});
+  simBodies.forEach(function(b){
+    b.x+=b.vx*dt+0.5*b.ax*dt*dt;
+    b.y+=b.vy*dt+0.5*b.ay*dt*dt;
+  });
+  computeAccelsN();
+  simBodies.forEach(function(b,i){
+    b.vx+=0.5*(oax[i]+b.ax)*dt;
+    b.vy+=0.5*(oay[i]+b.ay)*dt;
+  });
+}
+
+function checkCollN(){
+  for(var i=0;i<simBodies.length;i++){
+    for(var j=i+1;j<simBodies.length;j++){
+      var bi=simBodies[i],bj=simBodies[j];
+      if(!bi||!bj)continue;
+      var dx=bj.x-bi.x,dy=bj.y-bi.y,r=Math.sqrt(dx*dx+dy*dy);
+      if(r<bi.r+bj.r-4){
+        var abs=bi.mass>=bj.mass?bi:bj;
+        var src=bi.mass>=bj.mass?bj:bi;
+        var tm=abs.mass+src.mass;
+        abs.x=(abs.mass*abs.x+src.mass*src.x)/tm;
+        abs.y=(abs.mass*abs.y+src.mass*src.y)/tm;
+        abs.vx=(abs.mass*abs.vx+src.mass*src.vx)/tm;
+        abs.vy=(abs.mass*abs.vy+src.mass*src.vy)/tm;
+        abs.mass=tm;
+        if(!abs.isStar)abs.r=Math.max(abs.r,6+Math.pow(tm/80,.38)*5);
+        else abs.r=Math.max(22,22+Math.pow((tm-M_STAR)/500,.5)*4);
+        simFlash.push({x:abs.x,y:abs.y,life:40,col:src.color,maxLife:40});
+        var msg=src.name+' absorvido por '+abs.name;
+        collLog.unshift(msg);
+        if(collLog.length>8)collLog.pop();
+        simBodies.splice(simBodies.indexOf(src),1);
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function simStep(){
+  var ts=+document.getElementById('tScale').value;
+  for(var s=0;s<STEPS_N*ts;s++){
+    stepVerlet(DT_N);
+    if(checkCollN())break;
+  }
+  if(opts.trail){
+    simBodies.forEach(function(b){
+      if(!b.trail)b.trail=[];
+      var last=b.trail[b.trail.length-1];
+      if(!last||Math.hypot(b.x-last.x,b.y-last.y)>2.5){
+        b.trail.push({x:b.x,y:b.y});
+        if(b.trail.length>550)b.trail.shift();
+      }
+    });
+  }
+}
+
+// ── CAMERA ───────────────────────────────────────
+function w2s(wx,wy,cv){
+  var star=simBodies[0],W=cv.width,H=cv.height;
+  return{x:wx-star.x+W/2,y:wy-star.y+H/2};
+}
+function s2w(sx,sy,cv){
+  var star=simBodies[0],W=cv.width,H=cv.height;
+  return{x:sx+star.x-W/2,y:sy+star.y-H/2};
+}
+function getEvtPos(e,cv){
+  var r=cv.getBoundingClientRect();
+  var sx=e.clientX-r.left,sy=e.clientY-r.top;
+  // Scale for CSS vs actual canvas size
+  var scX=cv.width/r.width,scY=cv.height/r.height;
+  return{x:sx*scX,y:sy*scY};
+}
+
+// ── CIRCULAR VELOCITY ─────────────────────────────
+function circVel(wx,wy){
+  var star=simBodies[0];
+  var dx=wx-star.x,dy=wy-star.y;
+  var r=Math.sqrt(dx*dx+dy*dy);
+  if(r<star.r+30)return null;
+  // Account for star velocity (so new planet orbits stably)
+  var v=Math.sqrt(G_N*M_STAR/r);
+  return{vx:-v*dy/r+star.vx,vy:v*dx/r+star.vy,r:r,v:v};
+}
+
+// ── PLANET PLACEMENT ─────────────────────────────
+var simCV=document.getElementById('simCanvas');
+simCV.addEventListener('mousedown',function(e){
+  var sp=getEvtPos(e,simCV);
+  var w=s2w(sp.x,sp.y,simCV);
+  var cv2=circVel(w.x,w.y);
+  if(!cv2)return;
+  placing=true;
+  placeW={x:w.x,y:w.y};
+  mouseW={x:w.x,y:w.y};
+  e.preventDefault();
+});
+simCV.addEventListener('mousemove',function(e){
+  var sp=getEvtPos(e,simCV);
+  mouseW=s2w(sp.x,sp.y,simCV);
+});
+simCV.addEventListener('mouseup',function(e){
+  if(!placing)return;
+  placing=false;
+  if(!placeW||!mouseW)return;
+  var vx=(mouseW.x-placeW.x)*VDRAG;
+  var vy=(mouseW.y-placeW.y)*VDRAG;
+  addPlanetN(placeW.x,placeW.y,vx,vy);
+  placeW=null;
+});
+simCV.addEventListener('mouseleave',function(){
+  if(!placing)mouseW=null;
+});
+// Touch support
+simCV.addEventListener('touchstart',function(e){
+  var t=e.touches[0];
+  var sp=getEvtPos(t,simCV);
+  var w=s2w(sp.x,sp.y,simCV);
+  var cv2=circVel(w.x,w.y);
+  if(!cv2)return;
+  placing=true;placeW={x:w.x,y:w.y};mouseW={x:w.x,y:w.y};
+  e.preventDefault();
+},{passive:false});
+simCV.addEventListener('touchmove',function(e){
+  var t=e.touches[0];
+  var sp=getEvtPos(t,simCV);
+  mouseW=s2w(sp.x,sp.y,simCV);
+  e.preventDefault();
+},{passive:false});
+simCV.addEventListener('touchend',function(e){
+  if(!placing)return;placing=false;
+  if(!placeW||!mouseW)return;
+  var vx=(mouseW.x-placeW.x)*VDRAG;
+  var vy=(mouseW.y-placeW.y)*VDRAG;
+  addPlanetN(placeW.x,placeW.y,vx,vy);
+  placeW=null;
+});
+
+function addPlanetN(wx,wy,vx,vy){
+  var mass=+document.getElementById('nMass').value;
+  var r=Math.max(6,Math.min(20,6+Math.pow(mass/80,.38)*5));
+  // Remove if we already have 2 planets
+  var planets=simBodies.filter(function(b){return!b.isStar;});
+  if(planets.length>=2)simBodies.splice(simBodies.indexOf(planets[0]),1);
+  planets=simBodies.filter(function(b){return!b.isStar;});
+  var ci=planets.length%3;
+  simBodies.push({
+    id:Date.now(),name:'Planeta '+(ci+1),isStar:false,
+    x:wx,y:wy,vx:vx,vy:vy,ax:0,ay:0,
+    mass:mass,r:r,color:PCOLS[ci],cls:PCLS2[ci],
+    trail:[],kepArea:[]
+  });
+  computeAccelsN();
+  updateStatus();
+}
+
+// ── CONTROLS ─────────────────────────────────────
+function toggleRun(){
+  simRunning=!simRunning;
+  var btn=document.getElementById('runBtn');
+  btn.textContent=simRunning?'⏸ PAUSAR':'▶ INICIAR';
+  btn.classList.toggle('on',simRunning);
+}
+function fullReset(){
+  simRunning=false;
+  document.getElementById('runBtn').textContent='▶ INICIAR';
+  document.getElementById('runBtn').classList.remove('on');
+  initBodies();updateStatus();updateBodyPanel();
+  document.getElementById('collLog').style.display='none';
+  document.getElementById('collEntries').textContent='';
+}
+function toggleOpt(key){
+  opts[key]=!opts[key];
+  var ids={trail:'trailBtn',force:'forceBtn',kep:'kepBtn'};
+  var labels={trail:'RASTROS',force:'VETORES FORÇA',kep:'ÁREAS KEPLER II'};
+  var btn=document.getElementById(ids[key]);
+  btn.classList.toggle('on',opts[key]);
+  btn.textContent='◆ '+labels[key]+': '+(opts[key]?'ON':'OFF');
+  if(key==='trail'&&!opts.trail)simBodies.forEach(function(b){b.trail=[];});
+}
+function onMassChange(){
+  var m=+document.getElementById('nMass').value;
+  document.getElementById('nMassV').textContent=m+' u';
+  var r=Math.max(6,Math.min(20,6+Math.pow(m/80,.38)*5));
+  var dot=document.getElementById('massDot');
+  dot.style.width=r*1.2+'px';dot.style.height=r*1.2+'px';
+}
+function onSpeedChange(){
+  var v=+document.getElementById('tScale').value;
+  document.getElementById('tScaleV').textContent=v+'×';
+}
+function updateStatus(){
+  var planets=simBodies.filter(function(b){return!b.isStar;});
+  var st=document.getElementById('simStatus');
+  if(planets.length===0)st.textContent='Clique e arraste no canvas para posicionar o Planeta 1';
+  else if(planets.length===1)st.textContent='✓ Planeta 1 posicionado — adicione o Planeta 2!';
+  else st.textContent='✓ DESAFIO COMPLETO! '+planets.length+' planetas em órbita. A câmera segue a estrela.';
+}
+function updateBodyPanel(){
+  var panel=document.getElementById('bodyPanel');
+  panel.innerHTML='';
+  simBodies.forEach(function(b){
+    var star=simBodies[0];
+    var dist=Math.sqrt((b.x-star.x)*(b.x-star.x)+(b.y-star.y)*(b.y-star.y));
+    var v=Math.sqrt(b.vx*b.vx+b.vy*b.vy);
+    var T=b.isStar?0:2*Math.PI*Math.sqrt(dist*dist*dist/(G_N*M_STAR));
+    var box=document.createElement('div');
+    box.className='bp-box '+b.cls;
+    box.innerHTML='<div class="bp-name">'+b.name+'</div>'+
+      'Massa: '+b.mass.toFixed(0)+' u<br>'+
+      (b.isStar?'Posição: '+(b.x).toFixed(1)+', '+(b.y).toFixed(1):
+        'Dist. estrela: '+dist.toFixed(0)+' u')+
+      '<br>Velocidade: '+v.toFixed(2)+' u/t'+
+      (!b.isStar&&dist>40?'<br>Período est.: '+(T/60).toFixed(1)+' s':'');
+    panel.appendChild(box);
+  });
+  // Collision log
+  if(collLog.length>0){
+    document.getElementById('collLog').style.display='block';
+    document.getElementById('collEntries').innerHTML=collLog.map(function(l){return '<div>⚡ '+l+'</div>';}).join('');
+  }
+  // Star position readout
+  document.getElementById('starPosV').textContent='pos: '+(simBodies[0].x).toFixed(1)+', '+(simBodies[0].y).toFixed(1);
+}
+
+// ── RENDER ───────────────────────────────────────
+function drawN(){
+  var cv=document.getElementById('simCanvas');
+  if(!cv){requestAnimationFrame(drawN);return;}
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  var star=simBodies[0];
+
+  // Background
+  ctx.fillStyle='#020008';ctx.fillRect(0,0,W,H);
+
+  // Parallax stars (move slightly with camera)
+  bgSt2.forEach(function(s){
+    var sx=((s.wx-star.x*0.08)%W+W*2)%W;
+    var sy=((s.wy-star.y*0.08)%H+H*2)%H;
+    ctx.save();ctx.globalAlpha=s.a;ctx.fillStyle='#cca8ff';
+    ctx.beginPath();ctx.arc(sx,sy,s.r,0,Math.PI*2);ctx.fill();ctx.restore();
+  });
+
+  var now=performance.now()*.001;
+
+  // ── Kepler II areas ──
+  if(opts.kep){
+    simBodies.forEach(function(b){
+      if(b.isStar||!b.kepArea||b.kepArea.length<2)return;
+      for(var i=0;i<b.kepArea.length-1;i++){
+        var a1=b.kepArea[i],a2=b.kepArea[i+1];
+        var age=(i+1)/b.kepArea.length;
+        var p1=w2s(a1.x,a1.y,cv),p2=w2s(a2.x,a2.y,cv),ps=w2s(star.x,star.y,cv);
+        ctx.save();ctx.globalAlpha=age*.28;ctx.fillStyle=b.color;
+        ctx.beginPath();ctx.moveTo(ps.x,ps.y);ctx.lineTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.closePath();ctx.fill();ctx.restore();
+      }
+    });
+  }
+
+  // ── Trails ──
+  if(opts.trail){
+    simBodies.forEach(function(b){
+      if(!b.trail||b.trail.length<2)return;
+      for(var i=1;i<b.trail.length;i++){
+        var p1=w2s(b.trail[i-1].x,b.trail[i-1].y,cv);
+        var p2=w2s(b.trail[i].x,b.trail[i].y,cv);
+        var alpha=(i/b.trail.length)*.7;
+        ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=b.color;ctx.lineWidth=1.6;
+        ctx.shadowColor=b.color;ctx.shadowBlur=3;
+        ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();ctx.restore();
+      }
+    });
+  }
+
+  // ── Hover orbit preview ──
+  if(!placing&&mouseW){
+    var cv2=circVel(mouseW.x,mouseW.y);
+    if(cv2){
+      var sp=w2s(star.x,star.y,cv);
+      ctx.save();ctx.strokeStyle='rgba(170,68,255,.1)';ctx.lineWidth=1;ctx.setLineDash([3,7]);
+      ctx.beginPath();ctx.arc(sp.x,sp.y,cv2.r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+    }
+  }
+
+  // ── Placement preview ──
+  if(placing&&placeW&&mouseW){
+    var ps=w2s(placeW.x,placeW.y,cv);
+    var ms=w2s(mouseW.x,mouseW.y,cv);
+    var cv3=circVel(placeW.x,placeW.y);
+
+    if(cv3){
+      // Orbit circle
+      var starS=w2s(star.x,star.y,cv);
+      ctx.save();ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=1.2;ctx.setLineDash([5,5]);
+      ctx.beginPath();ctx.arc(starS.x,starS.y,cv3.r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+      // Reference circular velocity arrow (dashed white)
+      var circPx=w2s(placeW.x+cv3.vx/VDRAG,placeW.y+cv3.vy/VDRAG,cv);
+      ctx.save();ctx.strokeStyle='rgba(255,255,255,.4)';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
+      ctx.beginPath();ctx.moveTo(ps.x,ps.y);ctx.lineTo(circPx.x,circPx.y);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+      lbl2(ctx,(ps.x+circPx.x)/2,(ps.y+circPx.y)/2-10,'v circ.','rgba(255,255,255,.45)',9);
+    }
+
+    // Actual velocity arrow
+    var vx=(mouseW.x-placeW.x)*VDRAG,vy=(mouseW.y-placeW.y)*VDRAG;
+    var vMag=Math.sqrt(vx*vx+vy*vy);
+    var vCirc=cv3?cv3.v:0;
+    var ratio=vCirc>0?vMag/vCirc:0;
+    var arrowC=ratio<0.72?'#ff4488':ratio>1.4?'#ffaa00':'#44ffaa';
+    var arrowLabel=ratio<0.72?'CAIRÁ':ratio>1.4?'ESCAPARÁ':'ÓRBITA ≈ CIRCULAR';
+
+    gaFull(ctx,ps.x,ps.y,ms.x,ms.y,arrowC,2.5,14);
+    ctx.save();ctx.shadowColor=arrowC;ctx.shadowBlur=8;ctx.fillStyle=arrowC;
+    ctx.font='bold 10px Share Tech Mono,monospace';ctx.textAlign='left';
+    ctx.fillText('v='+vMag.toFixed(1)+' | '+arrowLabel,ms.x+12,ms.y);ctx.restore();
+
+    // Planet preview dot
+    var mass=+document.getElementById('nMass').value;
+    var rp=Math.max(6,Math.min(20,6+Math.pow(mass/80,.38)*5));
+    ctx.save();ctx.globalAlpha=.6;ctx.shadowColor='#aa44ff';ctx.shadowBlur=12;
+    ctx.beginPath();ctx.arc(ps.x,ps.y,rp,0,Math.PI*2);ctx.fillStyle='#aa44ff';ctx.fill();ctx.restore();
+  }
+
+  // ── Force vectors ──
+  if(opts.force){
+    simBodies.forEach(function(b){
+      if(!b.isStar){
+        var bs=w2s(b.x,b.y,cv);
+        var fScale=600;
+        gaFull(ctx,bs.x,bs.y,bs.x+b.ax*fScale,bs.y+b.ay*fScale,'#ffaa00',1.5,8);
+        gaFull(ctx,bs.x,bs.y,bs.x+b.vx*4,bs.y+b.vy*4,'rgba(68,170,255,.6)',1.5,6);
+      }
+    });
+  }
+
+  // ── Flash particles ──
+  simFlash=simFlash.filter(function(f){return f.life>0;});
+  simFlash.forEach(function(f){
+    var fs=w2s(f.x,f.y,cv);
+    var t=f.life/f.maxLife;
+    var fR=(1-t)*55;
+    ctx.save();ctx.globalAlpha=t*.9;ctx.strokeStyle=f.col;ctx.lineWidth=2.5;
+    ctx.shadowColor=f.col;ctx.shadowBlur=18;
+    ctx.beginPath();ctx.arc(fs.x,fs.y,fR,0,Math.PI*2);ctx.stroke();ctx.restore();
+    // spark lines
+    for(var k=0;k<6;k++){
+      var ang=k*Math.PI/3+f.life*.1;
+      var len2=(1-t)*30;
+      ctx.save();ctx.globalAlpha=t*.6;ctx.strokeStyle=f.col;ctx.lineWidth=1.5;
+      ctx.shadowColor=f.col;ctx.shadowBlur=8;
+      ctx.beginPath();ctx.moveTo(fs.x+Math.cos(ang)*fR*.4,fs.y+Math.sin(ang)*fR*.4);
+      ctx.lineTo(fs.x+Math.cos(ang)*(fR*.4+len2),fs.y+Math.sin(ang)*(fR*.4+len2));ctx.stroke();ctx.restore();
+    }
+    f.life--;
+  });
+
+  // ── Bodies ──
+  simBodies.forEach(function(b){
+    var bs=w2s(b.x,b.y,cv);
+    if(b.isStar){
+      drawStar(ctx,bs.x,bs.y,now,b.r);
+    } else {
+      ctx.save();ctx.shadowColor=b.color;ctx.shadowBlur=16;
+      var pg=ctx.createRadialGradient(bs.x-b.r*.3,bs.y-b.r*.3,1,bs.x,bs.y,b.r);
+      pg.addColorStop(0,'#fff');pg.addColorStop(.4,b.color);pg.addColorStop(1,'rgba(0,0,0,.6)');
+      ctx.beginPath();ctx.arc(bs.x,bs.y,b.r,0,Math.PI*2);ctx.fillStyle=pg;ctx.fill();ctx.restore();
+    }
+    lbl2(ctx,bs.x,bs.y+b.r+14,b.name,b.isStar?'rgba(255,204,0,.7)':b.color,9);
+    if(!b.isStar){
+      var d=Math.sqrt((b.x-star.x)*(b.x-star.x)+(b.y-star.y)*(b.y-star.y));
+      lbl2(ctx,bs.x,bs.y+b.r+26,d.toFixed(0)+' u','rgba(255,255,255,.3)',8);
+    }
+    // Small star displacement indicator
+    if(b.isStar&&(Math.abs(b.x)>2||Math.abs(b.y)>2)){
+      lbl2(ctx,bs.x+28,bs.y-28,'★ deslocada','rgba(255,170,0,.45)',8);
+    }
+  });
+
+  // Kepler II area tracking
+  if(opts.kep&&simRunning){
+    simBodies.forEach(function(b){
+      if(b.isStar)return;
+      if(!b.kepArea)b.kepArea=[];
+      if(b.kepArea.length===0||Math.hypot(b.x-b.kepArea[b.kepArea.length-1].x,b.y-b.kepArea[b.kepArea.length-1].y)>18){
+        b.kepArea.push({x:b.x,y:b.y});
+        if(b.kepArea.length>14)b.kepArea.shift();
+      }
+    });
+  }
+
+  // Update body panel
+  updateBodyPanel();
+
+  if(simRunning)simStep();
+  requestAnimationFrame(drawN);
+}
+
+function gaFull(ctx,x1,y1,x2,y2,col,lw,blur){
+  lw=lw||2;blur=blur||12;
+  var a=Math.atan2(y2-y1,x2-x1),L=11;
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=blur;
+  ctx.strokeStyle=col;ctx.lineWidth=lw;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.fillStyle=col;ctx.beginPath();
+  ctx.moveTo(x2,y2);ctx.lineTo(x2-L*Math.cos(a-.42),y2-L*Math.sin(a-.42));
+  ctx.lineTo(x2-L*Math.cos(a+.42),y2-L*Math.sin(a+.42));ctx.closePath();ctx.fill();ctx.restore();
+}
+function lbl2(ctx,x,y,txt,col,sz,align){
+  sz=sz||11;align=align||'center';
+  ctx.save();ctx.shadowColor=col;ctx.shadowBlur=5;ctx.fillStyle=col;
+  ctx.font=sz+'px Share Tech Mono,monospace';ctx.textAlign=align;ctx.fillText(txt,x,y);ctx.restore();
+}
+
+// QUIZ
+// ════════════════════════════════════════════════
+var QA={q1:0,q2:0,q3:0,q4:0,q5:0,q6:0,q7:0,q8:0};
+var FB={
+  q1:{c:'CORRETO! 1ª Lei: cada planeta descreve uma ELIPSE com o Sol num dos FOCOS. Órbitas circulares são caso especial (e=0).',
+      w:'ERRADO. 1ª Lei de Kepler: órbita ELÍPTICA, com o Sol num dos FOCOS (não no centro geométrico).'},
+  q2:{c:'CORRETO! No periélio, r é mínimo. Para conservar L = m·r·v = cte, se r diminui, v aumenta. Velocidade MÁXIMA no periélio.',
+      w:'ERRADO. No periélio (r mínimo), pela conservação do momento angular L = m·r·v = cte, a velocidade é MÁXIMA.'},
+  q3:{c:'CORRETO! T² = a³ → T² = 4³ = 64 → T = 8 anos. Verificação: T²/a³ = 64/64 = 1.',
+      w:'ERRADO. T² = a³ = 4³ = 64 → T = √64 = 8 anos. Pela 3ª Lei de Kepler.'},
+  q4:{c:'CORRETO! F ∝ 1/r². Se r dobra: F → F/2² = F/4. A força cai para um quarto.',
+      w:'ERRADO. F ∝ 1/r². Se r dobra (×2): F → F/(2²) = F/4. Um quarto do valor.'},
+  q5:{c:'CORRETO! g = GM/R². Se M→4M e R→2R: g\' = G(4M)/(2R)² = 4GM/4R² = GM/R² = g. Exatamente igual à Terra!',
+      w:'ERRADO. g = GM/R². Com M→4M e R→2R: g\' = G(4M)/(2R)² = 4GM/4R² = GM/R² = g. Igual à Terra.'},
+  q6:{c:'CORRETO! v = √(GM/r). Para r→2R: v\' = √(GM/2R) = (1/√2)·√(GM/R) = v₀/√2 ≈ 0,707·v₀.',
+      w:'ERRADO. v = √(GM/r). Com r dobrado: v\' = √(GM/2r) = v₀/√2 ≈ 0,71·v₀.'},
+  q7:{c:'CORRETO! T_X = 2T_Y. Pela 3ª Lei: T²/a³ = k → (2T_Y)²/aX³ = T_Y²/aY³ → 4/aX³ = 1/aY³ → aX³/aY³ = 4 → aX/aY = ∛4 ≈ 1,587.',
+      w:'ERRADO. T_X = 2T_Y. T²∝a³ → (2T)²/aX³ = T²/aY³ → aX³ = 4aY³ → aX/aY = ∛4 ≈ 1,587.'},
+  q8:{c:'CORRETO! Kepler (observação/matemática) DESCREVEU como as órbitas são. Newton (teoria física) EXPLICOU por que são assim, com a Lei da Gravitação Universal.',
+      w:'ERRADO. Kepler descreveu as órbitas matematicamente (COMO são). Newton foi além e explicou a CAUSA física (força gravitacional).'}
+};
+var answered=0;
+function ans(btn,qId,result){
+  var card=document.getElementById(qId);
+  card.querySelectorAll('.obt').forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('f_'+qId);
+  if(result==='correct'){btn.classList.add('correct');fb.textContent=FB[qId].c;fb.className='fb show ok';QA[qId]=1;}
+  else{btn.classList.add('wrong');fb.textContent=FB[qId].w;fb.className='fb show err';
+    card.querySelectorAll('.obt').forEach(function(b){if(b.getAttribute('onclick').indexOf("'correct'")>-1)b.classList.add('correct');});}
+  answered++;updateP();if(answered===8)showScore();
+}
+function updateP(){
+  document.getElementById('pBar').style.width=(answered/8*100)+'%';
+  document.getElementById('pTxt').textContent=answered+' / 8 respondidas';
+}
+function showScore(){
+  var sc=0;Object.values(QA).forEach(function(v){sc+=v;});
+  var p=document.getElementById('spanel');p.style.display='block';
+  document.getElementById('scv').textContent=sc+'/8';
+  var msgs=['Revise as leis e fórmulas!','Bom início! Continue estudando.','Indo bem — quase lá!','Ótimo domínio da Gravitação!','Perfeito! Digno de um astrônomo!'];
+  var idx=sc<=2?0:sc<=4?1:sc<=5?2:sc<=7?3:4;
+  document.getElementById('scm').textContent=msgs[idx];
+  var cols=['#ff4488','#ffaa00','#ffaa00','#44ffaa','#aa44ff'];
+  document.getElementById('scv').style.color=cols[idx];
+  document.getElementById('scv').style.textShadow='0 0 20px '+cols[idx];
+  p.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetQ(){
+  Object.keys(QA).forEach(function(k){QA[k]=0;});answered=0;updateP();
+  document.getElementById('spanel').style.display='none';
+  ['q1','q2','q3','q4','q5','q6','q7','q8'].forEach(function(id){
+    document.getElementById(id).querySelectorAll('.obt').forEach(function(b){b.disabled=false;b.classList.remove('correct','wrong');});
+    var fb=document.getElementById('f_'+id);fb.className='fb';fb.textContent='';
+  });
+}
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+window.addEventListener('load',function(){
+  initBodies();initBgStars2();onMassChange();
+  animK1();animK2();animK3();calcK3();calcGrav();
+  computeAccelsN();drawN();
+});
+</script>
+</body>
+</html>
