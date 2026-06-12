@@ -115,7 +115,7 @@
       display: none;
       position: absolute;
       background: #120120;
-      min-width: 240px;
+      min-width: 280px;
       box-shadow: 0px 8px 16px rgba(0,0,0,0.6);
       z-index: 10;
       border: 1px solid var(--purple-neon);
@@ -147,7 +147,7 @@
     .category-section h2 {
       font-family: 'Orbitron', sans-serif;
       color: white;
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       border-bottom: 2px solid rgba(188, 19, 254, 0.3);
       padding-bottom: 10px;
       margin-bottom: 30px;
@@ -203,7 +203,7 @@
     .exp-card h3 {
       font-family: 'Orbitron', sans-serif;
       color: var(--magenta-neon);
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       margin-bottom: 15px;
       position: relative;
       z-index: 1;
@@ -211,7 +211,7 @@
     .exp-card p {
       color: #d0c0d8;
       line-height: 1.6;
-      font-size: 1rem;
+      font-size: 0.95rem;
       margin-bottom: 25px;
       position: relative;
       z-index: 1;
@@ -262,98 +262,118 @@
     </div>
 
     <h1>Aulas Prontas</h1>
-    <p class="subtitle">Material didático e apresentações completas</p>
+    <p class="subtitle">Material didático estruturado por Módulos de Ensino</p>
 
     <div class="filter-section">
       <div class="dropdown">
-        <button class="dropbtn" id="current-category">Filtrar por Conteúdo ▾</button>
+        <button class="dropbtn" id="current-category">Filtrar por Módulo ▾</button>
         <div class="dropdown-content">
           <a onclick="filterCategory('todos')">Mostrar Todos</a>
-          <a onclick="filterCategory('cinematica')">Cinemática</a>
-          <a onclick="filterCategory('dinamica')">Dinâmica</a>
-          <a onclick="filterCategory('trabalho_energia')">Trabalho e Energia</a>
-          <a onclick="filterCategory('termologia')">Termologia</a>
-          <a onclick="filterCategory('termodinamica')">Termodinâmica</a>
-          <a onclick="filterCategory('ondulatoria')">Ondulatória</a>
-          <a onclick="filterCategory('optica')">Óptica</a>
-          <a onclick="filterCategory('eletrostatica')">Eletrostática</a>
-          <a onclick="filterCategory('eletrodinamica')">Eletrodinâmica</a>
-          <a onclick="filterCategory('eletromagnetismo')">Eletromagnetismo</a>
+          <a onclick="filterCategory('mod00')">Módulo 00: Fundamentos</a>
+          <a onclick="filterCategory('mod01')">Módulo 01: Mecânica</a>
+          <a onclick="filterCategory('mod02')">Módulo 02: Termologia</a>
+          <a onclick="filterCategory('mod03')">Módulo 03: Ondulatória</a>
+          <a onclick="filterCategory('mod04')">Módulo 04: Eletromagnetismo</a>
+          <a onclick="filterCategory('mod05')">Módulo 05: Moderna</a>
         </div>
       </div>
     </div>
 
-    <div class="category-section" id="sec-cinematica">
-      <h2>1. Cinemática</h2>
+    <div class="category-section" id="sec-mod00">
+      <h2>Módulo 00: Fundamentos da Física</h2>
       <div class="exp-grid">
         <div class="exp-card">
-          <span class="tag">Cinemática</span>
+          <span class="tag">F03</span>
           <div>
-            <h3>Aula - MRUV</h3>
-            <p>Aprenda os conceitos fundamentais do Movimento Retilíneo Uniformemente Variado, equações horárias e análise gráfica.</p>
+            <h3>Vetores</h3>
+            <p>Introdução a grandezas escalares e vetoriais, aprendizado de operações fundamentais com vetores e técnicas de decomposição vetorial.</p>
           </div>
-          <a href="aulas/aula-mruv.html" class="btn-start">Acessar Aula</a>
+          <a href="aulas/aula-vetores.html" class="btn-start">Acessar Aula</a>
         </div>
       </div>
       <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
     </div>
 
-    <div class="category-section" id="sec-dinamica">
-      <h2>2. Dinâmica</h2>
+    <div class="category-section" id="sec-mod01">
+      <h2>Módulo 01: Mecânica Clássica</h2>
       <div class="exp-grid">
         <div class="exp-card">
-          <span class="tag">Dinâmica</span>
+          <span class="tag">MC01</span>
+          <div>
+            <h3>Cinemática - MRU</h3>
+            <p>Estudo descritivo do Movimento Retilíneo Uniforme, com foco na compreensão de referenciais, equações horárias e velocidade constante.</p>
+          </div>
+          <a href="aulas/aula-cinematica-mru.html" class="btn-start">Acessar Aula</a>
+        </div>
+        
+        <div class="exp-card">
+          <span class="tag">MC01</span>
+          <div>
+            <h3>Cinemática - MRUV</h3>
+            <p>Aprenda os conceitos fundamentais do Movimento Retilíneo Uniformemente Variado, equações horárias da aceleração e análise gráfica.</p>
+          </div>
+          <a href="aulas/aula-mruv.html" class="btn-start">Acessar Aula</a>
+        </div>
+
+        <div class="exp-card">
+          <span class="tag">MC02</span>
           <div>
             <h3>Aplicações das Leis de Newton</h3>
             <p>Estudo aprofundado sobre forças de tração, peso, normal e atrito através de sistemas de blocos e roldanas.</p>
           </div>
           <a href="aulas/aula-apl-leis.html" class="btn-start">Acessar Aula</a>
         </div>
+
+        <div class="exp-card">
+          <span class="tag">MC03</span>
+          <div>
+            <h3>Gravitação Universal</h3>
+            <p>Análise dos modelos planetários, Leis de Kepler e o estudo detalhado da Lei da Gravitação Universal proposta por Newton.</p>
+          </div>
+          <a href="aulas/aula-gravitacao.html" class="btn-start">Acessar Aula</a>
+        </div>
+
+        <div class="exp-card">
+          <span class="tag">MC04</span>
+          <div>
+            <h3>Trabalho e Energia</h3>
+            <p>Definição e cálculo do trabalho de uma força, entendimento do conceito de potência e a aplicação da conservação da energia mecânica.</p>
+          </div>
+          <a href="aulas/aula-trabalho-energia.html" class="btn-start">Acessar Aula</a>
+        </div>
       </div>
       <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
     </div>
 
-    <div class="category-section" id="sec-trabalho_energia">
-      <h2>3. Trabalho e Energia</h2>
-      <div class="exp-grid">
-        </div>
-      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
-    </div>
-
-    <div class="category-section" id="sec-termologia">
-      <h2>4. Termologia</h2>
-      <div class="exp-grid">
-        </div>
-      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
-    </div>
-
-    <div class="category-section" id="sec-termodinamica">
-      <h2>5. Termodinâmica</h2>
-      <div class="exp-grid">
-        </div>
-      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
-    </div>
-
-    <div class="category-section" id="sec-ondulatoria">
-      <h2>6. Ondulatória</h2>
+    <div class="category-section" id="sec-mod02">
+      <h2>Módulo 02: Termologia e Termodinâmica</h2>
       <div class="exp-grid">
         <div class="exp-card">
-          <span class="tag">Ondulatória</span>
+          <span class="tag">T04</span>
+          <div>
+            <h3>Termodinâmica</h3>
+            <p>Estudo completo do trabalho gasoso, 1ª e 2ª Leis da Termodinâmica, análise de máquinas térmicas e o conceito de entropia.</p>
+          </div>
+          <a href="aulas/aula-termodinamica.html" class="btn-start">Acessar Aula</a>
+        </div>
+      </div>
+      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
+    </div>
+
+    <div class="category-section" id="sec-mod03">
+      <h2>Módulo 03: Ondulatória e Óptica</h2>
+      <div class="exp-grid">
+        <div class="exp-card">
+          <span class="tag">O001</span>
           <div>
             <h3>Introdução à Ondulatória</h3>
-            <p>Compreenda o conceito de ondas, as suas classificações quanto à natureza e direção, e as grandezas fundamentais como frequência, período e velocidade.</p>
+            <p>Compreenda o conceito de ondas, as suas classificações quanto à natureza e direção, e as grandezas fundamentais como frequência e período.</p>
           </div>
           <a href="aulas/ondulatoria.html" class="btn-start">Acessar Aula</a>
         </div>
-      </div>
-      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
-    </div>
 
-    <div class="category-section" id="sec-optica">
-      <h2>7. Óptica</h2>
-      <div class="exp-grid">
         <div class="exp-card">
-          <span class="tag">Óptica</span>
+          <span class="tag">O004</span>
           <div>
             <h3>Princípios da Óptica</h3>
             <p>Desvende a propagação retilínea da luz, os princípios da independência dos raios e os conceitos de sombra e penumbra.</p>
@@ -364,11 +384,11 @@
       <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
     </div>
 
-    <div class="category-section" id="sec-eletrostatica">
-      <h2>8. Eletrostática</h2>
+    <div class="category-section" id="sec-mod04">
+      <h2>Módulo 04: Eletrostática, Eletrodinâmica e Eletromagnetismo</h2>
       <div class="exp-grid">
         <div class="exp-card">
-          <span class="tag">Eletrostática</span>
+          <span class="tag">E01</span>
           <div>
             <h3>Princípios da Eletrostática</h3>
             <p>Compreenda as propriedades das cargas elétricas, processos de eletrização, força elétrica e a aplicação da Lei de Coulomb.</p>
@@ -379,17 +399,10 @@
       <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
     </div>
 
-    <div class="category-section" id="sec-eletrodinamica">
-      <h2>9. Eletrodinâmica</h2>
+    <div class="category-section" id="sec-mod05">
+      <h2>Módulo 05: Física Moderna e Contemporânea</h2>
       <div class="exp-grid">
-        </div>
-      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
-    </div>
-
-    <div class="category-section" id="sec-eletromagnetismo">
-      <h2>10. Eletromagnetismo</h2>
-      <div class="exp-grid">
-        </div>
+      </div>
       <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
     </div>
 
@@ -419,23 +432,19 @@
       });
     }
 
-    // Lógica do filtro de navegação
+    // Lógica do filtro de navegação atualizada
     function filterCategory(category) {
       const sections = document.querySelectorAll('.category-section');
       const button = document.getElementById('current-category');
       
       const names = {
         'todos': 'Mostrar Todos ▾',
-        'cinematica': 'Cinemática ▾',
-        'dinamica': 'Dinâmica ▾',
-        'trabalho_energia': 'Trabalho e Energia ▾',
-        'termologia': 'Termologia ▾',
-        'termodinamica': 'Termodinâmica ▾',
-        'ondulatoria': 'Ondulatória ▾',
-        'optica': 'Óptica ▾',
-        'eletrostatica': 'Eletrostática ▾',
-        'eletrodinamica': 'Eletrodinâmica ▾',
-        'eletromagnetismo': 'Eletromagnetismo ▾'
+        'mod00': 'Módulo 00: Fundamentos ▾',
+        'mod01': 'Módulo 01: Mecânica ▾',
+        'mod02': 'Módulo 02: Termologia ▾',
+        'mod03': 'Módulo 03: Ondulatória ▾',
+        'mod04': 'Módulo 04: Eletromagnetismo ▾',
+        'mod05': 'Módulo 05: Moderna ▾'
       };
       
       if(names[category]) button.innerText = names[category];
