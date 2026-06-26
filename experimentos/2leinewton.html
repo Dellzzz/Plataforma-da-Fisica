@@ -960,5 +960,12 @@ function showSim(name){
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click', ()=>showSim(b.dataset.sim)));
 showSim('newton');
 </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () =>
+        navigator.serviceWorker.register('./sw.js')
+      );
+    }
+  </script>
 </body>
 </html>
