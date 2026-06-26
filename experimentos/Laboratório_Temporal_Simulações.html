@@ -390,5 +390,12 @@ new ResizeObserver(layout).observe(document.getElementById('sceneBox'));
 window.addEventListener('resize',layout);
 setMode('mru'); layout(); requestAnimationFrame(frame);
 </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () =>
+        navigator.serviceWorker.register('./sw.js')
+      );
+    }
+  </script>
 </body>
 </html>
