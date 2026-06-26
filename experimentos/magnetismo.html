@@ -268,5 +268,12 @@ new ResizeObserver(resize).observe(document.querySelector('.cbox'));
 window.addEventListener('resize',resize);
 resize(); setMode('campo',document.querySelector('.tab')); requestAnimationFrame(frame);
 </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () =>
+        navigator.serviceWorker.register('./sw.js')
+      );
+    }
+  </script>
 </body>
 </html>
