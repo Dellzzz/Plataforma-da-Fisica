@@ -1657,5 +1657,12 @@ window.addEventListener('resize', () => {
   // refit canvases on mobile if needed
 });
 </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () =>
+        navigator.serviceWorker.register('./sw.js')
+      );
+    }
+  </script>
 </body>
 </html>
