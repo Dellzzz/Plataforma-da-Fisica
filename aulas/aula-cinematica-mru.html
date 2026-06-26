@@ -944,5 +944,12 @@ window.addEventListener('load',function(){
   drawDistCanvas();calcVel();drawMRUFrame(0);drawGraphs();
 });
 </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () =>
+        navigator.serviceWorker.register('./sw.js')
+      );
+    }
+  </script>
 </body>
 </html>
