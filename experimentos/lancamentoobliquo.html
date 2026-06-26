@@ -248,5 +248,12 @@ new ResizeObserver(resize).observe(wrap);
 window.addEventListener("resize", resize);
 resize();
 </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () =>
+        navigator.serviceWorker.register('./sw.js')
+      );
+    }
+  </script>
 </body>
 </html>
