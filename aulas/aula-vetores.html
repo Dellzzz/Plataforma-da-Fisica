@@ -772,5 +772,12 @@ window.addEventListener('load',function(){
   drawVecExplorer();drawDecomp();drawAdd();drawSub();calcDot();drawLab();
 });
 </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () =>
+        navigator.serviceWorker.register('./sw.js')
+      );
+    }
+  </script>
 </body>
 </html>
