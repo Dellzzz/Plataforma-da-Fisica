@@ -1880,5 +1880,12 @@ console.info('   3. Isso garante que a posição do eixo seja SEMPRE onde você 
 console.info('');
 console.info('✅ Agora múltiplos eixos no mesmo corpo mantêm a posição exata onde você clicou!');
 </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () =>
+        navigator.serviceWorker.register('./sw.js')
+      );
+    }
+  </script>
 </body>
 </html>
