@@ -14,13 +14,13 @@ const PRECACHE = [
   './icons/icon-512.png',
   // Área ENEM + aulas interativas
   './area-enem.html',
-  './eletrodinamica-enem.html',
-  './mecanica-enem.html',
-  './ondulatoria-enem.html',
-  './termodinamica-enem.html',
-  './eletromagnetismo-enem.html',
-  './optica-enem.html',
-  './hidrostatica-enem.html'
+  './area enem/eletrodinamica-enem.html',
+  './area enem/mecanica-enem.html',
+  './area enem/ondulatoria-enem.html',
+  './area enem/termodinamica-enem.html',
+  './area enem/eletromagnetismo-enem.html',
+  './area enem/optica-enem.html',
+  './area enem/hidrostatica-enem.html'
 ];
 
 // Instalação: pré-carrega o "esqueleto" do app
