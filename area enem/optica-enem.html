@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Óptica do Zero — Aula ENEM | Plataforma da Física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a1a; --bg-2:#0d0f24; --panel:rgba(18,22,48,0.72); --panel-solid:#12162f;
+    --cyan:#00e5ff; --cyan-dim:#0792a8; --magenta:#ff3df0; --violet:#8b5cff;
+    --green:#27e88a; --yellow:#ffd23d; --orange:#ff9d3d; --red:#ff5a6e; --gold:#ffcf4d;
+    --txt:#dbe6f5; --txt-dim:#8492b4; --line:rgba(255,210,61,0.22); --line-soft:rgba(255,255,255,0.07);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body::before{content:'';position:fixed;inset:0;z-index:-2;background:
+    radial-gradient(1100px 620px at 78% -8%, rgba(255,210,61,0.10), transparent 60%),
+    radial-gradient(900px 520px at 8% 12%, rgba(0,229,255,0.09), transparent 60%),
+    radial-gradient(800px 800px at 50% 120%, rgba(255,61,240,0.05), transparent 60%), var(--bg);}
+  body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(255,210,61,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,210,61,0.03) 1px,transparent 1px);
+    background-size:46px 46px;mask-image:radial-gradient(ellipse 100% 70% at 50% 0%,#000 30%,transparent 80%);}
+  ::selection{background:rgba(255,210,61,0.3);color:#fff}
+
+  .topbar{position:sticky;top:0;z-index:60;backdrop-filter:blur(12px);background:rgba(8,9,22,0.78);border-bottom:1px solid var(--line)}
+  .topbar-row{max-width:980px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:14px}
+  .tb-logo{font-family:'Orbitron';font-weight:700;font-size:14px;color:#eafcff;letter-spacing:.5px;display:flex;align-items:center;gap:9px;white-space:nowrap}
+  .tb-logo .spark{color:var(--gold);filter:drop-shadow(0 0 6px var(--gold))}
+  .tb-spacer{flex:1}
+  .tb-pct{font-family:'Orbitron';font-weight:700;font-size:13px;color:var(--green);min-width:42px;text-align:right}
+  .tb-toc-btn{font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:.4px;color:var(--gold);background:rgba(255,210,61,0.09);border:1px solid var(--line);padding:8px 13px;border-radius:9px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .tb-toc-btn:hover{background:rgba(255,210,61,0.18)}
+  .progress-strip{height:3px;background:rgba(255,255,255,0.06)}
+  .progress-strip > div{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--orange));box-shadow:0 0 10px rgba(255,210,61,.6);transition:width .4s ease}
+
+  .toc{position:fixed;inset:0;z-index:70;display:none;background:rgba(4,5,14,0.72);backdrop-filter:blur(4px)}
+  .toc.open{display:block}
+  .toc-panel{position:absolute;right:0;top:0;height:100%;width:min(340px,86vw);background:var(--panel-solid);border-left:1px solid var(--line);padding:24px 20px;overflow-y:auto;transform:translateX(100%);transition:transform .3s ease}
+  .toc.open .toc-panel{transform:translateX(0)}
+  .toc-panel h3{font-family:'Orbitron';font-weight:700;font-size:14px;color:var(--gold);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+  .toc-x{cursor:pointer;color:var(--txt-dim);font-size:22px;line-height:1}
+  .toc a{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--txt);padding:11px 12px;border-radius:9px;margin-bottom:4px;font-size:16px;font-weight:500;transition:.18s;border:1px solid transparent}
+  .toc a:hover{background:rgba(255,210,61,0.06);border-color:var(--line)}
+  .toc a .n{font-family:'Orbitron';font-size:11px;color:var(--gold);min-width:22px}
+  .toc a .dot{margin-left:auto;width:16px;height:16px;border-radius:50%;border:2px solid var(--cyan-dim);display:grid;place-items:center;font-size:10px;color:#04121a}
+  .toc a.done .dot{background:var(--green);border-color:var(--green)}
+
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  section.lesson{padding:60px 0;border-bottom:1px solid var(--line-soft)}
+  section.lesson:last-of-type{border-bottom:none}
+
+  .hero{position:relative;overflow:hidden;padding:0;border-bottom:1px solid var(--line)}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.6}
+  .hero-inner{position:relative;max-width:980px;margin:0 auto;padding:74px 20px 70px;text-align:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:2px;color:var(--gold);border:1px solid var(--line);background:rgba(255,210,61,0.05);padding:7px 15px;border-radius:30px;text-transform:uppercase;margin-bottom:26px}
+  .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .hero h1{font-family:'Orbitron';font-weight:900;font-size:clamp(34px,8vw,62px);line-height:1.02;letter-spacing:-1px;color:#eafcff;text-shadow:0 0 34px rgba(255,210,61,0.35)}
+  .hero h1 .glow{color:var(--gold);text-shadow:0 0 30px rgba(255,210,61,0.7)}
+  .hero .sub{font-size:clamp(17px,2.6vw,21px);color:var(--txt);max-width:650px;margin:22px auto 0;font-weight:500}
+  .hero .sub b{color:#eafcff;font-weight:700}
+  .hero-meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+  .chip{font-family:'Orbitron';font-size:11px;font-weight:500;color:var(--txt-dim);border:1px solid var(--line-soft);background:rgba(255,255,255,0.02);padding:8px 13px;border-radius:8px}
+  .chip b{color:var(--gold);font-weight:700}
+  .scroll-cue{margin-top:42px;font-family:'Orbitron';font-size:11px;letter-spacing:1.5px;color:var(--txt-dim);animation:bob 2s infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
+
+  .kicker{font-family:'Orbitron';font-weight:500;font-size:12px;letter-spacing:1.6px;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .kicker .num{font-weight:900;font-size:13px;color:#1a1404;background:var(--gold);width:30px;height:30px;display:grid;place-items:center;border-radius:9px;box-shadow:0 0 14px rgba(255,210,61,.5)}
+  h2.sec-title{font-family:'Orbitron';font-weight:700;font-size:clamp(24px,4.6vw,34px);color:#eafcff;line-height:1.12;letter-spacing:-.3px;margin-bottom:20px}
+  .lead{font-size:19px;color:var(--txt);font-weight:500;line-height:1.65;margin-bottom:18px}
+  p.body{font-size:17px;line-height:1.72;color:var(--txt);font-weight:400;margin-bottom:16px}
+  p.body b{color:#eafcff;font-weight:700}
+  p.body .hl{color:var(--gold);font-weight:600}
+  .unit{color:var(--violet);font-weight:700}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin:22px 0;backdrop-filter:blur(6px)}
+  .note{border-left:3px solid var(--gold);background:rgba(255,210,61,0.05);padding:15px 18px;border-radius:0 11px 11px 0;margin:20px 0;font-size:16.5px;line-height:1.6}
+  .note.tip{border-left-color:var(--green);background:rgba(39,232,138,0.06)}
+  .note.warn{border-left-color:var(--orange);background:rgba(255,157,61,0.06)}
+  .note .tag{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.6px;display:block;margin-bottom:6px;color:var(--gold)}
+  .note.tip .tag{color:var(--green)}
+  .note.warn .tag{color:var(--orange)}
+  .note b{color:#eafcff}
+
+  .formula{text-align:center;font-family:'Orbitron';font-weight:700;font-size:clamp(20px,4.6vw,28px);color:#eafcff;background:rgba(0,0,0,0.32);border:1px solid var(--line);border-radius:12px;padding:22px;margin:22px 0;letter-spacing:1px}
+  .formula .v{color:var(--gold)}
+  .formula .c{color:var(--cyan)}
+  .formula .i{color:var(--green)}
+  .formula small{display:block;font-family:'Rajdhani';font-weight:500;font-size:14px;letter-spacing:0;color:var(--txt-dim);margin-top:12px}
+
+  .map{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden;margin:22px 0}
+  .map.two{grid-template-columns:repeat(2,1fr)}
+  .map .m{background:var(--panel-solid);padding:18px 16px;text-align:center}
+  .map .m .ic{font-size:26px;display:block;margin-bottom:8px}
+  .map .m .t{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;display:block;margin-bottom:6px}
+  .map .m .d{color:var(--txt-dim);font-size:14px;line-height:1.4}
+
+  .sim{background:linear-gradient(180deg,rgba(13,15,36,0.9),rgba(10,10,26,0.9));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:24px 0;box-shadow:0 8px 40px rgba(0,0,0,0.35)}
+  .sim-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(255,210,61,0.06);border-bottom:1px solid var(--line)}
+  .sim-head .ic{font-size:16px}
+  .sim-head .ttl{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;letter-spacing:.4px}
+  .sim-head .lbl{margin-left:auto;font-family:'Orbitron';font-size:10px;color:var(--gold);border:1px solid var(--line);padding:4px 9px;border-radius:20px}
+  .sim-canvas-wrap{position:relative;width:100%;background:radial-gradient(circle at 50% 40%,rgba(255,210,61,0.04),transparent 70%)}
+  .sim canvas{display:block;width:100%}
+  .sim-controls{padding:18px}
+  .ctrl{margin-bottom:16px}
+  .ctrl:last-child{margin-bottom:0}
+  .ctrl-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .ctrl-label .nm{font-family:'Orbitron';font-weight:500;font-size:12.5px;color:var(--txt);letter-spacing:.3px}
+  .ctrl-label .vl{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--gold)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--gold),rgba(255,255,255,0.08));outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px rgba(255,210,61,0.7);border:2px solid #1a1404;cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--gold);box-shadow:0 0 12px rgba(255,210,61,0.7);border:2px solid #1a1404;cursor:pointer}
+  input[type=range].r{background:linear-gradient(90deg,#ff5a6e,rgba(255,255,255,0.08))}
+  input[type=range].r::-webkit-slider-thumb{background:#ff5a6e;box-shadow:0 0 10px rgba(255,90,110,.7)}
+  input[type=range].g{background:linear-gradient(90deg,#27e88a,rgba(255,255,255,0.08))}
+  input[type=range].g::-webkit-slider-thumb{background:#27e88a;box-shadow:0 0 10px rgba(39,232,138,.7)}
+  input[type=range].b{background:linear-gradient(90deg,#3b9dff,rgba(255,255,255,0.08))}
+  input[type=range].b::-webkit-slider-thumb{background:#3b9dff;box-shadow:0 0 10px rgba(59,157,255,.7)}
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .readout .ro{flex:1;min-width:90px;background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;text-align:center}
+  .readout .ro .k{font-family:'Orbitron';font-size:10px;letter-spacing:.5px;color:var(--txt-dim);display:block;margin-bottom:4px}
+  .readout .ro .v{font-family:'Orbitron';font-weight:700;font-size:18px;color:var(--gold)}
+  .readout .ro.g .v{color:var(--green)}
+  .readout .ro.c .v{color:var(--cyan)}
+
+  .enem-q{border:1px solid var(--violet);border-radius:var(--radius);overflow:hidden;margin:26px 0;background:linear-gradient(180deg,rgba(139,92,255,0.06),rgba(10,10,26,0.4))}
+  .eq-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(139,92,255,0.1);border-bottom:1px solid rgba(139,92,255,0.25);flex-wrap:wrap}
+  .eq-badge{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.4px;color:var(--violet);border:1px solid rgba(139,92,255,0.4);background:rgba(139,92,255,0.08);padding:5px 11px;border-radius:20px}
+  .eq-tag{font-family:'Orbitron';font-size:11px;color:var(--txt-dim);letter-spacing:.5px}
+  .eq-tag.real{margin-left:auto;color:var(--green)}
+  .eq-body{padding:20px 18px}
+  .eq-enun{font-size:16.5px;line-height:1.62;color:var(--txt);margin-bottom:16px}
+  .eq-alts{display:flex;flex-direction:column;gap:8px}
+  .eq-alt{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;font-size:15.5px;transition:.25s}
+  .eq-alt .let{font-family:'Orbitron';font-weight:700;font-size:13px;width:26px;height:26px;flex-shrink:0;display:grid;place-items:center;border-radius:7px;border:1px solid var(--cyan-dim);color:var(--cyan)}
+  .eq-alt.correct{border-color:var(--green);background:rgba(39,232,138,0.1)}
+  .eq-alt.correct .let{background:var(--green);color:#04121a;border-color:var(--green)}
+  .reveal-btn{margin-top:16px;width:100%;font-family:'Orbitron';font-weight:700;font-size:13px;letter-spacing:.5px;background:linear-gradient(120deg,var(--violet),#6f4ad6);color:#fff;border:none;padding:13px;border-radius:11px;cursor:pointer;transition:.2s}
+  .reveal-btn:hover{filter:brightness(1.12);box-shadow:0 0 20px rgba(139,92,255,0.4)}
+  .eq-sol{margin-top:18px;border-top:1px dashed rgba(139,92,255,0.3);padding-top:18px;display:none}
+  .eq-sol.show{display:block;animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .eq-sol h4{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;color:var(--gold);margin:16px 0 8px;text-transform:uppercase}
+  .eq-sol h4:first-child{margin-top:0}
+  .eq-sol p{font-size:16px;line-height:1.62;color:var(--txt);margin-bottom:6px}
+  .eq-sol .calc-step{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--yellow);background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:9px;padding:11px 14px;margin:10px 0;letter-spacing:.5px}
+  .eq-answer{margin-top:16px;font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--green);background:rgba(39,232,138,0.1);border:1px solid rgba(39,232,138,0.3);border-radius:10px;padding:13px 16px;text-align:center}
+
+  .laws{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}
+  .laws .lw{background:var(--panel-solid);border:1px solid var(--line-soft);border-radius:12px;padding:18px 14px;text-align:center}
+  .laws .lw .n{font-size:26px}
+  .laws .lw .t{font-family:'Orbitron';font-weight:700;font-size:12px;color:#eafcff;margin:8px 0 6px;letter-spacing:.3px}
+  .laws .lw .d{font-size:13.5px;color:var(--txt-dim);line-height:1.45}
+
+  .sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0}
+  .sheet .f{background:var(--panel-solid);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .sheet .f .eq{font-family:'Orbitron';font-weight:700;font-size:16px;color:var(--gold);margin-bottom:7px}
+  .sheet .f .ds{font-size:13.5px;color:var(--txt-dim);line-height:1.4}
+  .takeaways{list-style:none;margin:18px 0}
+  .takeaways li{position:relative;padding:9px 0 9px 32px;font-size:16.5px;line-height:1.55;border-bottom:1px solid var(--line-soft)}
+  .takeaways li:last-child{border-bottom:none}
+  .takeaways li::before{content:'\1F4A1';position:absolute;left:0;top:8px;font-size:15px}
+  .takeaways li b{color:#eafcff}
+
+  .finish-card{text-align:center;background:linear-gradient(135deg,rgba(255,210,61,0.08),rgba(255,157,61,0.06));border:1px solid var(--line)}
+  .btn{font-family:'Orbitron';font-weight:700;font-size:14px;letter-spacing:.5px;background:linear-gradient(120deg,var(--gold),#ffe08a);color:#1a1404;border:none;padding:15px 30px;border-radius:12px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:9px}
+  .btn:hover{filter:brightness(1.08);box-shadow:0 0 26px rgba(255,210,61,0.45);transform:translateY(-1px)}
+  .btn.done-state{background:linear-gradient(120deg,var(--green),#1fd07e);color:#04121a}
+  footer{padding:34px 20px 50px;text-align:center;color:var(--txt-dim);font-size:13.5px}
+  footer .ft-logo{font-family:'Orbitron';font-weight:700;color:var(--gold);font-size:14px}
+
+  @media(max-width:680px){
+    section.lesson{padding:46px 0}
+    .map,.map.two,.laws{grid-template-columns:1fr}
+    .hero-inner{padding:58px 20px 54px}
+    p.body,.lead{font-size:16.5px}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <span class="tb-logo"><span class="spark">&#128161;</span> Óptica · Aula ENEM</span>
+    <span class="tb-spacer"></span>
+    <span class="tb-pct" id="tbPct">0%</span>
+    <button class="tb-toc-btn" id="tocBtn">&#9776; Conteúdo</button>
+  </div>
+  <div class="progress-strip"><div id="progBar"></div></div>
+</div>
+
+<div class="toc" id="toc">
+  <div class="toc-panel">
+    <h3>Conteúdo da aula <span class="toc-x" id="tocX">&times;</span></h3>
+    <nav id="tocNav"></nav>
+  </div>
+</div>
+
+<header class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="pulse"></span> Plataforma da Física · do zero ao ENEM</span>
+    <h1>Óptica<br><span class="glow">do Zero</span></h1>
+    <p class="sub">Como a luz se comporta — reflete nos espelhos, entorta nas lentes e se separa em cores. Com simulações que você controla e <b>questões reais do ENEM</b> resolvidas passo a passo.</p>
+    <div class="hero-meta">
+      <span class="chip"><b>4</b> simulações interativas</span>
+      <span class="chip"><b>9</b> questões do ENEM</span>
+      <span class="chip"><b>0</b> pré-requisitos</span>
+    </div>
+    <div class="scroll-cue">&#9660; ROLE PARA COMEÇAR</div>
+  </div>
+</header>
+
+<main>
+
+<!-- 1. INTRO -->
+<section class="lesson" id="s1" data-title="O que é óptica">
+  <div class="wrap">
+    <div class="kicker"><span class="num">1</span> A grande ideia</div>
+    <h2 class="sec-title">O que é óptica?</h2>
+    <p class="lead">Óptica é o estudo da <b>luz</b>: como ela viaja, como bate e volta, como entorta e como se separa nas cores.</p>
+    <p class="body">Você usa óptica o tempo todo: quando se olha no espelho, quando põe os óculos, quando vê um arco-íris ou tira uma foto. Tudo isso segue três comportamentos básicos da luz que vamos estudar aqui.</p>
+    <p class="body">A primeira regra, a mais simples, é que <span class="hl">a luz se propaga em linha reta</span> (num meio uniforme). É por isso que existem sombras bem definidas, eclipses e a câmara escura. A partir daí, quando a luz encontra um obstáculo ou muda de meio, acontecem os dois grandes fenômenos:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#129691;</span><span class="t">REFLEXÃO</span><span class="d">a luz <b>bate e volta</b> (espelhos, o brilho das coisas)</span></div>
+      <div class="m"><span class="ic">&#128167;</span><span class="t">REFRAÇÃO</span><span class="d">a luz <b>entorta</b> ao mudar de meio (lentes, água, lupa)</span></div>
+    </div>
+    <p class="body">Domine esses dois e você entende praticamente toda a óptica do ENEM. Comece pela reflexão.</p>
+  </div>
+</section>
+
+<!-- 2. REFLEXÃO E ESPELHOS PLANOS -->
+<section class="lesson" id="s2" data-title="Reflexão e espelhos planos">
+  <div class="wrap">
+    <div class="kicker"><span class="num">2</span> A luz bate e volta</div>
+    <h2 class="sec-title">Reflexão e espelhos planos</h2>
+    <p class="body">Quando a luz bate numa superfície lisa, ela <b>reflete</b> seguindo uma regra simples e exata: o <span class="hl">ângulo de incidência é igual ao ângulo de reflexão</span> (ambos medidos em relação à reta normal, perpendicular à superfície).</p>
+    <div class="formula"><span class="v">&theta;<sub>i</sub></span> = <span class="c">&theta;<sub>r</sub></span> <small>ângulo de incidência = ângulo de reflexão (Lei da Reflexão)</small></div>
+    <p class="body">Ajuste o ângulo do raio e veja a reflexão acontecer:</p>
+
+    <!-- SIM 1 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#129691;</span><span class="ttl">Simulação · Lei da reflexão</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="reflectCanvas" height="200"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Ângulo de incidência</span><span class="vl" id="refAval">40&deg;</span></div>
+          <input type="range" id="refA" min="0" max="80" value="40">
+        </div>
+        <div class="readout">
+          <div class="ro"><span class="k">&Acirc;NGULO INCIDÊNCIA</span><span class="v" id="refI">—</span></div>
+          <div class="ro g"><span class="k">&Acirc;NGULO REFLEXÃO</span><span class="v" id="refR">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note tip">
+      <span class="tag">A IMAGEM NO ESPELHO PLANO</span>
+      No espelho plano, a imagem é <b>virtual</b> (parece estar atrás do espelho), do <b>mesmo tamanho</b> do objeto e à <b>mesma distância</b>. Ela só troca a direita pela esquerda — por isso as letras aparecem invertidas.
+    </div>
+  </div>
+</section>
+
+<!-- 3. ESPELHOS ESFÉRICOS -->
+<section class="lesson" id="s3" data-title="Espelhos esféricos">
+  <div class="wrap">
+    <div class="kicker"><span class="num">3</span> Espelhos que curvam</div>
+    <h2 class="sec-title">Espelhos côncavos e convexos</h2>
+    <p class="body">Espelhos curvos mudam o tamanho e a posição da imagem. Há dois tipos, e o ENEM cobra a diferença entre eles:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#128374;</span><span class="t">CÔNCAVO (curva para dentro)</span><span class="d"><b>Amplia</b> a imagem de perto. Espelho de maquiagem, farol, antena parabólica.</span></div>
+      <div class="m"><span class="ic">&#128375;</span><span class="t">CONVEXO (curva para fora)</span><span class="d"><b>Diminui</b> a imagem e <b>amplia o campo de visão</b>. Retrovisor, espelho de loja.</span></div>
+    </div>
+
+    <!-- ENEM p96 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2010</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">O espelho retrovisor convexo amplia o campo de visão do motorista, mas dá a impressão de que o carro de trás está mais longe do que realmente está. Sabe-se que, no espelho convexo, a imagem é menor que o objeto. Essa aparente contradição se explica porque</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>a imagem projetada na retina do motorista é menor do que o objeto.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>a velocidade do automóvel afeta a percepção da distância.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>o cérebro humano interpreta como distante uma imagem pequena.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>o espelho convexo é capaz de aumentar o campo visual do motorista.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>o motorista percebe a luz vinda do espelho com a parte lateral do olho.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>O espelho convexo forma uma imagem <b>reduzida</b>. Nosso cérebro aprendeu que objetos que parecem <b>menores</b> normalmente estão <b>mais longe</b>.</p>
+          <p>Então, ao ver a imagem pequena do carro de trás, o cérebro "conclui" que ele está distante — mesmo que esteja perto. É uma interpretação do cérebro, não uma propriedade física do espelho.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. REFRAÇÃO E LEI DE SNELL -->
+<section class="lesson" id="s4" data-title="Refração e Lei de Snell">
+  <div class="wrap">
+    <div class="kicker"><span class="num">4</span> A luz entorta</div>
+    <h2 class="sec-title">Refração e a Lei de Snell</h2>
+    <p class="body">Quando a luz passa de um meio para outro (do ar para a água, por exemplo), ela muda de <b>velocidade</b> e, por isso, muda de <b>direção</b> — é a <span class="hl">refração</span>. Cada meio tem um <b>índice de refração (n)</b>: quanto maior o índice, mais "lenta" a luz e mais o raio se aproxima da reta normal.</p>
+    <div class="note">
+      <span class="tag" style="color:var(--gold)">A REGRA QUE RESOLVE TUDO</span>
+      Ao entrar num meio <b>mais refringente</b> (n maior), o raio <b>se aproxima da normal</b>. Ao entrar num meio <b>menos refringente</b> (n menor), o raio <b>se afasta da normal</b>.
+    </div>
+    <p class="body">Mude o ângulo e o índice do segundo meio e veja o raio entortar:</p>
+
+    <!-- SIM 2 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#128167;</span><span class="ttl">Simulação · Refração (Lei de Snell)</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="refractCanvas" height="220"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Ângulo de incidência (no ar)</span><span class="vl" id="snIval">40&deg;</span></div>
+          <input type="range" id="snI" min="0" max="85" value="40">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Índice do 2&ordm; meio (n)</span><span class="vl" id="snNval">1.5</span></div>
+          <input type="range" id="snN" min="100" max="250" value="150">
+        </div>
+        <div class="readout">
+          <div class="ro c"><span class="k">&Acirc;NGULO REFRATADO</span><span class="v" id="snR">—</span></div>
+          <div class="ro"><span class="k">O RAIO</span><span class="v" id="snMsg" style="font-size:14px">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p85 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2014</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Um dispositivo para detectar gasolina adulterada usa refração: a gasolina pura tem razão entre os senos dos ângulos incidente e refratado igual a 1,4. Fazendo a luz incidir sempre com o mesmo ângulo, numa fiscalização o teste deu 1,9 (valor maior). Qual foi o comportamento do raio refratado nesse caso?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>Mudou de sentido.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Sofreu reflexão total.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>Atingiu o valor do ângulo limite.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>Direcionou-se para a superfície de separação.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>Aproximou-se da normal à superfície de separação.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>Aquela razão (sen i / sen r) é o índice de refração. Um valor <b>maior</b> (1,9 contra 1,4) significa um meio <b>mais refringente</b>.</p>
+          <h4>Aplicando a regra</h4>
+          <p>Como o índice ficou maior, o meio ficou mais refringente e o raio refratado <b>se aproxima mais da normal</b>. Foi essa mudança de ângulo que o dispositivo detectou, acusando a adulteração.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p89 -->
+    <div class="enem-q" data-correct="3">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Um tubo de vidro é mergulhado num copo com glicerina, e a parte imersa do tubo fica <b>invisível</b>. Esse fenômeno ocorre porque a</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>intensidade da luz é praticamente constante no vidro.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>parcela de luz refletida pelo vidro é praticamente nula.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>luz que incide no copo não é transmitida para o tubo de vidro.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>velocidade da luz é a mesma no vidro e na glicerina.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>trajetória da luz é alterada quando ela passa da glicerina para o vidro.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Nós enxergamos o vidro porque a luz reflete e refrata nas suas bordas. Isso só acontece quando o vidro e o meio ao redor têm índices de refração <b>diferentes</b>.</p>
+          <p>Vidro e glicerina têm praticamente o <b>mesmo índice</b> — ou seja, a luz tem a <b>mesma velocidade</b> nos dois. Sem diferença, não há desvio nem reflexão, e o tubo "some". É o mesmo princípio de lentes de contato quase invisíveis na água dos olhos.</p>
+          <div class="eq-answer">Resposta: alternativa D</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. FENÔMENOS DA REFRAÇÃO -->
+<section class="lesson" id="s5" data-title="Fenômenos da refração">
+  <div class="wrap">
+    <div class="kicker"><span class="num">5</span> A refração no mundo</div>
+    <h2 class="sec-title">Fenômenos da refração</h2>
+    <p class="body">A refração está por trás de várias ilusões e tecnologias. Sempre que a luz muda de meio, ela entorta — e isso engana os nossos olhos ou é aproveitado pela engenharia.</p>
+    <div class="laws">
+      <div class="lw"><span class="n">&#128031;</span><div class="t">PEIXE NA ÁGUA</div><div class="d">parece mais raso do que está</div></div>
+      <div class="lw"><span class="n">&#127774;</span><div class="t">MIRAGEM</div><div class="d">"poça" de água no asfalto quente</div></div>
+      <div class="lw"><span class="n">&#128268;</span><div class="t">FIBRA ÓPTICA</div><div class="d">luz presa por reflexão total</div></div>
+    </div>
+
+    <!-- ENEM p90 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Para fisgar um peixe com lança em um lago de águas tranquilas, o índio precisa mirar <b>abaixo</b> da posição em que enxerga o peixe. Ele deve proceder assim porque os raios de luz</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>refletidos pelo peixe não descrevem trajetória retilínea dentro da água.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>emitidos pelos olhos do índio desviam ao passar do ar para a água.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>espalhados pelo peixe são refletidos pela superfície da água.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>emitidos pelos olhos do índio são espalhados pela superfície.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>refletidos pelo peixe desviam sua trajetória ao passar da água para o ar.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>A luz que sai do peixe atravessa a fronteira <b>água &rarr; ar</b> e, nessa passagem, se desvia (refração). Quem enxerga <b>recebe</b> a luz do peixe — os olhos não emitem luz (elimina B e D).</p>
+          <h4>Por que mirar abaixo</h4>
+          <p>Por causa do desvio, o cérebro projeta o peixe numa posição mais <b>rasa e alta</b> do que a real. Para acertar o peixe de verdade, é preciso mirar <b>abaixo</b> da imagem que se vê.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p86 -->
+    <div class="enem-q" data-correct="0">
+      <div class="eq-head"><span class="eq-badge">ENEM 2014</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">As miragens podem dar a impressão de que há água (uma poça) onde não existe, por exemplo em estradas em dias quentes. Esse fenômeno óptico é consequência da</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>refração da luz nas camadas de ar próximas do chão quente.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>reflexão da luz ao incidir no solo quente.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>reflexão difusa da luz na superfície rugosa.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>dispersão da luz nas camadas de ar próximas do chão quente.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>difração da luz nas camadas de ar próximas do chão quente.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Perto do chão quente, o ar fica mais quente (e menos denso) do que o ar de cima. Essas camadas de ar com densidades diferentes têm índices de refração diferentes.</p>
+          <p>A luz do céu, ao atravessar essas camadas, vai se curvando (<b>refração</b>) até parecer vir do chão — criando a ilusão de uma poça d'água refletindo o céu.</p>
+          <div class="eq-answer">Resposta: alternativa A</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p87 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">A fibra óptica transmite internet conduzindo luz por um fino núcleo transparente, envolto por uma casca de índice de refração diferente. Para a luz ficar "presa" e percorrer grandes distâncias, o índice do núcleo em relação ao da casca deve ser</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>superior e ocorrer difração.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>superior e ocorrer reflexão interna total.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>inferior e ocorrer reflexão interna parcial.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>inferior e ocorrer interferência destrutiva.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>inferior e ocorrer interferência construtiva.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave: reflexão interna total</h4>
+          <p>Quando a luz tenta sair de um meio mais refringente (índice maior) para um menos refringente, com ângulo bem inclinado, ela não atravessa: <b>reflete totalmente</b> de volta.</p>
+          <h4>Aplicando à fibra</h4>
+          <p>Para isso funcionar, o <b>núcleo</b> precisa ter índice de refração <b>superior</b> ao da casca. Assim a luz vai "quicando" presa dentro do núcleo por reflexão interna total, percorrendo quilômetros sem vazar.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. LENTES -->
+<section class="lesson" id="s6" data-title="Lentes">
+  <div class="wrap">
+    <div class="kicker"><span class="num">6</span> A refração a serviço</div>
+    <h2 class="sec-title">Lentes: convergentes e divergentes</h2>
+    <p class="body">Uma <b>lente</b> é um pedaço de vidro que usa a refração para <b>concentrar ou espalhar</b> a luz. Há dois tipos:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#128300;</span><span class="t">CONVERGENTE (borda fina)</span><span class="d"><b>Junta</b> os raios num ponto (foco). Lupa, câmera, correção de hipermetropia.</span></div>
+      <div class="m"><span class="ic">&#128083;</span><span class="t">DIVERGENTE (borda grossa)</span><span class="d"><b>Espalha</b> os raios. Correção de miopia.</span></div>
+    </div>
+    <p class="body">Numa lente convergente, a imagem depende de onde está o objeto. Afaste e aproxime o objeto e veja a imagem mudar de tamanho, posição e orientação:</p>
+
+    <!-- SIM 3 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#128300;</span><span class="ttl">Simulação · Lente convergente</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="lensCanvas" height="210"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Distância do objeto até a lente</span><span class="vl" id="lensDval">—</span></div>
+          <input type="range" id="lensD" min="30" max="240" value="180">
+        </div>
+        <div class="readout">
+          <div class="ro c"><span class="k">IMAGEM</span><span class="v" id="lensType" style="font-size:14px">—</span></div>
+          <div class="ro g"><span class="k">ORIENTAÇÃO</span><span class="v" id="lensOri" style="font-size:14px">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="note tip">
+      <span class="tag">O SEU OLHO É UMA LENTE</span>
+      O cristalino do olho é uma lente convergente que projeta a imagem (invertida) no fundo do olho — o cérebro a "desvira". Os óculos apenas corrigem onde essa imagem se forma: à frente da retina (miopia, lente divergente) ou atrás dela (hipermetropia, lente convergente).
+    </div>
+  </div>
+</section>
+
+<!-- 7. LUZ E CORES -->
+<section class="lesson" id="s7" data-title="Luz e cores">
+  <div class="wrap">
+    <div class="kicker"><span class="num">7</span> A luz tem cores</div>
+    <h2 class="sec-title">Luz e cores</h2>
+    <p class="body">A luz branca do Sol é, na verdade, uma <b>mistura de todas as cores</b>. Um prisma (ou uma gota de chuva) separa essas cores porque cada uma refrata um pouco diferente — é assim que nasce o <span class="hl">arco-íris</span>.</p>
+    <p class="body">As cores da luz se somam de um jeito próprio: as <b>primárias</b> são vermelho, verde e azul (RGB). Combinando-as, surgem as secundárias. Some as três e você tem branco. Mexa nos canais e veja:</p>
+
+    <!-- SIM 4 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#127752;</span><span class="ttl">Simulação · Mistura de cores-luz (RGB)</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="colorCanvas" height="200"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm" style="color:#ff5a6e">Vermelho</span><span class="vl" id="colRval" style="color:#ff5a6e">255</span></div>
+          <input type="range" class="r" id="colR" min="0" max="255" value="255">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm" style="color:#27e88a">Verde</span><span class="vl" id="colGval" style="color:#27e88a">255</span></div>
+          <input type="range" class="g" id="colG" min="0" max="255" value="255">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm" style="color:#3b9dff">Azul</span><span class="vl" id="colBval" style="color:#3b9dff">255</span></div>
+          <input type="range" class="b" id="colB" min="0" max="255" value="255">
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <span class="tag" style="color:var(--gold)">CORES-LUZ SECUNDÁRIAS</span>
+      Vermelho + Verde = <b>Amarelo</b> &nbsp;&bull;&nbsp; Verde + Azul = <b>Ciano</b> &nbsp;&bull;&nbsp; Vermelho + Azul = <b>Magenta</b>. Cada secundária é a "complementar" da primária que falta — e um filtro daquela cor serve para <b>remover</b> a cor que falta.
+    </div>
+
+    <!-- ENEM p82 -->
+    <div class="enem-q" data-correct="3">
+      <div class="eq-head"><span class="eq-badge">ENEM 2014</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Lâmpadas fluorescentes têm forte componente de luz verde, o que deixa fotos com objetos brancos esverdeados. Para corrigir, usa-se um filtro que reduz a luz verde. Sabendo que amarelo = vermelho + verde, ciano = verde + azul e magenta = vermelho + azul, qual filtro usar para as cores ficarem naturais?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>Ciano.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Verde.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>Amarelo.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>Magenta.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>Vermelho.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Queremos <b>remover o excesso de verde</b>. Um filtro deixa passar as suas próprias cores e barra o resto. Precisamos de um filtro que <b>não tenha verde</b> na sua composição.</p>
+          <h4>Achando o filtro</h4>
+          <p>Olhando as combinações, o <b>magenta</b> = vermelho + azul — é a única cor sem verde. Por isso ele é a cor <b>complementar</b> do verde e serve para cancelá-lo, equilibrando a foto.</p>
+          <div class="eq-answer">Resposta: alternativa D</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p78 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2010</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">O efeito Tyndall é o que torna possível ver o feixe de luz de uma lanterna ao atravessar poeira no ar, neblina no farol do carro ou uma gelatina. Ao passar por um meio com partículas em suspensão, o feixe fica visível devido</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>à absorção do feixe de luz por esse meio.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>à interferência do feixe de luz nesse meio.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>à transmissão do feixe de luz nesse meio.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>à polarização do feixe de luz por esse meio.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>ao espalhamento do feixe de luz nesse meio.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave: espalhamento</h4>
+          <p>Vemos o feixe porque as partículas em suspensão <b>espalham</b> a luz em todas as direções — parte dessa luz chega aos nossos olhos, revelando o caminho do feixe.</p>
+          <p>É o mesmo espalhamento que deixa o <b>céu azul</b>: o ar espalha mais a luz azul do Sol do que as outras cores.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. APLICAÇÕES -->
+<section class="lesson" id="s8" data-title="Aplicações no ENEM">
+  <div class="wrap">
+    <div class="kicker"><span class="num">8</span> No mundo real</div>
+    <h2 class="sec-title">A óptica na tecnologia e na saúde</h2>
+    <p class="body">Além de espelhos e lentes, a óptica aparece no ENEM ligada à medicina, comunicação e fotografia. Veja um exemplo que junta luz, energia e o corpo humano.</p>
+
+    <!-- ENEM p66 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">A terapia fotodinâmica usa luz para tratar câncer de pele, excitando moléculas do medicamento. As moléculas absorvem as frequências mais altas da luz visível. Por isso, o tratamento cutâneo só é eficiente até cerca de 2 mm de profundidade. Isso se justifica porque a luz de</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>curto comprimento de onda é mais refletida pela pele.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>maior energia é mais absorvida pelo tecido orgânico.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>menor energia é absorvida nas regiões mais profundas.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>todos os comprimentos de onda terão alta intensidade.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>cada comprimento de onda percebe um índice de refração diferente.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Frequência mais alta significa luz de <b>maior energia</b>. O enunciado diz que o medicamento absorve as frequências mais altas — ou seja, a luz de maior energia.</p>
+          <p>Essa luz de maior energia é <b>muito absorvida logo na superfície</b> do tecido, então ela não consegue penetrar fundo. Por isso o tratamento fica limitado aos primeiros milímetros da pele.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note tip">
+      <span class="tag">ONDE A ÓPTICA APARECE</span>
+      Câmeras e celulares (lentes convergentes), óculos (lentes), fibra óptica e endoscopia (reflexão total), laser (cirurgias e leitores), microscópios e telescópios (lentes e espelhos) e o próprio arco-íris (refração + dispersão) — tudo é óptica em ação.
+    </div>
+  </div>
+</section>
+
+<!-- 9. RESUMO -->
+<section class="lesson" id="s9" data-title="Resumo e fórmulas">
+  <div class="wrap">
+    <div class="kicker"><span class="num">9</span> Leve no bolso</div>
+    <h2 class="sec-title">Resumo da óptica</h2>
+    <p class="body">A óptica do ENEM é quase toda conceitual. Guarde estas ideias e você resolve a maioria das questões:</p>
+    <div class="sheet">
+      <div class="f"><div class="eq">&theta;<sub>i</sub> = &theta;<sub>r</sub></div><div class="ds">Reflexão<br>(bate e volta)</div></div>
+      <div class="f"><div class="eq">n &uarr; = raio<br>&rarr; normal</div><div class="ds">Refração<br>(meio mais refringente)</div></div>
+      <div class="f"><div class="eq">Convexo</div><div class="ds">amplia campo<br>(retrovisor)</div></div>
+      <div class="f"><div class="eq">R + G + B</div><div class="ds">luz branca<br>(cores-luz)</div></div>
+    </div>
+
+    <h3 style="font-family:'Orbitron';font-weight:700;font-size:16px;color:var(--gold);margin:26px 0 6px">As ideias que mais caem</h3>
+    <ul class="takeaways">
+      <li>A luz anda em <b>linha reta</b>, <b>reflete</b> (bate e volta) e <b>refrata</b> (entorta ao mudar de meio).</li>
+      <li>Reflexão: <b>ângulo de incidência = ângulo de reflexão</b>.</li>
+      <li>Refração: meio <b>mais refringente</b> (n maior) aproxima o raio da normal. É o peixe, a miragem, a fibra óptica.</li>
+      <li>Espelho/lente <b>convexo/divergente</b> reduz; <b>côncavo/convergente</b> amplia ou concentra.</li>
+      <li><b>Reflexão interna total</b> prende a luz na fibra óptica (núcleo com índice maior que a casca).</li>
+      <li>Luz branca = todas as cores; primárias são <b>vermelho, verde e azul</b>, e um filtro remove a cor que lhe falta.</li>
+    </ul>
+
+    <div class="card finish-card">
+      <p style="font-family:'Orbitron';font-weight:700;font-size:18px;color:#eafcff;margin-bottom:8px">Você chegou ao fim! &#128161;</p>
+      <p class="body" style="margin-bottom:20px">Agora encare o simulado na Área ENEM para fixar tudo — as questões que você acertar saem da fila, e as que errar voltam para você dominar.</p>
+      <button class="btn" id="finishBtn">Marcar aula como concluída &#10003;</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="ft-logo">&#128161; Plataforma da Física</div>
+  <p style="margin-top:8px">Aula interativa de Óptica · questões do ENEM para fins educacionais</p>
+</footer>
+
+<script>
+'use strict';
+const Store = (function(){
+  const KEY = 'plataphysica_optica_aula';
+  let mem = null;
+  function read(){ try{ const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : (mem || {visited:[], done:false}); }catch(e){ return mem || {visited:[], done:false}; } }
+  function write(d){ mem = d; try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){} }
+  return { read, write };
+})();
+
+const secs = Array.from(document.querySelectorAll('section.lesson'));
+const data = Store.read();
+const visited = new Set(data.visited || []);
+const tocNav = document.getElementById('tocNav');
+tocNav.innerHTML = secs.map((s,i)=>`<a href="#${s.id}" data-go="${s.id}"><span class="n">${String(i+1).padStart(2,'0')}</span><span>${s.dataset.title}</span><span class="dot">&#10003;</span></a>`).join('');
+function refreshProgress(){
+  const pct = Math.round(visited.size / secs.length * 100);
+  document.getElementById('progBar').style.width = pct + '%';
+  document.getElementById('tbPct').textContent = pct + '%';
+  tocNav.querySelectorAll('a').forEach(a=> a.classList.toggle('done', visited.has(a.dataset.go)));
+}
+function markVisited(id){ if(visited.has(id)) return; visited.add(id); const d = Store.read(); d.visited = Array.from(visited); Store.write(d); refreshProgress(); }
+refreshProgress();
+if('IntersectionObserver' in window){
+  const obs = new IntersectionObserver((entries)=>{ entries.forEach(en=>{ if(en.isIntersecting) markVisited(en.target.id); }); }, { threshold:0.35 });
+  secs.forEach(s=>obs.observe(s));
+} else { secs.forEach(s=>markVisited(s.id)); }
+const toc = document.getElementById('toc');
+document.getElementById('tocBtn').onclick = ()=> toc.classList.add('open');
+document.getElementById('tocX').onclick = ()=> toc.classList.remove('open');
+toc.onclick = (e)=>{ if(e.target === toc) toc.classList.remove('open'); };
+tocNav.querySelectorAll('a').forEach(a=> a.onclick = ()=> toc.classList.remove('open'));
+const finishBtn = document.getElementById('finishBtn');
+function paintDone(){ finishBtn.classList.add('done-state'); finishBtn.innerHTML = '&#10003; Aula concluída'; }
+if(data.done) paintDone();
+finishBtn.onclick = ()=>{ secs.forEach(s=>visited.add(s.id)); const d = Store.read(); d.visited = Array.from(visited); d.done = true; Store.write(d); refreshProgress(); paintDone(); window.scrollTo({ top:0, behavior:'smooth' }); };
+
+document.querySelectorAll('.enem-q').forEach(q=>{
+  const btn = q.querySelector('.reveal-btn'), sol = q.querySelector('.eq-sol');
+  const correct = parseInt(q.dataset.correct, 10), alts = q.querySelectorAll('.eq-alt');
+  btn.onclick = ()=>{ const open = sol.classList.toggle('show'); if(open){ if(alts[correct]) alts[correct].classList.add('correct'); btn.innerHTML = 'Ocultar resolução &#9650;'; } else { btn.innerHTML = 'Ver resolução passo a passo &#9660;'; } };
+});
+
+function fitCanvas(cv, cssH){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = cv.clientWidth || cv.parentElement.clientWidth;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(cssH * dpr); cv.style.height = cssH + 'px';
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w, h: cssH };
+}
+
+/* HERO — prisma dispersando luz branca em arco-íris */
+(function(){
+  const cv = document.getElementById('heroCanvas'); if(!cv) return;
+  let W, H, t = 0;
+  function setup(){ const dpr = Math.min(window.devicePixelRatio||1,2); W=cv.clientWidth; H=cv.clientHeight||360; cv.width=W*dpr; cv.height=H*dpr; cv.getContext('2d').setTransform(dpr,0,0,dpr,0,0); }
+  const ctx = cv.getContext('2d');
+  const cols = ['#ff5a6e','#ff9d3d','#ffd23d','#27e88a','#00e5ff','#3b9dff','#8b5cff'];
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    const px = W*0.42, py = H*0.5, sz = Math.min(W*0.09,60);
+    // feixe branco entrando
+    ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(px-sz*0.5, py); ctx.stroke();
+    // prisma (triângulo)
+    ctx.beginPath(); ctx.moveTo(px, py-sz); ctx.lineTo(px+sz, py+sz); ctx.lineTo(px-sz, py+sz); ctx.closePath();
+    ctx.strokeStyle='rgba(255,210,61,0.5)'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.fillStyle='rgba(255,210,61,0.05)'; ctx.fill();
+    // arco-íris saindo
+    cols.forEach((c,i)=>{
+      const spread = (i-3)*3.2;
+      const amp = 4*Math.sin(t*0.6 + i*0.5);
+      ctx.strokeStyle=c; ctx.lineWidth=2.4; ctx.globalAlpha=0.75;
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      const ex = W, ey = py + spread*((W-px)/60) + amp;
+      ctx.lineTo(ex, ey);
+      ctx.stroke();
+    });
+    ctx.globalAlpha=1;
+    t += 0.03;
+    requestAnimationFrame(frame);
+  }
+  setup(); frame();
+  window.addEventListener('resize', setup);
+})();
+
+/* SIM 1 — reflexão */
+(function(){
+  const cv = document.getElementById('reflectCanvas');
+  const sA = document.getElementById('refA');
+  if(!cv) return;
+  let ctx, W, H;
+  function build(){ const r = fitCanvas(cv, 200); ctx = r.ctx; W = r.w; H = r.h; }
+  function frame(){
+    const deg = parseFloat(sA.value), th = deg*Math.PI/180;
+    ctx.clearRect(0,0,W,H);
+    const my = H-30, cx = W/2, L = Math.min(H-60, 150);
+    // espelho
+    ctx.fillStyle='rgba(0,229,255,0.15)'; ctx.fillRect(20, my, W-40, 10);
+    ctx.strokeStyle='rgba(0,229,255,0.7)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(20,my); ctx.lineTo(W-20,my); ctx.stroke();
+    for(let x=24;x<W-24;x+=14){ ctx.strokeStyle='rgba(0,229,255,0.3)'; ctx.beginPath(); ctx.moveTo(x,my+10); ctx.lineTo(x-7,my+18); ctx.stroke(); }
+    // normal
+    ctx.strokeStyle='rgba(255,255,255,0.35)'; ctx.setLineDash([5,5]); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(cx,my); ctx.lineTo(cx,my-L-10); ctx.stroke(); ctx.setLineDash([]);
+    // raio incidente (vem da esquerda-cima)
+    const ix = cx - Math.sin(th)*L, iy = my - Math.cos(th)*L;
+    ctx.strokeStyle='rgba(255,210,61,0.95)'; ctx.lineWidth=3; ctx.shadowColor='rgba(255,210,61,0.6)'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.moveTo(ix,iy); ctx.lineTo(cx,my); ctx.stroke();
+    // raio refletido (direita-cima)
+    const rx = cx + Math.sin(th)*L, ry = my - Math.cos(th)*L;
+    ctx.strokeStyle='rgba(0,229,255,0.95)'; ctx.shadowColor='rgba(0,229,255,0.6)';
+    ctx.beginPath(); ctx.moveTo(cx,my); ctx.lineTo(rx,ry); ctx.stroke(); ctx.shadowBlur=0;
+    // setas
+    arrow(ctx, ix,iy, cx,my, 'rgba(255,210,61,0.95)');
+    arrow(ctx, cx,my, rx,ry, 'rgba(0,229,255,0.95)');
+    // arcos de ângulo
+    ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=1.3;
+    ctx.beginPath(); ctx.arc(cx,my, 34, -Math.PI/2-th, -Math.PI/2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,my, 34, -Math.PI/2, -Math.PI/2+th); ctx.stroke();
+    ctx.fillStyle='rgba(255,210,61,0.95)'; ctx.font="700 12px Orbitron"; ctx.textAlign='center';
+    ctx.fillText(deg+'\u00B0', cx - Math.sin(th/2)*52, my - Math.cos(th/2)*52);
+    ctx.fillStyle='rgba(0,229,255,0.95)';
+    ctx.fillText(deg+'\u00B0', cx + Math.sin(th/2)*52, my - Math.cos(th/2)*52);
+    document.getElementById('refAval').textContent = deg+'\u00B0';
+    document.getElementById('refI').textContent = deg+'\u00B0';
+    document.getElementById('refR').textContent = deg+'\u00B0';
+    requestAnimationFrame(frame);
+  }
+  function arrow(c,x1,y1,x2,y2,col){ const a=Math.atan2(y2-y1,x2-x1); const mx=(x1+x2)/2,my=(y1+y2)/2; c.fillStyle=col; c.beginPath(); c.moveTo(mx,my); c.lineTo(mx-Math.cos(a-0.4)*9,my-Math.sin(a-0.4)*9); c.lineTo(mx-Math.cos(a+0.4)*9,my-Math.sin(a+0.4)*9); c.closePath(); c.fill(); }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* SIM 2 — refração (Snell) */
+(function(){
+  const cv = document.getElementById('refractCanvas');
+  const sI = document.getElementById('snI'), sN = document.getElementById('snN');
+  if(!cv) return;
+  let ctx, W, H;
+  function build(){ const r = fitCanvas(cv, 220); ctx = r.ctx; W = r.w; H = r.h; }
+  function frame(){
+    const th1 = parseFloat(sI.value)*Math.PI/180;
+    const n = parseFloat(sN.value)/100;      // 1.0 .. 2.5
+    const sin2 = Math.sin(th1)/n;             // ar (n1=1) -> meio n
+    const th2 = Math.asin(Math.min(1, sin2));
+    ctx.clearRect(0,0,W,H);
+    const iy = H/2, cx = W/2, L = Math.min(H/2-14, 100);
+    // meios
+    ctx.fillStyle='rgba(0,229,255,0.03)'; ctx.fillRect(0,0,W,iy);
+    ctx.fillStyle='rgba(0,229,255,0.10)'; ctx.fillRect(0,iy,W,H-iy);
+    ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(0,iy); ctx.lineTo(W,iy); ctx.stroke();
+    ctx.fillStyle='rgba(132,146,180,0.8)'; ctx.font="600 11px Orbitron"; ctx.textAlign='left';
+    ctx.fillText('AR  (n = 1,0)', 12, 20); ctx.fillText('MEIO  (n = '+n.toFixed(2).replace('.',',')+')', 12, H-14);
+    // normal
+    ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.setLineDash([5,5]); ctx.beginPath(); ctx.moveTo(cx,20); ctx.lineTo(cx,H-14); ctx.stroke(); ctx.setLineDash([]);
+    // incidente
+    const ix = cx - Math.sin(th1)*L, iyy = iy - Math.cos(th1)*L;
+    ctx.strokeStyle='rgba(255,210,61,0.95)'; ctx.lineWidth=3; ctx.shadowColor='rgba(255,210,61,0.5)'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.moveTo(ix,iyy); ctx.lineTo(cx,iy); ctx.stroke();
+    // refratado
+    const rx = cx + Math.sin(th2)*L, ryy = iy + Math.cos(th2)*L;
+    ctx.strokeStyle='rgba(0,229,255,0.95)'; ctx.shadowColor='rgba(0,229,255,0.5)';
+    ctx.beginPath(); ctx.moveTo(cx,iy); ctx.lineTo(rx,ryy); ctx.stroke(); ctx.shadowBlur=0;
+    // arcos
+    ctx.strokeStyle='rgba(255,255,255,0.35)'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.arc(cx,iy, 30, -Math.PI/2-th1, -Math.PI/2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,iy, 30, Math.PI/2, Math.PI/2+th2); ctx.stroke();
+    document.getElementById('snIval').textContent = parseFloat(sI.value)+'\u00B0';
+    document.getElementById('snNval').textContent = n.toFixed(2).replace('.',',');
+    document.getElementById('snR').textContent = Math.round(th2*180/Math.PI)+'\u00B0';
+    document.getElementById('snMsg').textContent = 'aproxima da normal';
+    requestAnimationFrame(frame);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* SIM 3 — lente convergente */
+(function(){
+  const cv = document.getElementById('lensCanvas');
+  const sD = document.getElementById('lensD');
+  if(!cv) return;
+  let ctx, W, H;
+  const F = 70;   // distância focal (px)
+  function build(){ const r = fitCanvas(cv, 210); ctx = r.ctx; W = r.w; H = r.h; }
+  function frame(){
+    const doo = parseFloat(sD.value);   // distância do objeto (px)
+    ctx.clearRect(0,0,W,H);
+    const axisY = H/2, lensX = W/2;
+    // eixo
+    ctx.strokeStyle='rgba(255,255,255,0.18)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(0,axisY); ctx.lineTo(W,axisY); ctx.stroke();
+    // lente
+    ctx.strokeStyle='rgba(255,210,61,0.8)'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.ellipse(lensX, axisY, 10, H*0.36, 0, 0, 6.28); ctx.stroke();
+    ctx.fillStyle='rgba(255,210,61,0.06)'; ctx.fill();
+    // focos
+    ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font="600 10px Orbitron"; ctx.textAlign='center';
+    [-F,F].forEach(f=>{ ctx.beginPath(); ctx.arc(lensX+f, axisY, 3,0,6.28); ctx.fill(); ctx.fillText('F', lensX+f, axisY+16); });
+    // objeto (seta para cima) à esquerda
+    const ox = lensX - doo, oh = 42;
+    ctx.strokeStyle='rgba(0,229,255,0.95)'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(ox, axisY); ctx.lineTo(ox, axisY-oh); ctx.stroke();
+    tri(ctx, ox, axisY-oh, -1, 'rgba(0,229,255,0.95)');
+    // imagem: 1/f = 1/do + 1/di
+    let di = 1/(1/F - 1/doo);   // px
+    const mag = -di/doo;
+    const ih = oh*mag;          // altura da imagem (sinal = orientação)
+    let virtual = di < 0;
+    const imgX = lensX + di;
+    ctx.strokeStyle = virtual ? 'rgba(139,92,255,0.9)' : 'rgba(39,232,138,0.95)';
+    ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(imgX, axisY); ctx.lineTo(imgX, axisY - ih); ctx.stroke();
+    tri(ctx, imgX, axisY - ih, ih>0?-1:1, virtual?'rgba(139,92,255,0.9)':'rgba(39,232,138,0.95)');
+    // raios principais (objeto topo -> paralelo -> foco; e pelo centro)
+    const otop = axisY - oh;
+    ctx.strokeStyle='rgba(255,210,61,0.5)'; ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.moveTo(ox, otop); ctx.lineTo(lensX, otop); // paralelo
+    // depois da lente passa pelo foco direito
+    const itop = axisY - ih;
+    ctx.lineTo(imgX, itop); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ox, otop); ctx.lineTo(imgX, itop); ctx.stroke(); // pelo centro (reto)
+    // labels
+    document.getElementById('lensDval').textContent = (doo>F?'além do foco':(Math.abs(doo-F)<6?'no foco':'antes do foco'));
+    let type, ori;
+    if(Math.abs(doo-F)<6){ type='no infinito'; ori='—'; }
+    else if(virtual){ type='virtual, maior'; ori='direita (em pé)'; }
+    else { type='real, '+(Math.abs(mag)>1?'maior':(Math.abs(mag)<0.98?'menor':'igual')); ori='invertida'; }
+    document.getElementById('lensType').textContent = type;
+    document.getElementById('lensOri').textContent = ori;
+    requestAnimationFrame(frame);
+  }
+  function tri(c,x,y,dir,col){ c.fillStyle=col; c.beginPath(); c.moveTo(x,y); c.lineTo(x-5,y-dir*9); c.lineTo(x+5,y-dir*9); c.closePath(); c.fill(); }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* SIM 4 — mistura de cores RGB (aditiva) */
+(function(){
+  const cv = document.getElementById('colorCanvas');
+  const sR=document.getElementById('colR'), sG=document.getElementById('colG'), sB=document.getElementById('colB');
+  if(!cv) return;
+  let ctx, W, H;
+  function build(){ const r = fitCanvas(cv, 200); ctx = r.ctx; W = r.w; H = r.h; }
+  function frame(){
+    const R=+sR.value, G=+sG.value, B=+sB.value;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#04060e'; ctx.fillRect(0,0,W,H);
+    const cx=W/2, cy=H/2, rad=Math.min(W*0.19, H*0.32), off=rad*0.62;
+    ctx.globalCompositeOperation='lighter';
+    const circles=[[cx, cy-off, `rgb(${R},0,0)`],[cx-off, cy+off*0.7, `rgb(0,${G},0)`],[cx+off, cy+off*0.7, `rgb(0,0,${B})`]];
+    circles.forEach(([x,y,c])=>{ ctx.fillStyle=c; ctx.beginPath(); ctx.arc(x,y,rad,0,6.28); ctx.fill(); });
+    ctx.globalCompositeOperation='source-over';
+    // amostra da cor resultante (soma)
+    ctx.fillStyle=`rgb(${R},${G},${B})`;
+    ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=1.5;
+    const sw=W-70;
+    ctx.beginPath(); ctx.arc(sw, 30, 16, 0, 6.28); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='rgba(132,146,180,0.9)'; ctx.font="600 9px Orbitron"; ctx.textAlign='center';
+    ctx.fillText('soma', sw, 56);
+    document.getElementById('colRval').textContent=R;
+    document.getElementById('colGval').textContent=G;
+    document.getElementById('colBval').textContent=B;
+    requestAnimationFrame(frame);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hidrostática do Zero — Aula ENEM | Plataforma da Física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#08111c; --bg-2:#0a1826; --panel:rgba(14,30,46,0.72); --panel-solid:#0f2131;
+    --cyan:#00e5ff; --cyan-dim:#0792a8; --aqua:#3bd6ff; --blue:#3b9dff; --violet:#8b5cff;
+    --green:#27e88a; --yellow:#ffd23d; --orange:#ff9d3d; --red:#ff5a6e;
+    --txt:#d6ecf7; --txt-dim:#7fa6bf; --line:rgba(0,229,255,0.2); --line-soft:rgba(255,255,255,0.07);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body::before{content:'';position:fixed;inset:0;z-index:-2;background:
+    radial-gradient(1100px 640px at 30% -8%, rgba(0,229,255,0.12), transparent 60%),
+    radial-gradient(900px 520px at 90% 10%, rgba(59,157,255,0.10), transparent 60%),
+    radial-gradient(900px 900px at 50% 130%, rgba(59,214,255,0.07), transparent 60%), var(--bg);}
+  body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.45;
+    background-image:linear-gradient(rgba(0,229,255,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.035) 1px,transparent 1px);
+    background-size:46px 46px;mask-image:radial-gradient(ellipse 100% 70% at 50% 0%,#000 30%,transparent 80%);}
+  ::selection{background:rgba(0,229,255,0.3);color:#fff}
+
+  .topbar{position:sticky;top:0;z-index:60;backdrop-filter:blur(12px);background:rgba(6,12,20,0.8);border-bottom:1px solid var(--line)}
+  .topbar-row{max-width:980px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:14px}
+  .tb-logo{font-family:'Orbitron';font-weight:700;font-size:14px;color:#eafcff;letter-spacing:.5px;display:flex;align-items:center;gap:9px;white-space:nowrap}
+  .tb-logo .spark{color:var(--cyan);filter:drop-shadow(0 0 6px var(--cyan))}
+  .tb-spacer{flex:1}
+  .tb-pct{font-family:'Orbitron';font-weight:700;font-size:13px;color:var(--green);min-width:42px;text-align:right}
+  .tb-toc-btn{font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:.4px;color:var(--cyan);background:rgba(0,229,255,0.09);border:1px solid var(--line);padding:8px 13px;border-radius:9px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .tb-toc-btn:hover{background:rgba(0,229,255,0.18)}
+  .progress-strip{height:3px;background:rgba(255,255,255,0.06)}
+  .progress-strip > div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--blue));box-shadow:0 0 10px rgba(0,229,255,.6);transition:width .4s ease}
+
+  .toc{position:fixed;inset:0;z-index:70;display:none;background:rgba(4,9,16,0.72);backdrop-filter:blur(4px)}
+  .toc.open{display:block}
+  .toc-panel{position:absolute;right:0;top:0;height:100%;width:min(340px,86vw);background:var(--panel-solid);border-left:1px solid var(--line);padding:24px 20px;overflow-y:auto;transform:translateX(100%);transition:transform .3s ease}
+  .toc.open .toc-panel{transform:translateX(0)}
+  .toc-panel h3{font-family:'Orbitron';font-weight:700;font-size:14px;color:var(--cyan);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+  .toc-x{cursor:pointer;color:var(--txt-dim);font-size:22px;line-height:1}
+  .toc a{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--txt);padding:11px 12px;border-radius:9px;margin-bottom:4px;font-size:16px;font-weight:500;transition:.18s;border:1px solid transparent}
+  .toc a:hover{background:rgba(0,229,255,0.06);border-color:var(--line)}
+  .toc a .n{font-family:'Orbitron';font-size:11px;color:var(--cyan);min-width:22px}
+  .toc a .dot{margin-left:auto;width:16px;height:16px;border-radius:50%;border:2px solid var(--cyan-dim);display:grid;place-items:center;font-size:10px;color:#04121a}
+  .toc a.done .dot{background:var(--green);border-color:var(--green)}
+
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  section.lesson{padding:60px 0;border-bottom:1px solid var(--line-soft)}
+  section.lesson:last-of-type{border-bottom:none}
+
+  .hero{position:relative;overflow:hidden;padding:0;border-bottom:1px solid var(--line)}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+  .hero-inner{position:relative;max-width:980px;margin:0 auto;padding:74px 20px 70px;text-align:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:2px;color:var(--cyan);border:1px solid var(--line);background:rgba(0,229,255,0.05);padding:7px 15px;border-radius:30px;text-transform:uppercase;margin-bottom:26px}
+  .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .hero h1{font-family:'Orbitron';font-weight:900;font-size:clamp(30px,7.4vw,58px);line-height:1.03;letter-spacing:-1px;color:#eafcff;text-shadow:0 0 34px rgba(0,229,255,0.35)}
+  .hero h1 .glow{color:var(--cyan);text-shadow:0 0 30px rgba(0,229,255,0.7)}
+  .hero .sub{font-size:clamp(17px,2.6vw,21px);color:var(--txt);max-width:650px;margin:22px auto 0;font-weight:500}
+  .hero .sub b{color:#eafcff;font-weight:700}
+  .hero-meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+  .chip{font-family:'Orbitron';font-size:11px;font-weight:500;color:var(--txt-dim);border:1px solid var(--line-soft);background:rgba(255,255,255,0.02);padding:8px 13px;border-radius:8px}
+  .chip b{color:var(--cyan);font-weight:700}
+  .scroll-cue{margin-top:42px;font-family:'Orbitron';font-size:11px;letter-spacing:1.5px;color:var(--txt-dim);animation:bob 2s infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
+
+  .kicker{font-family:'Orbitron';font-weight:500;font-size:12px;letter-spacing:1.6px;color:var(--cyan);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .kicker .num{font-weight:900;font-size:13px;color:#04121a;background:var(--cyan);width:30px;height:30px;display:grid;place-items:center;border-radius:9px;box-shadow:0 0 14px rgba(0,229,255,.5)}
+  h2.sec-title{font-family:'Orbitron';font-weight:700;font-size:clamp(23px,4.4vw,33px);color:#eafcff;line-height:1.12;letter-spacing:-.3px;margin-bottom:20px}
+  .lead{font-size:19px;color:var(--txt);font-weight:500;line-height:1.65;margin-bottom:18px}
+  p.body{font-size:17px;line-height:1.72;color:var(--txt);font-weight:400;margin-bottom:16px}
+  p.body b{color:#eafcff;font-weight:700}
+  p.body .hl{color:var(--cyan);font-weight:600}
+  .unit{color:var(--yellow);font-weight:700}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin:22px 0;backdrop-filter:blur(6px)}
+  .note{border-left:3px solid var(--cyan);background:rgba(0,229,255,0.05);padding:15px 18px;border-radius:0 11px 11px 0;margin:20px 0;font-size:16.5px;line-height:1.6}
+  .note.tip{border-left-color:var(--green);background:rgba(39,232,138,0.06)}
+  .note.warn{border-left-color:var(--orange);background:rgba(255,157,61,0.06)}
+  .note .tag{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.6px;display:block;margin-bottom:6px;color:var(--cyan)}
+  .note.tip .tag{color:var(--green)}
+  .note.warn .tag{color:var(--orange)}
+  .note b{color:#eafcff}
+
+  .formula{text-align:center;font-family:'Orbitron';font-weight:700;font-size:clamp(19px,4.4vw,27px);color:#eafcff;background:rgba(0,0,0,0.32);border:1px solid var(--line);border-radius:12px;padding:22px;margin:22px 0;letter-spacing:1px}
+  .formula .c{color:var(--cyan)}
+  .formula .y{color:var(--yellow)}
+  .formula .g{color:var(--green)}
+  .formula small{display:block;font-family:'Rajdhani';font-weight:500;font-size:14px;letter-spacing:0;color:var(--txt-dim);margin-top:12px}
+
+  .map{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden;margin:22px 0}
+  .map.two{grid-template-columns:repeat(2,1fr)}
+  .map .m{background:var(--panel-solid);padding:18px 16px;text-align:center}
+  .map .m .ic{font-size:26px;display:block;margin-bottom:8px}
+  .map .m .t{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;display:block;margin-bottom:6px}
+  .map .m .d{color:var(--txt-dim);font-size:14px;line-height:1.4}
+
+  .sim{background:linear-gradient(180deg,rgba(14,30,46,0.9),rgba(8,17,28,0.9));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:24px 0;box-shadow:0 8px 40px rgba(0,0,0,0.35)}
+  .sim-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(0,229,255,0.06);border-bottom:1px solid var(--line)}
+  .sim-head .ic{font-size:16px}
+  .sim-head .ttl{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;letter-spacing:.4px}
+  .sim-head .lbl{margin-left:auto;font-family:'Orbitron';font-size:10px;color:var(--cyan);border:1px solid var(--line);padding:4px 9px;border-radius:20px}
+  .sim-canvas-wrap{position:relative;width:100%;background:radial-gradient(circle at 50% 40%,rgba(0,229,255,0.04),transparent 70%)}
+  .sim canvas{display:block;width:100%}
+  .sim-controls{padding:18px}
+  .ctrl{margin-bottom:16px}
+  .ctrl:last-child{margin-bottom:0}
+  .ctrl-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .ctrl-label .nm{font-family:'Orbitron';font-weight:500;font-size:12.5px;color:var(--txt);letter-spacing:.3px}
+  .ctrl-label .vl{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--cyan)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--cyan),rgba(255,255,255,0.08));outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px rgba(0,229,255,0.7);border:2px solid #04121a;cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px rgba(0,229,255,0.7);border:2px solid #04121a;cursor:pointer}
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .readout .ro{flex:1;min-width:90px;background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;text-align:center}
+  .readout .ro .k{font-family:'Orbitron';font-size:10px;letter-spacing:.5px;color:var(--txt-dim);display:block;margin-bottom:4px}
+  .readout .ro .v{font-family:'Orbitron';font-weight:700;font-size:18px;color:var(--cyan)}
+  .readout .ro.g .v{color:var(--green)}
+  .readout .ro.y .v{color:var(--yellow)}
+  .readout .ro.r .v{color:var(--red)}
+
+  .enem-q{border:1px solid var(--violet);border-radius:var(--radius);overflow:hidden;margin:26px 0;background:linear-gradient(180deg,rgba(139,92,255,0.06),rgba(8,17,28,0.4))}
+  .eq-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(139,92,255,0.1);border-bottom:1px solid rgba(139,92,255,0.25);flex-wrap:wrap}
+  .eq-badge{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.4px;color:var(--violet);border:1px solid rgba(139,92,255,0.4);background:rgba(139,92,255,0.08);padding:5px 11px;border-radius:20px}
+  .eq-tag{font-family:'Orbitron';font-size:11px;color:var(--txt-dim);letter-spacing:.5px}
+  .eq-tag.real{margin-left:auto;color:var(--green)}
+  .eq-body{padding:20px 18px}
+  .eq-enun{font-size:16.5px;line-height:1.62;color:var(--txt);margin-bottom:16px}
+  .eq-alts{display:flex;flex-direction:column;gap:8px}
+  .eq-alt{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;font-size:15.5px;transition:.25s}
+  .eq-alt .let{font-family:'Orbitron';font-weight:700;font-size:13px;width:26px;height:26px;flex-shrink:0;display:grid;place-items:center;border-radius:7px;border:1px solid var(--cyan-dim);color:var(--cyan)}
+  .eq-alt.correct{border-color:var(--green);background:rgba(39,232,138,0.1)}
+  .eq-alt.correct .let{background:var(--green);color:#04121a;border-color:var(--green)}
+  .reveal-btn{margin-top:16px;width:100%;font-family:'Orbitron';font-weight:700;font-size:13px;letter-spacing:.5px;background:linear-gradient(120deg,var(--violet),#6f4ad6);color:#fff;border:none;padding:13px;border-radius:11px;cursor:pointer;transition:.2s}
+  .reveal-btn:hover{filter:brightness(1.12);box-shadow:0 0 20px rgba(139,92,255,0.4)}
+  .eq-sol{margin-top:18px;border-top:1px dashed rgba(139,92,255,0.3);padding-top:18px;display:none}
+  .eq-sol.show{display:block;animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .eq-sol h4{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;color:var(--cyan);margin:16px 0 8px;text-transform:uppercase}
+  .eq-sol h4:first-child{margin-top:0}
+  .eq-sol p{font-size:16px;line-height:1.62;color:var(--txt);margin-bottom:6px}
+  .eq-sol .calc-step{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--yellow);background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:9px;padding:11px 14px;margin:10px 0;letter-spacing:.5px}
+  .eq-answer{margin-top:16px;font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--green);background:rgba(39,232,138,0.1);border:1px solid rgba(39,232,138,0.3);border-radius:10px;padding:13px 16px;text-align:center}
+
+  .laws{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}
+  .laws .lw{background:var(--panel-solid);border:1px solid var(--line-soft);border-radius:12px;padding:18px 14px;text-align:center}
+  .laws .lw .n{font-size:26px}
+  .laws .lw .t{font-family:'Orbitron';font-weight:700;font-size:12px;color:#eafcff;margin:8px 0 6px;letter-spacing:.3px}
+  .laws .lw .d{font-size:13.5px;color:var(--txt-dim);line-height:1.45}
+
+  .sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0}
+  .sheet .f{background:var(--panel-solid);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .sheet .f .eq{font-family:'Orbitron';font-weight:700;font-size:16px;color:var(--cyan);margin-bottom:7px}
+  .sheet .f .ds{font-size:13.5px;color:var(--txt-dim);line-height:1.4}
+  .takeaways{list-style:none;margin:18px 0}
+  .takeaways li{position:relative;padding:9px 0 9px 32px;font-size:16.5px;line-height:1.55;border-bottom:1px solid var(--line-soft)}
+  .takeaways li:last-child{border-bottom:none}
+  .takeaways li::before{content:'\1F4A7';position:absolute;left:0;top:8px;font-size:15px}
+  .takeaways li b{color:#eafcff}
+
+  .finish-card{text-align:center;background:linear-gradient(135deg,rgba(0,229,255,0.08),rgba(59,157,255,0.06));border:1px solid var(--line)}
+  .btn{font-family:'Orbitron';font-weight:700;font-size:14px;letter-spacing:.5px;background:linear-gradient(120deg,var(--cyan),#5ae0ff);color:#04121a;border:none;padding:15px 30px;border-radius:12px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:9px}
+  .btn:hover{filter:brightness(1.08);box-shadow:0 0 26px rgba(0,229,255,0.45);transform:translateY(-1px)}
+  .btn.done-state{background:linear-gradient(120deg,var(--green),#1fd07e);color:#04121a}
+  footer{padding:34px 20px 50px;text-align:center;color:var(--txt-dim);font-size:13.5px}
+  footer .ft-logo{font-family:'Orbitron';font-weight:700;color:var(--cyan);font-size:14px}
+
+  @media(max-width:680px){
+    section.lesson{padding:46px 0}
+    .map,.map.two,.laws{grid-template-columns:1fr}
+    .hero-inner{padding:58px 20px 54px}
+    p.body,.lead{font-size:16.5px}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <span class="tb-logo"><span class="spark">&#128167;</span> Hidrostática · Aula ENEM</span>
+    <span class="tb-spacer"></span>
+    <span class="tb-pct" id="tbPct">0%</span>
+    <button class="tb-toc-btn" id="tocBtn">&#9776; Conteúdo</button>
+  </div>
+  <div class="progress-strip"><div id="progBar"></div></div>
+</div>
+
+<div class="toc" id="toc">
+  <div class="toc-panel">
+    <h3>Conteúdo da aula <span class="toc-x" id="tocX">&times;</span></h3>
+    <nav id="tocNav"></nav>
+  </div>
+</div>
+
+<header class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="pulse"></span> Plataforma da Física · do zero ao ENEM</span>
+    <h1>Hidro<span class="glow">stática</span><br>do Zero</h1>
+    <p class="sub">A física dos fluidos parados — por que um navio de aço flutua, como a prensa hidráulica levanta um carro e por que a pressão aumenta no fundo do mar. Com simulações interativas e <b>questões reais do ENEM</b> resolvidas passo a passo.</p>
+    <div class="hero-meta">
+      <span class="chip"><b>3</b> simulações interativas</span>
+      <span class="chip"><b>8</b> questões do ENEM</span>
+      <span class="chip"><b>0</b> pré-requisitos</span>
+    </div>
+    <div class="scroll-cue">&#9660; ROLE PARA COMEÇAR</div>
+  </div>
+</header>
+
+<main>
+
+<!-- 1. INTRO -->
+<section class="lesson" id="s1" data-title="O que é hidrostática">
+  <div class="wrap">
+    <div class="kicker"><span class="num">1</span> A grande ideia</div>
+    <h2 class="sec-title">O que é hidrostática?</h2>
+    <p class="lead">Hidrostática é o estudo dos <b>fluidos em repouso</b> — líquidos e gases parados — e das forças que eles exercem.</p>
+    <p class="body">Três conceitos sustentam tudo nesta aula, e o ENEM combina eles o tempo todo:</p>
+    <div class="map">
+      <div class="m"><span class="ic">&#9878;</span><span class="t">DENSIDADE</span><span class="d">quão "compacta" é a matéria</span></div>
+      <div class="m"><span class="ic">&#128295;</span><span class="t">PRESSÃO</span><span class="d">força espalhada por uma área</span></div>
+      <div class="m"><span class="ic">&#11014;</span><span class="t">EMPUXO</span><span class="d">o empurrão que o fluido dá para cima</span></div>
+    </div>
+    <p class="body">Com esses três, você explica desde o pneu do trator até por que um navio gigante de ferro não afunda. Vamos começar pela densidade.</p>
+  </div>
+</section>
+
+<!-- 2. DENSIDADE -->
+<section class="lesson" id="s2" data-title="Densidade">
+  <div class="wrap">
+    <div class="kicker"><span class="num">2</span> Compacto ou leve?</div>
+    <h2 class="sec-title">Densidade</h2>
+    <p class="body">A <span class="hl">densidade</span> mede quanta massa está "espremida" em cada volume. É o que diferencia um quilo de chumbo (pequeno) de um quilo de algodão (enorme).</p>
+    <div class="formula"><span class="c">d</span> = <span class="y">m</span> / <span class="g">V</span> <small>densidade = massa &divide; volume &nbsp;|&nbsp; água: d = 1,0 g/cm&sup3; = 1000 kg/m&sup3;</small></div>
+    <p class="body">A densidade decide quem <b>boia</b> e quem <b>afunda</b>: o que for <b>menos denso que a água</b> flutua (óleo, gelo, isopor); o que for <b>mais denso</b> afunda (pedra, metal). Guarde a densidade da água como referência: <b>1,0 g/cm&sup3;</b>.</p>
+
+    <!-- ENEM p46 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Densímetros em bombas de combustível verificam a quantidade de água no álcool. O volume máximo permitido de água no álcool é 4,9%. A densidade da água é 1,00 g/cm&sup3; e a do álcool anidro é 0,80 g/cm&sup3;. A leitura no densímetro correspondente à fração máxima permitida de água é mais próxima de</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>0,20 g/cm&sup3;.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>0,81 g/cm&sup3;.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>0,90 g/cm&sup3;.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>0,99 g/cm&sup3;.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>1,80 g/cm&sup3;.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Média ponderada das densidades</h4>
+          <p>A mistura tem 4,9% de água (d = 1,00) e 95,1% de álcool (d = 0,80). A densidade da mistura é a média ponderada:</p>
+          <div class="calc-step">d = 0,049 &times; 1,00 + 0,951 &times; 0,80</div>
+          <div class="calc-step">d = 0,049 + 0,761 &asymp; 0,81 g/cm&sup3;</div>
+          <p>O valor fica pouco acima de 0,80 (álcool puro), porque a água, mais densa, "puxa" a densidade para cima.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. PRESSÃO -->
+<section class="lesson" id="s3" data-title="Pressão">
+  <div class="wrap">
+    <div class="kicker"><span class="num">3</span> Força espalhada</div>
+    <h2 class="sec-title">Pressão: força dividida por área</h2>
+    <p class="body">A <span class="hl">pressão</span> é a força distribuída por uma área. A mesma força faz efeitos bem diferentes dependendo de estar concentrada ou espalhada.</p>
+    <div class="formula"><span class="c">P</span> = <span class="y">F</span> / <span class="g">A</span> <small>pressão = força &divide; área &nbsp;|&nbsp; unidade: Pa (N/m&sup2;)</small></div>
+    <p class="body">Por isso uma <b>faca afiada</b> corta (força numa área minúscula = pressão enorme), enquanto uma pessoa não afunda na neve com <b>raquetes</b> (mesmo peso numa área grande = pressão pequena). A área muda tudo.</p>
+
+    <!-- ENEM p49 -->
+    <div class="enem-q" data-correct="0">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">A compactação do solo pela agricultura, causada por máquinas cada vez mais pesadas, reduz a produtividade. Uma forma de prevenir a compactação é substituir os pneus dos tratores por pneus mais</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>largos, reduzindo a pressão sobre o solo.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>estreitos, reduzindo a pressão sobre o solo.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>largos, aumentando a pressão sobre o solo.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>estreitos, aumentando a pressão sobre o solo.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>altos, reduzindo a pressão sobre o solo.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Aplicando P = F/A</h4>
+          <p>O peso do trator (força) é o mesmo. Para diminuir a <b>pressão</b> sobre o solo e não compactá-lo, é preciso <b>aumentar a área</b> de contato.</p>
+          <p>Pneus mais <b>largos</b> têm maior área tocando o chão, então espalham o peso e reduzem a pressão. Menos pressão = menos compactação.</p>
+          <div class="eq-answer">Resposta: alternativa A</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. STEVIN -->
+<section class="lesson" id="s4" data-title="Teorema de Stevin">
+  <div class="wrap">
+    <div class="kicker"><span class="num">4</span> Fundo = mais pressão</div>
+    <h2 class="sec-title">Pressão nos líquidos (Teorema de Stevin)</h2>
+    <p class="body">Dentro de um líquido, a pressão <b>aumenta com a profundidade</b> — quanto mais fundo, mais coluna de água empurrando de cima. É o <span class="hl">Teorema de Stevin</span>:</p>
+    <div class="formula"><span class="c">P</span> = <span class="y">P&#8320;</span> + <span class="g">d &middot; g &middot; h</span> <small>pressão = pressão no topo + (densidade &times; gravidade &times; profundidade)</small></div>
+    <p class="body">Repare no que <b>não</b> aparece na fórmula: o formato ou a largura do recipiente. A pressão depende só da <b>profundidade</b> (e do líquido). Por isso barragens são mais grossas embaixo, e mergulhadores sentem os ouvidos "estourarem" ao descer. Veja os jatos: o furo mais fundo tem mais pressão e a água sai mais longe.</p>
+
+    <!-- SIM 1 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#128688;</span><span class="ttl">Simulação · Pressão x profundidade (jatos)</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="stevinCanvas" height="230"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Nível da água no reservatório</span><span class="vl" id="stLvl">alto</span></div>
+          <input type="range" id="stLevel" min="30" max="100" value="85">
+        </div>
+        <p style="font-size:14px;color:var(--txt-dim);text-align:center;margin:0">O furo <b>de baixo</b> está mais fundo &rarr; sofre mais pressão &rarr; a água jorra <b>mais longe</b>. Encher mais o reservatório aumenta a pressão em todos os furos.</p>
+      </div>
+    </div>
+
+    <!-- ENEM p52 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2011</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Um vaso sanitário econômico usa o Teorema de Stevin: ao acionar a alavanca, toda a água do tanque escoa e cobre o sifão; como maior profundidade significa maior pressão, a água desce levando os rejeitos ao esgoto. Comparado às válvulas de descarga, esse sistema economiza água. A característica que garante essa economia é devida</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>à altura do sifão de água.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>ao volume do tanque de água.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>à altura do nível de água no vaso.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>ao diâmetro do distribuidor de água.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>à eficiência da válvula de enchimento do tanque.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Na válvula de descarga comum, a água corre enquanto você segura o botão — o gasto é indefinido. Nesse vaso, cada descarga usa exatamente a água que cabe no <b>tanque</b>.</p>
+          <p>Como o <b>volume do tanque é fixo</b>, o consumo por descarga é limitado e sempre o mesmo — é daí que vem a economia.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. PRESSÃO ATMOSFÉRICA -->
+<section class="lesson" id="s5" data-title="Pressão atmosférica">
+  <div class="wrap">
+    <div class="kicker"><span class="num">5</span> O ar tem peso</div>
+    <h2 class="sec-title">Pressão atmosférica</h2>
+    <p class="body">O ar também é um fluido e tem peso. A <span class="hl">pressão atmosférica</span> é o "empurrão" que toda essa coluna de ar exerce sobre nós — e ela é bem forte, só não percebemos porque age por igual em todas as direções.</p>
+    <p class="body">Ela explica o <b>canudo</b> (você reduz a pressão na boca e a atmosfera empurra o líquido para cima), a <b>ventosa</b>, e a experiência de Torricelli. Também é a estrela da próxima questão:</p>
+
+    <!-- ENEM p47 -->
+    <div class="enem-q" data-correct="0">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Uma garrafa PET cheia de água tem três furos na lateral, em alturas diferentes. Com a garrafa <b>tampada</b>, a água não vaza por nenhum furo; ao <b>destampar</b>, a água escoa. Como a pressão atmosférica interfere no escoamento, nas situações tampada e destampada, respectivamente?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>Impede a saída de água, por ser maior que a pressão interna; não muda a velocidade de escoamento, que só depende da pressão da coluna de água.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Impede a saída de água, por ser maior que a pressão interna; altera a velocidade, que é proporcional à pressão atmosférica na altura do furo.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>Impede a entrada de ar, por ser menor que a pressão interna; altera a velocidade de escoamento.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>Impede a saída de água, por ser maior que a pressão interna; regula a velocidade, que só depende da pressão atmosférica.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>Impede a entrada de ar, por ser menor que a pressão interna; não muda a velocidade de escoamento.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Garrafa tampada</h4>
+          <p>Sem entrada de ar pelo topo, a pressão atmosférica externa (que atua nos furos) é <b>maior</b> que a pressão interna e <b>segura a água</b> dentro. Por isso não vaza.</p>
+          <h4>Garrafa destampada</h4>
+          <p>Com o topo aberto, entra ar e a água escoa por Stevin. A velocidade em cada furo depende só da <b>coluna de água acima dele</b> (profundidade), não da atmosfera — furo mais fundo, jato mais rápido.</p>
+          <div class="eq-answer">Resposta: alternativa A</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. PASCAL -->
+<section class="lesson" id="s6" data-title="Princípio de Pascal">
+  <div class="wrap">
+    <div class="kicker"><span class="num">6</span> Multiplicar força</div>
+    <h2 class="sec-title">Princípio de Pascal</h2>
+    <p class="body">O <span class="hl">Princípio de Pascal</span> diz que, num líquido, uma pressão aplicada em um ponto se transmite <b>igualmente</b> para todos os outros. Isso permite uma mágica: <b>multiplicar força</b>.</p>
+    <div class="formula"><span class="y">F&#8321;</span> / <span class="c">A&#8321;</span> = <span class="y">F&#8322;</span> / <span class="c">A&#8322;</span> <small>a mesma pressão nos dois êmbolos &rarr; área maior, força maior</small></div>
+    <p class="body">É a <b>prensa hidráulica</b>: você aperta com pouca força um êmbolo pequeno, e um êmbolo grande devolve uma força enorme — o suficiente para erguer um carro. Mude a razão entre as áreas e veja a força multiplicar:</p>
+
+    <!-- SIM 2 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#128295;</span><span class="ttl">Simulação · Prensa hidráulica</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="pascalCanvas" height="210"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Quantas vezes o êmbolo grande é maior (A&#8322;/A&#8321;)</span><span class="vl" id="pxRatio">5x</span></div>
+          <input type="range" id="pxR" min="2" max="12" value="5">
+        </div>
+        <div class="readout">
+          <div class="ro y"><span class="k">FORÇA APLICADA (F&#8321;)</span><span class="v">100 N</span></div>
+          <div class="ro g"><span class="k">FORÇA DE SAÍDA (F&#8322;)</span><span class="v" id="pxOut">500 N</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p48 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Um elevador hidráulico de acessibilidade usa o princípio de Pascal. A área da cabeça do pistão é cinco vezes maior que a da tubulação que sai da bomba. Desprezando o atrito e com g = 10 m/s&sup2;, deseja-se elevar, com velocidade constante, uma pessoa de 65 kg, uma cadeira de 15 kg e a plataforma de 20 kg. Qual deve ser a força exercida pela bomba sobre o fluido?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>20 N</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>100 N</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>200 N</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>1000 N</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>5000 N</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>1) Peso total a erguer</h4>
+          <p>Massa total = 65 + 15 + 20 = 100 kg. O peso é a força que o êmbolo grande precisa fazer:</p>
+          <div class="calc-step">F&#8322; = m &middot; g = 100 &times; 10 = 1000 N</div>
+          <h4>2) Aplicando Pascal</h4>
+          <p>A força se divide na mesma proporção das áreas. Como a área grande é 5x a pequena, a bomba faz 5x menos força:</p>
+          <div class="calc-step">F&#8321; = F&#8322; &divide; 5 = 1000 &divide; 5 = 200 N</div>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p55 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2010</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">O ludião é um frasco de vidro com água pela metade, emborcado dentro de uma garrafa PET cheia e tampada. Normalmente o frasco fica em cima; ao apertar a garrafa, ele desce. O movimento de descida do frasco, ao apertar, ocorre porque</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>diminui a força para baixo que a água aplica no frasco.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>aumenta a pressão na parte pressionada da garrafa.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>aumenta a quantidade de água que fica dentro do frasco.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>diminui a força de resistência da água sobre o frasco.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>diminui a pressão que a água aplica na base do frasco.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Pascal + empuxo juntos</h4>
+          <p>Ao apertar, a pressão se transmite por toda a água (Pascal) e comprime a bolha de ar dentro do frasco. Com o ar comprimido, <b>entra mais água</b> no frasco.</p>
+          <p>Mais água dentro = frasco mais pesado e mais denso, então o empuxo já não o segura e ele <b>afunda</b>. Ao soltar, o ar se expande, a água sai e ele sobe de novo.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. EMPUXO -->
+<section class="lesson" id="s7" data-title="Empuxo (Arquimedes)">
+  <div class="wrap">
+    <div class="kicker"><span class="num">7</span> O empurrão para cima</div>
+    <h2 class="sec-title">Empuxo e o Princípio de Arquimedes</h2>
+    <p class="body">Todo corpo mergulhado num fluido recebe uma força <b>para cima</b> chamada <span class="hl">empuxo</span>. O Princípio de Arquimedes diz que essa força é igual ao <b>peso do líquido que o corpo desloca</b>:</p>
+    <div class="formula"><span class="c">E</span> = <span class="y">d</span> &middot; <span class="g">g</span> &middot; <span class="c">V</span> <small>empuxo = densidade do líquido &times; gravidade &times; volume submerso</small></div>
+    <p class="body">Repare: o empuxo depende do <b>volume submerso</b>, não da massa do corpo. Arraste a densidade do objeto e veja quando ele flutua e quando afunda:</p>
+
+    <!-- SIM 3 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#11014;</span><span class="ttl">Simulação · Empuxo e flutuação</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="buoyCanvas" height="220"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Densidade do objeto (água = 1,0)</span><span class="vl" id="buDval">0,60</span></div>
+          <input type="range" id="buD" min="20" max="200" value="60">
+        </div>
+        <div class="readout">
+          <div class="ro"><span class="k">RESULTADO</span><span class="v" id="buState" style="font-size:15px">flutua</span></div>
+          <div class="ro g"><span class="k">PARTE SUBMERSA</span><span class="v" id="buSub">60%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p54 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2010</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Trabalhadores não conseguiam puxar uma escultura de ferro maciço do fundo de uma piscina vazia. Encher a piscina com água facilita a remoção porque a</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>escultura flutuará, e os homens não precisarão fazer força.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>escultura ficará com peso menor, e a força necessária será menor.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>água exercerá uma força proporcional à massa da escultura, para cima, somando-se à dos trabalhadores.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>água exercerá uma força para baixo, e o piso empurrará a escultura para cima.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>água exercerá uma força proporcional ao volume, para cima, que se soma à força dos trabalhadores.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Cuidado com as pegadinhas</h4>
+          <p>O empuxo é proporcional ao <b>volume</b> submerso (E = d&middot;g&middot;V), não à massa da escultura — isso já elimina a letra C. E o peso real da escultura <b>não muda</b> (elimina B); o que muda é a força que os trabalhadores precisam aplicar.</p>
+          <h4>O que acontece</h4>
+          <p>A água empurra a escultura <b>para cima</b> com o empuxo (proporcional ao volume). Essa força se soma à dos trabalhadores, ajudando a vencer o peso. A escultura de ferro não flutua sozinha (elimina A), mas fica mais fácil de puxar.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p53 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2011</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Para medir a densidade da água de um lago, usou-se um dinamômetro e um cubo maciço de 10 cm de aresta e 3 kg. Suspenso no ar, o dinamômetro marcou 30 N. Mergulhando o cubo até que metade do volume ficasse submersa, marcou 24 N. Com g = 10 m/s&sup2;, a densidade da água do lago, em g/cm&sup3;, é</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>0,6.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>1,2.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>1,5.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>2,4.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>4,8.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>1) O empuxo é a diferença das leituras</h4>
+          <p>No ar o dinamômetro lê o peso (30 N). Submerso, lê menos porque o empuxo ajuda a segurar:</p>
+          <div class="calc-step">E = 30 - 24 = 6 N</div>
+          <h4>2) Volume submerso</h4>
+          <p>O cubo tem 10 cm de aresta &rarr; volume 1000 cm&sup3;. Metade submersa = 500 cm&sup3; = 5 &times; 10&#8315;&#8308; m&sup3;.</p>
+          <h4>3) Isolando a densidade em E = d &middot; g &middot; V</h4>
+          <div class="calc-step">d = 6 &divide; (10 &times; 5&times;10&#8315;&#8308;) = 1200 kg/m&sup3;</div>
+          <p>Convertendo: 1200 kg/m&sup3; = 1,2 g/cm&sup3;.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. FLUTUAÇÃO -->
+<section class="lesson" id="s8" data-title="Flutuação">
+  <div class="wrap">
+    <div class="kicker"><span class="num">8</span> Boiar ou afundar</div>
+    <h2 class="sec-title">A regra da flutuação</h2>
+    <p class="body">Quem decide se um corpo boia ou afunda é a disputa entre <b>peso</b> (para baixo) e <b>empuxo</b> (para cima):</p>
+    <div class="laws">
+      <div class="lw"><span class="n">&#127754;</span><div class="t">EMPUXO &gt; PESO</div><div class="d">o corpo sobe e <b>flutua</b> (menos denso)</div></div>
+      <div class="lw"><span class="n">&#9878;</span><div class="t">EMPUXO = PESO</div><div class="d">fica em <b>equilíbrio</b>, parado no meio</div></div>
+      <div class="lw"><span class="n">&#128721;</span><div class="t">EMPUXO &lt; PESO</div><div class="d">o corpo <b>afunda</b> (mais denso)</div></div>
+    </div>
+    <div class="note">
+      <span class="tag" style="color:var(--cyan)">POR QUE UM NAVIO DE FERRO FLUTUA?</span>
+      O ferro é mais denso que a água, mas o navio é <b>oco</b> — cheio de ar. Espalhando o peso num volume enorme, a densidade média do navio fica <b>menor que a da água</b>, e ele boia. É a mesma razão pela qual você flutua mais fácil enchendo o peito de ar.
+    </div>
+    <p class="body">O iceberg mostra isso na prática: como o gelo tem densidade próxima (um pouco menor) à da água, quase <b>90% dele fica submerso</b> — só a "ponta do iceberg" aparece.</p>
+  </div>
+</section>
+
+<!-- 9. APLICAÇÕES -->
+<section class="lesson" id="s9" data-title="Aplicações no ENEM">
+  <div class="wrap">
+    <div class="kicker"><span class="num">9</span> No mundo real</div>
+    <h2 class="sec-title">Hidrostática no dia a dia</h2>
+    <p class="body">Os conceitos desta aula aparecem em tecnologias que você conhece — e o ENEM adora vesti-los de situações do cotidiano:</p>
+    <div class="laws">
+      <div class="lw"><span class="n">&#128667;</span><div class="t">FREIO E MACACO</div><div class="d">Pascal multiplica a força do pé/da mão</div></div>
+      <div class="lw"><span class="n">&#128674;</span><div class="t">NAVIOS E SUBMARINOS</div><div class="d">empuxo e controle de densidade</div></div>
+      <div class="lw"><span class="n">&#127894;</span><div class="t">BALÕES</div><div class="d">gás menos denso que o ar sobe</div></div>
+    </div>
+    <div class="note tip">
+      <span class="tag">DICA DE PROVA</span>
+      Quase toda questão de hidrostática cai em uma destas quatro: <b>P = F/A</b> (pressão e área), <b>Stevin</b> (profundidade), <b>Pascal</b> (multiplicar força) ou <b>empuxo</b> (boiar/afundar). Identifique qual é e você já tem meio caminho andado.
+    </div>
+  </div>
+</section>
+
+<!-- 10. RESUMO -->
+<section class="lesson" id="s10" data-title="Resumo e fórmulas">
+  <div class="wrap">
+    <div class="kicker"><span class="num">10</span> Leve no bolso</div>
+    <h2 class="sec-title">Resumo da hidrostática</h2>
+    <p class="body">As quatro fórmulas e ideias que resolvem a maioria das questões:</p>
+    <div class="sheet">
+      <div class="f"><div class="eq">d = m/V</div><div class="ds">Densidade<br>(água = 1 g/cm&sup3;)</div></div>
+      <div class="f"><div class="eq">P = F/A</div><div class="ds">Pressão<br>(força por área)</div></div>
+      <div class="f"><div class="eq">P = P&#8320;+dgh</div><div class="ds">Stevin<br>(profundidade)</div></div>
+      <div class="f"><div class="eq">E = dgV</div><div class="ds">Empuxo<br>(Arquimedes)</div></div>
+    </div>
+
+    <h3 style="font-family:'Orbitron';font-weight:700;font-size:16px;color:var(--cyan);margin:26px 0 6px">As ideias que mais caem</h3>
+    <ul class="takeaways">
+      <li><b>Densidade</b> decide quem boia: menos denso que a água flutua, mais denso afunda.</li>
+      <li><b>Pressão = força &divide; área</b> — mesma força, área maior, menos pressão (pneu largo, raquete de neve).</li>
+      <li><b>Stevin</b>: a pressão só depende da <b>profundidade</b>, não do formato do recipiente.</li>
+      <li><b>Pascal</b>: a pressão se transmite igual e a prensa hidráulica <b>multiplica força</b> (F&#8321;/A&#8321; = F&#8322;/A&#8322;).</li>
+      <li><b>Empuxo = d&middot;g&middot;V</b> depende do <b>volume submerso</b>, não da massa do corpo.</li>
+      <li>Flutuação: compare <b>empuxo x peso</b> — o navio de ferro boia porque é oco (densidade média menor).</li>
+    </ul>
+
+    <div class="card finish-card">
+      <p style="font-family:'Orbitron';font-weight:700;font-size:18px;color:#eafcff;margin-bottom:8px">Você chegou ao fim! &#128167;</p>
+      <p class="body" style="margin-bottom:20px">Agora encare o simulado na Área ENEM para fixar tudo — as questões que você acertar saem da fila, e as que errar voltam para você dominar.</p>
+      <button class="btn" id="finishBtn">Marcar aula como concluída &#10003;</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="ft-logo">&#128167; Plataforma da Física</div>
+  <p style="margin-top:8px">Aula interativa de Hidrostática · questões do ENEM para fins educacionais</p>
+</footer>
+
+<script>
+'use strict';
+const Store = (function(){
+  const KEY = 'plataphysica_hidro_aula';
+  let mem = null;
+  function read(){ try{ const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : (mem || {visited:[], done:false}); }catch(e){ return mem || {visited:[], done:false}; } }
+  function write(d){ mem = d; try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){} }
+  return { read, write };
+})();
+
+const secs = Array.from(document.querySelectorAll('section.lesson'));
+const data = Store.read();
+const visited = new Set(data.visited || []);
+const tocNav = document.getElementById('tocNav');
+tocNav.innerHTML = secs.map((s,i)=>`<a href="#${s.id}" data-go="${s.id}"><span class="n">${String(i+1).padStart(2,'0')}</span><span>${s.dataset.title}</span><span class="dot">&#10003;</span></a>`).join('');
+function refreshProgress(){
+  const pct = Math.round(visited.size / secs.length * 100);
+  document.getElementById('progBar').style.width = pct + '%';
+  document.getElementById('tbPct').textContent = pct + '%';
+  tocNav.querySelectorAll('a').forEach(a=> a.classList.toggle('done', visited.has(a.dataset.go)));
+}
+function markVisited(id){ if(visited.has(id)) return; visited.add(id); const d = Store.read(); d.visited = Array.from(visited); Store.write(d); refreshProgress(); }
+refreshProgress();
+if('IntersectionObserver' in window){
+  const obs = new IntersectionObserver((entries)=>{ entries.forEach(en=>{ if(en.isIntersecting) markVisited(en.target.id); }); }, { threshold:0.35 });
+  secs.forEach(s=>obs.observe(s));
+} else { secs.forEach(s=>markVisited(s.id)); }
+const toc = document.getElementById('toc');
+document.getElementById('tocBtn').onclick = ()=> toc.classList.add('open');
+document.getElementById('tocX').onclick = ()=> toc.classList.remove('open');
+toc.onclick = (e)=>{ if(e.target === toc) toc.classList.remove('open'); };
+tocNav.querySelectorAll('a').forEach(a=> a.onclick = ()=> toc.classList.remove('open'));
+const finishBtn = document.getElementById('finishBtn');
+function paintDone(){ finishBtn.classList.add('done-state'); finishBtn.innerHTML = '&#10003; Aula concluída'; }
+if(data.done) paintDone();
+finishBtn.onclick = ()=>{ secs.forEach(s=>visited.add(s.id)); const d = Store.read(); d.visited = Array.from(visited); d.done = true; Store.write(d); refreshProgress(); paintDone(); window.scrollTo({ top:0, behavior:'smooth' }); };
+
+document.querySelectorAll('.enem-q').forEach(q=>{
+  const btn = q.querySelector('.reveal-btn'), sol = q.querySelector('.eq-sol');
+  const correct = parseInt(q.dataset.correct, 10), alts = q.querySelectorAll('.eq-alt');
+  btn.onclick = ()=>{ const open = sol.classList.toggle('show'); if(open){ if(alts[correct]) alts[correct].classList.add('correct'); btn.innerHTML = 'Ocultar resolução &#9650;'; } else { btn.innerHTML = 'Ver resolução passo a passo &#9660;'; } };
+});
+
+function fitCanvas(cv, cssH){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = cv.clientWidth || cv.parentElement.clientWidth;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(cssH * dpr); cv.style.height = cssH + 'px';
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w, h: cssH };
+}
+
+/* HERO — bolhas subindo na água */
+(function(){
+  const cv = document.getElementById('heroCanvas'); if(!cv) return;
+  let W, H, bubbles = [];
+  function setup(){ const dpr = Math.min(window.devicePixelRatio||1,2); W=cv.clientWidth; H=cv.clientHeight||360; cv.width=W*dpr; cv.height=H*dpr; cv.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+    bubbles = Array.from({length:34}, ()=>({ x:Math.random()*W, y:Math.random()*H, r:2+Math.random()*7, sp:0.3+Math.random()*1.1, ph:Math.random()*6.28 })); }
+  const ctx = cv.getContext('2d');
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    bubbles.forEach(b=>{
+      b.y -= b.sp; b.ph += 0.03; b.x += Math.sin(b.ph)*0.4;
+      if(b.y < -10){ b.y = H+10; b.x = Math.random()*W; }
+      ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, 6.28);
+      ctx.strokeStyle='rgba(0,229,255,0.35)'; ctx.lineWidth=1.2; ctx.stroke();
+      ctx.fillStyle='rgba(59,214,255,0.08)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(b.x-b.r*0.3, b.y-b.r*0.3, b.r*0.28, 0, 6.28); ctx.fillStyle='rgba(255,255,255,0.4)'; ctx.fill();
+    });
+    requestAnimationFrame(frame);
+  }
+  setup(); frame();
+  window.addEventListener('resize', setup);
+})();
+
+/* SIM 1 — Stevin (jatos) */
+(function(){
+  const cv = document.getElementById('stevinCanvas');
+  const sL = document.getElementById('stLevel');
+  if(!cv) return;
+  let ctx, W, H, parts = [];
+  function build(){ const r = fitCanvas(cv, 230); ctx = r.ctx; W = r.w; H = r.h; }
+  function frame(){
+    const lvl = parseFloat(sL.value)/100;   // fração do reservatório cheia
+    ctx.clearRect(0,0,W,H);
+    const tankX = 40, tankW = Math.min(W*0.34, 150), tankTop = 20, tankBot = H-24, tankH = tankBot-tankTop;
+    const groundY = H-24;
+    // chão
+    ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(W,groundY); ctx.stroke();
+    // reservatório (paredes)
+    ctx.strokeStyle='rgba(0,229,255,0.5)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(tankX, tankTop); ctx.lineTo(tankX, tankBot); ctx.lineTo(tankX+tankW, tankBot); ctx.lineTo(tankX+tankW, tankTop); ctx.stroke();
+    // água
+    const surfY = tankBot - tankH*lvl;
+    ctx.fillStyle='rgba(0,180,230,0.28)'; ctx.fillRect(tankX+1, surfY, tankW-2, tankBot-surfY);
+    ctx.strokeStyle='rgba(0,229,255,0.6)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(tankX+1,surfY); ctx.lineTo(tankX+tankW-1,surfY); ctx.stroke();
+    // 3 furos (alturas)
+    const holes = [0.72, 0.5, 0.28].map(f=> tankBot - tankH*f); // y de cada furo (baixo, meio, alto)
+    holes.forEach(hy=>{
+      const depth = Math.max(0, hy - surfY);   // profundidade sob a superfície
+      // marca do furo
+      ctx.fillStyle = depth>0 ? 'rgba(0,229,255,0.9)':'rgba(120,140,160,0.6)';
+      ctx.beginPath(); ctx.arc(tankX+tankW, hy, 3, 0, 6.28); ctx.fill();
+      if(depth>2){
+        // velocidade de saída ~ sqrt(depth) -> alcance
+        const v = Math.sqrt(depth)*0.9;
+        // emite partículas
+        if(Math.random()<0.6) parts.push({ x:tankX+tankW, y:hy, vx:v, vy:0, life:60 });
+      }
+    });
+    // atualiza partículas (parábola)
+    const g = 0.14;
+    ctx.fillStyle='rgba(0,229,255,0.85)';
+    parts.forEach(p=>{ p.vy += g; p.x += p.vx; p.y += p.vy; p.life--; if(p.y>=groundY){ p.y=groundY; p.life=Math.min(p.life,4);} ctx.beginPath(); ctx.arc(p.x,p.y,2,0,6.28); ctx.fill(); });
+    parts = parts.filter(p=> p.life>0 && p.x < W);
+    // rótulos
+    ctx.fillStyle='rgba(132,146,180,0.9)'; ctx.font="600 10px Orbitron"; ctx.textAlign='left';
+    ctx.fillText('mais fundo = mais pressão = jato mais longe', tankX, groundY+16);
+    document.getElementById('stLvl').textContent = lvl>0.75?'alto':(lvl>0.5?'médio':'baixo');
+    requestAnimationFrame(frame);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* SIM 2 — prensa hidráulica */
+(function(){
+  const cv = document.getElementById('pascalCanvas');
+  const sR = document.getElementById('pxR');
+  if(!cv) return;
+  let ctx, W, H, t=0;
+  const F1 = 100;
+  function build(){ const r = fitCanvas(cv, 210); ctx = r.ctx; W = r.w; H = r.h; }
+  function frame(){
+    const ratio = parseFloat(sR.value);
+    const F2 = F1*ratio;
+    t += 0.04;
+    const push = (Math.sin(t)*0.5+0.5); // 0..1 animação de bombeamento
+    ctx.clearRect(0,0,W,H);
+    const baseY = H-30, tubeY = H-46;
+    // reservatório em U (base de líquido)
+    const x1 = W*0.24, x2 = W*0.7;
+    const wSmall = 26, wLarge = 26*Math.min(ratio,8)/2.2;
+    // tubo conectando
+    ctx.fillStyle='rgba(0,180,230,0.22)';
+    ctx.fillRect(x1-wSmall/2, tubeY, (x2+wLarge/2)-(x1-wSmall/2), 14);
+    // cilindro pequeno
+    ctx.strokeStyle='rgba(0,229,255,0.5)'; ctx.lineWidth=2;
+    const smallTop = 70 + push*14;
+    ctx.strokeRect(x1-wSmall/2, smallTop, wSmall, tubeY-smallTop+2);
+    ctx.fillStyle='rgba(0,180,230,0.22)'; ctx.fillRect(x1-wSmall/2+1, smallTop+16, wSmall-2, tubeY-smallTop-14);
+    // êmbolo pequeno
+    ctx.fillStyle='rgba(255,210,61,0.9)'; ctx.fillRect(x1-wSmall/2-2, smallTop, wSmall+4, 10);
+    // cilindro grande
+    const largeTop = 60 - push*4;
+    ctx.strokeRect(x2-wLarge/2, largeTop, wLarge, tubeY-largeTop+2);
+    ctx.fillStyle='rgba(0,180,230,0.22)'; ctx.fillRect(x2-wLarge/2+1, largeTop+16, wLarge-2, tubeY-largeTop-14);
+    // êmbolo grande + carga
+    ctx.fillStyle='rgba(39,232,138,0.9)'; ctx.fillRect(x2-wLarge/2-2, largeTop, wLarge+4, 10);
+    ctx.fillStyle='rgba(39,232,138,0.15)'; ctx.strokeStyle='rgba(39,232,138,0.6)';
+    ctx.fillRect(x2-wLarge/2, largeTop-24, wLarge, 22); ctx.strokeRect(x2-wLarge/2, largeTop-24, wLarge, 22);
+    ctx.fillStyle='rgba(39,232,138,0.95)'; ctx.font="700 11px Orbitron"; ctx.textAlign='center'; ctx.fillText('CARGA', x2, largeTop-9);
+    // setas de força
+    ctx.fillStyle='rgba(255,210,61,0.95)'; ctx.font="700 11px Orbitron";
+    ctx.fillText('F1', x1, smallTop-20); drawArrow(ctx, x1, smallTop-16, x1, smallTop-4, 'rgba(255,210,61,0.95)');
+    ctx.fillStyle='rgba(39,232,138,0.95)';
+    ctx.fillText('F2', x2, largeTop-34); drawArrow(ctx, x2, largeTop-30, x2, largeTop-42, 'rgba(39,232,138,0.95)');
+    // rótulos áreas
+    ctx.fillStyle='rgba(132,146,180,0.9)'; ctx.font="600 10px Orbitron";
+    ctx.fillText('êmbolo pequeno', x1, baseY+8); ctx.fillText('êmbolo grande ('+ratio+'x)', x2, baseY+8);
+    document.getElementById('pxRatio').textContent = ratio+'x';
+    document.getElementById('pxOut').textContent = F2+' N';
+    requestAnimationFrame(frame);
+  }
+  function drawArrow(c,x1,y1,x2,y2,col){ c.strokeStyle=col; c.lineWidth=3; c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke(); const a=Math.atan2(y2-y1,x2-x1); c.fillStyle=col; c.beginPath(); c.moveTo(x2,y2); c.lineTo(x2-Math.cos(a-0.5)*8,y2-Math.sin(a-0.5)*8); c.lineTo(x2-Math.cos(a+0.5)*8,y2-Math.sin(a+0.5)*8); c.closePath(); c.fill(); }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* SIM 3 — empuxo / flutuação */
+(function(){
+  const cv = document.getElementById('buoyCanvas');
+  const sD = document.getElementById('buD');
+  if(!cv) return;
+  let ctx, W, H, blockY=null;
+  function build(){ const r = fitCanvas(cv, 220); ctx = r.ctx; W = r.w; H = r.h; blockY=null; }
+  function frame(){
+    const d = parseFloat(sD.value)/100;   // densidade relativa (0.2..2.0)
+    ctx.clearRect(0,0,W,H);
+    const waterTop = H*0.34, waterBot = H-14, cx = W/2, bs = 54;
+    // água
+    ctx.fillStyle='rgba(0,180,230,0.22)'; ctx.fillRect(0, waterTop, W, waterBot-waterTop);
+    ctx.strokeStyle='rgba(0,229,255,0.5)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(0,waterTop); ctx.lineTo(W,waterTop); ctx.stroke();
+    ctx.fillStyle='rgba(132,146,180,0.7)'; ctx.font="600 10px Orbitron"; ctx.textAlign='left'; ctx.fillText('ÁGUA (d = 1,0)', 12, waterTop-6);
+    // posição do bloco
+    let targetTopY, sub;
+    if(d < 1){ // flutua: fração submersa = d
+      sub = d;
+      targetTopY = waterTop - bs*(1-sub);
+    } else { // afunda: repousa no fundo
+      sub = 1;
+      targetTopY = waterBot - bs;
+    }
+    if(blockY===null) blockY = targetTopY;
+    blockY += (targetTopY - blockY)*0.12;   // animação suave
+    // bloco
+    const grad = d<1 ? 'rgba(255,210,61,0.85)' : 'rgba(255,90,110,0.85)';
+    ctx.fillStyle='rgba(20,30,46,0.9)'; ctx.fillRect(cx-bs/2, blockY, bs, bs);
+    ctx.strokeStyle=grad; ctx.lineWidth=2.5; ctx.strokeRect(cx-bs/2, blockY, bs, bs);
+    ctx.fillStyle=grad; ctx.font="700 12px Orbitron"; ctx.textAlign='center';
+    ctx.fillText(d.toFixed(2).replace('.',','), cx, blockY+bs/2+4);
+    // setas peso (baixo) e empuxo (cima)
+    const pesoLen = 18*Math.min(d,2)+8;
+    drawArrow(ctx, cx-14, blockY+bs, cx-14, blockY+bs+pesoLen, 'rgba(255,90,110,0.95)');
+    ctx.fillStyle='rgba(255,90,110,0.95)'; ctx.font="700 10px Orbitron"; ctx.fillText('Peso', cx-14, blockY+bs+pesoLen+11);
+    const empLen = 18*Math.min(sub* (d<1?d:1)+ (d<1?0:1),2)+8;
+    const empLen2 = 18*(d<1?d:1)+8;
+    drawArrow(ctx, cx+14, blockY, cx+14, blockY-empLen2, 'rgba(0,229,255,0.95)');
+    ctx.fillStyle='rgba(0,229,255,0.95)'; ctx.fillText('Empuxo', cx+16, blockY-empLen2-4);
+    document.getElementById('buDval').textContent = d.toFixed(2).replace('.',',');
+    let st;
+    if(Math.abs(d-1)<0.03) st='equilíbrio';
+    else if(d<1) st='flutua';
+    else st='afunda';
+    document.getElementById('buState').textContent = st;
+    document.getElementById('buSub').textContent = Math.round(sub*100)+'%';
+    requestAnimationFrame(frame);
+  }
+  function drawArrow(c,x1,y1,x2,y2,col){ c.strokeStyle=col; c.lineWidth=3; c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke(); const a=Math.atan2(y2-y1,x2-x1); c.fillStyle=col; c.beginPath(); c.moveTo(x2,y2); c.lineTo(x2-Math.cos(a-0.5)*7,y2-Math.sin(a-0.5)*7); c.lineTo(x2-Math.cos(a+0.5)*7,y2-Math.sin(a+0.5)*7); c.closePath(); c.fill(); }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+</script>
+</body>
+</html>
