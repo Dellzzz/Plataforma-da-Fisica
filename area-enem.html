@@ -567,6 +567,8 @@ const AULAS = [
   { ic:'&#12336;', t:'Ondulatória do Zero', d:'Ondas, som, refração, interferência e espectro eletromagnético', url:'./area enem/ondulatoria-enem.html' },
   { ic:'&#128293;', t:'Termodinâmica do Zero', d:'Calor, temperatura, calorimetria, mudanças de estado e máquinas térmicas', url:'./area enem/termodinamica-enem.html' },
   { ic:'&#129522;', t:'Eletromagnetismo do Zero', d:'Ímãs, campo magnético, indução de Faraday, geradores e transformadores', url:'./area enem/eletromagnetismo-enem.html' },
+  { ic:'&#128161;', t:'Óptica do Zero', d:'Luz, reflexão, espelhos, refração, lentes e cores', url:'./area enem/optica-enem.html' },
+  { ic:'&#128167;', t:'Hidrostática do Zero', d:'Densidade, pressão, Stevin, Pascal e empuxo (flutuação)', url:'./area enem/hidrostatica-enem.html' },
 ];
 
 const CONTEUDOS = [
@@ -1384,14 +1386,21 @@ function renderAulasEnem(){
     'Energia':        { url:'./mecanica-enem.html', label:'Abrir aula de Mecânica' },
     'Gravitação':     { url:'./mecanica-enem.html', label:'Abrir aula de Mecânica' },
     'Termologia':     { url:'./termodinamica-enem.html', label:'Abrir aula interativa' },
-    'Eletromagnetismo': { url:'./eletromagnetismo-enem.html', label:'Abrir aula interativa' }
+    'Eletromagnetismo': { url:'./eletromagnetismo-enem.html', label:'Abrir aula interativa' },
+    'Óptica':         { url:'./optica-enem.html', label:'Abrir aula interativa' },
+    'Hidrostática':   { url:'./hidrostatica-enem.html', label:'Abrir aula interativa' }
   };
   const VIDEOS = {
     'Cinemática':      { url:'https://www.youtube.com/watch?v=M3Bbg1bginM', prof:'Prof. Pedro Assaad', resumo:'Como descrever o movimento: posição, velocidade e aceleração, nos casos de MRU (velocidade constante) e MRUV (aceleração constante), com a conversão km/h &harr; m/s.' },
     'Ondulatória':     { url:'https://www.youtube.com/watch?v=QL-QjbzUJPw', prof:'Prof. Umberto Mannarino', resumo:'As ondas e suas propriedades (amplitude, comprimento de onda e frequência), a equação fundamental v = &lambda;&middot;f, o som e os fenômenos de reflexão, refração, difração e ressonância.' },
     'Termologia':      { url:'https://www.youtube.com/watch?v=u-7ajvTkDk0', prof:'Prof. Pedro Abalada', resumo:'Calor e temperatura, calorimetria (Q = m&middot;c&middot;&Delta;T), mudanças de estado, transferência de calor e as leis da termodinâmica que regem as máquinas térmicas.' },
     'Eletrodinâmica':  { url:'https://www.youtube.com/watch?v=37ZgzVoikCY', prof:'Prof. Umberto Mannarino', resumo:'Corrente, tensão e resistência, a Lei de Ohm (V = R&middot;i), potência elétrica e o cálculo do consumo de energia na conta de luz.' },
-    'Eletromagnetismo':{ url:'https://www.youtube.com/watch?v=aaGx54PbdvA', prof:'Prof. Pedro Assaad', resumo:'A ligação entre eletricidade e magnetismo: campo magnético, experimento de Oersted, indução de Faraday, geradores e transformadores.' }
+    'Eletromagnetismo':{ url:'https://www.youtube.com/watch?v=aaGx54PbdvA', prof:'Prof. Pedro Assaad', resumo:'A ligação entre eletricidade e magnetismo: campo magnético, experimento de Oersted, indução de Faraday, geradores e transformadores.' },
+    'Óptica':          { url:'https://www.youtube.com/watch?v=oRPwxS88kZE', prof:'Prof. Pedro Assaad', resumo:'Como a luz se comporta: reflexão em espelhos, refração e lentes, formação de imagens e fenômenos como miragens, fibra óptica e as cores.' },
+    'Dinâmica':        { url:'https://www.youtube.com/watch?v=ohVZn6PYdys', prof:'Prof. Renato Palmeira', resumo:'As causas do movimento: as três Leis de Newton, força resultante, peso e atrito, e a relação F = m&middot;a.' },
+    'Energia':         { url:'https://www.youtube.com/watch?v=jPn5RT_cnZ8', prof:'Prof. Umberto Mannarino', resumo:'Trabalho, energia cinética e potencial gravitacional, a conservação da energia mecânica e as transformações de energia.' },
+    'Hidrostática':    { url:'https://www.youtube.com/watch?v=pQlCv40jTCc', prof:'Prof. Boaro', resumo:'Densidade, pressão e o Teorema de Stevin, o princípio de Pascal (prensa hidráulica) e o empuxo de Arquimedes (por que os corpos flutuam).' },
+    'Gravitação':      { url:'https://www.youtube.com/watch?v=TEwl_wZJJGs', prof:'Prof. Hilton Junior', resumo:'A gravidade e o movimento dos astros: a Lei da Gravitação Universal de Newton e as Leis de Kepler para as órbitas dos planetas.' }
   };
   const byTema = {};
   QUESTOES.forEach(q => { (byTema[q.tema] = byTema[q.tema] || []).push(q); });
