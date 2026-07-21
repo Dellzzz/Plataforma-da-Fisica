@@ -5,324 +5,259 @@
   <meta name="theme-color" content="#00e5ff">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Física - Início</title>
+  <title>Platafísica — Início</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
+    :root{
+      --bg:#060b18;
+      --cyan:#00e5ff;
+      --cyan-soft:#7df9ff;
+      --violet:#8b5cff;
+      --green:#27e88a;
+      --txt:#dbefff;
+      --txt-dim:#8fb2cf;
+      --line:rgba(0,229,255,0.2);
+      --card:rgba(255,255,255,0.045);
     }
-
-    html, body {
-      overflow-x: hidden;
-      width: 100%;
-    }
-
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{overflow-x:hidden;width:100%}
+    html{scroll-behavior:smooth}
     body{
-      min-height: 100vh;
-      font-family:'Poppins', sans-serif;
-      
-      /* FALLBACK GARANTIDO: Cor escura base caso o gradiente falhe no celular */
-      background-color: #060b18; 
-      
-      /* GRADIENTE: Navegadores modernos vão carregar isso por cima da cor base */
+      min-height:100vh;
+      font-family:'Poppins',sans-serif;
+      background-color:var(--bg);
       background-image:
-        radial-gradient(circle at top left, rgba(0,255,255,0.15), transparent 25%),
-        radial-gradient(circle at bottom right, rgba(0,140,255,0.18), transparent 25%),
+        radial-gradient(circle at top left, rgba(0,229,255,0.15), transparent 26%),
+        radial-gradient(circle at bottom right, rgba(0,140,255,0.16), transparent 26%),
         linear-gradient(135deg, #050816, #0b1026, #060b18);
-      
-      color:white;
+      color:var(--txt);
       position:relative;
+      -webkit-font-smoothing:antialiased;
     }
-
-    /* GRID */
     body::before{
-      content:"";
-      position:fixed;
-      inset:0;
+      content:"";position:fixed;inset:0;z-index:-2;
       background:
-        linear-gradient(rgba(0,255,255,0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,255,0.06) 1px, transparent 1px);
-      background-size:40px 40px;
-      z-index:-2;
+        linear-gradient(rgba(0,229,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.05) 1px, transparent 1px);
+      background-size:42px 42px;
+      mask-image:radial-gradient(ellipse 90% 60% at 50% 0%, #000 40%, transparent 85%);
     }
-
     body::after{
-      content:"";
-      position:fixed;
-      width:500px;
-      height:500px;
-      background:rgba(0,255,255,0.08);
-      filter:blur(120px);
-      -webkit-filter:blur(120px);
-      top:-120px;
-      right:-120px;
-      z-index:-1;
-      pointer-events: none; 
+      content:"";position:fixed;width:520px;height:520px;
+      background:rgba(0,229,255,0.08);filter:blur(130px);-webkit-filter:blur(130px);
+      top:-140px;right:-140px;z-index:-1;pointer-events:none;
     }
+    ::selection{background:rgba(0,229,255,0.3);color:#fff}
+    a{text-decoration:none;color:inherit}
 
     /* NAVBAR */
     .navbar{
-      width:100%;
-      padding:20px 40px;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:25px;
-      position:sticky;
-      top:0;
-      z-index:1000;
-      background:rgba(5, 10, 25, 0.7);
-      -webkit-backdrop-filter:blur(12px);
-      backdrop-filter:blur(12px);
-      border-bottom:1px solid rgba(0,255,255,0.2);
-      box-shadow:0 0 20px rgba(0,255,255,0.08);
+      width:100%;padding:16px 32px;display:flex;justify-content:center;align-items:center;gap:8px;
+      position:sticky;top:0;z-index:1000;flex-wrap:wrap;
+      background:rgba(5,10,25,0.72);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--line);box-shadow:0 0 24px rgba(0,229,255,0.07);
     }
-
     .navbar a{
-      text-decoration:none;
-      color:#cdefff;
-      font-family:'Orbitron', sans-serif;
-      font-size:0.95rem;
-      letter-spacing:1px;
-      padding:12px 20px;
-      border-radius:12px;
-      transition:0.3s ease;
-      border:1px solid transparent;
-      white-space: nowrap; 
+      color:#bfe4ff;font-family:'Orbitron',sans-serif;font-size:.82rem;letter-spacing:1px;
+      padding:9px 16px;border-radius:11px;transition:.25s ease;border:1px solid transparent;white-space:nowrap;
     }
+    .navbar a:hover,.navbar a:focus-visible{color:var(--cyan-soft);border-color:rgba(0,229,255,0.4);background:rgba(0,229,255,0.08);outline:none}
+    .navbar a.active{color:var(--cyan-soft);border-color:rgba(0,229,255,0.5);background:rgba(0,229,255,0.12)}
 
-    .navbar a:hover{
-      color:#7df9ff;
-      border:1px solid rgba(0,255,255,0.4);
-      background:rgba(0,255,255,0.08);
-      box-shadow: 0 0 10px rgba(0,255,255,0.2), 0 0 20px rgba(0,255,255,0.1);
+    .container{width:90%;max-width:1120px;margin:auto;padding:44px 0 60px}
+
+    /* HERO */
+    .hero{text-align:center;margin-bottom:46px;padding:0 8px}
+    .brand{
+      font-family:'Orbitron',sans-serif;font-weight:900;
+      font-size:clamp(2.4rem,9vw,4.6rem);letter-spacing:clamp(3px,1.4vw,10px);
+      text-transform:uppercase;color:var(--cyan-soft);line-height:1.02;
+      text-shadow:0 0 14px rgba(0,229,255,.6),0 0 40px rgba(0,229,255,.35);
+      animation:glow 3.5s infinite alternate;
     }
+    @keyframes glow{from{text-shadow:0 0 12px rgba(0,229,255,.5),0 0 26px rgba(0,229,255,.3)}to{text-shadow:0 0 22px rgba(0,229,255,.7),0 0 60px rgba(0,229,255,.4)}}
+    .hero .tag{margin-top:14px;color:var(--txt);font-size:clamp(1rem,2.4vw,1.15rem);font-weight:400}
+    .hero .prof{margin-top:6px;color:var(--txt-dim);font-size:.92rem;letter-spacing:.5px;font-family:'Orbitron',sans-serif;font-weight:400}
+    .hero .cue{margin-top:22px;display:inline-block;font-family:'Orbitron',sans-serif;font-size:.72rem;letter-spacing:2px;color:var(--txt-dim);text-transform:uppercase}
 
-    .active{
-      color:#7df9ff !important;
-      border:1px solid rgba(0,255,255,0.5) !important;
-      background:rgba(0,255,255,0.12);
+    /* FEATURED ENEM BAND */
+    .enem{
+      position:relative;border-radius:26px;overflow:hidden;margin-bottom:34px;
+      background:
+        radial-gradient(600px 300px at 85% -20%, rgba(139,92,255,0.18), transparent 60%),
+        linear-gradient(135deg, rgba(0,229,255,0.09), rgba(139,92,255,0.07));
+      border:1px solid rgba(0,229,255,0.35);
+      box-shadow:0 0 30px rgba(0,229,255,0.12), inset 0 0 40px rgba(0,229,255,0.04);
+      padding:34px 34px 30px;
     }
-
-    .container{
-      width:90%;
-      max-width:1200px;
-      margin:auto;
-      padding:50px 0;
+    .enem-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+    .enem-ic{width:46px;height:46px;flex-shrink:0;display:grid;place-items:center;border-radius:13px;background:rgba(0,229,255,0.12);border:1px solid var(--line);color:var(--cyan-soft)}
+    .enem h2{font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(1.5rem,4.5vw,2rem);color:#eafcff;letter-spacing:1px}
+    .tag-new{font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:1px;color:#04121a;background:var(--green);padding:4px 10px;border-radius:20px;text-transform:uppercase}
+    .enem p.lead{color:var(--txt);font-size:clamp(1rem,2.4vw,1.12rem);line-height:1.6;max-width:660px;margin:6px 0 20px}
+    .enem p.lead b{color:var(--cyan-soft);font-weight:600}
+    .chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+    .chip{
+      display:inline-flex;align-items:center;gap:8px;font-size:.92rem;font-weight:500;
+      color:var(--txt);background:rgba(255,255,255,0.05);border:1px solid var(--line);
+      padding:9px 15px;border-radius:12px;transition:.22s ease;
     }
-
-    .title{
-      text-align:center;
-      margin-bottom:60px;
-      padding: 0 10px;
+    .chip .dot{width:8px;height:8px;border-radius:50%;box-shadow:0 0 8px currentColor}
+    .chip:hover,.chip:focus-visible{border-color:var(--cyan);background:rgba(0,229,255,0.1);transform:translateY(-2px);color:#fff;outline:none}
+    .chip.c1{--c:#00e5ff}.chip.c2{--c:#27e88a}.chip.c3{--c:#7df9ff}.chip.c4{--c:#ff9d3d}.chip.c5{--c:#8b5cff}
+    .chip .dot{color:var(--c)}
+    .btn-primary{
+      display:inline-flex;align-items:center;gap:10px;font-family:'Orbitron',sans-serif;font-weight:700;
+      font-size:.92rem;letter-spacing:.5px;color:#04121a;
+      background:linear-gradient(120deg,var(--cyan),#33b6ff);
+      padding:14px 26px;border-radius:13px;transition:.25s ease;
+      box-shadow:0 0 22px rgba(0,229,255,0.35);
     }
+    .btn-primary:hover,.btn-primary:focus-visible{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 0 30px rgba(0,229,255,.5);outline:none}
 
-    .title h1{
-      font-family:'Orbitron', sans-serif;
-      font-size:4rem;
-      letter-spacing:8px;
-      text-transform:uppercase;
-      color:#7df9ff;
-      text-shadow: 0 0 10px #00f7ff, 0 0 25px #00f7ff, 0 0 50px #00f7ff;
-      animation:glow 3s infinite alternate;
-      word-break: break-word; 
-    }
-
-    .title p{
-      margin-top:15px;
-      color:#b8dfff;
-      font-size:1.1rem;
-      letter-spacing:1px;
-    }
-
-    @keyframes glow{
-      from{ text-shadow: 0 0 10px #00f7ff, 0 0 25px #00f7ff; }
-      to{ text-shadow: 0 0 20px #00f7ff, 0 0 40px #00f7ff, 0 0 80px #00f7ff; }
-    }
-
-    .cards{
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
-      gap:35px;
-    }
-
+    /* GRID OF DESTINATIONS */
+    .section-label{font-family:'Orbitron',sans-serif;font-size:.74rem;letter-spacing:2px;color:var(--txt-dim);text-transform:uppercase;margin:0 4px 16px;display:flex;align-items:center;gap:12px}
+    .section-label::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px}
     .card{
-      position:relative;
-      padding:35px;
-      border-radius:24px;
-      background:rgba(255,255,255,0.05);
-      -webkit-backdrop-filter:blur(12px);
-      backdrop-filter:blur(12px);
-      border:1px solid rgba(0,255,255,0.2);
-      overflow:hidden;
-      transition:0.4s ease;
-      box-shadow: 0 0 15px rgba(0,255,255,0.08), inset 0 0 20px rgba(255,255,255,0.03);
-      display: block; 
-      text-decoration: none;
+      position:relative;padding:28px;border-radius:20px;background:var(--card);
+      -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+      border:1px solid var(--line);overflow:hidden;transition:.35s ease;display:flex;flex-direction:column;
+      box-shadow:0 0 14px rgba(0,229,255,0.06), inset 0 0 22px rgba(255,255,255,0.02);
     }
+    .card::before{content:"";position:absolute;width:150px;height:150px;background:rgba(0,229,255,0.12);border-radius:50%;top:-70px;right:-70px;filter:blur(26px);-webkit-filter:blur(26px);transition:.35s}
+    .card:hover,.card:focus-visible{transform:translateY(-8px);border-color:var(--cyan);box-shadow:0 0 24px rgba(0,229,255,0.22),0 0 48px rgba(0,229,255,0.12);outline:none}
+    .card:hover::before{background:rgba(0,229,255,0.2)}
+    .card .ic{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:rgba(0,229,255,0.1);border:1px solid var(--line);color:var(--cyan-soft);margin-bottom:16px;position:relative;z-index:1}
+    .card h3{font-family:'Orbitron',sans-serif;color:#eafcff;font-size:1.15rem;letter-spacing:1px;margin-bottom:10px;position:relative;z-index:1}
+    .card p{color:var(--txt-dim);line-height:1.6;font-size:.95rem;position:relative;z-index:1;flex:1;margin-bottom:18px}
+    .card .go{font-family:'Orbitron',sans-serif;font-size:.78rem;letter-spacing:.8px;color:var(--cyan-soft);display:inline-flex;align-items:center;gap:8px;position:relative;z-index:1;text-transform:uppercase}
+    .card .go svg{transition:.25s}
+    .card:hover .go svg{transform:translateX(4px)}
+    .card .corner-tag{position:absolute;top:16px;right:16px;z-index:2}
 
-    .card::before{
-      content:"";
-      position:absolute;
-      width:180px;
-      height:180px;
-      background:rgba(0,255,255,0.12);
-      border-radius:50%;
-      top:-80px;
-      right:-80px;
-      filter:blur(20px);
-      -webkit-filter:blur(20px);
-    }
+    .footer{text-align:center;margin-top:60px;color:#6f97ba;font-size:.9rem;letter-spacing:.5px}
+    .footer b{color:var(--cyan-soft);font-weight:500}
 
-    .card:hover{
-      transform:translateY(-10px) scale(1.02);
-      border-color:#00f7ff;
-      box-shadow: 0 0 20px rgba(0,255,255,0.25), 0 0 50px rgba(0,255,255,0.15);
-    }
-
-    .card h2{
-      font-family:'Orbitron', sans-serif;
-      color:#7df9ff;
-      margin-bottom:18px;
-      font-size:1.5rem;
-      letter-spacing:2px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .card p{
-      color:#dbefff;
-      line-height:1.8;
-      font-size:1rem;
-      position: relative;
-      z-index: 1;
-      margin-bottom: 20px;
-    }
-
-    .btn-neon {
-      display: inline-block;
-      color: white;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.9rem;
-      border: 1px solid #00f7ff;
-      padding: 10px 20px;
-      border-radius: 8px;
-      background: transparent;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      position: relative;
-      z-index: 1;
-      transition: 0.3s;
-    }
-
-    .footer{
-      text-align:center;
-      margin-top:70px;
-      color:#7ba7c9;
-      font-size:0.95rem;
-      letter-spacing:1px;
-    }
-
-    /* ========================================= */
-    /* OTIMIZAÇÃO OBRIGATÓRIA PARA MOBILE        */
-    /* ========================================= */
     @media(max-width:768px){
-
-      /* Força um fundo escuro limpo caso todos os efeitos falhem */
-      body {
-        background: #060b18 !important;
-      }
-
-      /* Remove o desfoque gigante no celular */
-      body::after {
-        display: none !important; 
-      }
-
-      .navbar{
-        flex-wrap:wrap;
-        gap:10px;
-        padding:15px 10px;
-      }
-      
-      .navbar a {
-        font-size: 0.85rem;
-        padding: 8px 12px;
-        flex: 1 1 calc(50% - 15px);
-        text-align: center;
-      }
-
-      /* Desliga a animação para não bugar GPUs de celular */
-      .title h1{
-        font-size:2.5rem;
-        animation: none !important; 
-        text-shadow: 0 0 15px #00f7ff !important; 
-      }
-
-      .card{
-        padding:28px;
-      }
-      
-      .card h2 {
-        font-size: 1.3rem;
-      }
+      body{background:#060b18 !important}
+      body::after{display:none !important}
+      .navbar{padding:12px 8px;gap:6px}
+      .navbar a{font-size:.76rem;padding:8px 11px}
+      .container{width:92%;padding:32px 0 48px}
+      .brand{animation:none !important;text-shadow:0 0 16px rgba(0,229,255,.6) !important}
+      .enem{padding:26px 20px 24px}
+      .card{padding:24px}
     }
-
+    @media(prefers-reduced-motion:reduce){
+      *{animation:none !important;transition:none !important}
+      html{scroll-behavior:auto}
+    }
   </style>
 </head>
 
 <body>
 
   <nav class="navbar">
-  	<a href="index.html" class="active">Início</a>
-  	<a href="aula.html">Aulas</a>
-  	<a href="listas.html">Listas</a>
-  	<a href="experimentos.html">Experimentos</a>
+    <a href="index.html" class="active">Início</a>
+    <a href="area-enem.html">Área ENEM</a>
+    <a href="aula.html">Aulas</a>
+    <a href="listas.html">Listas</a>
+    <a href="experimentos.html">Experimentos</a>
   </nav>
 
   <div class="container">
 
-    <div class="title">
-      <h1 style="font-size: 24px;"> Platafísica </h1>
-      <p>Plataforma de estudos e descobertas científicas</p>
-      <p>Prof. Jardel A. Leite</p>
-    </div>
+    <header class="hero">
+      <div class="brand">Platafísica</div>
+      <p class="tag">Estudo de Física do zero ao ENEM — com simulações, questões e experimentos.</p>
+      <p class="prof">Prof. Jardel A. Leite</p>
+      <span class="cue">&#9660; Escolha por onde começar</span>
+    </header>
 
-    <div class="cards">
+    <!-- FEATURED: ÁREA ENEM -->
+    <section class="enem">
+      <div class="enem-head">
+        <span class="enem-ic" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/>
+          </svg>
+        </span>
+        <h2>Área ENEM</h2>
+        <span class="tag-new">Novo</span>
+      </div>
+      <p class="lead">Aulas interativas <b>do zero</b>, um <b>simulado que se adapta aos seus erros</b> e questões reais do ENEM resolvidas passo a passo. Comece por um tema:</p>
+
+      <div class="chips">
+        <a class="chip c1" href="./eletrodinamica-enem.html"><span class="dot"></span> Eletrodinâmica</a>
+        <a class="chip c2" href="./mecanica-enem.html"><span class="dot"></span> Mecânica</a>
+        <a class="chip c3" href="./ondulatoria-enem.html"><span class="dot"></span> Ondulatória</a>
+        <a class="chip c4" href="./termodinamica-enem.html"><span class="dot"></span> Termodinâmica</a>
+        <a class="chip c5" href="./eletromagnetismo-enem.html"><span class="dot"></span> Eletromagnetismo</a>
+      </div>
+
+      <a class="btn-primary" href="area-enem.html">
+        Entrar na Área ENEM
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </section>
+
+    <!-- OTHER DESTINATIONS -->
+    <div class="section-label">Explorar a plataforma</div>
+    <div class="grid">
 
       <a href="aula.html" class="card">
-        <h2>Aulas Prontas</h2>
-        <p>O caminho mais rápido para o conhecimento.</p>
-        <span class="btn-neon">Acessar Aulas</span>
+        <span class="ic" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.5 5 8 4.5 4 5v13c4-.5 6.5 0 8 1.5 1.5-1.5 4-2 8-1.5V5c-4-.5-6.5 0-8 1.5z"/><path d="M12 6.5v13"/></svg>
+        </span>
+        <h3>Aulas Prontas</h3>
+        <p>Lições organizadas por conteúdo para estudar do seu jeito, no seu ritmo.</p>
+        <span class="go">Acessar aulas <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
 
       <a href="listas.html" class="card">
-        <h2>Listas de Exercícios</h2>
-        <p>Pratique seus conhecimentos e teste suas habilidades.</p>
-        <span class="btn-neon">Acessar Listas</span>
+        <span class="ic" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 1.5-1.5M4 12l1 1 1.5-1.5M4 18l1 1 1.5-1.5"/></svg>
+        </span>
+        <h3>Listas de Exercícios</h3>
+        <p>Pratique e teste o que aprendeu com séries de questões por assunto.</p>
+        <span class="go">Acessar listas <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </a>
 
       <a href="experimentos.html" class="card">
-        <h2>Experimentos</h2>
-        <p>Explore simulações interativas de fenômenos físicos em tempo real.</p>
-        <span class="btn-neon">Acessar Laboratório</span>
+        <span class="ic" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 8.5A2 2 0 0 0 6.8 21h10.4a2 2 0 0 0 1.8-3.5L14 9V3"/><path d="M7.5 15h9"/></svg>
+        </span>
+        <h3>Experimentos</h3>
+        <p>Simulações interativas de fenômenos físicos para explorar em tempo real.</p>
+        <span class="go">Acessar laboratório <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a href="https://dellzzz.github.io/Planetario_Physica/" target="_blank" rel="noopener" class="card">
+        <span class="corner-tag"><span class="tag-new">Novo</span></span>
+        <span class="ic" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6"/><ellipse cx="12" cy="12" rx="11" ry="4.5" transform="rotate(-20 12 12)"/></svg>
+        </span>
+        <h3>Planetário</h3>
+        <p>Passeie pelo Sistema Solar em 3D e veja os planetas em órbita interativa.</p>
+        <span class="go">Abrir planetário <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
       </a>
 
     </div>
 
     <div class="footer">
-      © 2026 • Compartilhe suas descobertas .
+      &copy; 2026 &bull; <b>Platafísica</b> &mdash; compartilhe suas descobertas.
     </div>
 
   </div>
+
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () =>
-        navigator.serviceWorker.register('./sw.js')
-      );
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
     }
   </script>
 </body>
