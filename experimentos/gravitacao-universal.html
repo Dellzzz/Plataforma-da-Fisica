@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#04060e">
+<title>Gravitação Universal 3D — Plataforma da Física</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04060e;
+  --panel:rgba(9,15,29,.93);
+  --line:rgba(0,229,255,.28);
+  --cyan:#00e5ff;
+  --mag:#ff3df0;
+  --lime:#aaff00;
+  --amber:#ffb300;
+  --txt:#dff3ff;
+  --dim:#7fa7bb;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font-family:'Rajdhani',system-ui,sans-serif;
+  font-size:15px;
+  user-select:none;-webkit-user-select:none;
+}
+#sceneHost{position:fixed;inset:0;z-index:0}
+#sceneHost canvas{display:block;cursor:grab;touch-action:none}
+.hidden{display:none !important}
+
+/* ---------- Barra superior ---------- */
+.tbar{
+  position:fixed;top:0;left:0;right:0;z-index:20;
+  display:flex;align-items:center;gap:8px;
+  padding:calc(8px + env(safe-area-inset-top)) 10px 10px;
+  background:linear-gradient(rgba(4,8,16,.92),rgba(4,8,16,0));
+  pointer-events:none;
+}
+.tbar>*{pointer-events:auto}
+.tbtn{
+  display:flex;align-items:center;justify-content:center;
+  min-width:42px;height:42px;padding:0 10px;
+  border-radius:12px;border:1px solid var(--line);
+  background:rgba(6,18,32,.72);color:var(--cyan);
+  font-family:'Rajdhani';font-weight:700;font-size:17px;
+  backdrop-filter:blur(8px);cursor:pointer;text-decoration:none;
+}
+.tbtn:active{transform:scale(.94)}
+#btnDemo{
+  border-color:rgba(255,61,240,.55);color:var(--mag);
+  font-family:'Orbitron';font-size:11px;letter-spacing:2px;
+  box-shadow:0 0 14px rgba(255,61,240,.28);
+  animation:pulseMag 2.6s ease-in-out infinite;
+}
+@keyframes pulseMag{0%,100%{box-shadow:0 0 8px rgba(255,61,240,.2)}50%{box-shadow:0 0 20px rgba(255,61,240,.5)}}
+.title{flex:1;text-align:center;min-width:0}
+.title h1{
+  margin:0;font-family:'Orbitron';font-size:13px;letter-spacing:2.5px;
+  color:var(--cyan);text-shadow:0 0 14px rgba(0,229,255,.65);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.title small{display:block;font-size:11px;font-weight:600;color:var(--amber);letter-spacing:1px;opacity:.9}
+
+/* ---------- Chip HUD ---------- */
+#hudChip{
+  position:fixed;right:10px;top:calc(58px + env(safe-area-inset-top));z-index:15;
+  padding:5px 10px;border-radius:20px;border:1px solid var(--line);
+  background:rgba(6,18,32,.7);backdrop-filter:blur(6px);
+  font-size:12px;font-weight:700;color:var(--dim);letter-spacing:.5px;
+}
+#hudChip b{color:var(--lime)}
+
+/* ---------- Barra inferior ---------- */
+.bbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;
+  display:flex;align-items:flex-end;justify-content:space-around;gap:4px;
+  padding:10px 8px calc(10px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(4,8,16,0),rgba(4,8,16,.9) 40%);
+  pointer-events:none;
+}
+.bbar>*{pointer-events:auto}
+.bbtn{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  min-width:56px;padding:8px 6px;border-radius:14px;
+  border:1px solid var(--line);background:rgba(6,18,32,.74);
+  color:var(--txt);font-family:'Rajdhani';font-weight:700;font-size:10px;
+  letter-spacing:.6px;backdrop-filter:blur(8px);cursor:pointer;
+}
+.bbtn .ic{font-size:19px;line-height:1}
+.bbtn:active{transform:scale(.93)}
+#btnPlay{
+  width:60px;height:60px;min-width:60px;border-radius:50%;
+  border:2px solid var(--lime);color:var(--lime);
+  font-size:20px;display:flex;align-items:center;justify-content:center;
+  background:rgba(12,26,8,.82);
+  box-shadow:0 0 22px rgba(170,255,0,.35);cursor:pointer;
+  font-family:'Rajdhani';font-weight:700;
+}
+#btnPlay:active{transform:scale(.93)}
+
+/* ---------- Painéis / cartão de info ---------- */
+.panel{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 6px 30px rgba(0,0,0,.55), inset 0 0 30px rgba(0,229,255,.04);
+  backdrop-filter:blur(12px);
+}
+#infoCard{
+  position:fixed;left:10px;top:calc(58px + env(safe-area-inset-top));z-index:25;
+  width:min(300px, calc(100vw - 20px));padding:12px;
+}
+.ic-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+#icDot{width:14px;height:14px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px currentColor;flex:none}
+#icName{flex:1;font-family:'Orbitron';font-size:12px;letter-spacing:1.5px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#icClose{border:none;background:none;color:var(--dim);font-size:16px;cursor:pointer;padding:2px 6px}
+.ic-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin-bottom:8px}
+.ic-grid label{display:block;font-size:10px;font-weight:600;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+.ic-grid b{font-size:15px;color:var(--cyan);font-weight:700}
+.ic-formula{
+  font-family:'Orbitron';font-size:10.5px;color:var(--amber);
+  border:1px dashed rgba(255,179,0,.35);border-radius:10px;
+  padding:7px 8px;margin-bottom:8px;letter-spacing:.5px;line-height:1.5;
+  word-break:break-word;
+}
+.ic-slider label{font-size:10px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;font-weight:600}
+.ic-actions{display:flex;gap:6px;margin-top:8px}
+.ic-actions button{
+  flex:1;padding:8px 4px;border-radius:10px;border:1px solid var(--line);
+  background:rgba(0,229,255,.06);color:var(--txt);
+  font-family:'Rajdhani';font-weight:700;font-size:11.5px;cursor:pointer;
+}
+.ic-actions button.active{border-color:var(--lime);color:var(--lime);background:rgba(170,255,0,.08)}
+.ic-actions button.danger{border-color:rgba(255,82,82,.5);color:#ff8a80}
+
+/* ---------- Sliders ---------- */
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;margin:2px 0}
+input[type=range]::-webkit-slider-runnable-track{height:4px;background:linear-gradient(90deg,var(--cyan),var(--mag));border-radius:2px}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  background:#eaffff;border:2px solid var(--cyan);margin-top:-9px;
+  box-shadow:0 0 12px rgba(0,229,255,.85);
+}
+input[type=range]::-moz-range-track{height:4px;background:linear-gradient(90deg,var(--cyan),var(--mag));border-radius:2px}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#eaffff;border:2px solid var(--cyan)}
+
+/* ---------- Folhas (bottom sheets) ---------- */
+#scrim{position:fixed;inset:0;z-index:30;background:rgba(2,4,10,.55);opacity:0;pointer-events:none;transition:opacity .25s}
+#scrim.show{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:35;
+  transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.9,.3,1);
+  background:var(--panel);border-top:1px solid var(--line);
+  border-radius:20px 20px 0 0;max-height:66vh;overflow-y:auto;
+  padding:14px 14px calc(18px + env(safe-area-inset-bottom));
+  backdrop-filter:blur(14px);box-shadow:0 -8px 44px rgba(0,0,0,.65);
+}
+.sheet.open{transform:translateY(0)}
+.sheet h3{
+  display:flex;justify-content:space-between;align-items:center;
+  margin:0 0 12px;font-family:'Orbitron';font-size:12.5px;
+  letter-spacing:2px;color:var(--cyan);
+}
+.sheet h3 .x{border:none;background:none;color:var(--dim);font-size:17px;cursor:pointer;padding:2px 8px}
+.sheet h4{margin:14px 0 8px;font-size:12px;letter-spacing:1.5px;color:var(--amber);text-transform:uppercase}
+
+.scn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.scn-card{
+  text-align:left;padding:11px 12px;border-radius:14px;
+  border:1px solid var(--line);background:rgba(0,229,255,.05);
+  color:var(--txt);cursor:pointer;font-family:'Rajdhani';
+}
+.scn-card:active{transform:scale(.96);border-color:var(--cyan)}
+.scn-card .em{font-size:21px}
+.scn-card b{display:block;font-size:13.5px;font-weight:700;margin:3px 0 1px}
+.scn-card span{font-size:11px;color:var(--dim);font-weight:600;line-height:1.25;display:block}
+
+.opt-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px dashed rgba(127,167,187,.16)}
+.opt-row .lab b{display:block;font-size:14px;font-weight:700}
+.opt-row .lab span{font-size:11px;color:var(--dim);font-weight:600}
+.sw{position:relative;width:48px;height:27px;flex:none;cursor:pointer}
+.sw input{display:none}
+.sw i{position:absolute;inset:0;background:#0b2230;border:1px solid var(--line);border-radius:20px;transition:.2s}
+.sw i:after{content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#5f7f90;transition:.2s}
+.sw input:checked+i{background:rgba(0,229,255,.22);border-color:var(--cyan)}
+.sw input:checked+i:after{left:24px;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+
+.slider-row{padding:10px 2px;border-bottom:1px dashed rgba(127,167,187,.16)}
+.slider-row .lab{display:flex;justify-content:space-between;font-weight:700;font-size:13px}
+.slider-row .lab output{color:var(--lime);font-family:'Orbitron';font-size:11px}
+
+.btn-main{
+  display:block;width:100%;padding:12px;margin-top:10px;border-radius:12px;
+  border:1px solid var(--cyan);background:rgba(0,229,255,.1);
+  color:var(--cyan);font-family:'Orbitron';font-size:11.5px;letter-spacing:2px;
+  cursor:pointer;text-align:center;
+}
+.btn-main.lime{border-color:var(--lime);color:var(--lime);background:rgba(170,255,0,.08)}
+.btn-main.warn{border-color:rgba(255,82,82,.55);color:#ff8a80;background:rgba(255,82,82,.06)}
+.btn-main:active{transform:scale(.97)}
+
+#saveName{
+  width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);
+  background:rgba(0,10,20,.6);color:var(--txt);
+  font-family:'Rajdhani';font-weight:600;font-size:15px;outline:none;
+}
+#saveName:focus{border-color:var(--cyan)}
+.save-item{
+  display:flex;align-items:center;gap:8px;padding:9px 10px;margin-top:8px;
+  border:1px solid rgba(127,167,187,.25);border-radius:12px;background:rgba(0,229,255,.04);
+}
+.save-item .nm{flex:1;min-width:0}
+.save-item .nm b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.save-item .nm span{font-size:10.5px;color:var(--dim)}
+.save-item button{
+  padding:7px 10px;border-radius:9px;border:1px solid var(--line);
+  background:rgba(0,229,255,.08);color:var(--cyan);font-weight:700;font-size:11px;cursor:pointer;
+}
+.save-item button.del{border-color:rgba(255,82,82,.5);color:#ff8a80;background:rgba(255,82,82,.05)}
+.cache-note{margin-top:10px;font-size:11px;color:var(--dim);font-weight:600;text-align:center}
+
+/* ---------- Demo ---------- */
+#demoBox{
+  position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(92px + env(safe-area-inset-bottom));z-index:40;
+  width:min(560px, calc(100vw - 20px));padding:13px 14px 10px;
+  border-color:rgba(255,61,240,.5);
+  box-shadow:0 6px 34px rgba(0,0,0,.6), 0 0 24px rgba(255,61,240,.14);
+}
+#demoContent h4{margin:0 0 6px;font-family:'Orbitron';font-size:12.5px;letter-spacing:1.5px;color:var(--mag)}
+#demoContent p{margin:0 0 6px;font-size:13.5px;line-height:1.45;font-weight:600;color:var(--txt)}
+#demoContent .formula{
+  font-family:'Orbitron';font-size:13px;color:var(--amber);text-align:center;
+  padding:6px;border:1px dashed rgba(255,179,0,.4);border-radius:10px;margin:6px 0;
+}
+.demo-dots{display:flex;gap:5px;justify-content:center;margin:8px 0 6px}
+.demo-dots span{width:7px;height:7px;border-radius:50%;background:rgba(127,167,187,.35)}
+.demo-dots span.on{background:var(--mag);box-shadow:0 0 8px var(--mag)}
+.demo-nav{display:flex;gap:8px;align-items:center}
+.demo-nav .sp{flex:1}
+.demo-nav button{
+  padding:9px 14px;border-radius:11px;border:1px solid var(--line);
+  background:rgba(0,229,255,.07);color:var(--txt);
+  font-family:'Rajdhani';font-weight:700;font-size:13px;cursor:pointer;
+}
+.demo-nav button:disabled{opacity:.35}
+#demoNext{border-color:var(--mag);color:var(--mag);background:rgba(255,61,240,.09)}
+#demoExit{border-color:rgba(127,167,187,.4);color:var(--dim)}
+
+/* ---------- Dica de posicionamento ---------- */
+#placeHint{
+  position:fixed;left:50%;transform:translateX(-50%);
+  top:calc(64px + env(safe-area-inset-top));z-index:28;
+  padding:8px 14px;border-radius:20px;border:1px solid var(--lime);
+  background:rgba(12,26,8,.85);color:var(--lime);
+  font-weight:700;font-size:12.5px;letter-spacing:.5px;
+  box-shadow:0 0 16px rgba(170,255,0,.3);
+}
+
+/* ---------- Toast ---------- */
+#toastBox{
+  position:fixed;left:50%;transform:translateX(-50%) translateY(-8px);
+  top:calc(60px + env(safe-area-inset-top));z-index:60;
+  padding:9px 16px;border-radius:22px;border:1px solid var(--line);
+  background:rgba(6,18,32,.94);color:var(--cyan);
+  font-weight:700;font-size:13px;opacity:0;pointer-events:none;
+  transition:opacity .25s, transform .25s;max-width:calc(100vw - 30px);text-align:center;
+}
+#toastBox.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- Modal ajuda ---------- */
+.modal{
+  position:fixed;inset:0;z-index:70;background:rgba(2,4,10,.72);
+  display:flex;align-items:center;justify-content:center;padding:18px;
+  backdrop-filter:blur(4px);
+}
+.modal-card{
+  max-width:430px;width:100%;max-height:82vh;overflow-y:auto;
+  padding:18px;border-radius:18px;
+}
+.modal-card h3{margin:0 0 10px;font-family:'Orbitron';font-size:13px;letter-spacing:2px;color:var(--cyan)}
+.modal-card h4{margin:14px 0 6px;font-size:12px;letter-spacing:1.5px;color:var(--amber);text-transform:uppercase}
+.modal-card p, .modal-card li{font-size:13.5px;line-height:1.5;font-weight:600;color:var(--txt)}
+.modal-card ul{margin:4px 0;padding-left:20px}
+.modal-card .formula{
+  font-family:'Orbitron';font-size:14px;color:var(--amber);text-align:center;
+  padding:8px;border:1px dashed rgba(255,179,0,.4);border-radius:10px;margin:8px 0;
+}
+
+@media (min-width:700px){
+  .sheet{left:50%;right:auto;transform:translate(-50%,105%);width:560px;border-radius:20px 20px 0 0}
+  .sheet.open{transform:translate(-50%,0)}
+  .title h1{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<div id="sceneHost"></div>
+
+<!-- Barra superior -->
+<header class="tbar">
+  <a class="tbtn" id="btnBack" href="index.html" title="Voltar à Plataforma da Física">←</a>
+  <div class="title">
+    <h1>GRAVITAÇÃO UNIVERSAL</h1>
+    <small>F = G · m₁ · m₂ / r²</small>
+  </div>
+  <button class="tbtn" id="btnDemo">DEMO</button>
+  <button class="tbtn" id="btnHelp" title="Ajuda">?</button>
+</header>
+
+<div id="hudChip"><b id="hudBodies">0</b> corpos · <span id="hudSpeed">×1</span></div>
+
+<!-- Cartão do corpo selecionado -->
+<div id="infoCard" class="panel hidden">
+  <div class="ic-head">
+    <span id="icDot"></span>
+    <span id="icName">Corpo</span>
+    <button id="icClose">✕</button>
+  </div>
+  <div class="ic-grid">
+    <div><label>Massa</label><b id="icMass">—</b></div>
+    <div><label>Velocidade</label><b id="icVel">—</b></div>
+    <div><label>Dist. → <span id="icOtherName">?</span></label><b id="icDist">—</b></div>
+    <div><label>Aceleração</label><b id="icAcc">—</b></div>
+  </div>
+  <div class="ic-formula" id="icFormula">F = G · M · m / r²</div>
+  <div class="ic-slider">
+    <label>Ajustar massa</label>
+    <input type="range" id="icMassSlider" min="0" max="100" step="1" value="50">
+  </div>
+  <div class="ic-actions">
+    <button id="icFollow">🎥 Seguir</button>
+    <button id="icFix">📌 Fixar</button>
+    <button id="icDel" class="danger">🗑</button>
+  </div>
+</div>
+
+<!-- Barra inferior -->
+<nav class="bbar">
+  <button class="bbtn" id="btnScen"><span class="ic">🌌</span>Cenários</button>
+  <button class="bbtn" id="btnAdd"><span class="ic">＋</span>Corpo</button>
+  <button id="btnPlay"><span id="playIco">❚❚</span></button>
+  <button class="bbtn" id="btnOpt"><span class="ic">⚙️</span>Opções</button>
+  <button class="bbtn" id="btnSave"><span class="ic">💾</span>Salvar</button>
+</nav>
+
+<div id="scrim"></div>
+
+<!-- Folha: cenários -->
+<section class="sheet" id="sheetScen">
+  <h3>CENÁRIOS <button class="x">✕</button></h3>
+  <div class="scn-grid">
+    <button class="scn-card" data-scn="sistema-solar"><span class="em">🌞</span><b>Sistema Solar</b><span>Planetas em órbita de uma estrela</span></button>
+    <button class="scn-card" data-scn="terra-lua"><span class="em">🌍</span><b>Terra &amp; Lua</b><span>A órbita circular clássica</span></button>
+    <button class="scn-card" data-scn="eliptica"><span class="em">🥚</span><b>Órbita Elíptica</b><span>Kepler: elipses e velocidades</span></button>
+    <button class="scn-card" data-scn="binarias"><span class="em">💫</span><b>Estrelas Binárias</b><span>Duas estrelas, um centro de massa</span></button>
+    <button class="scn-card" data-scn="figura8"><span class="em">♾️</span><b>Figura-8</b><span>Coreografia exata de 3 corpos</span></button>
+    <button class="scn-card" data-scn="estilingue"><span class="em">🎯</span><b>Estilingue</b><span>Desvio de sondas por um planeta</span></button>
+    <button class="scn-card" data-scn="disco"><span class="em">🪐</span><b>Disco de Poeira</b><span>Dezenas de partículas em disco</span></button>
+    <button class="scn-card" data-scn="caos3"><span class="em">🌀</span><b>Caos de 3 Corpos</b><span>Sensível e imprevisível</span></button>
+  </div>
+</section>
+
+<!-- Folha: adicionar corpo -->
+<section class="sheet" id="sheetAdd">
+  <h3>NOVO CORPO <button class="x">✕</button></h3>
+  <div class="slider-row">
+    <div class="lab"><span>Massa</span><output id="addMassVal">20</output></div>
+    <input type="range" id="addMass" min="0" max="100" step="1" value="35">
+  </div>
+  <button class="btn-main lime" id="btnPlace">🎯 POSICIONAR E LANÇAR (arraste)</button>
+  <button class="btn-main" id="btnAutoOrbit">🛰 ADICIONAR EM ÓRBITA AUTOMÁTICA</button>
+  <p class="cache-note">Dica: no modo posicionar, toque no plano, arraste para definir a velocidade e solte para lançar.</p>
+</section>
+
+<!-- Folha: opções -->
+<section class="sheet" id="sheetOpt">
+  <h3>OPÇÕES <button class="x">✕</button></h3>
+  <div class="slider-row">
+    <div class="lab"><span>Velocidade do tempo</span><output id="optSpeedVal">×1.0</output></div>
+    <input type="range" id="optSpeed" min="0.1" max="8" step="0.1" value="1">
+  </div>
+  <div class="slider-row">
+    <div class="lab"><span>Constante gravitacional (G)</span><output id="optGVal">×1.00</output></div>
+    <input type="range" id="optG" min="0.2" max="3" step="0.05" value="1">
+  </div>
+  <div class="opt-row"><div class="lab"><b>Trilhas orbitais</b><span>Rastro do movimento</span></div><label class="sw"><input type="checkbox" id="chkTrails" checked><i></i></label></div>
+  <div class="opt-row"><div class="lab"><b>Vetores v e a</b><span>Velocidade (verde) e aceleração (rosa)</span></div><label class="sw"><input type="checkbox" id="chkVectors"><i></i></label></div>
+  <div class="opt-row"><div class="lab"><b>Malha do espaço-tempo</b><span>Poços gravitacionais</span></div><label class="sw"><input type="checkbox" id="chkGrid" checked><i></i></label></div>
+  <div class="opt-row"><div class="lab"><b>Colisões</b><span>Fusão conservando momento</span></div><label class="sw"><input type="checkbox" id="chkColl" checked><i></i></label></div>
+  <div class="opt-row"><div class="lab"><b>Seguir seleção</b><span>Câmera acompanha o corpo</span></div><label class="sw"><input type="checkbox" id="chkFollow"><i></i></label></div>
+  <button class="btn-main" id="btnRestart">↺ REINICIAR CENÁRIO</button>
+  <button class="btn-main warn" id="btnClear">🗑 LIMPAR TUDO</button>
+  <p class="cache-note" id="cacheStatus">Cache local: verificando…</p>
+</section>
+
+<!-- Folha: salvar / carregar -->
+<section class="sheet" id="sheetSave">
+  <h3>SALVAR NO CACHE <button class="x">✕</button></h3>
+  <input type="text" id="saveName" maxlength="40" placeholder="Nome do cenário (ex.: Meu universo)">
+  <button class="btn-main lime" id="btnDoSave">💾 SALVAR CENÁRIO ATUAL</button>
+  <h4>Meus cenários salvos</h4>
+  <div id="savesList"></div>
+  <p class="cache-note">Os cenários ficam gravados no cache do navegador e sobrevivem ao fechar a página. A sessão atual também é restaurada automaticamente.</p>
+</section>
+
+<!-- Demo overlay -->
+<div id="demoBox" class="panel hidden">
+  <div id="demoContent"></div>
+  <div class="demo-dots" id="demoDots"></div>
+  <div class="demo-nav">
+    <button id="demoExit">Sair</button>
+    <span class="sp"></span>
+    <button id="demoPrev">←</button>
+    <button id="demoNext">Próximo →</button>
+  </div>
+</div>
+
+<div id="placeHint" class="hidden">Toque no plano para posicionar</div>
+<div id="toastBox"></div>
+
+<!-- Modal de ajuda -->
+<div class="modal hidden" id="helpModal">
+  <div class="modal-card panel">
+    <h3>COMO USAR</h3>
+    <ul>
+      <li><b>1 dedo</b> — girar a câmera</li>
+      <li><b>Pinça</b> — aproximar / afastar</li>
+      <li><b>2 dedos</b> — deslocar a vista</li>
+      <li><b>Toque em um corpo</b> — selecionar e ver dados ao vivo</li>
+      <li><b>＋ Corpo</b> — toque no plano, arraste e solte para lançar</li>
+    </ul>
+    <h4>A física</h4>
+    <div class="formula">F = G · m₁ · m₂ / r²</div>
+    <p>Simulação de N corpos com unidades didáticas (G = 1), integrador de Verlet e colisões que conservam o momento linear. A malha azul representa, de forma ilustrativa, os poços gravitacionais do espaço-tempo.</p>
+    <h4>Sobre</h4>
+    <p>Objeto Digital de Aprendizagem — Plataforma da Física · Prof. Jardel A. Leite.</p>
+    <button class="btn-main" id="btnHelpClose">ENTENDI</button>
+  </div>
+</div>
+
+<!-- Templates do modo Demo -->
+<div hidden id="tpl-demo-0">
+  <h4>🍎 A Lei da Gravitação Universal</h4>
+  <div class="formula">F = G · m₁ · m₂ / r²</div>
+  <p>Newton (1687): <b>toda massa atrai toda massa</b>. Dobre a distância e a força cai 4×. À sua frente: a Terra e a Lua. Gire a cena com o dedo!</p>
+</div>
+<div hidden id="tpl-demo-1">
+  <h4>🌕 Por que a Lua não cai?</h4>
+  <p>Ela <b>cai o tempo todo</b> — mas se move de lado com a velocidade exata <b>v = √(GM/r)</b> para "errar o chão" para sempre. Ativei os vetores: velocidade em <b style="color:#aaff00">verde</b>, aceleração (sempre apontando para a Terra!) em <b style="color:#ff3df0">rosa</b>.</p>
+</div>
+<div hidden id="tpl-demo-2">
+  <h4>🥚 Kepler e as elipses</h4>
+  <p>Com menos velocidade, a órbita vira uma <b>elipse</b>. Observe a trilha: perto do planeta o satélite <b>acelera</b>; longe, <b>desacelera</b>. É a 2ª Lei de Kepler — áreas iguais em tempos iguais.</p>
+</div>
+<div hidden id="tpl-demo-3">
+  <h4>💫 Estrelas binárias</h4>
+  <p>Duas estrelas de mesma massa dançam em torno do <b>centro de massa</b> comum. Cerca de metade das estrelas da galáxia vive em pares assim!</p>
+</div>
+<div hidden id="tpl-demo-4">
+  <h4>♾️ A coreografia Figura-8</h4>
+  <p>Uma solução periódica <b>exata</b> do problema de 3 corpos (Chenciner &amp; Montgomery, 2000). Três estrelas se perseguem no mesmo caminho em forma de 8. Raríssima na natureza, linda na tela.</p>
+</div>
+<div hidden id="tpl-demo-5">
+  <h4>🎯 Estilingue gravitacional</h4>
+  <p>Três sondas passam a distâncias diferentes do planeta: quanto <b>mais perto</b>, maior o <b>desvio</b> da trajetória. É assim que sondas espaciais "roubam" energia dos planetas para viajar mais longe.</p>
+</div>
+<div hidden id="tpl-demo-6">
+  <h4>🪐 Discos e anéis</h4>
+  <p>Dezenas de partículas orbitando uma estrela: é assim que nascem <b>sistemas planetários</b> e os anéis de Saturno. Repare nas colisões e fusões!</p>
+</div>
+<div hidden id="tpl-demo-7">
+  <h4>🚀 Sua vez!</h4>
+  <p>Use <b>＋ Corpo</b> para criar e lançar astros, mude <b>G</b> e o tempo nas Opções, toque em um corpo para ver a força calculada ao vivo — e <b>salve seus universos no cache</b>. Bons experimentos!</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+'use strict';
+(function(){
+if(typeof THREE === 'undefined'){
+  document.body.insertAdjacentHTML('beforeend',
+    '<div style="position:fixed;inset:0;z-index:99;display:flex;align-items:center;justify-content:center;background:#04060e;color:#dff3ff;padding:30px;text-align:center;font-family:sans-serif">Falha ao carregar a biblioteca 3D. Verifique a conex\u00e3o e recarregue a p\u00e1gina.</div>');
+  return;
+}
+
+/* ================= CACHE (localStorage com fallback) ================= */
+var Store = (function(){
+  var mem = {};
+  var ok = false;
+  try{
+    localStorage.setItem('__gs_t','1');
+    localStorage.removeItem('__gs_t');
+    ok = true;
+  }catch(e){ ok = false; }
+  return {
+    ok: ok,
+    get: function(k){
+      try{ if(ok) return localStorage.getItem(k); }catch(e){}
+      return (k in mem) ? mem[k] : null;
+    },
+    set: function(k,v){
+      try{ if(ok){ localStorage.setItem(k,v); return; } }catch(e){}
+      mem[k] = v;
+    },
+    del: function(k){
+      try{ if(ok){ localStorage.removeItem(k); return; } }catch(e){}
+      delete mem[k];
+    }
+  };
+})();
+
+/* ================= UTILIDADES ================= */
+function $(id){ return document.getElementById(id); }
+function fmt(x){
+  if(!isFinite(x)) return '-';
+  var a = Math.abs(x);
+  if(a >= 10000) return Math.round(x).toString();
+  if(a >= 100) return x.toFixed(0);
+  if(a >= 10) return x.toFixed(1);
+  if(a >= 1) return x.toFixed(2);
+  return x.toFixed(3);
+}
+var toastTimer = null;
+function toast(msg){
+  var t = $('toastBox');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2300);
+}
+
+/* ================= ESTADO ================= */
+var EPS2 = 0.9;
+var TRAIL_MAX = 360;
+var MAX_BODIES = 140;
+var PALETTE = ['#00e5ff','#ff3df0','#aaff00','#ffb300','#ff5252','#7c4dff','#18ffff','#ffee58','#69f0ae','#ff8a65'];
+
+var sim = { G:1, timeScale:1, running:true, bodies:[], collisions:true };
+var view = { trails:true, vectors:false, grid:true, follow:false };
+var selected = null;
+var currentScenario = 'sistema-solar';
+var restartData = null;
+var demo = { on:false, i:0 };
+
+/* ================= CENA 3D ================= */
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 6000);
+var renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x04060e, 1);
+$('sceneHost').appendChild(renderer.domElement);
+
+scene.add(new THREE.AmbientLight(0x8fb3c7, 0.7));
+var mainLight = new THREE.PointLight(0xfff2cc, 1.4, 0, 2);
+mainLight.position.set(0, 300, 0);
+scene.add(mainLight);
+
+/* estrelas de fundo */
+(function(){
+  var N = 1400;
+  var arr = new Float32Array(N*3);
+  for(var i=0;i<N;i++){
+    var u = Math.random()*2 - 1;
+    var ph = Math.random()*Math.PI*2;
+    var s = Math.sqrt(1 - u*u);
+    var r = 900 + Math.random()*600;
+    arr[i*3] = s*Math.cos(ph)*r;
+    arr[i*3+1] = u*r;
+    arr[i*3+2] = s*Math.sin(ph)*r;
+  }
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(arr,3));
+  scene.add(new THREE.Points(g, new THREE.PointsMaterial({
+    color:0x9fc9d8, size:1.7, sizeAttenuation:false, transparent:true, opacity:0.75
+  })));
+})();
+
+/* texturas geradas */
+function makeGlowTex(){
+  var c = document.createElement('canvas'); c.width = c.height = 128;
+  var g = c.getContext('2d');
+  var gr = g.createRadialGradient(64,64,0,64,64,64);
+  gr.addColorStop(0,'rgba(255,255,255,1)');
+  gr.addColorStop(0.25,'rgba(255,255,255,0.55)');
+  gr.addColorStop(0.6,'rgba(255,255,255,0.12)');
+  gr.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0,0,128,128);
+  return new THREE.CanvasTexture(c);
+}
+function makeRingTex(){
+  var c = document.createElement('canvas'); c.width = c.height = 128;
+  var g = c.getContext('2d');
+  g.strokeStyle = 'rgba(255,255,255,0.95)';
+  g.lineWidth = 6;
+  g.shadowColor = 'rgba(255,255,255,0.9)';
+  g.shadowBlur = 10;
+  g.beginPath(); g.arc(64,64,50,0,Math.PI*2); g.stroke();
+  return new THREE.CanvasTexture(c);
+}
+var glowTex = makeGlowTex();
+var unitSphere = new THREE.SphereGeometry(1, 22, 16);
+
+var selRing = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: makeRingTex(), color:0x00e5ff, transparent:true, depthTest:false
+}));
+selRing.visible = false;
+scene.add(selRing);
+
+/* malha do espaco-tempo */
+var gridGeo = new THREE.PlaneGeometry(760, 760, 46, 46);
+gridGeo.rotateX(-Math.PI/2);
+var gridMesh = new THREE.Mesh(gridGeo, new THREE.MeshBasicMaterial({
+  color:0x00e5ff, wireframe:true, transparent:true, opacity:0.14
+}));
+scene.add(gridMesh);
+
+/* fantasma e seta do modo posicionar */
+var ghost = new THREE.Mesh(unitSphere, new THREE.MeshBasicMaterial({ color:0x00e5ff, transparent:true, opacity:0.45 }));
+ghost.visible = false;
+scene.add(ghost);
+var placeArrow = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(), 8, 0xaaff00, 3, 1.6);
+placeArrow.visible = false;
+scene.add(placeArrow);
+
+/* ================= CORPOS ================= */
+var bodyId = 0;
+function radiusFor(m){ return Math.min(8, Math.max(0.55, 0.5*Math.pow(m, 0.28))); }
+function isStarMass(m){ return m >= 600; }
+
+function makeBody(o){
+  if(sim.bodies.length >= MAX_BODIES){ toast('Limite de corpos atingido'); return null; }
+  bodyId++;
+  var b = {
+    id: bodyId,
+    name: o.name || ('Corpo ' + bodyId),
+    m: o.m,
+    x: o.x||0, y: o.y||0, z: o.z||0,
+    vx: o.vx||0, vy: o.vy||0, vz: o.vz||0,
+    ax:0, ay:0, az:0,
+    fixed: !!o.fixed,
+    color: o.color || PALETTE[bodyId % PALETTE.length],
+    star: isStarMass(o.m),
+    radius: radiusFor(o.m),
+    mesh:null, glow:null, trailLine:null, trailPos:null, trailCount:0,
+    vArr:null, aArr:null
+  };
+  var mat = b.star
+    ? new THREE.MeshBasicMaterial({ color:b.color })
+    : new THREE.MeshLambertMaterial({ color:b.color });
+  b.mesh = new THREE.Mesh(unitSphere, mat);
+  b.mesh.scale.setScalar(b.radius);
+  scene.add(b.mesh);
+
+  b.glow = new THREE.Sprite(new THREE.SpriteMaterial({
+    map:glowTex, color:b.color, transparent:true,
+    blending:THREE.AdditiveBlending, depthWrite:false,
+    opacity: b.star ? 0.95 : 0.5
+  }));
+  var gs = b.radius * (b.star ? 7 : 3.2);
+  b.glow.scale.set(gs, gs, 1);
+  scene.add(b.glow);
+
+  b.trailPos = new Float32Array(TRAIL_MAX*3);
+  var tg = new THREE.BufferGeometry();
+  tg.setAttribute('position', new THREE.BufferAttribute(b.trailPos, 3));
+  tg.setDrawRange(0,0);
+  b.trailLine = new THREE.Line(tg, new THREE.LineBasicMaterial({
+    color:b.color, transparent:true, opacity:0.55
+  }));
+  b.trailLine.frustumCulled = false;
+  scene.add(b.trailLine);
+
+  sim.bodies.push(b);
+  return b;
+}
+
+function setMass(b, m){
+  b.m = m;
+  b.radius = radiusFor(m);
+  b.mesh.scale.setScalar(b.radius);
+  var st = isStarMass(m);
+  if(st !== b.star){
+    b.star = st;
+    b.mesh.material.dispose();
+    b.mesh.material = st
+      ? new THREE.MeshBasicMaterial({ color:b.color })
+      : new THREE.MeshLambertMaterial({ color:b.color });
+    b.glow.material.opacity = st ? 0.95 : 0.5;
+  }
+  var gs = b.radius * (b.star ? 7 : 3.2);
+  b.glow.scale.set(gs, gs, 1);
+}
+
+function removeBody(b){
+  var i = sim.bodies.indexOf(b);
+  if(i < 0) return;
+  scene.remove(b.mesh); scene.remove(b.glow); scene.remove(b.trailLine);
+  if(b.vArr){ scene.remove(b.vArr); scene.remove(b.aArr); }
+  b.mesh.material.dispose();
+  b.glow.material.dispose();
+  b.trailLine.geometry.dispose();
+  b.trailLine.material.dispose();
+  sim.bodies.splice(i,1);
+  if(selected === b) deselect();
+}
+function clearAll(){
+  while(sim.bodies.length) removeBody(sim.bodies[0]);
+}
+
+/* ================= FISICA ================= */
+function computeAccels(){
+  var bs = sim.bodies, n = bs.length, i, j;
+  for(i=0;i<n;i++){ bs[i].ax = 0; bs[i].ay = 0; bs[i].az = 0; }
+  for(i=0;i<n;i++){
+    var b = bs[i];
+    for(j=i+1;j<n;j++){
+      var c = bs[j];
+      var dx = c.x-b.x, dy = c.y-b.y, dz = c.z-b.z;
+      var r2 = dx*dx + dy*dy + dz*dz + EPS2;
+      var inv = sim.G / (r2 * Math.sqrt(r2));
+      var fb = inv*c.m, fc = inv*b.m;
+      b.ax += fb*dx; b.ay += fb*dy; b.az += fb*dz;
+      c.ax -= fc*dx; c.ay -= fc*dy; c.az -= fc*dz;
+    }
+  }
+}
+function stepPhysics(h){
+  var bs = sim.bodies, n = bs.length, i, b;
+  for(i=0;i<n;i++){
+    b = bs[i]; if(b.fixed) continue;
+    b.vx += 0.5*h*b.ax; b.vy += 0.5*h*b.ay; b.vz += 0.5*h*b.az;
+    b.x += h*b.vx; b.y += h*b.vy; b.z += h*b.vz;
+  }
+  computeAccels();
+  for(i=0;i<n;i++){
+    b = bs[i]; if(b.fixed) continue;
+    b.vx += 0.5*h*b.ax; b.vy += 0.5*h*b.ay; b.vz += 0.5*h*b.az;
+  }
+}
+function handleCollisions(){
+  if(!sim.collisions) return;
+  var bs = sim.bodies;
+  for(var i=0;i<bs.length;i++){
+    for(var j=i+1;j<bs.length;j++){
+      var a = bs[i], c = bs[j];
+      var dx = c.x-a.x, dy = c.y-a.y, dz = c.z-a.z;
+      var d2 = dx*dx + dy*dy + dz*dz;
+      var rr = (a.radius + c.radius) * 0.72;
+      if(d2 < rr*rr){
+        var big = a.m >= c.m ? a : c;
+        var sml = big === a ? c : a;
+        var M = big.m + sml.m;
+        big.vx = (big.vx*big.m + sml.vx*sml.m)/M;
+        big.vy = (big.vy*big.m + sml.vy*sml.m)/M;
+        big.vz = (big.vz*big.m + sml.vz*sml.m)/M;
+        if(!big.fixed){
+          big.x = (big.x*big.m + sml.x*sml.m)/M;
+          big.y = (big.y*big.m + sml.y*sml.m)/M;
+          big.z = (big.z*big.m + sml.z*sml.m)/M;
+        }
+        if(selected === sml) select(big);
+        setMass(big, M);
+        removeBody(sml);
+        computeAccels();
+        toast('Colis\u00e3o! Corpos fundidos');
+        return;
+      }
+    }
+  }
+}
+
+/* ================= TRILHAS / VISUAL ================= */
+function updateTrails(){
+  for(var i=0;i<sim.bodies.length;i++){
+    var b = sim.bodies[i];
+    var arr = b.trailPos;
+    if(b.trailCount < TRAIL_MAX){
+      var k = b.trailCount*3;
+      arr[k] = b.x; arr[k+1] = b.y; arr[k+2] = b.z;
+      b.trailCount++;
+    } else {
+      arr.copyWithin(0,3);
+      arr[TRAIL_MAX*3-3] = b.x; arr[TRAIL_MAX*3-2] = b.y; arr[TRAIL_MAX*3-1] = b.z;
+    }
+    b.trailLine.geometry.attributes.position.needsUpdate = true;
+    b.trailLine.geometry.setDrawRange(0, b.trailCount);
+  }
+}
+function resetTrails(){
+  for(var i=0;i<sim.bodies.length;i++){
+    sim.bodies[i].trailCount = 0;
+    sim.bodies[i].trailLine.geometry.setDrawRange(0,0);
+  }
+}
+
+var tmpV = new THREE.Vector3();
+function updateArrows(b){
+  var show = view.vectors && (sim.bodies.length <= 10 || b === selected);
+  if(!show){
+    if(b.vArr){ b.vArr.visible = false; b.aArr.visible = false; }
+    return;
+  }
+  if(!b.vArr){
+    b.vArr = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(), 4, 0xaaff00);
+    b.aArr = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(), 4, 0xff3df0);
+    scene.add(b.vArr); scene.add(b.aArr);
+  }
+  var vm = Math.sqrt(b.vx*b.vx + b.vy*b.vy + b.vz*b.vz);
+  if(vm > 0.01){
+    tmpV.set(b.vx, b.vy, b.vz).multiplyScalar(1/vm);
+    var L = Math.min(42, 3 + vm*2.2);
+    b.vArr.position.set(b.x, b.y, b.z);
+    b.vArr.setDirection(tmpV);
+    b.vArr.setLength(L, L*0.22, L*0.1);
+    b.vArr.visible = true;
+  } else b.vArr.visible = false;
+  var am = Math.sqrt(b.ax*b.ax + b.ay*b.ay + b.az*b.az);
+  if(am > 0.005){
+    tmpV.set(b.ax, b.ay, b.az).multiplyScalar(1/am);
+    var L2 = Math.min(34, 2 + am*9);
+    b.aArr.position.set(b.x, b.y, b.z);
+    b.aArr.setDirection(tmpV);
+    b.aArr.setLength(L2, L2*0.22, L2*0.1);
+    b.aArr.visible = true;
+  } else b.aArr.visible = false;
+}
+
+function updateVisuals(){
+  var big = null;
+  for(var i=0;i<sim.bodies.length;i++){
+    var b = sim.bodies[i];
+    b.mesh.position.set(b.x, b.y, b.z);
+    b.glow.position.set(b.x, b.y, b.z);
+    b.trailLine.visible = view.trails;
+    if(b.star && (!big || b.m > big.m)) big = b;
+    updateArrows(b);
+  }
+  if(big){ mainLight.position.set(big.x, big.y, big.z); mainLight.intensity = 1.6; }
+  else { mainLight.position.set(0, 300, 0); mainLight.intensity = 1.0; }
+  if(selected){
+    selRing.visible = true;
+    selRing.position.set(selected.x, selected.y, selected.z);
+    var s = selected.radius*3.2 + 0.6 + Math.sin(performance.now()*0.005)*0.5;
+    selRing.scale.set(s, s, 1);
+  } else selRing.visible = false;
+}
+
+function updateGrid(){
+  var pos = gridMesh.geometry.attributes.position;
+  var arr = pos.array;
+  var cs = [];
+  for(var i=0;i<sim.bodies.length;i++){
+    if(sim.bodies[i].m >= 40) cs.push(sim.bodies[i]);
+  }
+  cs.sort(function(a,b){ return b.m - a.m; });
+  if(cs.length > 8) cs.length = 8;
+  var n = arr.length/3;
+  for(var v=0; v<n; v++){
+    var x = arr[v*3], z = arr[v*3+2], depth = 0;
+    for(var k=0;k<cs.length;k++){
+      var b2 = cs[k];
+      var dx = x-b2.x, dz = z-b2.z;
+      depth += 1.35*Math.sqrt(b2.m)/(Math.sqrt(dx*dx+dz*dz)+7);
+    }
+    if(depth > 34) depth = 34;
+    arr[v*3+1] = -10 - depth;
+  }
+  pos.needsUpdate = true;
+}
+
+/* ================= CAMERA ================= */
+var cam = { target:new THREE.Vector3(0,0,0), radius:200, theta:0.7, phi:1.08, min:22, max:1200 };
+function applyCamera(){
+  var sp = Math.sin(cam.phi);
+  camera.position.set(
+    cam.target.x + cam.radius*sp*Math.sin(cam.theta),
+    cam.target.y + cam.radius*Math.cos(cam.phi),
+    cam.target.z + cam.radius*sp*Math.cos(cam.theta)
+  );
+  camera.lookAt(cam.target);
+}
+
+var raycaster = new THREE.Raycaster();
+function groundPoint(cx, cy){
+  var r = renderer.domElement.getBoundingClientRect();
+  var nx = ((cx - r.left)/r.width)*2 - 1;
+  var ny = -(((cy - r.top)/r.height)*2 - 1);
+  raycaster.setFromCamera({x:nx, y:ny}, camera);
+  var o = raycaster.ray.origin, d = raycaster.ray.direction;
+  if(Math.abs(d.y) < 1e-6) return null;
+  var t = -o.y / d.y;
+  if(t < 0) return null;
+  return { x:o.x + d.x*t, z:o.z + d.z*t };
+}
+
+function pickAt(cx, cy){
+  var r = renderer.domElement.getBoundingClientRect();
+  var best = null, bestD = 1e9;
+  var halfFov = Math.tan(camera.fov*Math.PI/360);
+  for(var i=0;i<sim.bodies.length;i++){
+    var b = sim.bodies[i];
+    tmpV.set(b.x, b.y, b.z);
+    var dist = tmpV.distanceTo(camera.position);
+    tmpV.project(camera);
+    if(tmpV.z > 1 || tmpV.z < -1) continue;
+    var sx = (tmpV.x*0.5 + 0.5)*r.width + r.left;
+    var sy = (-tmpV.y*0.5 + 0.5)*r.height + r.top;
+    var d = Math.hypot(sx-cx, sy-cy);
+    var pr = b.radius*(r.height/2)/(dist*halfFov);
+    var lim = Math.max(30, pr*1.6);
+    if(d < lim && d < bestD){ best = b; bestD = d; }
+  }
+  if(best) select(best); else deselect();
+}
+
+/* ================= ENTRADA (toque + mouse) ================= */
+var host = renderer.domElement;
+host.style.touchAction = 'none';
+var pts = {};
+var lastPinch = 0, lastMid = null, tap = null;
+
+function ptList(){
+  var a = [];
+  for(var k in pts) a.push(pts[k]);
+  return a;
+}
+function pinchDist(){
+  var a = ptList();
+  return a.length < 2 ? 0 : Math.hypot(a[0].x-a[1].x, a[0].y-a[1].y);
+}
+function midPoint(){
+  var a = ptList();
+  return a.length < 2 ? null : { x:(a[0].x+a[1].x)/2, y:(a[0].y+a[1].y)/2 };
+}
+var tRight = new THREE.Vector3(), tUp = new THREE.Vector3();
+function panBy(dx, dy){
+  var e2 = camera.matrixWorld.elements;
+  tRight.set(e2[0], e2[1], e2[2]);
+  tUp.set(e2[4], e2[5], e2[6]);
+  var sc = cam.radius*0.0016;
+  cam.target.addScaledVector(tRight, -dx*sc);
+  cam.target.addScaledVector(tUp, dy*sc);
+}
+
+host.addEventListener('pointerdown', function(e){
+  if(host.setPointerCapture){ try{ host.setPointerCapture(e.pointerId); }catch(err){} }
+  pts[e.pointerId] = { x:e.clientX, y:e.clientY };
+  var n = ptList().length;
+  if(placing.active && n === 1){ placeDown(e); return; }
+  if(n === 1){
+    tap = { x:e.clientX, y:e.clientY, t:performance.now(), moved:false };
+  } else {
+    tap = null;
+    lastPinch = pinchDist();
+    lastMid = midPoint();
+  }
+});
+host.addEventListener('pointermove', function(e){
+  var p = pts[e.pointerId];
+  if(!p) return;
+  var dx = e.clientX - p.x, dy = e.clientY - p.y;
+  p.x = e.clientX; p.y = e.clientY;
+  if(placing.active){ placeMove(e); return; }
+  var n = ptList().length;
+  if(n === 1){
+    if(tap && Math.abs(e.clientX-tap.x)+Math.abs(e.clientY-tap.y) > 10) tap.moved = true;
+    cam.theta -= dx*0.0055;
+    cam.phi -= dy*0.0055;
+    cam.phi = Math.max(0.12, Math.min(3.0, cam.phi));
+  } else if(n === 2){
+    var d = pinchDist();
+    if(lastPinch > 0 && d > 0){
+      cam.radius *= lastPinch/d;
+      cam.radius = Math.max(cam.min, Math.min(cam.max, cam.radius));
+    }
+    lastPinch = d;
+    var m = midPoint();
+    if(lastMid && m) panBy(m.x-lastMid.x, m.y-lastMid.y);
+    lastMid = m;
+  }
+});
+function pointerEnd(e){
+  if(placing.active && placing.stage === 1){ placeUp(e); }
+  delete pts[e.pointerId];
+  if(ptList().length < 2){ lastPinch = 0; lastMid = null; }
+  if(tap && !tap.moved && (performance.now()-tap.t) < 450 && !placing.active){
+    pickAt(e.clientX, e.clientY);
+  }
+  tap = null;
+}
+host.addEventListener('pointerup', pointerEnd);
+host.addEventListener('pointercancel', pointerEnd);
+host.addEventListener('wheel', function(e){
+  e.preventDefault();
+  cam.radius *= 1 + e.deltaY*0.001;
+  cam.radius = Math.max(cam.min, Math.min(cam.max, cam.radius));
+}, { passive:false });
+host.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+document.addEventListener('gesturestart', function(e){ e.preventDefault(); });
+
+/* ================= MODO POSICIONAR ================= */
+var placing = { active:false, stage:0, m:20, px:0, pz:0 };
+function startPlacing(m){
+  placing.active = true; placing.stage = 0; placing.m = m;
+  closeSheets(); deselect();
+  ghost.scale.setScalar(radiusFor(m));
+  $('placeHint').textContent = 'Toque no plano para posicionar o corpo';
+  $('placeHint').classList.remove('hidden');
+}
+function stopPlacing(){
+  placing.active = false; placing.stage = 0;
+  ghost.visible = false; placeArrow.visible = false;
+  $('placeHint').classList.add('hidden');
+}
+function placeDown(e){
+  var g = groundPoint(e.clientX, e.clientY);
+  if(!g){ toast('Aponte para o plano'); return; }
+  placing.stage = 1;
+  placing.px = g.x; placing.pz = g.z;
+  ghost.position.set(g.x, 0, g.z);
+  ghost.visible = true;
+  $('placeHint').textContent = 'Arraste para definir a velocidade e solte';
+}
+function placeMove(e){
+  if(placing.stage !== 1) return;
+  var g = groundPoint(e.clientX, e.clientY);
+  if(!g) return;
+  var dx = g.x - placing.px, dz = g.z - placing.pz;
+  var len = Math.hypot(dx, dz);
+  if(len > 2){
+    tmpV.set(dx/len, 0, dz/len);
+    placeArrow.position.set(placing.px, 0, placing.pz);
+    placeArrow.setDirection(tmpV);
+    var L = Math.min(len, 70);
+    placeArrow.setLength(L, Math.min(6, L*0.3), Math.min(3, L*0.15));
+    placeArrow.visible = true;
+  } else placeArrow.visible = false;
+  $('placeHint').textContent = 'v = ' + fmt(len*0.085) + '  (solte para lan\u00e7ar)';
+}
+function placeUp(e){
+  var g = groundPoint(e.clientX, e.clientY);
+  var vx = 0, vz = 0;
+  if(g){ vx = (g.x - placing.px)*0.085; vz = (g.z - placing.pz)*0.085; }
+  makeBody({ m:placing.m, x:placing.px, z:placing.pz, vx:vx, vz:vz });
+  computeAccels();
+  stopPlacing();
+  currentScenario = 'custom';
+  toast('Corpo lan\u00e7ado!');
+  autosaveNow();
+}
+function addAutoOrbit(m){
+  var big = null;
+  for(var i=0;i<sim.bodies.length;i++){
+    if(!big || sim.bodies[i].m > big.m) big = sim.bodies[i];
+  }
+  if(!big || big.m < m*2){
+    makeBody({ m:m, x:(Math.random()-0.5)*80, z:(Math.random()-0.5)*80 });
+  } else {
+    var rr = big.radius*4 + 26 + Math.random()*70;
+    var an = Math.random()*Math.PI*2;
+    var vo = Math.sqrt(sim.G*big.m/rr);
+    makeBody({
+      m:m,
+      x: big.x + rr*Math.cos(an), z: big.z + rr*Math.sin(an),
+      vx: big.vx - vo*Math.sin(an), vz: big.vz + vo*Math.cos(an)
+    });
+  }
+  computeAccels();
+  currentScenario = 'custom';
+  toast('Corpo em \u00f3rbita adicionado');
+  autosaveNow();
+}
+
+/* ================= SELECAO / INFO ================= */
+var infoVisible = false;
+function select(b){
+  selected = b;
+  infoVisible = true;
+  $('infoCard').classList.remove('hidden');
+  $('icDot').style.background = b.color;
+  $('icDot').style.color = b.color;
+  $('icName').textContent = b.name;
+  $('icMassSlider').value = sliderFromMass(b.m);
+  $('icFix').classList.toggle('active', b.fixed);
+  $('icFollow').classList.toggle('active', view.follow);
+  updateInfo();
+}
+function deselect(){
+  selected = null;
+  infoVisible = false;
+  $('infoCard').classList.add('hidden');
+}
+function updateInfo(){
+  if(!selected || !infoVisible) return;
+  var b = selected;
+  $('icMass').textContent = fmt(b.m);
+  $('icVel').textContent = fmt(Math.sqrt(b.vx*b.vx + b.vy*b.vy + b.vz*b.vz));
+  $('icAcc').textContent = fmt(Math.sqrt(b.ax*b.ax + b.ay*b.ay + b.az*b.az));
+  var best = null, bestG = 0, bestD2 = 0;
+  for(var i=0;i<sim.bodies.length;i++){
+    var c = sim.bodies[i];
+    if(c === b) continue;
+    var dx = c.x-b.x, dy = c.y-b.y, dz = c.z-b.z;
+    var d2 = dx*dx + dy*dy + dz*dz + 0.01;
+    var gg = sim.G*c.m/d2;
+    if(gg > bestG){ bestG = gg; best = c; bestD2 = d2; }
+  }
+  if(best){
+    var d = Math.sqrt(bestD2);
+    var F = sim.G*best.m*b.m/bestD2;
+    $('icOtherName').textContent = best.name;
+    $('icDist').textContent = fmt(d);
+    $('icFormula').textContent =
+      'F = ' + fmt(sim.G) + ' \u00d7 ' + fmt(best.m) + ' \u00d7 ' + fmt(b.m) +
+      ' / ' + fmt(d) + '\u00b2 \u2248 ' + fmt(F) + ' (un.)';
+  } else {
+    $('icOtherName').textContent = '?';
+    $('icDist').textContent = '-';
+    $('icFormula').textContent = 'F = G \u00b7 M \u00b7 m / r\u00b2';
+  }
+}
+function massFromSlider(s){ return 0.5*Math.pow(10, s*0.047); }
+function sliderFromMass(m){
+  var s = Math.round(Math.log(Math.max(m,0.5)/0.5)/Math.LN10/0.047);
+  return Math.max(0, Math.min(100, s));
+}
+
+/* ================= CENARIOS ================= */
+function orbitBody(central, name, m, r, ang, color){
+  var v = Math.sqrt(sim.G*central.m/r);
+  return makeBody({
+    name:name, m:m, color:color,
+    x: central.x + r*Math.cos(ang), z: central.z + r*Math.sin(ang),
+    vx: central.vx - v*Math.sin(ang), vz: central.vz + v*Math.cos(ang)
+  });
+}
+var SCENARIOS = {
+  'sistema-solar': { ts:1, cr:240, build:function(){
+    var sol = makeBody({ name:'Sol', m:20000, fixed:true, color:'#ffd54f' });
+    orbitBody(sol, 'Merc\u00fario', 6, 34, 0.0, '#b0bec5');
+    orbitBody(sol, 'V\u00eanus', 14, 48, 1.3, '#ffb300');
+    orbitBody(sol, 'Terra', 15, 64, 2.5, '#42a5f5');
+    orbitBody(sol, 'Marte', 9, 82, 3.9, '#ff7043');
+    orbitBody(sol, 'J\u00fapiter', 350, 125, 5.2, '#ffcc80');
+  }},
+  'terra-lua': { ts:2, cr:140, build:function(){
+    makeBody({ name:'Terra', m:1500, color:'#42a5f5', vz:0.042 });
+    makeBody({ name:'Lua', m:12, x:55, vz:-5.22, color:'#cfd8dc' });
+  }},
+  'eliptica': { ts:2.5, cr:150, build:function(){
+    makeBody({ name:'Planeta', m:1500, fixed:true, color:'#42a5f5' });
+    makeBody({ name:'Sat\u00e9lite', m:10, x:58, vz:-3.3, color:'#aaff00' });
+  }},
+  'binarias': { ts:3, cr:140, build:function(){
+    makeBody({ name:'Estrela A', m:800, x:-32, vz:2.5, color:'#00e5ff' });
+    makeBody({ name:'Estrela B', m:800, x:32, vz:-2.5, color:'#ff3df0' });
+  }},
+  'figura8': { ts:6, cr:160, build:function(){
+    var k = 2.3355;
+    makeBody({ name:'Alfa', m:300, x:-53.35, z:13.37, vx:0.46620*k, vz:0.43237*k, color:'#00e5ff' });
+    makeBody({ name:'Beta', m:300, x:0, z:0, vx:-0.93241*k, vz:-0.86473*k, color:'#aaff00' });
+    makeBody({ name:'Gama', m:300, x:53.35, z:-13.37, vx:0.46620*k, vz:0.43237*k, color:'#ff3df0' });
+  }},
+  'estilingue': { ts:1.5, cr:230, build:function(){
+    makeBody({ name:'Planeta', m:6000, fixed:true, color:'#ffb300' });
+    makeBody({ name:'Sonda 1', m:0.4, x:-170, z:-14, vx:16, color:'#00e5ff' });
+    makeBody({ name:'Sonda 2', m:0.4, x:-170, z:-30, vx:16, color:'#aaff00' });
+    makeBody({ name:'Sonda 3', m:0.4, x:-170, z:-55, vx:16, color:'#ff3df0' });
+  }},
+  'disco': { ts:1.5, cr:260, build:function(){
+    var sol = makeBody({ name:'Estrela', m:15000, fixed:true, color:'#ffd54f' });
+    for(var i=0;i<56;i++){
+      var r = 42 + Math.random()*75;
+      var an = Math.random()*Math.PI*2;
+      var v = Math.sqrt(sim.G*sol.m/r)*(0.96 + Math.random()*0.08);
+      makeBody({
+        name:'Part\u00edcula ' + (i+1),
+        m: 0.3 + Math.random()*0.9,
+        x: r*Math.cos(an), y:(Math.random()-0.5)*4, z: r*Math.sin(an),
+        vx: -v*Math.sin(an), vy:(Math.random()-0.5)*0.3, vz: v*Math.cos(an),
+        color: PALETTE[i % PALETTE.length]
+      });
+    }
+  }},
+  'caos3': { ts:3, cr:180, build:function(){
+    makeBody({ name:'Corpo A', m:500, x:55, vz:2.2, color:'#00e5ff' });
+    makeBody({ name:'Corpo B', m:500, x:-28, z:48, vx:-1.9, vz:-1.1, color:'#aaff00' });
+    makeBody({ name:'Corpo C', m:500, x:-28, z:-48, vx:1.9, vz:-1.1, color:'#ff3df0' });
+  }}
+};
+
+function loadScenario(key){
+  var s = SCENARIOS[key];
+  if(!s) return;
+  clearAll(); deselect(); stopPlacing();
+  currentScenario = key;
+  sim.G = 1;
+  sim.timeScale = s.ts || 1;
+  sim.running = true;
+  s.build();
+  computeAccels();
+  resetTrails();
+  cam.target.set(0,0,0);
+  cam.radius = s.cr || 190;
+  syncSimUI();
+  restartData = JSON.stringify(serialize());
+  autosaveNow();
+}
+
+/* ================= SERIALIZACAO / CACHE ================= */
+function serialize(){
+  return {
+    v:1, scn:currentScenario, G:sim.G, ts:sim.timeScale,
+    bodies: sim.bodies.map(function(b){
+      return {
+        n:b.name, m:+b.m.toFixed(4), c:b.color, f:b.fixed?1:0,
+        x:+b.x.toFixed(3), y:+b.y.toFixed(3), z:+b.z.toFixed(3),
+        vx:+b.vx.toFixed(4), vy:+b.vy.toFixed(4), vz:+b.vz.toFixed(4)
+      };
+    })
+  };
+}
+function restoreData(d){
+  clearAll(); deselect(); stopPlacing();
+  currentScenario = d.scn || 'custom';
+  sim.G = d.G || 1;
+  sim.timeScale = d.ts || 1;
+  sim.running = true;
+  (d.bodies || []).forEach(function(o){
+    makeBody({ name:o.n, m:o.m, color:o.c, fixed:!!o.f, x:o.x, y:o.y, z:o.z, vx:o.vx, vy:o.vy, vz:o.vz });
+  });
+  computeAccels();
+  cam.target.set(0,0,0);
+  syncSimUI();
+  restartData = JSON.stringify(serialize());
+}
+function autosaveNow(){
+  try{ Store.set('gravsim_autosave', JSON.stringify(serialize())); }catch(e){}
+}
+function saveSettings(){
+  Store.set('gravsim_settings', JSON.stringify({
+    trails:view.trails, vectors:view.vectors, grid:view.grid, coll:sim.collisions
+  }));
+}
+function loadSettings(){
+  try{
+    var s = JSON.parse(Store.get('gravsim_settings') || 'null');
+    if(s){
+      view.trails = !!s.trails; view.vectors = !!s.vectors;
+      view.grid = !!s.grid; sim.collisions = !!s.coll;
+    }
+  }catch(e){}
+  syncViewUI();
+}
+function getSaves(){
+  try{ return JSON.parse(Store.get('gravsim_saves') || '[]') || []; }catch(e){ return []; }
+}
+function setSaves(a){ Store.set('gravsim_saves', JSON.stringify(a)); }
+function renderSaves(){
+  var box = $('savesList');
+  box.innerHTML = '';
+  var saves = getSaves();
+  if(!saves.length){
+    var p = document.createElement('p');
+    p.className = 'cache-note';
+    p.textContent = 'Nenhum cen\u00e1rio salvo ainda.';
+    box.appendChild(p);
+    return;
+  }
+  saves.forEach(function(sv, idx){
+    var row = document.createElement('div');
+    row.className = 'save-item';
+    var nm = document.createElement('div');
+    nm.className = 'nm';
+    var b = document.createElement('b'); b.textContent = sv.name;
+    var sp = document.createElement('span');
+    sp.textContent = sv.date + ' \u00b7 ' + (sv.data && sv.data.bodies ? sv.data.bodies.length : 0) + ' corpos';
+    nm.appendChild(b); nm.appendChild(sp);
+    var bl = document.createElement('button');
+    bl.textContent = 'Carregar';
+    bl.addEventListener('click', function(){
+      restoreData(sv.data);
+      closeSheets();
+      toast('Cen\u00e1rio carregado');
+    });
+    var bd = document.createElement('button');
+    bd.className = 'del';
+    bd.textContent = '\u2715';
+    bd.addEventListener('click', function(){
+      var a = getSaves(); a.splice(idx,1); setSaves(a); renderSaves();
+      toast('Cen\u00e1rio apagado');
+    });
+    row.appendChild(nm); row.appendChild(bl); row.appendChild(bd);
+    box.appendChild(row);
+  });
+}
+
+/* ================= UI ================= */
+function syncSimUI(){
+  $('optSpeed').value = sim.timeScale;
+  $('optSpeedVal').textContent = '\u00d7' + fmt(sim.timeScale);
+  $('optG').value = sim.G;
+  $('optGVal').textContent = '\u00d7' + sim.G.toFixed(2);
+  $('playIco').textContent = sim.running ? '\u275A\u275A' : '\u25B6';
+  updateHud();
+}
+function syncViewUI(){
+  $('chkTrails').checked = view.trails;
+  $('chkVectors').checked = view.vectors;
+  $('chkGrid').checked = view.grid;
+  $('chkColl').checked = sim.collisions;
+  $('chkFollow').checked = view.follow;
+}
+function updateHud(){
+  $('hudBodies').textContent = sim.bodies.length;
+  $('hudSpeed').textContent = '\u00d7' + fmt(sim.timeScale);
+}
+function openSheet(id){
+  closeSheets();
+  stopPlacing();
+  $(id).classList.add('open');
+  $('scrim').classList.add('show');
+  if(id === 'sheetSave') renderSaves();
+}
+function closeSheets(){
+  ['sheetScen','sheetAdd','sheetOpt','sheetSave'].forEach(function(id){
+    $(id).classList.remove('open');
+  });
+  $('scrim').classList.remove('show');
+}
+$('scrim').addEventListener('click', closeSheets);
+Array.prototype.forEach.call(document.querySelectorAll('.sheet .x'), function(btn){
+  btn.addEventListener('click', closeSheets);
+});
+$('btnScen').addEventListener('click', function(){ openSheet('sheetScen'); });
+$('btnAdd').addEventListener('click', function(){ openSheet('sheetAdd'); });
+$('btnOpt').addEventListener('click', function(){ openSheet('sheetOpt'); });
+$('btnSave').addEventListener('click', function(){ openSheet('sheetSave'); });
+$('btnPlay').addEventListener('click', function(){
+  sim.running = !sim.running;
+  $('playIco').textContent = sim.running ? '\u275A\u275A' : '\u25B6';
+});
+Array.prototype.forEach.call(document.querySelectorAll('.scn-card'), function(card){
+  card.addEventListener('click', function(){
+    loadScenario(card.getAttribute('data-scn'));
+    closeSheets();
+  });
+});
+
+/* adicionar corpo */
+$('addMass').addEventListener('input', function(){
+  $('addMassVal').textContent = fmt(massFromSlider(+this.value));
+});
+$('addMassVal').textContent = fmt(massFromSlider(+$('addMass').value));
+$('btnPlace').addEventListener('click', function(){
+  startPlacing(massFromSlider(+$('addMass').value));
+});
+$('btnAutoOrbit').addEventListener('click', function(){
+  addAutoOrbit(massFromSlider(+$('addMass').value));
+  closeSheets();
+});
+
+/* opcoes */
+$('optSpeed').addEventListener('input', function(){
+  sim.timeScale = +this.value;
+  $('optSpeedVal').textContent = '\u00d7' + fmt(sim.timeScale);
+  updateHud();
+});
+$('optG').addEventListener('input', function(){
+  sim.G = +this.value;
+  $('optGVal').textContent = '\u00d7' + sim.G.toFixed(2);
+  computeAccels();
+});
+$('chkTrails').addEventListener('change', function(){ view.trails = this.checked; if(this.checked) resetTrails(); saveSettings(); });
+$('chkVectors').addEventListener('change', function(){ view.vectors = this.checked; saveSettings(); });
+$('chkGrid').addEventListener('change', function(){ view.grid = this.checked; saveSettings(); });
+$('chkColl').addEventListener('change', function(){ sim.collisions = this.checked; saveSettings(); });
+$('chkFollow').addEventListener('change', function(){
+  view.follow = this.checked;
+  if(selected) $('icFollow').classList.toggle('active', view.follow);
+});
+$('btnRestart').addEventListener('click', function(){
+  if(restartData){
+    try{ restoreData(JSON.parse(restartData)); }catch(e){}
+    closeSheets();
+    toast('Cen\u00e1rio reiniciado');
+  }
+});
+$('btnClear').addEventListener('click', function(){
+  clearAll(); deselect();
+  currentScenario = 'custom';
+  restartData = JSON.stringify(serialize());
+  closeSheets();
+  toast('Universo limpo');
+});
+
+/* salvar */
+$('btnDoSave').addEventListener('click', function(){
+  var saves = getSaves();
+  var name = $('saveName').value.trim() || ('Cen\u00e1rio ' + (saves.length + 1));
+  saves.push({ name:name, date:new Date().toLocaleString('pt-BR'), data:serialize() });
+  while(saves.length > 12) saves.shift();
+  setSaves(saves);
+  $('saveName').value = '';
+  renderSaves();
+  toast('Cen\u00e1rio salvo no cache!');
+});
+
+/* info card */
+$('icClose').addEventListener('click', deselect);
+$('icDel').addEventListener('click', function(){ if(selected){ removeBody(selected); } });
+$('icFix').addEventListener('click', function(){
+  if(!selected) return;
+  selected.fixed = !selected.fixed;
+  if(selected.fixed){ selected.vx = 0; selected.vy = 0; selected.vz = 0; }
+  this.classList.toggle('active', selected.fixed);
+});
+$('icFollow').addEventListener('click', function(){
+  view.follow = !view.follow;
+  $('chkFollow').checked = view.follow;
+  this.classList.toggle('active', view.follow);
+});
+$('icMassSlider').addEventListener('input', function(){
+  if(!selected) return;
+  setMass(selected, massFromSlider(+this.value));
+  $('icMass').textContent = fmt(selected.m);
+});
+
+/* ajuda */
+$('btnHelp').addEventListener('click', function(){ $('helpModal').classList.remove('hidden'); });
+$('btnHelpClose').addEventListener('click', function(){ $('helpModal').classList.add('hidden'); });
+$('helpModal').addEventListener('click', function(e){
+  if(e.target === this) this.classList.add('hidden');
+});
+
+/* ================= DEMO ================= */
+var DEMO_STEPS = [
+  { tpl:'tpl-demo-0', run:function(){ view.vectors = false; syncViewUI(); loadScenario('terra-lua'); } },
+  { tpl:'tpl-demo-1', run:function(){ if(currentScenario !== 'terra-lua') loadScenario('terra-lua'); view.vectors = true; syncViewUI(); } },
+  { tpl:'tpl-demo-2', run:function(){ view.vectors = false; view.trails = true; syncViewUI(); loadScenario('eliptica'); } },
+  { tpl:'tpl-demo-3', run:function(){ loadScenario('binarias'); } },
+  { tpl:'tpl-demo-4', run:function(){ loadScenario('figura8'); } },
+  { tpl:'tpl-demo-5', run:function(){ loadScenario('estilingue'); } },
+  { tpl:'tpl-demo-6', run:function(){ loadScenario('disco'); } },
+  { tpl:'tpl-demo-7', run:function(){ loadScenario('sistema-solar'); } }
+];
+function demoShow(){
+  var st = DEMO_STEPS[demo.i];
+  $('demoContent').innerHTML = $(st.tpl).innerHTML;
+  st.run();
+  var dd = $('demoDots');
+  dd.innerHTML = '';
+  for(var i=0;i<DEMO_STEPS.length;i++){
+    var s = document.createElement('span');
+    if(i === demo.i) s.className = 'on';
+    dd.appendChild(s);
+  }
+  $('demoPrev').disabled = demo.i === 0;
+  $('demoNext').textContent = demo.i === DEMO_STEPS.length-1 ? 'Concluir' : 'Pr\u00f3ximo \u2192';
+}
+function startDemo(){
+  demo.on = true; demo.i = 0;
+  closeSheets(); deselect(); stopPlacing();
+  $('demoBox').classList.remove('hidden');
+  demoShow();
+}
+function exitDemo(){
+  demo.on = false;
+  $('demoBox').classList.add('hidden');
+  toast('Explore livremente!');
+}
+$('btnDemo').addEventListener('click', startDemo);
+$('demoExit').addEventListener('click', exitDemo);
+$('demoPrev').addEventListener('click', function(){ if(demo.i > 0){ demo.i--; demoShow(); } });
+$('demoNext').addEventListener('click', function(){
+  if(demo.i >= DEMO_STEPS.length-1){ exitDemo(); return; }
+  demo.i++; demoShow();
+});
+
+/* ================= LOOP ================= */
+var frame = 0;
+var lastT = performance.now();
+function animate(now){
+  requestAnimationFrame(animate);
+  var dt = Math.min(0.05, Math.max(0.001, (now - lastT)/1000));
+  lastT = now;
+  frame++;
+  if(sim.running && sim.bodies.length > 0){
+    var simDt = 1.2*sim.timeScale*dt;
+    var sub = Math.max(2, Math.min(60, Math.ceil(simDt/0.004)));
+    var h = simDt/sub;
+    for(var s2=0; s2<sub; s2++) stepPhysics(h);
+    handleCollisions();
+    var te = sim.bodies.length > 25 ? 3 : 1;
+    if(view.trails && frame % te === 0) updateTrails();
+  }
+  if(demo.on) cam.theta += 0.0009;
+  if(view.follow && selected){
+    cam.target.x += (selected.x - cam.target.x)*0.12;
+    cam.target.y += (selected.y - cam.target.y)*0.12;
+    cam.target.z += (selected.z - cam.target.z)*0.12;
+  }
+  applyCamera();
+  updateVisuals();
+  gridMesh.visible = view.grid;
+  if(view.grid && frame % 2 === 0) updateGrid();
+  if(frame % 8 === 0){ updateInfo(); updateHud(); }
+  renderer.render(scene, camera);
+}
+window.addEventListener('resize', function(){
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+/* ================= INICIALIZACAO ================= */
+loadSettings();
+$('cacheStatus').textContent = Store.ok
+  ? '\uD83D\uDCBE Cache local: ativo \u2014 sess\u00e3o e cen\u00e1rios s\u00e3o preservados'
+  : '\u26A0 Cache indispon\u00edvel neste ambiente \u2014 usando mem\u00f3ria da sess\u00e3o';
+
+var restored = false;
+try{
+  var auto = JSON.parse(Store.get('gravsim_autosave') || 'null');
+  if(auto && auto.bodies && auto.bodies.length){
+    restoreData(auto);
+    restored = true;
+    toast('Sess\u00e3o restaurada do cache');
+  }
+}catch(e){}
+if(!restored) loadScenario('sistema-solar');
+
+if(!Store.get('gravsim_seen')){
+  Store.set('gravsim_seen','1');
+  setTimeout(function(){ toast('Toque em DEMO para um tour guiado'); }, 1500);
+}
+setInterval(autosaveNow, 8000);
+document.addEventListener('visibilitychange', function(){
+  if(document.hidden){ autosaveNow(); saveSettings(); }
+});
+
+requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>
