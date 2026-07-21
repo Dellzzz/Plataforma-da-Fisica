@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#00e5ff">
+<title>Área ENEM — Física | Plataforma da Física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a1a;
+    --bg-2:#0d0f24;
+    --panel:rgba(18,22,48,0.72);
+    --panel-solid:#12162f;
+    --cyan:#00e5ff;
+    --cyan-dim:#0792a8;
+    --magenta:#ff3df0;
+    --violet:#8b5cff;
+    --green:#27e88a;
+    --yellow:#ffd23d;
+    --red:#ff5a6e;
+    --txt:#dbe6f5;
+    --txt-dim:#8492b4;
+    --line:rgba(0,229,255,0.18);
+    --glow:0 0 18px rgba(0,229,255,0.35);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Rajdhani',sans-serif;
+    background:var(--bg);
+    color:var(--txt);
+    min-height:100vh;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  /* fundo atmosférico: glow radial + grade sutil */
+  body::before{
+    content:'';position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(1100px 600px at 78% -8%, rgba(139,92,255,0.16), transparent 60%),
+      radial-gradient(900px 600px at 10% 110%, rgba(0,229,255,0.13), transparent 55%),
+      var(--bg);
+  }
+  body::after{
+    content:'';position:fixed;inset:0;z-index:-1;opacity:0.5;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.05) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,229,255,0.05) 1px,transparent 1px);
+    background-size:46px 46px;
+    mask-image:radial-gradient(circle at 50% 30%,#000 0%,transparent 80%);
+  }
+
+  .wrap{max-width:1080px;margin:0 auto;padding:26px 18px 80px}
+
+  /* ---------- Header ---------- */
+  header.hero{
+    display:flex;align-items:center;gap:16px;
+    padding:20px 22px;margin-bottom:22px;
+    background:linear-gradient(120deg,rgba(0,229,255,0.08),rgba(139,92,255,0.06));
+    border:1px solid var(--line);border-radius:var(--radius);
+    position:relative;overflow:hidden;
+  }
+  header.hero::before{
+    content:'';position:absolute;top:-50%;right:-10%;width:280px;height:280px;
+    background:radial-gradient(circle,rgba(0,229,255,0.22),transparent 65%);
+  }
+  .logo-glyph{
+    font-family:'Orbitron';font-weight:900;font-size:42px;color:#bdf5ff;
+    text-shadow:0 0 22px var(--cyan),0 0 6px var(--cyan);
+    flex-shrink:0;line-height:1;
+  }
+  .hero-txt h1{
+    font-family:'Orbitron';font-weight:700;font-size:clamp(19px,4.4vw,28px);
+    letter-spacing:1px;color:#eafcff;
+  }
+  .hero-txt h1 span{color:var(--cyan)}
+  .hero-txt p{color:var(--txt-dim);font-size:15px;font-weight:500;margin-top:2px}
+
+  /* ---------- Tabs ---------- */
+  nav.tabs{
+    display:flex;gap:6px;margin-bottom:22px;
+    overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;
+  }
+  nav.tabs::-webkit-scrollbar{height:5px}
+  nav.tabs::-webkit-scrollbar-thumb{background:var(--cyan-dim);border-radius:9px}
+  .tab-btn{
+    font-family:'Orbitron';font-weight:500;font-size:13px;letter-spacing:0.4px;
+    color:var(--txt-dim);background:rgba(255,255,255,0.02);
+    border:1px solid transparent;border-radius:10px;
+    padding:11px 16px;cursor:pointer;white-space:nowrap;
+    transition:all .22s ease;position:relative;
+  }
+  .tab-btn:hover{color:var(--txt);background:rgba(0,229,255,0.06)}
+  .tab-btn.active{
+    color:#eafcff;border-color:var(--line);
+    background:linear-gradient(180deg,rgba(0,229,255,0.14),rgba(0,229,255,0.03));
+    box-shadow:var(--glow);
+  }
+  .tab-btn.active::after{
+    content:'';position:absolute;left:14px;right:14px;bottom:-1px;height:2px;
+    background:var(--cyan);box-shadow:0 0 10px var(--cyan);border-radius:2px;
+  }
+
+  /* ---------- Panels ---------- */
+  .panel{display:none;animation:fade .4s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .card{
+    background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);padding:20px 22px;margin-bottom:16px;
+    backdrop-filter:blur(6px);
+  }
+  .card h2{
+    font-family:'Orbitron';font-weight:700;font-size:18px;color:#eafcff;
+    margin-bottom:12px;display:flex;align-items:center;gap:9px;letter-spacing:.5px;
+  }
+  .card h2 .ic{color:var(--cyan);filter:drop-shadow(0 0 6px var(--cyan))}
+  .card h3{font-family:'Orbitron';font-weight:500;font-size:15px;color:var(--cyan);margin:16px 0 8px}
+  .card p{color:var(--txt);margin-bottom:10px;font-size:15.5px}
+  .card p.muted{color:var(--txt-dim);font-size:14.5px}
+  .lead{font-size:17px;color:#cfe2f5}
+  strong{color:#fff}
+  .hl{color:var(--cyan);font-weight:600}
+
+  .badge{
+    display:inline-block;font-family:'Orbitron';font-size:11px;font-weight:500;
+    padding:3px 9px;border-radius:20px;letter-spacing:.5px;
+    border:1px solid var(--line);color:var(--cyan);background:rgba(0,229,255,0.07);
+  }
+  .badge.mag{color:var(--magenta);border-color:rgba(255,61,240,0.3);background:rgba(255,61,240,0.07)}
+  .badge.vio{color:var(--violet);border-color:rgba(139,92,255,0.3);background:rgba(139,92,255,0.07)}
+  .badge.grn{color:var(--green);border-color:rgba(39,232,138,0.3);background:rgba(39,232,138,0.07)}
+
+  /* grid de facts */
+  .fact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+  .fact{
+    border:1px solid var(--line);border-radius:11px;padding:14px;
+    background:rgba(0,229,255,0.03);text-align:center;
+  }
+  .fact .num{font-family:'Orbitron';font-weight:900;font-size:26px;color:var(--cyan);text-shadow:0 0 14px rgba(0,229,255,0.4)}
+  .fact .lbl{font-size:13px;color:var(--txt-dim);margin-top:4px}
+
+  /* checklist / toggles */
+  .check-row{
+    display:flex;align-items:center;gap:13px;padding:12px 14px;margin-bottom:8px;
+    border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,0.015);
+    cursor:pointer;transition:all .2s;
+  }
+  .check-row:hover{background:rgba(0,229,255,0.05);border-color:rgba(0,229,255,0.35)}
+  .check-row.done{background:rgba(39,232,138,0.07);border-color:rgba(39,232,138,0.32)}
+  .check-box{
+    width:24px;height:24px;border-radius:7px;border:2px solid var(--cyan-dim);
+    flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    font-size:15px;color:var(--bg);transition:all .2s;font-weight:900;
+  }
+  .check-row.done .check-box{background:var(--green);border-color:var(--green);box-shadow:0 0 12px rgba(39,232,138,0.5)}
+  .check-txt{font-size:15px;font-weight:500;color:var(--txt)}
+  .check-row.done .check-txt{color:#a9f5cd}
+
+  /* botões */
+  .btn{
+    font-family:'Orbitron';font-weight:700;font-size:14px;letter-spacing:.6px;
+    border:none;border-radius:11px;padding:13px 26px;cursor:pointer;
+    background:linear-gradient(120deg,var(--cyan),#33b6ff);color:#04121a;
+    box-shadow:0 6px 20px rgba(0,229,255,0.3);transition:all .22s;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,229,255,0.45)}
+  .btn:active{transform:translateY(0)}
+  .btn.ghost{
+    background:transparent;color:var(--cyan);border:1px solid var(--line);
+    box-shadow:none;
+  }
+  .btn.ghost:hover{background:rgba(0,229,255,0.08)}
+  .btn.danger{background:linear-gradient(120deg,var(--red),#ff8a5a);color:#1a0608;box-shadow:0 6px 20px rgba(255,90,110,0.3)}
+  .btn.sm{padding:9px 16px;font-size:12px}
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+  /* lesson / content cards */
+  .item-card{
+    display:flex;align-items:center;gap:14px;padding:15px 16px;margin-bottom:10px;
+    border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,0.015);
+    transition:all .2s;
+  }
+  .item-card:hover{border-color:rgba(0,229,255,0.4);background:rgba(0,229,255,0.04)}
+  .item-ic{
+    width:46px;height:46px;border-radius:11px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:22px;
+    background:linear-gradient(135deg,rgba(0,229,255,0.15),rgba(139,92,255,0.12));
+    border:1px solid var(--line);
+  }
+  .item-body{flex:1;min-width:0}
+  .item-body .t{font-family:'Orbitron';font-weight:500;font-size:14.5px;color:#eafcff}
+  .item-body .d{font-size:13.5px;color:var(--txt-dim);margin-top:2px}
+  .item-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+  .mini-check{
+    width:30px;height:30px;border-radius:8px;border:2px solid var(--cyan-dim);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    font-size:16px;font-weight:900;color:transparent;transition:all .2s;flex-shrink:0;
+  }
+  .mini-check.on{background:var(--green);border-color:var(--green);color:#04121a;box-shadow:0 0 12px rgba(39,232,138,0.5)}
+  a.open-link{
+    font-family:'Orbitron';font-size:11px;font-weight:500;color:var(--cyan);
+    text-decoration:none;border:1px solid var(--line);border-radius:8px;
+    padding:7px 11px;transition:all .2s;white-space:nowrap;
+  }
+  a.open-link:hover{background:rgba(0,229,255,0.1)}
+
+  /* accordion conteúdos */
+  .acc{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden;background:rgba(255,255,255,0.012)}
+  .acc-head{
+    display:flex;align-items:center;gap:12px;padding:15px 16px;cursor:pointer;
+    transition:background .2s;
+  }
+  .acc-head:hover{background:rgba(0,229,255,0.04)}
+  .acc-head .a-ic{font-size:20px}
+  .acc-head .a-title{flex:1;font-family:'Orbitron';font-weight:500;font-size:14.5px;color:#eafcff}
+  .acc-head .chev{color:var(--cyan);transition:transform .3s;font-size:14px}
+  .acc.open .chev{transform:rotate(180deg)}
+  .acc-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .acc-body-inner{padding:2px 18px 18px 18px}
+  .acc-body-inner ul{list-style:none;margin:8px 0}
+  .acc-body-inner li{padding:6px 0 6px 22px;position:relative;font-size:15px;color:var(--txt)}
+  .acc-body-inner li::before{content:'▸';position:absolute;left:4px;color:var(--cyan)}
+  .formula{
+    font-family:'Orbitron';font-weight:500;color:var(--cyan);
+    background:rgba(0,229,255,0.06);border:1px solid var(--line);
+    border-radius:8px;padding:9px 14px;margin:8px 0;display:inline-block;font-size:15px;
+  }
+
+  /* ---------- Simulado ---------- */
+  .sim-start{text-align:center;padding:8px 6px 4px}
+  .sim-config{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0}
+  .opt-pill{
+    font-family:'Orbitron';font-weight:500;font-size:13px;color:var(--txt-dim);
+    border:1px solid var(--line);border-radius:10px;padding:11px 20px;cursor:pointer;
+    transition:all .2s;background:rgba(255,255,255,0.02);
+  }
+  .opt-pill.sel{color:#04121a;background:var(--cyan);border-color:var(--cyan);box-shadow:var(--glow)}
+
+  .sim-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+  .timer{
+    font-family:'Orbitron';font-weight:700;font-size:20px;color:var(--cyan);
+    border:1px solid var(--line);border-radius:10px;padding:8px 16px;
+    background:rgba(0,229,255,0.06);box-shadow:var(--glow);letter-spacing:1px;
+  }
+  .timer.warn{color:var(--yellow);border-color:rgba(255,210,61,0.4);box-shadow:0 0 16px rgba(255,210,61,0.35);animation:pulse 1s infinite}
+  .timer.crit{color:var(--red);border-color:rgba(255,90,110,0.5);box-shadow:0 0 16px rgba(255,90,110,0.4);animation:pulse .6s infinite}
+  @keyframes pulse{50%{opacity:.6}}
+  .q-counter{font-family:'Orbitron';font-size:13px;color:var(--txt-dim)}
+  .q-counter b{color:var(--cyan);font-size:16px}
+
+  .progress-track{height:6px;background:rgba(255,255,255,0.06);border-radius:6px;margin-bottom:20px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));border-radius:6px;transition:width .3s;box-shadow:0 0 10px rgba(0,229,255,0.5)}
+
+  .q-tema{margin-bottom:12px}
+  .q-text{font-size:17px;color:#eafcff;line-height:1.6;margin-bottom:18px;font-weight:500}
+  .alt{
+    display:flex;align-items:flex-start;gap:13px;padding:14px 16px;margin-bottom:10px;
+    border:1px solid var(--line);border-radius:11px;cursor:pointer;
+    background:rgba(255,255,255,0.015);transition:all .18s;
+  }
+  .alt:hover{border-color:rgba(0,229,255,0.45);background:rgba(0,229,255,0.05)}
+  .alt.sel{border-color:var(--cyan);background:rgba(0,229,255,0.12);box-shadow:var(--glow)}
+  .alt-letter{
+    font-family:'Orbitron';font-weight:700;width:30px;height:30px;flex-shrink:0;
+    border-radius:8px;border:1px solid var(--cyan-dim);color:var(--cyan);
+    display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .18s;
+  }
+  .alt.sel .alt-letter{background:var(--cyan);color:#04121a;border-color:var(--cyan)}
+  .alt-text{font-size:15.5px;color:var(--txt);padding-top:3px}
+  /* estados de correção */
+  .alt.correct{border-color:var(--green);background:rgba(39,232,138,0.12)}
+  .alt.correct .alt-letter{background:var(--green);color:#04121a;border-color:var(--green)}
+  .alt.wrong{border-color:var(--red);background:rgba(255,90,110,0.1)}
+  .alt.wrong .alt-letter{background:var(--red);color:#1a0608;border-color:var(--red)}
+
+  .sim-nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
+
+  /* resultado */
+  .result-hero{text-align:center;padding:14px 0 6px}
+  .score-ring{
+    width:150px;height:150px;border-radius:50%;margin:0 auto 16px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .score-ring .pct{font-family:'Orbitron';font-weight:900;font-size:38px;color:#eafcff}
+  .score-ring .sub{font-size:13px;color:var(--txt-dim);font-family:'Orbitron'}
+
+  .review-q{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px;background:rgba(255,255,255,0.012)}
+  .review-q .rq-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .rq-status{font-family:'Orbitron';font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px}
+  .rq-status.ok{color:var(--green);background:rgba(39,232,138,0.12);border:1px solid rgba(39,232,138,0.3)}
+  .rq-status.no{color:var(--red);background:rgba(255,90,110,0.12);border:1px solid rgba(255,90,110,0.3)}
+  .resolucao{font-size:14.5px;color:var(--txt-dim);margin-top:8px;padding:12px 14px;border-left:2px solid var(--cyan);background:rgba(0,229,255,0.04);border-radius:0 8px 8px 0}
+  .resolucao b{color:var(--cyan)}
+  .remedy{
+    display:inline-flex;align-items:center;gap:7px;margin-top:10px;
+    font-family:'Orbitron';font-size:12px;font-weight:500;color:var(--magenta);
+    text-decoration:none;border:1px solid rgba(255,61,240,0.3);border-radius:9px;
+    padding:8px 13px;transition:all .2s;background:rgba(255,61,240,0.06);
+  }
+  .remedy:hover{background:rgba(255,61,240,0.14)}
+
+  /* ---------- Relatório ---------- */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:13px;margin-bottom:18px}
+  .stat{
+    border:1px solid var(--line);border-radius:13px;padding:18px 16px;text-align:center;
+    background:linear-gradient(180deg,rgba(0,229,255,0.05),rgba(0,229,255,0.01));
+  }
+  .stat .v{font-family:'Orbitron';font-weight:900;font-size:30px;color:var(--cyan);text-shadow:0 0 14px rgba(0,229,255,0.4);line-height:1}
+  .stat .k{font-size:12.5px;color:var(--txt-dim);margin-top:7px;font-family:'Orbitron'}
+
+  .theme-bar-row{margin-bottom:14px}
+  .tbr-head{display:flex;justify-content:space-between;margin-bottom:6px}
+  .tbr-head .name{font-family:'Orbitron';font-size:13px;color:var(--txt)}
+  .tbr-head .val{font-family:'Orbitron';font-size:13px;font-weight:700}
+  .tbr-track{height:13px;background:rgba(255,255,255,0.05);border-radius:7px;overflow:hidden}
+  .tbr-fill{height:100%;border-radius:7px;transition:width .8s ease;position:relative}
+
+  .hist-row{
+    display:flex;align-items:center;gap:14px;padding:13px 15px;margin-bottom:9px;
+    border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,0.012);
+  }
+  .hist-date{font-family:'Orbitron';font-size:12px;color:var(--txt-dim);min-width:120px}
+  .hist-score{font-family:'Orbitron';font-weight:700;font-size:16px}
+  .hist-meta{font-size:13px;color:var(--txt-dim);margin-left:auto}
+
+  .recommend{
+    border:1px solid rgba(255,210,61,0.3);border-radius:12px;padding:14px 16px;
+    background:rgba(255,210,61,0.05);margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;
+  }
+  .recommend .r-ic{font-size:22px;flex-shrink:0}
+  .recommend .r-txt{font-size:14.5px;color:var(--txt)}
+  .recommend .r-txt b{color:var(--yellow)}
+
+  .empty{
+    text-align:center;padding:40px 20px;color:var(--txt-dim);
+  }
+  .empty .e-ic{font-size:46px;margin-bottom:12px;opacity:.6}
+  .empty p{font-size:15px}
+
+  .note{font-size:13px;color:var(--txt-dim);font-style:italic;margin-top:8px}
+  .divider{height:1px;background:var(--line);margin:18px 0}
+
+  @media(max-width:560px){
+    .wrap{padding:18px 12px 70px}
+    header.hero{padding:16px}
+    .logo-glyph{font-size:34px}
+    .card{padding:16px}
+    .q-text{font-size:16px}
+  }
+  /* ---- Aulas ENEM (details nativos) ---- */
+  details.tdet{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden;background:rgba(255,255,255,0.012)}
+  details.tdet>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:11px;padding:15px 16px;font-family:'Orbitron';font-weight:500;font-size:14.5px;color:#eafcff;transition:background .2s}
+  details.tdet>summary::-webkit-details-marker{display:none}
+  details.tdet>summary:hover{background:rgba(0,229,255,0.04)}
+  details.tdet[open]>summary{border-bottom:1px solid var(--line)}
+  details.tdet[open]>summary .chev{transform:rotate(180deg)}
+  .tdet-title{flex:1}
+  .tdet-body{padding:14px 16px}
+  details.qdet{border:1px solid var(--line);border-radius:10px;margin-bottom:7px;overflow:hidden;background:rgba(0,229,255,0.02)}
+  details.qdet>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:11px 13px;transition:background .2s}
+  details.qdet>summary::-webkit-details-marker{display:none}
+  details.qdet>summary:hover{background:rgba(0,229,255,0.05)}
+  details.qdet[open]>summary .chev{transform:rotate(180deg)}
+  details.qdet[open]>summary{border-bottom:1px solid var(--line)}
+  .qsum{font-size:13px;color:var(--txt);flex:1;line-height:1.3}
+  .qbody{padding:4px 14px 14px}
+  .est-btn{margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="logo-glyph">&#934;</div>
+    <div class="hero-txt">
+      <h1>Área <span>ENEM</span> — Física</h1>
+      <p>Estude, treine e acompanhe seu desempenho rumo ao exame</p>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabBar">
+    <button class="tab-btn active" data-tab="sobre">Sobre o ENEM</button>
+    <button class="tab-btn" data-tab="aulas">Aulas</button>
+    <button class="tab-btn" data-tab="aulasenem">Aulas ENEM</button>
+    <button class="tab-btn" data-tab="conteudos">Conteúdos ENEM</button>
+    <button class="tab-btn" data-tab="simulados">Simulados</button>
+    <button class="tab-btn" data-tab="relatorio">Relatório</button>
+  </nav>
+
+  <!-- ============ SOBRE O ENEM ============ -->
+  <section class="panel active" id="panel-sobre">
+    <div class="card">
+      <h2><span class="ic">&#9432;</span> Como a Física cai no ENEM</h2>
+      <p class="lead">A Física aparece na prova de <strong>Ciências da Natureza</strong> (junto com Química e Biologia), aplicada no segundo dia do exame.</p>
+      <div class="fact-grid">
+        <div class="fact"><div class="num">~15</div><div class="lbl">questões de Física</div></div>
+        <div class="fact"><div class="num">45</div><div class="lbl">questões no caderno</div></div>
+        <div class="fact"><div class="num">5</div><div class="lbl">alternativas (A a E)</div></div>
+        <div class="fact"><div class="num">5h30</div><div class="lbl">para o caderno todo</div></div>
+      </div>
+      <p class="muted">Os números variam um pouco a cada edição, mas a proporção se mantém: a Física divide o caderno com as outras duas áreas.</p>
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">&#9888;</span> O jeito ENEM de cobrar</h2>
+      <p>A Física do ENEM é <span class="hl">muito mais de interpretação do que de cálculo pesado</span>. O segredo costuma estar em ler bem o enunciado e o gráfico — não em decorar fórmulas raras.</p>
+      <h3>Marcas registradas da prova</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:6px">
+        <div class="item-card"><div class="item-ic">&#128220;</div><div class="item-body"><div class="t">Textos longos</div><div class="d">Contexto antes da pergunta</div></div></div>
+        <div class="item-card"><div class="item-ic">&#128202;</div><div class="item-body"><div class="t">Gráficos e tabelas</div><div class="d">Ler dados vale ponto</div></div></div>
+        <div class="item-card"><div class="item-ic">&#127969;</div><div class="item-body"><div class="t">Cotidiano</div><div class="d">Física do dia a dia</div></div></div>
+        <div class="item-card"><div class="item-ic">&#9889;</div><div class="item-body"><div class="t">Energia em foco</div><div class="d">Conta de luz, kWh, eficiência</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">&#9889;</span> Os temas que mais aparecem</h2>
+      <p class="muted">Distribuição aproximada com base nas últimas edições — use como guia de prioridade de estudo.</p>
+      <div id="temaWeights" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">&#9989;</span> Checklist do candidato</h2>
+      <p class="muted">Marque o que você já domina. Fica salvo automaticamente neste aparelho.</p>
+      <div id="sobreChecklist" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <!-- ============ AULAS ENEM ============ -->
+  <section class="panel" id="panel-aulas">
+    <div class="card">
+      <h2><span class="ic">&#127916;</span> Aulas de Física</h2>
+      <p class="muted">Aulas interativas do zero ao ENEM, com simulações e questões resolvidas passo a passo. Marque como concluída ao terminar — seu progresso fica salvo.</p>
+      <div id="progressAulas" style="margin:14px 0 6px"></div>
+      <div id="aulasList" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <!-- ============ AULAS ENEM ============ -->
+  <section class="panel" id="panel-aulasenem">
+    <div class="card">
+      <h2><span class="ic">&#127891;</span> Aulas ENEM com questões resolvidas</h2>
+      <p class="muted">Aulas organizadas por tema, com a estratégia de como o assunto cai na prova e a resolução comentada de questões reais do ENEM. Toque em um tema para expandir e, depois, em cada questão para ver a resolução.</p>
+    </div>
+    <div id="aulasEnemList"></div>
+  </section>
+
+  <!-- ============ CONTEÚDOS ENEM ============ -->
+  <section class="panel" id="panel-conteudos">
+    <div class="card">
+      <h2><span class="ic">&#128218;</span> Resumos por tema</h2>
+      <p class="muted">Conceitos-chave e fórmulas essenciais de cada eixo. Toque para expandir e marque os que já revisou.</p>
+      <div id="progressConteudos" style="margin:14px 0 6px"></div>
+      <div id="conteudosList" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <!-- ============ SIMULADOS ============ -->
+  <section class="panel" id="panel-simulados">
+    <!-- tela inicial -->
+    <div class="card" id="simStart">
+      <h2><span class="ic">&#9201;</span> Simulado cronometrado</h2>
+      <div class="sim-start">
+        <p class="lead">Questões no estilo ENEM, com tempo cronometrado e correção comentada.</p>
+        <p class="muted" style="margin-top:6px">Você terá <span class="hl">3 minutos por questão</span>. Os simulados são <span class="hl">personalizados</span>: priorizam os temas em que você mais erra, e uma questão só reaparece se você já tiver errado antes.</p>
+        <div id="simMastery" style="margin:18px 0 6px"></div>
+        <p style="margin-top:14px;font-family:'Orbitron';font-size:13px;color:var(--txt-dim)">Quantas questões?</p>
+        <div class="sim-config" id="simQtyPills"></div>
+        <button class="btn" id="btnStartSim" style="margin-top:6px">Iniciar Simulado &#9654;</button>
+      </div>
+    </div>
+
+    <!-- tela da questão -->
+    <div class="card" id="simQuiz" style="display:none">
+      <div class="sim-top">
+        <div class="q-counter">Questão <b id="qNow">1</b> / <span id="qTotal">10</span></div>
+        <div class="timer" id="simTimer">00:00</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="simProgress" style="width:0%"></div></div>
+      <div class="q-tema"><span class="badge" id="qTema">Tema</span> <span class="badge vio" id="qAno">ENEM</span></div>
+      <div class="q-text" id="qText"></div>
+      <div id="qAlts"></div>
+      <div class="sim-nav">
+        <button class="btn ghost" id="btnPrev">&#9664; Anterior</button>
+        <button class="btn" id="btnNext">Próxima &#9654;</button>
+      </div>
+    </div>
+
+    <!-- tela de resultado -->
+    <div id="simResult" style="display:none"></div>
+  </section>
+
+  <!-- ============ RELATÓRIO ============ -->
+  <section class="panel" id="panel-relatorio">
+    <div id="reportContent"></div>
+  </section>
+
+</div>
+
+<script>
+/* =====================================================================
+   PERSISTÊNCIA  —  localStorage com fallback em memória.
+   No GitHub Pages usa localStorage de verdade (dados salvos no aparelho).
+   Se o ambiente bloquear storage (ex.: pré-visualização), cai p/ memória,
+   então o protótipo continua navegável.
+   ===================================================================== */
+const Store = (function(){
+  const KEY = 'plataphysica_enem_v1';
+  let mem = null;
+  function def(){
+    return { sobre:{}, aulas:{}, conteudos:{}, aulasenem:{}, historico:[], qstate:{} };
+  }
+  function read(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      return raw ? JSON.parse(raw) : def();
+    }catch(e){
+      if(!mem) mem = def();
+      return mem;
+    }
+  }
+  function write(data){
+    try{
+      localStorage.setItem(KEY, JSON.stringify(data));
+    }catch(e){
+      mem = data;
+    }
+  }
+  function update(fn){
+    const d = read(); fn(d); write(d); return d;
+  }
+  return { read, write, update, reset(){ write(def()); } };
+})();
+
+/* =====================================================================
+   DADOS DE CONTEÚDO
+   ===================================================================== */
+const TEMAS_PESO = [
+  { nome:'Eletricidade e Energia', peso:30, cor:'var(--cyan)' },
+  { nome:'Mecânica', peso:28, cor:'var(--violet)' },
+  { nome:'Ondas e Óptica', peso:18, cor:'var(--magenta)' },
+  { nome:'Termodinâmica', peso:16, cor:'var(--green)' },
+  { nome:'Física Moderna', peso:8, cor:'var(--yellow)' },
+];
+
+const CHECKLIST_SOBRE = [
+  'Sei interpretar gráficos de movimento (posição, velocidade, tempo)',
+  'Calculo consumo de energia elétrica em kWh e o custo na conta de luz',
+  'Domino conservação de energia mecânica (cinética e potencial)',
+  'Entendo as Leis de Newton aplicadas a situações do cotidiano',
+  'Sei trabalhar com calor sensível e mudanças de temperatura',
+  'Reconheço fenômenos ondulatórios (som, luz, frequência, comprimento de onda)',
+  'Aplico a Lei de Ohm e analiso circuitos simples',
+  'Conheço a ideia de fóton e energia quantizada (Física Moderna)',
+];
+
+const AULAS = [
+  { ic:'&#9889;', t:'Eletrodinâmica do Zero', d:'Corrente, tensão, Lei de Ohm, potência e conta de luz', url:'./eletrodinamica-enem.html' },
+  { ic:'&#9881;', t:'Mecânica do Zero', d:'Cinemática, Leis de Newton, energia e quantidade de movimento', url:'./mecanica-enem.html' },
+  { ic:'&#12336;', t:'Ondulatória do Zero', d:'Ondas, som, refração, interferência e espectro eletromagnético', url:'./ondulatoria-enem.html' },
+  { ic:'&#128293;', t:'Termodinâmica do Zero', d:'Calor, temperatura, calorimetria, mudanças de estado e máquinas térmicas', url:'./termodinamica-enem.html' },
+  { ic:'&#129522;', t:'Eletromagnetismo do Zero', d:'Ímãs, campo magnético, indução de Faraday, geradores e transformadores', url:'./eletromagnetismo-enem.html' },
+];
+
+const CONTEUDOS = [
+  {
+    ic:'&#9889;', nome:'Eletricidade e Energia',
+    pontos:[
+      'Potência elétrica: relaciona tensão e corrente no aparelho.',
+      'Energia consumida medida em quilowatt-hora (kWh) — base da conta de luz.',
+      'Lei de Ohm liga tensão, corrente e resistência.',
+      'Eficiência energética e fontes renováveis (eólica e solar) são contexto frequente.',
+    ],
+    formulas:['P = U &#183; i','E = P &#183; t','U = R &#183; i']
+  },
+  {
+    ic:'&#129518;', nome:'Mecânica',
+    pontos:[
+      'Cinemática: descreve o movimento (velocidade, aceleração, gráficos).',
+      'Leis de Newton: relacionam força resultante e aceleração.',
+      'Energia mecânica se conserva sem atrito (cinética + potencial).',
+      'Trabalho de uma força e teorema trabalho-energia.',
+    ],
+    formulas:['v = v&#8320; + a&#183;t','F = m &#183; a','E&#8344; = &#189; m v&#178;','E&#8346; = m g h']
+  },
+  {
+    ic:'&#127754;', nome:'Ondas e Óptica',
+    pontos:[
+      'Toda onda relaciona velocidade, frequência e comprimento de onda.',
+      'Som é onda mecânica; luz e ondas de rádio são eletromagnéticas.',
+      'Reflexão e refração explicam espelhos e lentes.',
+      'Equação dos pontos conjugados para lentes e espelhos.',
+    ],
+    formulas:['v = &#955; &#183; f','1/f = 1/p + 1/p&#39;']
+  },
+  {
+    ic:'&#127777;', nome:'Termodinâmica',
+    pontos:[
+      'Calor sensível muda a temperatura sem mudar o estado.',
+      'Calor latente muda o estado mantendo a temperatura.',
+      'Calor específico é característico de cada substância.',
+      'Aquecedores solares e máquinas térmicas como contexto.',
+    ],
+    formulas:['Q = m &#183; c &#183; &#916;T','Q = m &#183; L']
+  },
+  {
+    ic:'&#9883;', nome:'Física Moderna',
+    pontos:[
+      'A energia da luz vem em pacotes chamados fótons.',
+      'A energia de um fóton depende da sua frequência.',
+      'Efeito fotoelétrico: base de painéis solares e sensores.',
+      'Aparece em menor proporção, mas costuma ser direto.',
+    ],
+    formulas:['E = h &#183; f']
+  },
+];
+
+/* =====================================================================
+   BANCO DE QUESTÕES  (estilo ENEM)
+   correta = índice (0..4). Atenção: nos cálculos do JS o sinal de menos
+   é sempre o hífen ASCII; expoentes negativos no texto usam superscrito.
+   ===================================================================== */
+const QUESTOES = [
+  { id:"p32", tema:"Eletrodinâmica", ano:"ENEM 2010",
+    enunciado:"Deseja-se instalar uma estação de geração de energia elétrica em um município localizado no interior de um pequeno vale cercado de altas montanhas de difícil acesso. A cidade é cruzada por um rio, que é fonte de água para consumo, irrigação das lavouras de subsistência e pesca. Na região, que possui pequena extensão territorial, a incidência solar é alta o ano todo. A estação em questão irá abastecer apenas o município apresentado. Qual forma de obtenção de energia, entre as apresentadas, é a mais indicada para ser implantada nesse município de modo a causar o menor impacto ambiental?",
+    alt:["Termelétrica, pois é possível utilizar a água do rio no sistema de refrigeração.", "Eólica, pois a geografia do local é própria para a captação desse tipo de energia.", "Nuclear, pois o modo de resfriamento de seus sistemas não afetaria a população.", "Fotovoltaica, pois é possível aproveitar a energia solar que chega à superfície do local.", "Hidrelétrica, pois o rio que corta o município é suficiente para abastecer a usina construída."],
+    correta:3,
+    res:"Fotovoltaica aproveita a alta incidência solar local com o menor impacto ambiental.",
+    remedy:{ nome:"Simulador de Eletricidade", url:"./eletricidade.html" } },
+  { id:"p60", tema:"Eletrodinâmica", ano:"ENEM 2014",
+    enunciado:"Alguns sistemas de segurança incluem detectores de movimento. Nesses sensores, existe uma substância que se polariza na presença de radiação eletromagnética de certa região de frequência, gerando uma tensão que pode ser amplificada e empregada para efeito de controle. Quando uma pessoa se aproxima do sistema, a radiação emitida por seu corpo é detectada por esse tipo de sensor. A radiação captada por esse detector encontra-se na região de frequência",
+    alt:["da luz visível.", "do ultravioleta.", "do infravermelho.", "das micro-ondas.", "das ondas longas de rádio."],
+    correta:2,
+    res:"O corpo humano emite radiação na faixa do infravermelho, que é o que o sensor capta.",
+    remedy:{ nome:"Simulador de Eletricidade", url:"./eletricidade.html" } },
+  { id:"p88", tema:"Eletrodinâmica", ano:"ENEM 2012",
+    enunciado:"A eficiência das lâmpadas pode ser comparada utilizando a razão, considerada linear, entre a quantidade de luz produzida e o consumo. A quantidade de luz é medida pelo fluxo luminoso, cuja unidade é o lúmen (lm). O consumo está relacionado à potência elétrica da lâmpada que é medida em watt (W). Por exemplo, uma lâmpada incandescente de 40 W emite cerca de 600 lm, enquanto uma lâmpada fluorescente de 40 W emite cerca de 3000 lm. A eficiência de uma lâmpada incandescente de 40 W é",
+    alt:["maior que a de uma lâmpada fluorescente de 8 W, que produz menor quantidade de luz.", "maior que a de uma lâmpada fluorescente de 40 W, que produz menor quantidade de luz.", "menor que a de uma lâmpada fluorescente de 8 W, que produz a mesma quantidade de luz.", "menor que a de uma lâmpada fluorescente de 40 W, pois consome maior quantidade de energia.", "igual a de uma lâmpada fluorescente de 40 W, que consome a mesma quantidade de energia."],
+    correta:2,
+    res:"A fluorescente de 40 W produz 3000 lm contra 600 lm da incandescente: a incandescente é menos eficiente que uma fluorescente que dê a mesma luz.",
+    remedy:{ nome:"Simulador de Eletricidade", url:"./eletricidade.html" } },
+  { id:"p105", tema:"Eletrodinâmica", ano:"ENEM PPL 2014",
+    enunciado:"Os manuais dos fornos micro-ondas desaconselham, sob pena de perda da garantia, que eles sejam ligados em paralelo juntamente a outros aparelhos eletrodomésticos por meio de tomadas múltiplas, popularmente conhecidas como “benjamins” ou “tês”, devido ao alto risco de incêndio e derretimento dessas tomadas, bem como daquelas dos próprios aparelhos. Os riscos citados são decorrentes da",
+    alt:["resistividade da conexão, que diminui devido à variação de temperatura do circuito.", "corrente elétrica superior ao máximo que a tomada múltipla pode suportar.", "resistência elétrica elevada na conexão simultânea de aparelhos eletrodomésticos.", "tensão insuficiente para manter todos os aparelhos eletrodomésticos em funcionamento.", "intensidade do campo elétrico elevada, que causa o rompimento da rigidez dielétrica da tomada múltipla."],
+    correta:1,
+    res:"Ligar muitos aparelhos na mesma tomada soma as correntes e ultrapassa o limite que ela suporta, causando aquecimento e risco de incêndio.",
+    remedy:{ nome:"Simulador de Eletricidade", url:"./eletricidade.html" } },
+  { id:"p106", tema:"Eletrodinâmica", ano:"ENEM 2013",
+    enunciado:"O chuveiro elétrico é um dispositivo capaz de transformar energia elétrica em energia térmica, o que possibilita a elevação da temperatura da água. Um chuveiro projetado para funcionar em 110V pode ser adaptado para funcionar em 220V, de modo a manter inalterada sua potência. Uma das maneiras de fazer essa adaptação é trocar a resistência do chuveiro por outra, de mesmo material e com o(a)",
+    alt:["dobro do comprimento do fio.", "metade do comprimento do fio.", "metade da área da seção reta do fio.", "quádruplo da área da seção reta do fio.", "quarta parte da área da seção reta do fio."],
+    correta:4,
+    res:"Para manter a potência ao dobrar a tensão, a resistência precisa quadruplicar; com o mesmo material, isso se obtém reduzindo a área da seção a um quarto.",
+    remedy:{ nome:"Simulador de Eletricidade", url:"./eletricidade.html" } },
+  { id:"p108", tema:"Eletrodinâmica", ano:"ENEM 2013",
+    enunciado:"Um circuito em série é formado por uma pilha, uma lâmpada incandescente e uma chave interruptora. Ao se ligar a chave, a lâmpada acende quase instantaneamente, irradiando calor e luz. Popularmente, associa-se o fenômeno da irradiação de energia a um desgaste da corrente elétrica, ao atravessar o filamento da lâmpada, e à rapidez com que a lâmpada começa a brilhar. Essa explicação está em desacordo com o modelo clássico de corrente. De acordo com o modelo mencionado, o fato de a lâmpada acender quase instantaneamente está relacionado à rapidez com que",
+    alt:["o fluido elétrico se desloca no circuito.", "as cargas negativas móveis atravessam o circuito.", "a bateria libera cargas móveis para o filamento da lâmpada.", "o campo elétrico se estabelece em todos os pontos do circuito.", "as cargas positivas e negativas se chocam no filamento da lâmpada."],
+    correta:3,
+    res:"No modelo clássico, a lâmpada acende quase instantaneamente porque o campo elétrico se estabelece em todo o circuito quase à velocidade da luz.",
+    remedy:{ nome:"Simulador de Eletricidade", url:"./eletricidade.html" } },
+  { id:"p110", tema:"Eletrodinâmica", ano:"ENEM PPL 2013",
+    enunciado:"Um grupo de amigos foi passar o fim de semana em um acampamento rural, onde não há eletricidade. Uma pessoa levou um gerador a diesel e outra levou duas lâmpadas, diferentes fios e bocais. Perto do anoitecer, iniciaram a instalação e verificaram que as lâmpadas eram de 60 W – 110 V e o gerador produzia uma tensão de 220 V. Para que as duas lâmpadas possam funcionar de acordo com suas especificações e o circuito tenha menor perda possível, a estrutura do circuito elétrico deverá ser de dois bocais ligados em",
+    alt:["série e usar fios de maior espessura.", "série e usar fios de máximo comprimento.", "paralelo e usar fios de menor espessura.", "paralelo e usar fios de maior espessura.", "paralelo e usar fios de máximo comprimento."],
+    correta:0,
+    res:"Lâmpadas de 110 V em um gerador de 220 V devem ser ligadas em série; fios mais grossos reduzem a perda no circuito.",
+    remedy:{ nome:"Simulador de Eletricidade", url:"./eletricidade.html" } },
+  { id:"p141", tema:"Eletrodinâmica", ano:"ENEM PPL 2012",
+    enunciado:"Chuveiros elétricos possuem uma chave para regulagem da temperatura verão/inverno e para desligar o chuveiro. Além disso, é possível regular a temperatura da água, abrindo ou fechando o registro. Abrindo, diminui-se a temperatura e fechando, aumenta-se. Aumentando-se o fluxo da água há uma redução na sua temperatura, pois",
+    alt:["aumenta-se a área da superfície da água dentro do chuveiro, aumentando a perda de calor por radiação.", "aumenta-se o calor especifico da água, aumentando a dificuldade com que a massa de água se aquece no chuveiro.", "diminui-se a capacidade térmica do conjunto água/chuveiro, diminuindo também a capacidade do conjunto de se aquecer.", "diminui-se o contato entre a corrente elétrica do chuveiro e a água, diminuindo também a sua capacidade de aquecê-la.", "diminui-se o tempo de contato entre a água e a resistência do chuveiro, diminuindo a transferência de calor de uma para a outra."],
+    correta:4,
+    res:"Aumentar o fluxo reduz o tempo de contato da água com a resistência, diminuindo o calor transferido a cada porção de água.",
+    remedy:{ nome:"Simulador de Eletricidade", url:"./eletricidade.html" } },
+  { id:"p150", tema:"Eletrodinâmica", ano:"ENEM PPL 2014",
+    enunciado:"Para a proteção contra curtos-circuitos em residências são utilizados disjuntores, compostos por duas lâminas de metais diferentes, com suas superfícies soldadas uma à outra, ou seja, uma lâmina bimetálica. Essa lâmina toca o contato elétrico, fechando o circuito e deixando a corrente elétrica passar. Quando da passagem de uma corrente superior à estipulada (limite), a lâmina se curva para um dos lados, afastando-se do contato elétrico e, assim, interrompendo o circuito. Isso ocorre porque os metais da lâmina possuem uma característica física cuja resposta é diferente para a mesma corrente elétrica que passa no circuito. A característica física que deve ser observada para a escolha dos dois metais dessa lâmina bimetálica é o coeficiente de",
+    alt:["dureza.", "elasticidade.", "dilatação térmica.", "compressibilidade.", "condutividade elétrica."],
+    correta:2,
+    res:"A lâmina bimetálica curva-se porque os dois metais têm dilatação térmica diferente ao aquecer com a passagem da corrente.",
+    remedy:{ nome:"Simulador de Eletricidade", url:"./eletricidade.html" } },
+  { id:"p130", tema:"Eletromagnetismo", ano:"ENEM 2011",
+    enunciado:"O manual de funcionamento de um captador de guitarra elétrica apresenta o seguinte texto: Esse captador comum consiste de uma bobina, fios condutores enrolados em torno de um ímã permanente. O campo magnético do ímã induz o ordenamento dos polos magnéticos na corda da guitarra, que está próxima a ele. Assim, quando a corda é tocada, as oscilações produzem variações, com o mesmo padrão, no fluxo magnético que atravessa a bobina. Isso induz uma corrente elétrica na bobina, que é transmitida até o amplificador e, daí, para o alto-falante. Um guitarrista trocou as cordas originais de sua guitarra, que eram feitas de aço, por outras feitas de náilon. Com o uso dessas cordas, o amplificador ligado ao instrumento não emitia mais som, porque a corda de náilon",
+    alt:["isola a passagem de corrente elétrica da bobina para o alto-falante.", "varia seu comprimento mais intensamente do que ocorre com o aço.", "apresenta uma magnetização desprezível sob a ação do ímã permanente.", "induz correntes elétricas na bobina mais intensas que a capacidade do captador.", "oscila com uma frequência menor do que a que pode ser percebida pelo captador."],
+    correta:2,
+    res:"O náilon não é magnetizável: não perturba o campo do ímã nem induz corrente na bobina, então o captador deixa de funcionar.",
+    remedy:{ nome:"Conteúdo de Eletromagnetismo", url:"#conteudos" } },
+  { id:"p131", tema:"Eletromagnetismo", ano:"ENEM 2ª aplicação 2010",
+    enunciado:"Há vários tipos de tratamentos de doenças cerebrais que requerem a estimulação de partes do cérebro por correntes elétricas. Os eletrodos são introduzidos no cérebro para gerar pequenas correntes em áreas específicas. Para se eliminar a necessidade de introduzir eletrodos no cérebro, uma alternativa é usar bobinas que, colocadas fora da cabeça, sejam capazes de induzir correntes elétricas no tecido cerebral. Para que o tratamento de patologias cerebrais com bobinas seja realizado satisfatoriamente, é necessário que",
+    alt:["haja um grande número de espiras nas bobinas, o que diminui a voltagem induzida.", "o campo magnético criado pelas bobinas seja constante, de forma a haver indução eletromagnética.", "se observe que a intensidade das correntes induzidas depende da intensidade da corrente nas bobinas.", "a corrente nas bobinas seja contínua, para que o campo magnético possa ser de grande intensidade.", "o campo magnético dirija a corrente elétrica das bobinas para dentro do cérebro do paciente."],
+    correta:2,
+    res:"A intensidade da corrente induzida no tecido depende da intensidade da corrente (variável) que passa nas bobinas.",
+    remedy:{ nome:"Conteúdo de Eletromagnetismo", url:"#conteudos" } },
+  { id:"p132", tema:"Eletromagnetismo", ano:"ENEM 2ª aplicação 2010",
+    enunciado:"Os dínamos são geradores de energia elétrica utilizados em bicicletas para acender uma pequena lâmpada. Para isso, é necessário que a parte móvel esteja em contato com o pneu da bicicleta e, quando ela entra em movimento, é gerada energia elétrica para acender a lâmpada. Dentro desse gerador, encontram-se um imã e uma bobina. O princípio de funcionamento desse equipamento é explicado pelo fato de que a",
+    alt:["corrente elétrica no circuito fechado gera um campo magnético nessa região.", "bobina imersa no campo magnético em circuito fechado gera uma corrente elétrica.", "bobina em atrito com o campo magnético no circuito fechado gera uma corrente elétrica.", "corrente elétrica é gerada em circuito fechado por causa da presença do campo magnético.", "corrente elétrica é gerada em circuito fechado quando há variação do campo magnético."],
+    correta:4,
+    res:"O dínamo gera corrente por indução: a variação do campo magnético no circuito fechado é que produz a corrente elétrica.",
+    remedy:{ nome:"Conteúdo de Eletromagnetismo", url:"#conteudos" } },
+  { id:"p58", tema:"Ondulatória", ano:"ENEM PPL 2013",
+    enunciado:"Um enfeite para berço é constituído de um aro metálico com um ursinho pendurado, que gira com velocidade angular constante. O aro permanece orientado na horizontal, de forma que o movimento do ursinho seja projetado na parede pela sua sombra. Enquanto o ursinho gira, sua sombra descreve um movimento",
+    alt:["circular uniforme.", "retilíneo uniforme.", "retilíneo harmônico simples.", "circular uniformemente variado.", "retilíneo uniformemente variado."],
+    correta:2,
+    res:"A sombra (projeção) de um movimento circular uniforme descreve um movimento harmônico simples.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p59", tema:"Ondulatória", ano:"ENEM 2014",
+    enunciado:"Quando adolescente, as nossas tardes, após as aulas, consistiam em tomar às mãos o violão e o dicionário de acordes de Almir Chediak e desafiar nosso amigo Hamilton a descobrir, apenas ouvindo o acorde, quais notas eram escolhidas. Sempre perdíamos a aposta, ele possui o ouvido absoluto. O ouvido absoluto é uma característica perceptual de poucos indivíduos capazes de identificar notas isoladas sem outras referências, isto é, sem precisar relacioná-las com outras notas de uma melodia. No contexto apresentado, a propriedade física das ondas que permite essa distinção entre as notas é a",
+    alt:["frequência.", "intensidade.", "forma da onda.", "amplitude da onda.", "velocidade de propagação."],
+    correta:0,
+    res:"A nota musical percebida é determinada pela frequência da onda sonora.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p63", tema:"Ondulatória", ano:"ENEM PPL 2013",
+    enunciado:"Visando reduzir a poluição sonora de uma cidade, a Câmara de Vereadores aprovou uma lei que impõe o limite máximo de 40 dB (decibéis) para o nível sonoro permitido após as 22 horas. Ao aprovar a referida lei, os vereadores estão limitando qual característica da onda?",
+    alt:["A altura da onda sonora.", "A amplitude da onda sonora.", "A frequência da onda sonora.", "A velocidade da onda sonora.", "O timbre da onda sonora."],
+    correta:1,
+    res:"O nível sonoro (volume) está associado à amplitude da onda; limitar os decibéis limita a amplitude.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p64", tema:"Ondulatória", ano:"ENEM 2012",
+    enunciado:"Nossa pele possui células que reagem à incidência de luz ultravioleta e produzem uma substância chamada melanina, responsável pela pigmentação da pele. Pensando em se bronzear, uma garota vestiu um biquíni, acendeu a luz de seu quarto e deitou-se exatamente abaixo da lâmpada incandescente. Após várias horas ela percebeu que não conseguiu resultado algum. O bronzeamento não ocorreu porque a luz emitida pela lâmpada incandescente é de",
+    alt:["baixa intensidade.", "baixa frequência.", "um espectro contínuo.", "amplitude inadequada.", "curto comprimento de onda."],
+    correta:1,
+    res:"A luz da lâmpada incandescente é de baixa frequência (pouco ultravioleta), insuficiente para ativar a melanina.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p65", tema:"Ondulatória", ano:"ENEM PPL 2012",
+    enunciado:"Para afinar um violão, um músico necessita de uma nota para referência, por exemplo, a nota Lá em um piano. Dessa forma, ele ajusta as cordas do violão até que ambos os instrumentos toquem a mesma nota. Mesmo ouvindo a mesma nota, é possível diferenciar o som emitido pelo piano e pelo violão. Essa diferenciação é possível, porque",
+    alt:["a ressonância do som emitido pelo piano é maior.", "a potência do som emitido pelo piano é maior.", "a intensidade do som emitido por cada instrumento é diferente.", "o timbre do som produzido por cada instrumento é diferente.", "a amplitude do som emitido por cada instrumento é diferente."],
+    correta:3,
+    res:"A mesma nota em instrumentos diferentes soa distinta por causa do timbre.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p67", tema:"Ondulatória", ano:"ENEM 2012",
+    enunciado:"Em um dia de chuva muito forte, constatou-se uma goteira sobre o centro de uma piscina coberta, formando um padrão de ondas circulares. Nessa situação, observou-se que caíam duas gotas a cada segundo. A distância entre duas cristas consecutivas era de 25 cm e cada uma delas se aproximava da borda da piscina com velocidade de 1,0 m/s. Após algum tempo a chuva diminuiu e a goteira passou a cair uma vez por segundo. Com a diminuição da chuva, a distância entre as cristas e a velocidade de propagação da onda se tornaram, respectivamente,",
+    alt:["maior que 25 cm e maior que 1,0 m/s.", "maior que 25 cm e igual a 1,0 m/s.", "menor que 25 cm e menor que 1,0 m/s.", "menor que 25 cm e igual a 1,0 m/s.", "igual a 25 cm e igual a 1,0 m/s."],
+    correta:1,
+    res:"Reduzindo a frequência das gotas, o comprimento de onda aumenta, mas a velocidade (que depende do meio) permanece igual.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p68", tema:"Ondulatória", ano:"ENEM 2009",
+    enunciado:"A ultrassonografia, também chamada de ecografia, é uma técnica de geração de imagens muito utilizada em medicina. Ela se baseia na reflexão que ocorre quando um pulso de ultrassom, emitido pelo aparelho colocado em contato com a pele, atravessa a superfície que separa um órgão do outro, produzindo ecos que podem ser captados de volta pelo aparelho. Para a observação de detalhes no interior do corpo, os pulsos sonoros emitidos têm frequências altíssimas, de até 30 MHz, ou seja, 30 milhões de oscilações a cada segundo. A determinação de distâncias entre órgãos do corpo humano feita com esse aparelho fundamenta-se em duas variáveis imprescindíveis:",
+    alt:["a intensidade do som produzido pelo aparelho e a frequência desses sons.", "a quantidade de luz usada para gerar as imagens no aparelho e a velocidade do som nos tecidos.", "a quantidade de pulsos emitidos pelo aparelho a cada segundo e a frequência dos sons emitidos pelo aparelho.", "a velocidade do som no interior dos tecidos e o tempo entre os ecos produzidos pelas superfícies dos órgãos.", "o tempo entre os ecos produzidos pelos órgãos e a quantidade de pulsos emitidos a cada segundo pelo aparelho."],
+    correta:3,
+    res:"O ultrassom determina distâncias pela velocidade do som nos tecidos e pelo tempo entre os ecos.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p70", tema:"Ondulatória", ano:"ENEM PPL 2014",
+    enunciado:"Ao assistir a uma apresentação musical, um músico que estava na plateia percebeu que conseguia ouvir quase perfeitamente o som da banda, perdendo um pouco de nitidez nas notas mais agudas. Ele verificou que havia muitas pessoas bem mais altas à sua frente, bloqueando a visão direta do palco e o acesso aos alto-falantes. Sabe-se que a velocidade do som no ar é e que a região de frequências das notas emitidas é de, aproximadamente, a Qual fenômeno ondulatório é o principal responsável para que o músico percebesse essa diferenciação do som?",
+    alt:["Difração.", "Reflexão.", "Refração.", "Atenuação.", "Interferência."],
+    correta:0,
+    res:"O som contorna os obstáculos por difração; as notas agudas (menor comprimento de onda) difratam menos e perdem nitidez.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p71", tema:"Ondulatória", ano:"ENEM 2014",
+    enunciado:"Ao sintonizarmos uma estação de rádio ou um canal de TV em um aparelho, estamos alterando algumas características elétricas de seu circuito receptor. Das inúmeras ondas eletromagnéticas que chegam simultaneamente ao receptor, somente aquelas que oscilam com determinada frequência resultarão em máxima absorção de energia. O fenômeno descrito é a",
+    alt:["difração.", "refração.", "polarização.", "interferência.", "ressonância."],
+    correta:4,
+    res:"Sintonizar é ressonância: o circuito absorve energia máxima na frequência igual à sua frequência natural.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p72", tema:"Ondulatória", ano:"ENEM PPL 2013",
+    enunciado:"Em um violão afinado, quando se toca a corda Lá com seu comprimento efetivo (harmônico fundamental), o som produzido tem frequência de 440 Hz. Se a mesma corda do violão é comprimida na metade do seu comprimento, a frequência do novo harmônico",
+    alt:["se reduz à metade, porque o comprimento de onda dobrou.", "dobra, porque o comprimento de onda foi reduzido à metade.", "quadruplica, porque o comprimento de onda foi reduzido à metade.", "quadruplica, porque o comprimento de onda foi reduzido à quarta parte.", "não se modifica, porque é uma característica independente do comprimento da corda que vibra."],
+    correta:1,
+    res:"Comprimindo a corda à metade, o comprimento de onda cai pela metade e a frequência dobra.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p73", tema:"Ondulatória", ano:"ENEM PPL 2013",
+    enunciado:"As moléculas de água são dipolos elétricos que podem se alinhar com o campo elétrico, da mesma forma que uma bússola se alinha com um campo magnético. Quando o campo elétrico oscila, as moléculas de água fazem o mesmo. No forno de micro-ondas, a frequência de oscilação do campo elétrico é igual à frequência natural de rotação das moléculas de água. Assim, a comida é cozida quando o movimento giratório das moléculas de água transfere a energia térmica às moléculas circundantes. HEWITT, P. Física conceitual. Porto Alegre: Bookman, 2002 . A propriedade das ondas que permite, nesse caso, um aumento da energia de rotação das moléculas de água é a",
+    alt:["reflexão.", "refração.", "ressonância.", "superposição.", "difração."],
+    correta:2,
+    res:"A frequência do campo igual à frequência natural de rotação das moléculas de água caracteriza ressonância.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p74", tema:"Ondulatória", ano:"ENEM 2013",
+    enunciado:"Em viagens de avião, é solicitado aos passageiros o desligamento de todos os aparelhos cujo funcionamento envolva a emissão ou a recepção de ondas eletromagnéticas. O procedimento é utilizado para eliminar fontes de radiação que possam interferir nas comunicações via rádio dos pilotos com a torre de controle. A propriedade das ondas emitidas que justifica o procedimento adotado é o fato de",
+    alt:["terem fases opostas.", "serem ambas audíveis.", "terem intensidades inversas.", "serem de mesma amplitude.", "terem frequências próximas."],
+    correta:4,
+    res:"Aparelhos que emitem em frequências próximas às do rádio dos pilotos podem interferir na comunicação.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p76", tema:"Ondulatória", ano:"ENEM 2ª aplicação 2010",
+    enunciado:"Ao contrário dos rádios comuns (AM ou FM), em que uma única antena transmissora é capaz de alcançar toda a cidade, os celulares necessitam de várias antenas para cobrir um vasto território. No caso dos rádios FM, a frequência de transmissão está na faixa dos MHz (ondas de rádio), enquanto, para os celulares, a frequência está na casa dos GHz (micro-ondas). Quando comparado aos rádios comuns, o alcance de um celular é muito menor. Considerando-se as informações do texto, o fator que possibilita essa diferença entre propagação das ondas de rádio e as de micro-ondas é que as ondas de rádio são",
+    alt:["facilmente absorvidas na camada da atmosfera superior conhecida como ionosfera.", "capazes de contornar uma diversidade de obstáculos como árvores, edifícios e pequenas elevações.", "mais refratadas pela atmosfera terrestre, que apresenta maior índice de refração para as ondas de rádio.", "menos atenuadas por interferência, pois o número de aparelhos que utilizam ondas de rádio é menor.", "constituídas por pequenos comprimentos de onda que lhes conferem um alto poder de penetração em materiais de baixa densidade."],
+    correta:1,
+    res:"Ondas de rádio têm maior comprimento de onda e contornam obstáculos (difração), por isso alcançam distâncias maiores.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p77", tema:"Ondulatória", ano:"ENEM 2010",
+    enunciado:"As ondas eletromagnéticas, como a luz visível e as ondas de rádio, viajam em linha reta em um meio homogêneo. Então, as ondas de rádio emitidas na região litorânea do Brasil não alcançariam a região amazônica do Brasil por causa da curvatura da Terra. Entretanto sabemos que é possível transmitir ondas de rádio entre essas localidades devido à ionosfera. Com ajuda da ionosfera, a transmissão de ondas planas entre o litoral do Brasil e a região amazônica é possível por meio da",
+    alt:["reflexão.", "refração.", "difração.", "polarização.", "interferência."],
+    correta:0,
+    res:"A ionosfera reflete as ondas de rádio, permitindo a transmissão além da curvatura da Terra.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p82", tema:"Óptica", ano:"ENEM 2014",
+    enunciado:"É comum aos fotógrafos tirar fotos coloridas em ambientes iluminados por lâmpadas fluorescentes, que contêm uma forte composição de luz verde. A consequência desse fato na fotografia é que todos os objetos claros, principalmente os brancos, aparecerão esverdeados. Para equilibrar as cores, deve-se usar um filtro adequado para diminuir a intensidade da luz verde que chega aos sensores da câmera fotográfica. Na escolha desse filtro, utiliza-se o conhecimento da composição das cores-luz primárias: vermelho, verde e azul; e das cores-luz secundárias: amarelo = vermelho + verde, ciano = verde + azul e magenta = vermelho + azul. Na situação descrita, qual deve ser o filtro utilizado para que a fotografia apresente as cores naturais dos objetos?",
+    alt:["Ciano.", "Verde.", "Amarelo.", "Magenta.", "Vermelho."],
+    correta:3,
+    res:"Para reduzir o verde, usa-se o filtro magenta (vermelho + azul), cor complementar do verde.",
+    remedy:{ nome:"Experimento Câmara Escura", url:"./camara-escura.html" } },
+  { id:"p85", tema:"Óptica", ano:"ENEM 2014",
+    enunciado:"Uma proposta de dispositivo capaz de indicar a qualidade da gasolina vendida em postos e, consequentemente, evitar fraudes, poderia utilizar o conceito de refração luminosa. Nesse sentido, a gasolina não adulterada, na temperatura ambiente, apresenta razão entre os senos dos raios incidente e refratado igual a 1,4. Desse modo, fazendo incidir o feixe de luz proveniente do ar com um ângulo fixo e maior que zero, qualquer modificação no ângulo do feixe refratado indicará adulteração no combustível. Em uma fiscalização rotineira, o teste apresentou o valor de 1,9. Qual foi o comportamento do raio refratado?",
+    alt:["Mudou de sentido.", "Sofreu reflexão total.", "Atingiu o valor do ângulo limite.", "Direcionou-se para a superfície de separação.", "Aproximou-se da normal à superfície de separação."],
+    correta:4,
+    res:"Índice maior (1,9 contra 1,4) indica meio mais refringente: o raio refratado aproxima-se da normal.",
+    remedy:{ nome:"Experimento Câmara Escura", url:"./camara-escura.html" } },
+  { id:"p90", tema:"Óptica", ano:"ENEM 2012",
+    enunciado:"Alguns povos indígenas ainda preservam suas tradições realizando a pesca com lanças, demonstrando uma notável habilidade. Para fisgar um peixe em um lago com águas tranquilas o índio deve mirar abaixo da posição em que enxerga o peixe. Ele deve proceder dessa forma porque os raios de luz",
+    alt:["refletidos pelo peixe não descrevem uma trajetória retilínea no interior da água.", "emitidos pelos olhos do índio desviam sua trajetória quando passam do ar para a água.", "espalhados pelo peixe são refletidos pela superfície da água.", "emitidos pelos olhos do índio são espalhados pela superfície da água.", "refletidos pelo peixe desviam sua trajetória quando passam da água para o ar."],
+    correta:4,
+    res:"A luz refletida pelo peixe se desvia ao passar da água para o ar, fazendo o peixe parecer acima de onde realmente está.",
+    remedy:{ nome:"Experimento Câmara Escura", url:"./camara-escura.html" } },
+  { id:"p89", tema:"Óptica", ano:"ENEM PPL 2012",
+    enunciado:"Em um experimento, coloca-se glicerina dentro de um tubo de vidro liso. Em seguida, parte do tubo é colocada em um copo de vidro que contém glicerina e a parte do tubo imersa fica invisível. Esse fenômeno ocorre porque a",
+    alt:["intensidade da luz é praticamente constante no vidro.", "parcela de luz refletida pelo vidro é praticamente nula.", "luz que incide no copo não é transmitida para o tubo de vidro.", "velocidade da luz é a mesma no vidro e na glicerina.", "trajetória da luz é alterada quando ela passa da glicerina para o vidro."],
+    correta:3,
+    res:"A parte imersa some porque vidro e glicerina têm o mesmo índice de refração (mesma velocidade da luz), sem desvio nem reflexão.",
+    remedy:{ nome:"Experimento Câmara Escura", url:"./camara-escura.html" } },
+  { id:"p1", tema:"Dinâmica", ano:"ENEM PPL 2014",
+    enunciado:"Na Antiguidade, algumas pessoas acreditavam que, no lançamento obliquo de um objeto, a resultante das forças que atuavam sobre ele tinha o mesmo sentido da velocidade em todos os instantes do movimento. Isso não está de acordo com as interpretações científicas atualmente utilizadas para explicar esse fenômeno. Desprezando a resistência do ar, qual é a direção e o sentido do vetor força resultante que atua sobre o objeto no ponto mais alto da trajetória?",
+    alt:["Indefinido, pois ele é nulo, assim como a velocidade vertical nesse ponto.", "Vertical para baixo, pois somente o peso está presente durante o movimento.", "Horizontal no sentido do movimento, pois devido à inércia o objeto mantém seu movimento.", "Inclinado na direção do lançamento, pois a força inicial que atua sobre o objeto é constante.", "Inclinado para baixo e no sentido do movimento, pois aponta para o ponto onde o objeto cairá."],
+    correta:1,
+    res:"No ponto mais alto da trajetória, a única força que age é o peso: vertical e para baixo.",
+    remedy:{ nome:"Simulador de Leis de Newton", url:"./leis-newton.html" } },
+  { id:"p17", tema:"Dinâmica", ano:"ENEM 2013",
+    enunciado:"Uma pessoa necessita da força de atrito em seus pés para se deslocar sobre uma superfície. Logo, uma pessoa que sobe uma rampa em linha reta será auxiliada pela força de atrito exercida pelo chão em seus pés. Em relação ao movimento dessa pessoa, quais são a direção e o sentido da força de atrito mencionada no texto?",
+    alt:["Perpendicular ao plano e no mesmo sentido do movimento.", "Paralelo ao plano e no sentido contrário ao movimento.", "Paralelo ao plano e no mesmo sentido do movimento.", "Horizontal e no mesmo sentido do movimento.", "Vertical e sentido para cima."],
+    correta:2,
+    res:"Ao subir a rampa, o atrito empurra os pés no sentido do movimento, paralelo ao plano.",
+    remedy:{ nome:"Simulador de Leis de Newton", url:"./leis-newton.html" } },
+  { id:"p20", tema:"Dinâmica", ano:"ENEM 2009",
+    enunciado:"O ônibus espacial Atlantis foi lançado ao espaço com cinco astronautas a bordo e uma câmera nova, que iria substituir uma outra danificada por um curto-circuito no telescópio Hubble. Depois de entrarem em órbita a 560 km de altura, os astronautas se aproximaram do Hubble. Dois astronautas saíram da Atlantis e se dirigiram ao telescópio. Ao abrir a porta de acesso, um deles exclamou: “Esse telescópio tem a massa grande, mas o peso é pequeno.” Considerando o texto e as leis de Kepler, pode-se afirmar que a frase dita pelo astronauta",
+    alt:["se justifica porque o tamanho do telescópio determina a sua massa, enquanto seu pequeno peso decorre da falta de ação da aceleração da gravidade.", "se justifica ao verificar que a inércia do telescópio é grande comparada à dele próprio, e que o peso do telescópio é pequeno porque a atração gravitacional criada por sua massa era pequena.", "não se justifica, porque a avaliação da massa e do peso de objetos em órbita tem por base as leis de Kepler, que não se aplicam a satélites artificiais.", "não se justifica, porque a força-peso é a força exercida pela gravidade terrestre, neste caso, sobre o telescópio e é a responsável por manter o próprio telescópio em órbita.", "não se justifica, pois a ação da força-peso implica a ação de uma força de reação contrária, que não existe naquele ambiente. A massa do telescópio poderia ser avaliada simplesmente pelo seu volume."],
+    correta:3,
+    res:"O peso é a força gravitacional da Terra sobre o telescópio; ela não desaparece em órbita (a massa é grande, mas o peso ali é menor).",
+    remedy:{ nome:"Simulador de Leis de Newton", url:"./leis-newton.html" } },
+  { id:"p22", tema:"Dinâmica", ano:"ENEM PPL 2012",
+    enunciado:"Em 1543, Nicolau Copérnico publicou um livro revolucionário em que propunha a Terra girando em torno do seu próprio eixo e rodando em torno do Sol. Isso contraria a concepção aristotélica, que acredita que a Terra é o centro do universo. Para os aristotélicos, se a Terra gira do oeste para o leste, coisas como nuvens e pássaros, que não estão presas à Terra, pareceriam estar sempre se movendo do leste para o oeste, justamente como o Sol. Mas foi Galileu Galilei que, em 1632, baseando-se em experiências, rebateu a crítica aristotélica, confirmando assim o sistema de Copérnico. Seu argumento, adaptado para a nossa época, é se uma pessoa, dentro de um vagão de trem em repouso, solta uma bola, ela cai junto a seus pés. Mas se o vagão estiver se movendo com velocidade constante, a bola também cai junto a seus pés. Isto porque a bola, enquanto cai, continua a compartilhar do movimento do vagão. O princípio físico usado por Galileu para rebater o argumento aristotélico foi",
+    alt:["a lei da inércia.", "ação e reação.", "a segunda lei de Newton.", "a conservação da energia.", "o princípio da equivalência."],
+    correta:0,
+    res:"A lei da inércia explica por que objetos não presos acompanham o movimento da Terra em vez de \"ficar para trás\".",
+    remedy:{ nome:"Simulador de Leis de Newton", url:"./leis-newton.html" } },
+  { id:"p23", tema:"Dinâmica", ano:"ENEM PPL 2012",
+    enunciado:"Durante uma faxina, a mãe pediu que o filho a ajudasse, deslocando um móvel para mudá-lo de lugar. Para escapar da tarefa, o filho disse ter aprendido na escola que não poderia puxar o móvel, pois a Terceira Lei de Newton define que se puxar o móvel, o móvel o puxará igualmente de volta, e assim não conseguirá exercer uma força que possa colocá-lo em movimento. Qual argumento a mãe utilizará para apontar o erro de interpretação do garoto?",
+    alt:["A força de ação é aquela exercida pelo garoto.", "A força resultante sobre o móvel é sempre nula.", "As forças que o chão exerce sobre o garoto se anulam.", "A força de ação é um pouco maior que a força de reação.", "O par de forças de ação e reação não atua em um mesmo corpo."],
+    correta:4,
+    res:"O par ação e reação atua em corpos diferentes, então não se anula: o garoto consegue mover o móvel.",
+    remedy:{ nome:"Simulador de Leis de Newton", url:"./leis-newton.html" } },
+  { id:"p24", tema:"Dinâmica", ano:"ENEM PPL 2012",
+    enunciado:"O freio ABS é um sistema que evita que as rodas de um automóvel sejam bloqueadas durante uma frenagem forte e entrem em derrapagem. Testes demonstram que, a partir de uma dada velocidade, a distância de frenagem será menor se for evitado o bloqueio das rodas. O ganho na eficiência da frenagem na ausência de bloqueio das rodas resulta do fato de",
+    alt:["o coeficiente de atrito estático tornar-se igual ao dinâmico momentos antes da derrapagem.", "o coeficiente de atrito estático ser maior que o dinâmico, independentemente da superfície de contato entre os pneus e o pavimento.", "o coeficiente de atrito estático ser menor que o dinâmico, independentemente da superfície de contato entre os pneus e o pavimento.", "a superfície de contato entre os pneus e o pavimento ser maior com as rodas desbloqueadas, independentemente do coeficiente de atrito.", "a superfície de contato entre os pneus e o pavimento ser maior com as rodas desbloqueadas e o coeficiente de atrito estático ser maior que o dinâmico."],
+    correta:1,
+    res:"Sem travar as rodas atua o atrito estático, maior que o dinâmico, o que reduz a distância de frenagem.",
+    remedy:{ nome:"Simulador de Leis de Newton", url:"./leis-newton.html" } },
+  { id:"p31", tema:"Termologia", ano:"ENEM 2010",
+    enunciado:"Com o objetivo de se testar a eficiência de fornos de micro-ondas, planejou-se o aquecimento em 10°C de amostras de diferentes substâncias, cada uma com determinada massa, em cinco fornos de marcas distintas. Nesse teste, cada forno operou à potência máxima. O forno mais eficiente foi aquele que",
+    alt:["forneceu a maior quantidade de energia às amostras.", "cedeu energia à amostra de maior massa em mais tempo.", "forneceu a maior quantidade de energia em menos tempo.", "cedeu energia à amostra de menor calor específico mais lentamente.", "forneceu a menor quantidade de energia às amostras em menos tempo."],
+    correta:2,
+    res:"O forno mais eficiente entrega a mesma energia (mesmo aquecimento) em menos tempo.",
+    remedy:{ nome:"Conteúdo de Termodinâmica", url:"#conteudos" } },
+  { id:"p134", tema:"Termologia", ano:"ENEM 2014",
+    enunciado:"A elevação da temperatura das águas de rios, lagos e mares diminui a solubilidade do oxigênio, pondo em risco as diversas formas de vida aquática que dependem desse gás. Se essa elevação de temperatura acontece por meios artificiais, dizemos que existe poluição térmica. As usinas nucleares, pela própria natureza do processo de geração de energia, podem causar esse tipo de poluição. Que parte do ciclo de geração de energia das usinas nucleares está associada a esse tipo de poluição?",
+    alt:["Fissão do material radioativo.", "Condensação do vapor-d‘água no final do processo.", "Conversão de energia das turbinas pelos geradores.", "Aquecimento da água líquida para gerar vapor d‘água.", "Lançamento do vapor-d‘água sobre as pás das turbinas."],
+    correta:1,
+    res:"A poluição térmica vem da condensação do vapor, etapa em que calor é devolvido à água do ambiente.",
+    remedy:{ nome:"Conteúdo de Termodinâmica", url:"#conteudos" } },
+  { id:"p136", tema:"Termologia", ano:"ENEM 2013",
+    enunciado:"Aquecedores solares usados em residências têm o objetivo de elevar a temperatura da água até 70°C. No entanto, a temperatura ideal da água para um banho é de 30°C. Por isso, deve-se misturar a água aquecida com a água à temperatura ambiente de um outro reservatório, que se encontra a 25°C. Qual a razão entre a massa de água quente e a massa de água fria na mistura para um banho à temperatura ideal?",
+    alt:["0,111.", "0,125.", "0,357.", "0,428.", "0,833."],
+    correta:1,
+    res:"Igualando o calor cedido e o recebido: m_quente x (70-30) = m_fria x (30-25), logo a razão é 5/40 = 0,125.",
+    remedy:{ nome:"Conteúdo de Termodinâmica", url:"#conteudos" } },
+  { id:"p137", tema:"Termologia", ano:"ENEM PPL 2013",
+    enunciado:"É comum nos referirmos a dias quentes como dias “de calor”. Muitas vezes ouvimos expressões como “hoje está calor” ou “hoje o calor está muito forte” quando a temperatura ambiente está alta. No contexto científico, é correto o significado de “calor” usado nessas expressões?",
+    alt:["Sim, pois o calor de um corpo depende de sua temperatura.", "Sim, pois calor é sinônimo de alta temperatura.", "Não, pois calor é energia térmica em trânsito.", "Não, pois calor é a quantidade de energia térmica contida em um corpo.", "Não, pois o calor é diretamente proporcional à temperatura, mas são conceitos diferentes."],
+    correta:2,
+    res:"Cientificamente, calor é energia térmica em trânsito; não é algo \"contido\" no corpo, então a expressão é incorreta.",
+    remedy:{ nome:"Conteúdo de Termodinâmica", url:"#conteudos" } },
+  { id:"p142", tema:"Termologia", ano:"ENEM PPL 2012",
+    enunciado:"Em dias com baixas temperaturas, as pessoas utilizam casacos ou blusas de lã com o intuito de minimizar a sensação de frio. Fisicamente, esta sensação ocorre pelo fato de o corpo humano liberar calor, que é a energia transferida de um corpo para outro em virtude da diferença de temperatura entre eles. A utilização de vestimenta de lã diminui a sensação de frio, porque",
+    alt:["possui a propriedade de gerar calor.", "é constituída de material denso, o que não permite a entrada do ar frio.", "diminui a taxa de transferência de calor do corpo humano para o meio externo.", "tem como principal característica a absorção de calor, facilitando o equilíbrio térmico.", "está em contato direto com o corpo humano, facilitando a transferência de calor por condução."],
+    correta:2,
+    res:"A lã reduz a taxa de transferência de calor do corpo para o ambiente por ser um bom isolante térmico.",
+    remedy:{ nome:"Conteúdo de Termodinâmica", url:"#conteudos" } },
+  { id:"p145", tema:"Termologia", ano:"ENEM 2009",
+    enunciado:"A água apresenta propriedades físico-químicas que a coloca em posição de destaque como substância essencial à vida. Dentre essas, destacam-se as propriedades térmicas biologicamente muito importantes, por exemplo, o elevado valor de calor latente de vaporização. Esse calor latente refere-se à quantidade de calor que deve ser adicionada a um líquido em seu ponto de ebulição, por unidade de massa, para convertê-lo em vapor na mesma temperatura, que no caso da água é igual a 540 calorias por grama. A propriedade físico-química mencionada no texto confere à água a capacidade de",
+    alt:["servir como doador de elétrons no processo de fotossíntese.", "funcionar como regulador térmico para os organismos vivos.", "agir como solvente universal nos tecidos animais e vegetais.", "transportar os íons de ferro e magnésio nos tecidos vegetais.", "funcionar como mantenedora do metabolismo nos organismos vivos."],
+    correta:1,
+    res:"O elevado calor latente de vaporização da água faz dela um eficiente regulador térmico para os seres vivos.",
+    remedy:{ nome:"Conteúdo de Termodinâmica", url:"#conteudos" } },
+  { id:"p27", tema:"Energia", ano:"ENEM 2012",
+    enunciado:"Os carrinhos de brinquedo podem ser de vários tipos. Dentre eles, há os movidos a corda, em que uma mola em seu interior é comprimida quando a criança puxa o carrinho para trás. Ao ser solto, o carrinho entra em movimento enquanto a mola volta à sua forma inicial. O processo de conversão de energia que ocorre no carrinho descrito também é verificado em",
+    alt:["um dínamo.", "um freio de automóvel.", "um motor a combustão.", "uma usina hidroelétrica.", "uma atiradeira (estilingue)."],
+    correta:4,
+    res:"A mola que volta à forma e impulsiona o carrinho é o mesmo princípio do estilingue: energia elástica convertida em cinética.",
+    remedy:{ nome:"Simulador de Trabalho e Energia", url:"./trabalho-energia.html" } },
+  { id:"p28", tema:"Energia", ano:"ENEM PPL 2012",
+    enunciado:"A usina termelétrica a carvão é um dos tipos de unidades geradoras de energia elétrica no Brasil, Essas usinas transformam a energia contida no combustível (carvão mineral) em energia elétrica. Em que sequência ocorrem os processos para realizar essa transformação?",
+    alt:["A usina transforma diretamente toda a energia química contida no carvão em energia elétrica, usando reações de fissão em uma célula combustível.", "A usina queima o carvão, produzindo energia térmica, que é transformada em energia elétrica por dispositivos denominados transformadores.", "A queima do carvão produz energia térmica, que é usada para transformar água em vapor. A energia contida no vapor é transformada em energia mecânica na turbina e, então, transformada em energia elétrica no gerador.", "A queima do carvão produz energia térmica, que é transformada em energia potencial na torre da usina, Essa energia é então transformada em energia elétrica nas células eletrolíticas.", "A queima do carvão produz energia térmica, que é usada para aquecer água, transformando-se novamente em energia química, quando a água é decomposta em hidrogênio e oxigênio, gerando energia elétrica."],
+    correta:2,
+    res:"A sequência é: queima gera calor, que vira vapor, que move a turbina (energia mecânica), que aciona o gerador (energia elétrica).",
+    remedy:{ nome:"Simulador de Trabalho e Energia", url:"./trabalho-energia.html" } },
+  { id:"p29", tema:"Energia", ano:"ENEM PPL 2012",
+    enunciado:"Um automóvel, em movimento uniforme, anda por uma estrada plana, quando começa a descer uma ladeira, na qual o motorista faz com que o carro se mantenha sempre com velocidade escalar constante. Durante a descida, o que ocorre com as energias potencial, cinética e mecânica do carro?",
+    alt:["A energia mecânica mantém-se constante, já que a velocidade escalar não varia e, portanto, a energia cinética é constante.", "A energia cinética aumenta, pois a energia potencial gravitacional diminui e quando uma se reduz, a outra cresce.", "A energia potencial gravitacional mantém-se constante, já que há apenas forças conservativas agindo sobre o carro.", "A energia mecânica diminui, pois a energia cinética se mantém constante, mas a energia potencial gravitacional diminui.", "A energia cinética mantém-se constante, já que não há trabalho realizado sobre o carro."],
+    correta:3,
+    res:"Com a energia cinética constante e a potencial diminuindo na descida, a energia mecânica diminui: há dissipação pelo freio.",
+    remedy:{ nome:"Simulador de Trabalho e Energia", url:"./trabalho-energia.html" } },
+  { id:"p155", tema:"Energia", ano:"ENEM 2011",
+    enunciado:"Um motor só poderá realizar trabalho se receber uma quantidade de energia de outro sistema. No caso, a energia armazenada no combustível é, em parte, liberada durante a combustão para que o aparelho possa funcionar. Quando o motor funciona, parte da energia convertida ou transformada na combustão não pode ser utilizada para a realização de trabalho. Isso significa dizer que há vazamento da energia em outra forma. CARVALHO, A. X. Z. Física Térmica. Belo Horizonte: Pax, 2009 . De acordo com o texto, as transformações de energia que ocorrem durante o funcionamento do motor são decorrentes de a",
+    alt:["liberação de calor dentro do motor ser impossível.", "realização de trabalho pelo motor ser incontrolável.", "conversão integral de calor em trabalho ser impossível.", "transformação de energia térmica em cinética ser impossível.", "utilização de energia potencial do combustível ser incontrolável."],
+    correta:2,
+    res:"Pela 2a lei da termodinâmica, é impossível converter todo o calor em trabalho; parte sempre se perde como calor.",
+    remedy:{ nome:"Simulador de Trabalho e Energia", url:"./trabalho-energia.html" } },
+  { id:"p5", tema:"Cinemática", ano:"ENEM PPL 2013",
+    enunciado:"O trem de passageiros da Estrada de Ferro Vitória-Minas (EFVM), que circula diariamente entre a cidade de Cariacica, na Grande Vitória, e a capital mineira Belo Horizonte, está utilizando uma nova tecnologia de frenagem eletrônica. Com a tecnologia anterior, era preciso iniciar a frenagem cerca de 400 metros antes da estação. Atualmente, essa distância caiu para 250 metros, o que proporciona redução no tempo de viagem. Considerando uma velocidade de 72 km/h, qual o módulo da diferença entre as acelerações de frenagem depois e antes da adoção dessa tecnologia?",
+    alt:["0,08 m/s2", "0,30 m/s2", "1,10 m/s2", "1,60 m/s2", "3,90 m/s2"],
+    correta:1,
+    res:"v = 20 m/s. Como a = v²/(2d): antes 400/800 = 0,5 e depois 400/500 = 0,8; a diferença é 0,30 m/s².",
+    remedy:{ nome:"Aula de Cinemática", url:"./lancamento-obliquo.html" } },
+  { id:"p21", tema:"Cinemática", ano:"ENEM 2009",
+    enunciado:"O Brasil pode se transformar no primeiro país das Américas a entrar no seleto grupo das nações que dispõem de trens-bala. O Ministério dos Transportes prevê o lançamento do edital de licitação internacional para a construção da ferrovia de alta velocidade Rio-São Paulo. A viagem ligará os 403 quilómetros entre a Central do Brasil, no Rio, e a Estação da Luz, no centro da capital paulista, em uma hora e 25 minutos. Devido а alta velocidade, um dos problemas a ser enfrentado na escolha do trajeto que será percorrido pelo trem é o dimensionamento das curvas. Considerando-se que uma aceleração lateral confortável para os passageiros e segura para o trem seja de 0,1 g, em que g é a aceleração da gravidade (considerada igual a 10 m/s2), e que a velocidade do trem se mantenha constante em todo o percurso, seria correto prever que as curvas existentes no trajeto deveriam ter raio de curvatura mínimo de, aproximadamente,",
+    alt:["80 m.", "430 m.", "800 m.", "1.600 m.", "6.400 m."],
+    correta:4,
+    res:"v ≈ 79 m/s (403 km em 1h25). O raio é r = v²/a = 79²/(0,1 x 10) ≈ 6400 m.",
+    remedy:{ nome:"Aula de Cinemática", url:"./lancamento-obliquo.html" } },
+  { id:"p48", tema:"Hidrostática", ano:"ENEM 2013",
+    enunciado:"Para oferecer acessibilidade aos portadores de dificuldade de locomoção, é utilizado, em ônibus e automóveis, o elevador hidráulico. Nesse dispositivo é usada uma bomba elétrica, para forçar um fluido a passar de uma tubulação estreita para outra mais larga, e dessa forma acionar um pistão que movimenta a plataforma. Considere um elevador hidráulico cuja área da cabeça do pistão seja cinco vezes maior do que a área da tubulação que sai da bomba. Desprezando o atrito e considerando uma aceleração gravitacional de 10m/s2, deseja-se elevar uma pessoa de 65kg em uma cadeira de rodas de 15kg sobre a plataforma de 20kg. Qual deve ser a força exercida pelo motor da bomba sobre o fluido, para que o cadeirante seja elevado com velocidade constante?",
+    alt:["20N", "100N", "200N", "1000N", "5000N"],
+    correta:2,
+    res:"Pelo princípio de Pascal, F = peso x (área menor / área maior) = 1000 x (1/5) = 200 N.",
+    remedy:{ nome:"Simulador de Hidrostática", url:"./hidrostatica.html" } },
+  { id:"p54", tema:"Hidrostática", ano:"ENEM 2010",
+    enunciado:"Durante uma obra em um clube, um grupo de trabalhadores teve de remover uma escultura de ferro maciço colocada no fundo de uma piscina vazia. Cinco trabalhadores amarraram cordas à escultura e tentaram puxá-la para cima, sem sucesso. Se a piscina for preenchida com água, ficará mais fácil para os trabalhadores removerem a escultura, pois a",
+    alt:["escultura flutuará. Dessa forma, os homens não precisarão fazer força para remover a escultura do fundo.", "escultura ficará com peso menor, Dessa forma, a intensidade da força necessária para elevar a escultura será menor.", "água exercerá uma força na escultura proporcional a sua massa, e para cima. Esta força se somará á força que os trabalhadores fazem para anular a ação da força peso da escultura.", "água exercerá uma força na escultura para baixo, e esta passará a receber uma força ascendente do piso da piscina. Esta força ajudará a anular a ação da força peso na escultura.", "água exercerá uma força na escultura proporcional ao seu volume, e para cima. Esta força se somará à força que os trabalhadores fazem, podendo resultar em uma força ascendente maior que o peso da escultura."],
+    correta:4,
+    res:"O empuxo (para cima, proporcional ao volume submerso) soma-se à força dos trabalhadores, facilitando a remoção.",
+    remedy:{ nome:"Simulador de Hidrostática", url:"./hidrostatica.html" } },
+  { id:"p99", tema:"Eletrodinâmica", ano:"ENEM 2010",
+    enunciado:"Duas irmãs que dividem o mesmo quarto de estudos combinaram de comprar duas caixas com tampas para guardarem seus pertences dentro de suas caixas, evitando, assim, a bagunça sobre a mesa de estudos. Uma delas comprou uma metálica, e a outra, uma caixa de madeira de área e espessura lateral diferentes, para facilitar a identificação. Um dia as meninas foram estudar para a prova de Física e, ao se acomodarem na mesa de estudos, guardaram seus celulares ligados dentro de suas caixas. Ao longo desse dia, uma delas recebeu ligações telefônicas, enquanto os amigos da outra tentavam ligar e recebiam a mensagem de que o celular estava fora da área de cobertura ou desligado. Para explicar essa situação, um físico deveria afirmar que o material da caixa, cujo telefone celular não recebeu as ligações é de",
+    alt:["madeira e o telefone não funcionava porque a madeira não é um bom condutor de eletricidade.", "metal e o telefone não funcionava devido à blindagem eletrostática que o metal proporcionava.", "metal e o telefone não funcionava porque o metal refletia todo tipo de radiação que nele incidia.", "metal e o telefone não funcionava porque a área lateral da caixa de metal era maior.", "madeira e o telefone não funcionava porque a espessura desta caixa era maior que a espessura da caixa de metal."],
+    correta:1,
+    res:"A caixa de metal funciona como gaiola de Faraday: a blindagem eletrostática barra o sinal do celular.",
+    remedy:{ nome:"Simulador de Eletricidade", url:"./eletricidade.html" } },
+  { id:"p111", tema:"Eletrodinâmica", ano:"ENEM PPL 2012",
+    enunciado:"No manual de uma máquina de lavar, o usuário vê o símbolo: Este símbolo orienta o consumidor sobre a necessidade de a máquina ser ligada a",
+    alt:["um fio terra para evitar sobrecarga elétrica.", "um fio neutro para evitar sobrecarga elétrica.", "um fio terra para aproveitar as cargas elétricas do solo.", "uma rede de coleta de água da chuva.", "uma rede de coleta de esgoto doméstico."],
+    correta:0,
+    res:"O símbolo indica aterramento; o fio terra escoa fugas de corrente e evita choques e sobrecarga.",
+    remedy:{ nome:"Simulador de Eletricidade", url:"./eletricidade.html" } },
+  { id:"p98", tema:"Eletrodinâmica", ano:"ENEM PPL 2014",
+    enunciado:"Em museus de ciências, é comum encontrarem-se máquinas que eletrizam materiais e geram intensas descargas elétricas. O gerador de Van de Graaff (Figura 1) é um exemplo, como atestam as faíscas (Figura 2) que ele produz. O experimento fica mais interessante quando se aproxima do gerador em funcionamento, com a mão, uma lâmpada fluorescente (Figura 3). Quando a descarga atinge a lâmpada, mesmo desconectada da rede elétrica, ela brilha por breves instantes. Muitas pessoas pensam que é o fato de a descarga atingir a lâmpada que a faz brilhar. Contudo, se a lâmpada for aproximada dos corpos da situação (Figura 2), no momento em que a descarga ocorrer entre eles, a lâmpada também brilhará, apesar de não receber nenhuma descarga elétrica. A grandeza física associada ao brilho instantâneo da lâmpada fluorescente, por estar próxima a uma descarga elétrica, é o(a)",
+    alt:["carga elétrica.", "campo elétrico.", "corrente elétrica.", "capacitância elétrica.", "condutividade elétrica."],
+    correta:1,
+    res:"A lâmpada acende ao ser atingida pelo campo elétrico intenso da descarga, mesmo sem estar ligada à rede.",
+    remedy:{ nome:"Simulador de Eletricidade", url:"./eletricidade.html" } },
+  { id:"p116", tema:"Eletrodinâmica", ano:"ENEM 2ª aplicação 2010",
+    enunciado:"A resistência elétrica de um fio é determinada pela suas dimensões e pelas propriedades estruturais do material. A condutividade caracteriza a estrutura do material, de tal forma que a resistência de um fio pode ser determinada conhecendo-se L, o comprimento do fio e A, a área de seção reta. A tabela relaciona o material à sua respectiva resistividade em temperatura ambiente. Tabela de condutividade Material Condutividade (S·m/mm2) Alumínio 34,2 Cobre 61,7 Ferro 10,2 Prata 62,5 Tungstênio 18,8 Mantendo-se as mesmas dimensões geométricas, o fio que apresenta menor resistência elétrica é aquele feito de",
+    alt:["tungstênio.", "alumínio.", "ferro.", "cobre.", "prata."],
+    correta:4,
+    res:"A prata tem a maior condutividade da tabela, logo o fio de prata é o de menor resistência elétrica.",
+    remedy:{ nome:"Simulador de Eletricidade", url:"./eletricidade.html" } },
+  { id:"p79", tema:"Ondulatória", ano:"ENEM 2ª aplicação 2010",
+    enunciado:"Um garoto que passeia de carro com seu pai pela cidade, ao ouvir o rádio, percebe que a sua estação de rádio preferida, a 94,9 FM, que opera na banda de frequência de megahertz, tem seu sinal de transmissão superposto pela transmissão de uma rádio pirata de mesma frequência que interfere no sinal da emissora do centro em algumas regiões da cidade. Considerando a situação apresentada, a rádio pirata interfere no sinal da rádio do centro devido à",
+    alt:["atenuação promovida pelo ar nas radiações emitidas.", "maior amplitude da radiação emitida pela estação do centro.", "diferença de intensidade entre as fontes emissoras de ondas.", "menor potência de transmissão das ondas da emissora pirata.", "semelhança dos comprimentos de onda das radiações emitidas."],
+    correta:4,
+    res:"A interferência ocorre porque as duas emissoras têm comprimentos de onda (frequências) praticamente iguais.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p81", tema:"Ondulatória", ano:"ENEM 2009",
+    enunciado:"O progresso da tecnologia introduziu diversos artefatos geradores de campos eletromagnéticos. Uma das mais empregadas invenções nessa área são os telefones celulares e smartphones. As tecnologias de transmissão de celular atualmente em uso no Brasil contemplam dois sistemas. O primeiro deles é operado entre as frequências de 800 MHz e 900 MHz e constitui os chamados sistemas TDMA/CDMA. Já a tecnologia GSM, ocupa a frequência de 1.800 MHz. Considerando que a intensidade de transmissão e o nível de recepção “celular” sejam os mesmos para as tecnologias de transmissão TDMA/CDMA ou GSM, se um engenheiro tiver de escolher entre as duas tecnologias para obter a mesma cobertura, levando em consideração apenas o número de antenas em uma região, ele deverá escolher:",
+    alt:["a tecnologia GSM, pois é a que opera com ondas de maior comprimento de onda.", "a tecnologia TDMA/CDMA, pois é a que apresenta Efeito Doppler mais pronunciado.", "a tecnologia GSM, pois é a que utiliza ondas que se propagam com maior velocidade.", "qualquer uma das duas, pois as diferenças nas frequências são compensadas pelas diferenças nos comprimentos de onda.", "qualquer uma das duas, pois nesse caso as intensidades decaem igualmente da mesma forma, independentemente da frequência."],
+    correta:4,
+    res:"Com mesma intensidade e recepção, a cobertura é a mesma: a intensidade decai igualmente, independentemente da frequência.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p93", tema:"Ondulatória", ano:"ENEM 2011",
+    enunciado:"Uma equipe de cientistas lançará uma expedição ao Titanic para criar um detalhado mapa 3D que “vai tirar, virtualmente, o Titanic do fundo do mar para o público”. A expedição ao local, a 4 quilômetros de profundidade no Oceano Atlântico, está sendo apresentada como a mais sofisticada expedição científica ao Titanic. Ela utilizará tecnologias de imagem e sonar que nunca tinham sido aplicadas ao navio, para obter o mais completo inventário de seu conteúdo. Esta complementação é necessária em razão das condições do navio, naufragado há um século. O Estado de São Paulo. Disponível em: Acesso em: 27 jul. 2010 . No problema apresentado para gerar imagens através de camadas de sedimentos depositados no navio, o sonar é mais adequado, pois a",
+    alt:["propagação da luz na água ocorre a uma velocidade maior que a do som neste meio.", "absorção da luz ao longo de uma camada de água é facilitada enquanto a absorção do som não.", "refração da luz a uma grande profundidade acontece com uma intensidade menor que a do som.", "atenuação da luz nos materiais analisados é distinta da atenuação de som nestes mesmos materiais.", "reflexão da luz nas camadas de sedimentos é menos intensa do que a reflexão do som neste material."],
+    correta:3,
+    res:"Usa-se o sonar porque a atenuação do som nesses materiais e profundidades é diferente (menor) que a da luz.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p62", tema:"Ondulatória", ano:"ENEM 2013",
+    enunciado:"Uma manifestação comum das torcidas em estádios de futebol é a ola mexicana. Os espectadores de uma linha, sem sair do lugar e sem se deslocarem lateralmente, ficam de pé e se sentam, sincronizados com os da linha adjacente. O efeito coletivo se propaga pelos espectadores do estádio, formando uma onda progressiva, conforme ilustração. Calcula-se que a velocidade de propagação dessa “onda humana” é de 45 km/h, e que cada período de oscilação contém 16 pessoas, que se levantam e sentam organizadamente e distanciadas entre si por 80 cm. Nessa ola mexicana, a frequência da onda, em hertz, é um valor mais próximo de",
+    alt:["0,3.", "0,5.", "1,0.", "1,9.", "3,7."],
+    correta:2,
+    res:"O comprimento de onda é 16 x 0,80 = 12,8 m e v = 45 km/h ≈ 12,5 m/s; logo f = v/lambda ≈ 12,5/12,8 ≈ 1,0 Hz.",
+    remedy:{ nome:"Conteúdo de Ondas", url:"#conteudos" } },
+  { id:"p78", tema:"Óptica", ano:"ENEM 2ª aplicação 2010",
+    enunciado:"O efeito Tyndall é um efeito óptico de turbidez provocado pelas partículas de uma dispersão coloidal. Foi observado pela primeira vez por Michael Faraday em 1857 e, posteriormente, investigado pelo físico inglês John Tyndall. Este efeito é o que torna possível, por exemplo, observar as partículas de poeira suspensas no ar por meio de uma réstia de luz, observar gotículas de água que formam a neblina por meio do farol do carro ou, ainda, observar o feixe luminoso de uma lanterna por meio de um recipiente contendo gelatina. REIS, M. Completamente Química: Físico-Química. São Paulo: FTD, 2001. Ao passar por um meio contendo partículas dispersas, um feixe de luz sofre o efeito Tyndall devido",
+    alt:["à absorção do feixe de luz por este meio.", "à interferência do feixe de luz neste meio.", "à transmissão do feixe de luz neste meio.", "à polarização do feixe de luz por este meio.", "ao espalhamento do feixe de luz neste meio."],
+    correta:4,
+    res:"O efeito Tyndall é o espalhamento da luz pelas partículas em suspensão no meio.",
+    remedy:{ nome:"Experimento Câmara Escura", url:"./camara-escura.html" } },
+  { id:"p86", tema:"Óptica", ano:"ENEM PPL 2014",
+    enunciado:"As miragens existem e podem induzir à percepção de que há água onde não existe. Elas são a manifestação de um fenômeno óptico que ocorre na atmosfera. Esse fenômeno óptico é consequência da",
+    alt:["refração da luz nas camadas de ar próximas do chão quente.", "reflexão da luz ao incidir no solo quente.", "reflexão difusa da luz na superfície rugosa.", "dispersão da luz nas camadas de ar próximas do chão quente.", "difração da luz nas camadas de ar próximas do chão quente."],
+    correta:0,
+    res:"A miragem é refração: a luz se curva nas camadas de ar de densidades diferentes perto do chão quente.",
+    remedy:{ nome:"Experimento Câmara Escura", url:"./camara-escura.html" } },
+  { id:"p87", tema:"Óptica", ano:"ENEM PPL 2013",
+    enunciado:"A banda larga brasileira é lenta. No Japão já existem redes de fibras ópticas, que permitem acessos à internet com velocidade de 1 gigabit por segundo (Gbps), o suficiente para baixar em um minuto, por exemplo, 80 filmes. No Brasil a maioria das conexões ainda é de 1 megabit por segundo (Mbps), ou seja, menos de um milésimo dos acessos mais rápidos do Japão. A fibra óptica é composta basicamente de um material dielétrico (sílica ou plástico), segundo uma estrutura cilíndrica, transparente e flexível. Ela é formada de uma região central envolta por uma camada, também de material dielétrico, com índice de refração diferente ao do núcleo. A transmissão em uma fibra óptica acontecerá de forma correta se o índice de refração do núcleo, em relação ao revestimento, for",
+    alt:["superior e ocorrer difração.", "superior e ocorrer reflexão interna total.", "inferior e ocorrer reflexão interna parcial.", "inferior e ocorrer interferência destrutiva.", "inferior e ocorrer interferência construtiva."],
+    correta:1,
+    res:"A fibra óptica transmite a luz por reflexão interna total, mantendo-a confinada no núcleo.",
+    remedy:{ nome:"Experimento Câmara Escura", url:"./camara-escura.html" } },
+  { id:"p96", tema:"Óptica", ano:"ENEM 2ª aplicação 2010",
+    enunciado:"Os espelhos retrovisores, que deveriam auxiliar os motoristas na hora de estacionar ou mudar de pista, muitas vezes causam problemas. É que o espelho retrovisor do lado direito, em alguns modelos, distorce a imagem, dando a impressão de que o veículo está a uma distância maior do que a real. Este tipo de espelho, chamado convexo, é utilizado com o objetivo de ampliar o campo visual do motorista, já que no Brasil se adota a direção do lado esquerdo e, assim, o espelho da direita fica muito mais distante dos olhos do condutor. Sabe-se que, em um espelho convexo, a imagem formada está mais próxima do espelho do que este está do objeto, o que parece estar em conflito com a informação apresentada na reportagem. Essa aparente contradição é explicada pelo fato de",
+    alt:["a imagem projetada na retina do motorista ser menor do que o objeto.", "a velocidade do automóvel afetar a percepção da distância.", "o cérebro humano interpretar como distante uma imagem pequena.", "o espelho convexo ser capaz de aumentar o campo visual do motorista.", "o motorista perceber a luz vinda do espelho com a parte lateral do olho."],
+    correta:2,
+    res:"O cérebro interpreta a imagem menor (do espelho convexo) como se o objeto estivesse mais distante.",
+    remedy:{ nome:"Experimento Câmara Escura", url:"./camara-escura.html" } },
+  { id:"p66", tema:"Óptica", ano:"ENEM PPL 2012",
+    enunciado:"A terapia fotodinâmica é um tratamento que utiliza luz para cura de câncer através da excitação de moléculas medicamentosas, que promovem a desestruturação das células tumorais. Para a eficácia do tratamento, é necessária a iluminação na região do tecido a ser tratado. Em geral, as moléculas medicamentosas absorvem as frequências mais altas. Por isso, as intervenções cutâneas são limitadas pela penetração da luz visível, conforme a figura: A profundidade de até 2 mm em que o tratamento cutâneo é eficiente se justifica porque a luz de",
+    alt:["curto comprimento de onda é mais refletida pela pele.", "maior energia é mais absorvida pelo tecido orgânico.", "menor energia é absorvida nas regiões mais profundas.", "todos os comprimentos de onda terão alta intensidade.", "cada comprimento de onda percebe um índice de refração diferente."],
+    correta:1,
+    res:"A luz de maior energia (frequência mais alta) é mais absorvida pelo tecido, por isso penetra apenas poucos milímetros.",
+    remedy:{ nome:"Experimento Câmara Escura", url:"./camara-escura.html" } },
+  { id:"p3", tema:"Cinemática", ano:"ENEM PPL 2013",
+    enunciado:"Conta-se que um curioso incidente aconteceu durante a Primeira Guerra Mundial. Quando voava a uma altitude de dois mil metros, um piloto francês viu o que acreditava ser uma mosca parada perto de sua face. Apanhando-a rapidamente, ficou surpreso ao verificar que se tratava de um projétil alemão. PERELMAN, J. Aprenda física brincando. São Paulo: Hemus, 1970. O piloto consegue apanhar o projétil, pois",
+    alt:["ele foi disparado em direção ao avião francês, freado pelo ar e parou justamente na frente do piloto.", "o avião se movia no mesmo sentido que o dele, com velocidade visivelmente superior.", "ele foi disparado para cima com velocidade constante, no instante em que o avião francês passou.", "o avião se movia no sentido oposto ao dele, com velocidade de mesmo valor.", "o avião se movia no mesmo sentido que o dele, com velocidade de mesmo valor."],
+    correta:4,
+    res:"O projétil estava praticamente parado em relação ao avião porque ambos se moviam no mesmo sentido com a mesma velocidade.",
+    remedy:{ nome:"Aula de Cinemática", url:"./lancamento-obliquo.html" } },
+  { id:"p13", tema:"Cinemática", ano:"ENEM 2009",
+    enunciado:"No mundial de 2007, o americano Bernard Lagat, usando pela primeira vez uma sapatilha 34% mais leve do que a média, conquistou o ouro na corrida de 1.500 metros com um tempo de 3,58 minutos. No ano anterior, em 2006, ele havia ganhado medalha de ouro com um tempo de 3,65 minutos nos mesmos 1.500 metros. Revista Veja, São Paulo, ago. 2008 . Sendo assim, a velocidade média do atleta aumentou em aproximadamente",
+    alt:["1,05%.", "2,00%.", "4,11%.", "4,19%.", "7,00%."],
+    correta:1,
+    res:"A velocidade aumenta na razão 3,65/3,58 ≈ 1,02, ou seja, cerca de 2%.",
+    remedy:{ nome:"Aula de Cinemática", url:"./lancamento-obliquo.html" } },
+  { id:"p14", tema:"Cinemática", ano:"ENEM 2009",
+    enunciado:"O Super-homem e as leis do movimento Uma das razões para pensar sobre física dos super-heróis é, acima de tudo, uma forma divertida de explorar muitos fenômenos físicos interessantes, desde fenômenos corriqueiros até eventos considerados fantásticos. A figura seguinte mostra o Super-homem lançando-se no espaço para chegar ao topo de um prédio de altura H. Seria possível admitir que com seus superpoderes ele estaria voando com propulsão própria, mas considere que ele tenha dado um forte salto. Neste caso, sua velocidade final no ponto mais alto do salto deve ser zero, caso contrário, ele continuaria subindo. Sendo g a aceleração da gravidade, a relação entre a velocidade inicial do Super-homem e a altura atingida é dada por: v2 = 2gH. A altura que o Super-homem alcança em seu salto depende do quadrado de sua velocidade inicial porque",
+    alt:["a altura do seu pulo é proporcional à sua velocidade média multiplicada pelo tempo que ele permanece no ar ao quadrado.", "o tempo que ele permanece no ar é diretamente proporcional à aceleração da gravidade e essa é diretamente proporcional à velocidade.", "o tempo que ele permanece no ar é inversamente proporcional à aceleração da gravidade e essa é inversamente proporcional à velocidade média.", "a aceleração do movimento deve ser elevada ao quadrado, pois existem duas acelerações envolvidas: a aceleração da gravidade e a aceleração do salto.", "a altura do seu pulo é proporcional à sua velocidade média multiplicada pelo tempo que ele permanece no ar, e esse tempo também depende da sua velocidade inicial. Leis de Newton"],
+    correta:4,
+    res:"A altura do salto é proporcional à velocidade média vezes o tempo no ar, e esse tempo depende da velocidade inicial e de g.",
+    remedy:{ nome:"Aula de Cinemática", url:"./lancamento-obliquo.html" } },
+  { id:"p40", tema:"Dinâmica", ano:"ENEM 2014",
+    enunciado:"Para entender os movimentos dos corpos, Galileu discutiu o movimento de uma esfera de metal em dois planos inclinados sem atritos e com a possibilidade de se alterarem os ângulos de inclinação, conforme mostra a figura. Na descrição do experimento, quando a esfera de metal é abandonada para descer um plano inclinado de um determinado nível, ela sempre atinge, no plano ascendente, no máximo, um nível igual àquele em que foi abandonada. Se o ângulo de inclinação do plano de subida for reduzido a zero, a esfera",
+    alt:["manterá sua velocidade constante, pois o impulso resultante sobre ela será nulo.", "manterá sua velocidade constante, pois o impulso da descida continuará a empurrá-la.", "diminuirá gradativamente a sua velocidade, pois não haverá mais impulso para empurrá- la.", "diminuirá gradativamente a sua velocidade, pois o impulso resultante será contrário ao seu movimento.", "aumentará gradativamente a sua velocidade, pois não haverá nenhum impulso contrário ao seu movimento."],
+    correta:0,
+    res:"Sem inclinação de subida e sem atrito, não há força resultante: pela inércia, a esfera mantém a velocidade constante.",
+    remedy:{ nome:"Simulador de Leis de Newton", url:"./leis-newton.html" } },
+  { id:"p11", tema:"Dinâmica", ano:"ENEM 2011",
+    enunciado:"Para medir o tempo de reação de uma pessoa, pode-se realizar a seguinte experiência: I. Mantenha uma régua (com cerca de 30 cm) suspensa verticalmente, segurando-a pela extremidade superior, de modo que o zero da régua esteja situado na extremidade inferior. II. A pessoa deve colocar os dedos de sua mão, em forma de pinça, próximos do zero da régua, sem tocá-la. III. Sem aviso prévio, a pessoa que estiver segurando a régua deve soltá-la. A outra pessoa deve procurar segurá-la o mais rapidamente possível e observar a posição onde conseguiu segurar a régua, isto é, a distância que ela percorre durante a queda. O quadro seguinte mostra a posição em que três pessoas conseguiram segurar a régua e os respectivos tempos de reação. Distância percorrida pela Tempo de régua durante a queda reação (metro) (segundo) 0,30 0,24 0,15 0,17 0,10 0,14 A distância percorrida pela régua aumenta mais rapidamente que o tempo de reação porque a",
+    alt:["energia mecânica da régua aumenta, o que a faz cair mais rápido.", "resistência do ar aumenta, o que faz a régua cair com menor velocidade.", "aceleração de queda da régua varia, o que provoca um movimento acelerado.", "força peso da régua tem valor constante, o que gera um movimento acelerado.", "velocidade da régua é constante, o que provoca uma passagem linear de tempo."],
+    correta:3,
+    res:"O peso da régua é constante, o que produz um movimento uniformemente acelerado durante a queda.",
+    remedy:{ nome:"Simulador de Leis de Newton", url:"./leis-newton.html" } },
+  { id:"p34", tema:"Energia", ano:"ENEM 2009",
+    enunciado:"A energia geotérmica tem sua origem no núcleo derretido da Terra, onde as temperaturas atingem 4.000 ºC. Essa energia é primeiramente produzida pela decomposição de materiais radiativos dentro do planeta. Em fontes geotérmicas, a água, aprisionada em um reservatório subterrâneo, é aquecida pelas rochas ao redor e fica submetida a altas pressões, podendo atingir temperaturas de até 370 ºC sem entrar em ebulição. Ao ser liberada na superfície, à pressão ambiente, ela se vaporiza e se resfria, formando fontes ou gêiseres. O vapor de poços geotérmicos é separado da água e é utilizado no funcionamento de turbinas para gerar eletricidade. A água quente pode ser utilizada para aquecimento direto ou em usinas de dessalinização. HINRICHS, Roger A. Energia e Meio Ambiente. São Paulo: Pioneira Thomson Learning, 2003 . Sob o aspecto da conversão de energia, as usinas geotérmicas",
+    alt:["funcionam com base na conversão de energia potencial gravitacional em energia térmica.", "transformam inicialmente a energia solar em energia cinética e, depois, em energia térmica.", "podem aproveitar a energia química transformada em térmica no processo de dessalinização.", "assemelham-se às usinas nucleares no que diz respeito à conversão de energia térmica em cinética e, depois, em elétrica.", "utilizam a mesma fonte primária de energia que as usinas nucleares, sendo, portanto, semelhantes os riscos decorrentes de ambas."],
+    correta:3,
+    res:"As usinas geotérmicas, como as nucleares, convertem energia térmica em cinética (turbina) e depois em elétrica.",
+    remedy:{ nome:"Simulador de Trabalho e Energia", url:"./trabalho-energia.html" } },
+  { id:"p36", tema:"Energia", ano:"ENEM 2009",
+    enunciado:"O esquema mostra um diagrama de bloco de uma estação geradora de eletricidade abastecida por combustível fóssil. Se fosse necessário melhorar o rendimento dessa usina, que forneceria eletricidade para abastecer uma cidade, qual das seguintes ações poderia resultar em alguma economia de energia, sem afetar a capacidade de geração da usina?",
+    alt:["Reduzir a quantidade de combustível fornecido à usina para ser queimado.", "Reduzir o volume de água do lago que circula no condensador de vapor.", "Reduzir o tamanho da bomba usada para devolver a água líquida à caldeira.", "Melhorar a capacidade dos dutos com vapor conduzirem calor para o ambiente.", "Usar o calor liberado com os gases pela chaminé para mover um outro gerador."],
+    correta:4,
+    res:"Aproveitar o calor que sairia pela chaminé para mover outro gerador economiza energia sem reduzir a geração.",
+    remedy:{ nome:"Simulador de Trabalho e Energia", url:"./trabalho-energia.html" } },
+  { id:"p127", tema:"Energia", ano:"ENEM 2009",
+    enunciado:"A eficiência de um processo de conversão de energia é definida como a razão entre a produção de energia ou trabalho útil e o total de entrada de energia no processo. A figura mostra um processo com diversas etapas. Nesse caso, a eficiência geral será igual ao produto das eficiências das etapas individuais. A entrada de energia que não se transforma em trabalho útil é perdida sob formas não utilizáveis (como resíduos de calor). Aumentar a eficiência dos processos de conversão de energia implica economizar recursos e combustíveis. Das propostas seguintes, qual resultará em maior aumento da eficiência geral do processo?",
+    alt:["Aumentar a quantidade de combustível para queima na usina de força.", "Utilizar lâmpadas incandescentes, que geram pouco calor e muita luminosidade.", "Manter o menor número possível de aparelhos elétricos em funcionamento nas moradias.", "Utilizar cabos com menor diâmetro nas linhas de transmissão a fim de economizar o material condutor.", "Utilizar materiais com melhores propriedades condutoras nas linhas de transmissão e lâmpadas fluorescentes nas moradias."],
+    correta:4,
+    res:"Usar melhores condutores na transmissão e lâmpadas fluorescentes nas casas reduz as perdas e aumenta a eficiência global.",
+    remedy:{ nome:"Simulador de Trabalho e Energia", url:"./trabalho-energia.html" } },
+  { id:"p148", tema:"Energia", ano:"ENEM 2009",
+    enunciado:"Além de ser capaz de gerar eletricidade, a energia solar é usada para muitas outras finalidades. A figura a seguir mostra o uso da energia solar para dessalinizar a água. Nela, um tanque contendo água salgada é coberto por um plástico transparente e tem a sua parte central abaixada pelo peso de uma pedra, sob a qual se coloca um recipiente (copo). A água evaporada se condensa no plástico e escorre até o ponto mais baixo, caindo dentro do copo. Nesse processo, a energia solar cedida à água salgada",
+    alt:["fica retida na água doce que cai no copo, tornando-a, assim, altamente energizada.", "fica armazenada na forma de energia potencial gravitacional contida na água doce.", "é usada para provocar a reação química que transforma a água salgada em água doce.", "é cedida ao ambiente externo através do plástico, onde ocorre a condensação do vapor.", "é reemitida como calor para fora do tanque, no processo de evaporação da água salgada."],
+    correta:3,
+    res:"A energia solar é, ao final, cedida ao ambiente externo através do plástico, onde o vapor de água se condensa.",
+    remedy:{ nome:"Simulador de Trabalho e Energia", url:"./trabalho-energia.html" } },
+  { id:"p140", tema:"Termologia", ano:"ENEM PPL 2012",
+    enunciado:"Em um centro de pesquisa de alimentos, um técnico efetuou a determinação do valor calórico de determinados alimentos da seguinte forma: colocou uma massa conhecida de água em um recipiente termicamente isolado. Em seguida, dentro desse recipiente, foi queimada uma determinada massa do alimento. Como o calor liberado por essa queima é fornecido para a água, o técnico calculou a quantidade de calor que cada grama do alimento libera. Para a realização desse teste, qual aparelho de medida é essencial?",
+    alt:["Cronômetro.", "Dinamômetro.", "Termômetro.", "Radiômetro.", "Potenciômetro."],
+    correta:2,
+    res:"Como o calor é medido pela variação de temperatura da água, o aparelho essencial é o termômetro.",
+    remedy:{ nome:"Conteúdo de Termodinâmica", url:"#conteudos" } },
+  { id:"p135", tema:"Termologia", ano:"ENEM PPL 2014",
+    enunciado:"Um engenheiro decidiu instalar um aquecedor solar em sua casa, conforme mostra o esquema. De acordo com as instruções de montagem, para se ter um aproveitamento máximo da incidência solar, as placas do coletor solar devem ser instaladas com um ângulo de inclinação determinado. O parâmetro que define o valor do ângulo de inclinação dessas placas coletoras é a",
+    alt:["altitude.", "latitude.", "longitude.", "nebulosidade.", "umidade relativa do ar."],
+    correta:1,
+    res:"O ângulo ideal de inclinação do coletor solar é definido pela latitude do local.",
+    remedy:{ nome:"Conteúdo de Termodinâmica", url:"#conteudos" } },
+  { id:"p33", tema:"Termologia", ano:"ENEM 2ª aplicação 2010",
+    enunciado:"No nosso dia a dia, deparamo-nos com muitas tarefas pequenas e problemas que demandam pouca energia para serem resolvidos e, por isso, não consideramos a eficiência energética de nossas ações. No global, isso significa desperdiçar muito calor que poderia ainda ser usado como fonte de energia para outros processos. Em ambientes industriais, esse reaproveitamento é feito por um processo chamado de cogeração. A figura a seguir ilustra um exemplo de cogeração na produção de energia elétrica. Em relação ao processo secundário de aproveitamento de energia ilustrado na figura, a perda global de energia é reduzida por meio da transformação de energia",
+    alt:["térmica em mecânica.", "mecânica em térmica.", "química em térmica.", "química em mecânica.", "elétrica em luminosa."],
+    correta:0,
+    res:"Na cogeração, o calor residual é reaproveitado convertendo energia térmica em mecânica.",
+    remedy:{ nome:"Conteúdo de Termodinâmica", url:"#conteudos" } },
+  { id:"p147", tema:"Termologia", ano:"ENEM 2009",
+    enunciado:"A invenção da geladeira proporcionou uma revolução no aproveitamento dos alimentos, ao permitir que fossem armazenados e transportados por longos períodos. A figura apresentada ilustra o processo cíclico de funcionamento de uma geladeira, em que um gás no interior de uma tubulação é forçado a circular entre o congelador e a parte externa da geladeira. É por meio dos processos de compressão, que ocorre na parte externa, e de expansão, que ocorre na parte interna, que o gás proporciona a troca de calor entre o interior e o exterior da geladeira. Nos processos de transformação de energia envolvidos no funcionamento da geladeira,",
+    alt:["a expansão do gás é um processo que cede a energia necessária ao resfriamento da parte interna da geladeira.", "o calor flui de forma não espontânea da parte mais fria, no interior, para a mais quente, no exterior da geladeira.", "a quantidade de calor cedida ao meio externo é igual ao calor retirado da geladeira.", "a eficiência é tanto maior quanto menos isolado termicamente do ambiente externo for o seu compartimento interno.", "a energia retirada do interior pode ser devolvida à geladeira abrindo-se a sua porta, o que reduz seu consumo de energia."],
+    correta:1,
+    res:"Na geladeira, o calor é forçado a fluir de forma não espontânea do interior frio para o exterior quente (2a lei).",
+    remedy:{ nome:"Conteúdo de Termodinâmica", url:"#conteudos" } },
+  { id:"p46", tema:"Hidrostática", ano:"ENEM PPL 2013",
+    enunciado:"Os densímetros instalados nas bombas de combustível permitem averiguar se a quantidade de água presente no álcool hidratado está dentro das especificações determinadas pela Agência Nacional do Petróleo (ANP). O volume máximo permitido de água no álcool é de 4,9%. A densidade da água e do álcool anidro são de 1,00 g/cm3 e 0,80 g/cm3, respectivamente. A leitura no densímetro que corresponderia à fração máxima permitida de água é mais próxima de",
+    alt:["0,20 g/cm3.", "0,81 g/cm3.", "0,90 g/cm3.", "0,99 g/cm3.", "1,80 g/cm3."],
+    correta:1,
+    res:"A densidade da mistura é aproximadamente 0,049 x 1,0 + 0,951 x 0,80 ≈ 0,81 g/cm³.",
+    remedy:{ nome:"Simulador de Hidrostática", url:"./hidrostatica.html" } },
+  { id:"p49", tema:"Hidrostática", ano:"ENEM 2012",
+    enunciado:"Um dos problemas ambientais vivenciados pela agricultura hoje em dia é a compactação do solo, devida ao intenso tráfego de máquinas cada vez mais pesadas, reduzindo a produtividade das culturas. Uma das formas de prevenir o problema de compactação do solo é substituir os pneus dos tratores por pneus mais",
+    alt:["largos, reduzindo pressão sobre o solo.", "estreitos, reduzindo a pressão sobre o solo.", "largos, aumentando a pressão sobre o solo.", "estreitos, aumentando a pressão sobre o solo.", "altos, reduzindo a pressão sobre o solo."],
+    correta:0,
+    res:"Pneus mais largos distribuem o peso em uma área maior, reduzindo a pressão sobre o solo.",
+    remedy:{ nome:"Simulador de Hidrostática", url:"./hidrostatica.html" } },
+  { id:"p53", tema:"Hidrostática", ano:"ENEM 2011",
+    enunciado:"Em um experimento realizado para determinar a densidade da água de um lago, foram utilizados alguns materiais conforme ilustrado: um dinamômetro D com graduação de 0 N a 50 N e um cubo maciço e homogêneo de 10 cm de aresta e 3 kg de massa. Inicialmente, foi conferida a calibração do dinamômetro, constatando-se a leitura de 30 N quando o cubo era preso ao dinamômetro e suspenso no ar. Ao mergulhar o cubo na água do lago, até que metade do seu volume ficasse submersa, foi registrada a leitura de 24 N no dinamômetro. Considerando que a aceleração da gravidade local é de , a densidade da água do lago, em ,é",
+    alt:["0,6.", "1,2.", "1,5.", "2,4.", "4,8."],
+    correta:1,
+    res:"O empuxo é 30 - 24 = 6 N sobre meio volume (500 cm³); rho = E/(g x V) = 6/(10 x 5e-4) = 1200 kg/m³ = 1,2.",
+    remedy:{ nome:"Simulador de Hidrostática", url:"./hidrostatica.html" } },
+  { id:"p47", tema:"Hidrostática", ano:"ENEM 2013",
+    enunciado:"Para realizar um experimento com uma garrafa PET cheia de água, perfurou-se a lateral da garrafa em três posições a diferentes alturas. Com a garrafa tampada, a água não vazou por nenhum dos orifícios, e, com a garrafa destampada, observou-se o escoamento da água, conforme ilustrado na figura. Como a pressão atmosférica interfere no escoamento da água, nas situações com a garrafa tampada e destampada, respectivamente?",
+    alt:["Impede a saída de água, por ser maior que a pressão interna; não muda a velocidade de escoamento, que só depende da pressão da coluna de água.", "Impede a saída de água, por ser maior que a pressão interna; altera a velocidade de escoamento, que é proporcional à pressão atmosférica na altura do furo.", "Impede a entrada de ar, por ser menor que a pressão interna; altera a velocidade de escoamento, que é proporcional à pressão atmosférica na altura do furo.", "Impede a saída de água, por ser maior que a pressão interna; regula a velocidade de escoamento, que só depende da pressão atmosférica.", "Impede a entrada de ar, por ser menor que a pressão interna; não muda a velocidade de escoamento, que só depende da pressão da coluna de água."],
+    correta:0,
+    res:"Tampada, a pressão atmosférica (maior que a interna) impede a saída; destampada, a velocidade só depende da coluna de água.",
+    remedy:{ nome:"Simulador de Hidrostática", url:"./hidrostatica.html" } },
+  { id:"p52", tema:"Hidrostática", ano:"ENEM 2011",
+    enunciado:"Um tipo de vaso sanitário que vem substituindo as válvulas de descarga está esquematizado na figura. Ao acionar a alavanca, toda a água do tanque é escoada e aumenta o nível no vaso, até cobrir o sifão. De acordo com o Teorema de Stevin, quanto maior a profundidade, maior a pressão. Assim, a água desce levando os rejeitos até o sistema de esgoto. A válvula da caixa de descarga se fecha e ocorre o seu enchimento. Em relação às válvulas de descarga, esse tipo de sistema proporciona maior economia de água. A característica de funcionamento que garante essa economia é devida",
+    alt:["à altura do sifão de água.", "ao volume do tanque de água.", "à altura do nível de água no vaso.", "ao diâmetro do distribuidor de água.", "à eficiência da válvula de enchimento do tanque."],
+    correta:1,
+    res:"A economia vem do volume fixo do tanque, que limita a água usada em cada descarga.",
+    remedy:{ nome:"Simulador de Hidrostática", url:"./hidrostatica.html" } },
+  { id:"p55", tema:"Hidrostática", ano:"ENEM 2ª aplicação 2010",
+    enunciado:"Um brinquedo chamado ludião consiste em um pequeno frasco de vidro, parcialmente preenchido com água, que é emborcado (virado com a boca para baixo) dentro de uma garrafa PET cheia de água e tampada. Nessa situação, o frasco fica na parte superior da garrafa, conforme mostra a figura 1. Quando a garrafa é pressionada, o frasco se desloca para baixo, como mostrado na figura 2. Ao apertar a garrafa, o movimento de descida do frasco ocorre porque",
+    alt:["diminui a força para baixo que a água aplica no frasco.", "aumenta a pressão na parte pressionada da garrafa.", "aumenta a quantidade de água que fica dentro do frasco.", "diminui a força de resistência da água sobre o frasco.", "diminui a pressão que a água aplica na base do frasco."],
+    correta:2,
+    res:"Ao apertar a garrafa, aumenta a pressão (Pascal), que comprime o ar no frasco e o faz descer.",
+    remedy:{ nome:"Simulador de Hidrostática", url:"./hidrostatica.html" } },
+  { id:"p42", tema:"Gravitação", ano:"ENEM 2012",
+    enunciado:"A característica que permite identificar um planeta no céu é o seu movimento relativo às estrelas fixas. Se observarmos a posição de um planeta por vários dias, verificaremos que sua posição em relação às estrelas fixas se modifica regularmente. A figura destaca o movimento de Marte observado em intervalos de 10 dias, registrado da Terra. Qual a causa da forma da trajetória do planeta Marte registrada na figura?",
+    alt:["A maior velocidade orbital da Terra faz com que, em certas épocas, ela ultrapasse Marte.", "A presença de outras estrelas faz com que sua trajetória seja desviada por meio da atração gravitacional.", "A órbita de Marte, em torno do Sol, possui uma forma elíptica mais acentuada que a dos demais planetas.", "A atração gravitacional entre a Terra e Marte faz com que este planeta apresente uma órbita irregular em torno do Sol.", "A proximidade de Marte com Júpiter, em algumas épocas do ano, faz com que a atração gravitacional de Júpiter interfira em seu movimento."],
+    correta:0,
+    res:"O movimento retrógrado de Marte ocorre porque a Terra, mais rápida, ultrapassa Marte em sua órbita.",
+    remedy:{ nome:"Conteúdo de Gravitação", url:"#conteudos" } },
+];
+
+/* =====================================================================
+   NAVEGAÇÃO POR ABAS
+   ===================================================================== */
+const tabBar = document.getElementById('tabBar');
+tabBar.addEventListener('click', e=>{
+  const btn = e.target.closest('.tab-btn');
+  if(!btn) return;
+  goTab(btn.dataset.tab);
+});
+function goTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  if(tab==='relatorio') renderReport();
+  if(tab==='aulasenem') renderAulasEnem();
+  if(tab==='simulados') renderSimStart();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* =====================================================================
+   SOBRE O ENEM
+   ===================================================================== */
+function renderTemaWeights(){
+  const box = document.getElementById('temaWeights');
+  box.innerHTML = TEMAS_PESO.map(t=>`
+    <div class="theme-bar-row">
+      <div class="tbr-head"><span class="name">${t.nome}</span><span class="val" style="color:${t.cor}">${t.peso}%</span></div>
+      <div class="tbr-track"><div class="tbr-fill" style="width:${t.peso}%;background:${t.cor};box-shadow:0 0 10px ${t.cor}"></div></div>
+    </div>`).join('');
+}
+function renderSobreChecklist(){
+  const data = Store.read();
+  const box = document.getElementById('sobreChecklist');
+  box.innerHTML = CHECKLIST_SOBRE.map((txt,i)=>{
+    const on = !!data.sobre[i];
+    return `<div class="check-row ${on?'done':''}" data-i="${i}">
+      <div class="check-box">${on?'&#10003;':''}</div>
+      <div class="check-txt">${txt}</div>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.check-row').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      const i = row.dataset.i;
+      Store.update(d=>{ d.sobre[i] = !d.sobre[i]; });
+      renderSobreChecklist();
+    });
+  });
+}
+
+/* =====================================================================
+   AULAS
+   ===================================================================== */
+function renderAulas(){
+  const data = Store.read();
+  const done = AULAS.filter((_,i)=>data.aulas[i]).length;
+  document.getElementById('progressAulas').innerHTML = progressBar(done, AULAS.length, 'aulas concluídas');
+  const list = document.getElementById('aulasList');
+  list.innerHTML = AULAS.map((a,i)=>{
+    const on = !!data.aulas[i];
+    return `<div class="item-card">
+      <div class="item-ic">${a.ic}</div>
+      <div class="item-body"><div class="t">${a.t}</div><div class="d">${a.d}</div></div>
+      <div class="item-actions">
+        <a class="open-link" href="${a.url}">Abrir</a>
+        <div class="mini-check ${on?'on':''}" data-i="${i}" title="Marcar como concluída">${on?'&#10003;':''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('.mini-check').forEach(c=>{
+    c.addEventListener('click', ()=>{
+      const i = c.dataset.i;
+      Store.update(d=>{ d.aulas[i] = !d.aulas[i]; });
+      renderAulas();
+    });
+  });
+}
+
+/* =====================================================================
+   CONTEÚDOS
+   ===================================================================== */
+function renderConteudos(){
+  const data = Store.read();
+  const done = CONTEUDOS.filter((_,i)=>data.conteudos[i]).length;
+  document.getElementById('progressConteudos').innerHTML = progressBar(done, CONTEUDOS.length, 'temas revisados');
+  const list = document.getElementById('conteudosList');
+  list.innerHTML = CONTEUDOS.map((c,i)=>{
+    const on = !!data.conteudos[i];
+    return `<div class="acc" data-i="${i}">
+      <div class="acc-head">
+        <span class="a-ic">${c.ic}</span>
+        <span class="a-title">${c.nome}</span>
+        <div class="mini-check ${on?'on':''}" data-check="${i}" title="Marcar como revisado">${on?'&#10003;':''}</div>
+        <span class="chev">&#9660;</span>
+      </div>
+      <div class="acc-body"><div class="acc-body-inner">
+        <ul>${c.pontos.map(p=>`<li>${p}</li>`).join('')}</ul>
+        <div>${c.formulas.map(f=>`<span class="formula">${f}</span>`).join(' ')}</div>
+      </div></div>
+    </div>`;
+  }).join('');
+  // expandir / recolher
+  list.querySelectorAll('.acc-head').forEach(head=>{
+    head.addEventListener('click', e=>{
+      if(e.target.closest('.mini-check')) return;
+      const acc = head.parentElement;
+      const body = acc.querySelector('.acc-body');
+      const open = acc.classList.toggle('open');
+      body.style.maxHeight = open ? body.scrollHeight + 'px' : '0';
+    });
+  });
+  // marcar revisado
+  list.querySelectorAll('.mini-check').forEach(c=>{
+    c.addEventListener('click', ev=>{
+      ev.stopPropagation();
+      const i = c.dataset.check;
+      Store.update(d=>{ d.conteudos[i] = !d.conteudos[i]; });
+      renderConteudos();
+    });
+  });
+}
+
+function progressBar(done, total, label){
+  const pct = total ? Math.round(done/total*100) : 0;
+  return `<div class="tbr-head"><span class="name">${done} de ${total} ${label}</span><span class="val" style="color:var(--cyan)">${pct}%</span></div>
+    <div class="tbr-track"><div class="tbr-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--cyan),var(--violet));box-shadow:0 0 10px rgba(0,229,255,.5)"></div></div>`;
+}
+
+/* =====================================================================
+   SIMULADO
+   ===================================================================== */
+let simState = null;
+const SEC_POR_QUESTAO = 180;
+
+function renderQtyPills(){
+  const box = document.getElementById('simQtyPills');
+  const opts = [5, 10, 20];
+  box.dataset.sel = '10';
+  box.innerHTML = opts.map(n=>`<div class="opt-pill ${n===10?'sel':''}" data-n="${n}">${n} questões</div>`).join('');
+  box.querySelectorAll('.opt-pill').forEach(p=>{
+    p.addEventListener('click', ()=>{
+      box.querySelectorAll('.opt-pill').forEach(x=>x.classList.remove('sel'));
+      p.classList.add('sel');
+      box.dataset.sel = p.dataset.n;
+    });
+  });
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+/* ===================================================================
+   SIMULADO PERSONALIZADO
+   - foca nos temas em que o usuário mais erra
+   - nunca repete questão já acertada (só reaparece o que foi errado)
+   =================================================================== */
+function buildSimulado(qty){
+  const data = Store.read();
+  const qstate = data.qstate || {};
+  const avail = QUESTOES.filter(q => !(qstate[q.id] && qstate[q.id].mastered));
+  if(avail.length === 0) return [];
+  // acerto acumulado por tema, a partir do histórico
+  const acc = {};
+  (data.historico || []).forEach(h => {
+    for(const t in h.porTema){
+      if(!acc[t]) acc[t] = { c:0, t:0 };
+      acc[t].c += h.porTema[t].acertos;
+      acc[t].t += h.porTema[t].total;
+    }
+  });
+  function weakness(tema){
+    const a = acc[tema];
+    if(!a || a.t === 0) return 0.5;        // sem dados ainda: prioridade média
+    return 1 - (a.c / a.t);                // quanto menor o acerto, maior a fraqueza
+  }
+  // 1) questões já erradas voltam com prioridade (preenchem até metade do simulado)
+  const wrong = shuffle(avail.filter(q => qstate[q.id] && qstate[q.id].att > 0));
+  const chosen = wrong.slice(0, Math.ceil(qty / 2));
+  const ids = new Set(chosen.map(q => q.id));
+  // 2) completa as demais vagas com amostragem ponderada pelos temas mais fracos
+  const rest = avail.filter(q => !ids.has(q.id));
+  let need = Math.min(qty, avail.length) - chosen.length;
+  while(need > 0 && rest.length > 0){
+    let tot = 0; const w = rest.map(q => { const x = 1 + 3 * weakness(q.tema); tot += x; return x; });
+    let r = Math.random() * tot, idx = rest.length - 1;
+    for(let i = 0; i < rest.length; i++){ r -= w[i]; if(r <= 0){ idx = i; break; } }
+    chosen.push(rest[idx]); rest.splice(idx, 1); need--;
+  }
+  return shuffle(chosen);
+}
+
+function renderSimStart(){
+  const data = Store.read();
+  const qstate = data.qstate || {};
+  const total = QUESTOES.length;
+  const mastered = QUESTOES.filter(q => qstate[q.id] && qstate[q.id].mastered).length;
+  const wrong = QUESTOES.filter(q => qstate[q.id] && qstate[q.id].att > 0 && !qstate[q.id].mastered).length;
+  const avail = total - mastered;
+  const pct = Math.round(mastered / total * 100);
+  const box = document.getElementById('simMastery');
+  if(!box) return;
+  let html = `<div class="tbr-head"><span class="name">${mastered} de ${total} questões dominadas</span><span class="val" style="color:var(--green)">${pct}%</span></div>
+    <div class="tbr-track"><div class="tbr-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--green),var(--cyan));box-shadow:0 0 10px rgba(39,232,138,.5)"></div></div>`;
+  if(wrong > 0) html += `<p class="muted" style="margin-top:8px;font-size:13.5px">&#9851; ${wrong} ${wrong === 1 ? 'questão errada aguarda' : 'questões erradas aguardam'} revisão e terão prioridade.</p>`;
+  box.innerHTML = html;
+  const btn = document.getElementById('btnStartSim');
+  const pills = document.getElementById('simQtyPills');
+  if(avail === 0){
+    if(pills) pills.style.display = 'none';
+    if(btn){ btn.innerHTML = 'Recomeçar do zero'; btn.classList.add('ghost'); btn.onclick = resetMastery; }
+    box.innerHTML += `<p class="muted" style="margin-top:10px;color:#a9f5cd">&#127881; Parabéns! Você dominou todas as ${total} questões. Recomece para treinar de novo.</p>`;
+  } else {
+    if(pills) pills.style.display = 'flex';
+    if(btn){ btn.innerHTML = 'Iniciar Simulado &#9654;'; btn.classList.remove('ghost'); btn.onclick = startSim; }
+  }
+}
+
+function resetMastery(){
+  if(confirm('Recomeçar libera todas as questões novamente (zera o que você "dominou"). Seu histórico de simulados é mantido. Continuar?')){
+    Store.update(d => { d.qstate = {}; });
+    renderSimStart();
+  }
+}
+
+/* ===================================================================
+   AULAS ENEM — aulas por tema com resolução comentada das questões
+   =================================================================== */
+const NOTA_ENEM = {
+ 'Eletrodinâmica':'O tema que mais cai. Foco em consumo de energia (kWh), Lei de Ohm, potência e circuitos, quase sempre no contexto do cotidiano (chuveiro, lâmpadas, conta de luz).',
+ 'Eletromagnetismo':'A indução de Faraday é o coração: geradores, dínamos e bobinas. A corrente elétrica surge da variação do campo magnético.',
+ 'Ondulatória':'Segundo tema mais frequente. Distinga frequência (altura), amplitude (volume) e timbre; e domine os fenômenos: reflexão, refração, difração e ressonância.',
+ 'Óptica':'Refração e reflexão no dia a dia: lentes, espelhos, miragens e fibra óptica. Acompanhe o caminho da luz ao passar entre meios diferentes.',
+ 'Dinâmica':'Leis de Newton aplicadas: inércia, força resultante e atrito. Lembre-se de que o par ação-reação atua em corpos diferentes e por isso não se anula.',
+ 'Cinemática':'Descrição do movimento: velocidade, aceleração e leitura de gráficos. Atenção à conversão de km/h para m/s.',
+ 'Energia':'Conservação e conversão de energia, rendimento e a 2a lei da termodinâmica: nem todo calor pode virar trabalho.',
+ 'Termologia':'Calor x temperatura (calor é energia em trânsito), trocas de calor (condução, convecção, irradiação) e dilatação. Muito ligado a aquecedores e eficiência.',
+ 'Hidrostática':'Pressão, empuxo e densidade. Os princípios de Pascal, Stevin e Arquimedes aplicados a situações reais.',
+ 'Gravitação':'Movimento de planetas e satélites, diferença entre peso e massa e as leis de Kepler.',
+};
+
+function renderAulasEnem(){
+  const data = Store.read();
+  const studied = data.aulasenem || {};
+  const AULA_LINKS = {
+    'Eletrodinâmica': { url:'./eletrodinamica-enem.html', label:'Abrir aula interativa' },
+    'Ondulatória':    { url:'./ondulatoria-enem.html', label:'Abrir aula interativa' },
+    'Cinemática':     { url:'./mecanica-enem.html', label:'Abrir aula de Mecânica' },
+    'Dinâmica':       { url:'./mecanica-enem.html', label:'Abrir aula de Mecânica' },
+    'Energia':        { url:'./mecanica-enem.html', label:'Abrir aula de Mecânica' },
+    'Gravitação':     { url:'./mecanica-enem.html', label:'Abrir aula de Mecânica' },
+    'Termologia':     { url:'./termodinamica-enem.html', label:'Abrir aula interativa' },
+    'Eletromagnetismo': { url:'./eletromagnetismo-enem.html', label:'Abrir aula interativa' }
+  };
+  const VIDEOS = {
+    'Cinemática':      { url:'https://www.youtube.com/watch?v=M3Bbg1bginM', prof:'Prof. Pedro Assaad', resumo:'Como descrever o movimento: posição, velocidade e aceleração, nos casos de MRU (velocidade constante) e MRUV (aceleração constante), com a conversão km/h &harr; m/s.' },
+    'Ondulatória':     { url:'https://www.youtube.com/watch?v=QL-QjbzUJPw', prof:'Prof. (a confirmar)', resumo:'As ondas e suas propriedades (amplitude, comprimento de onda e frequência), a equação fundamental v = &lambda;&middot;f, o som e os fenômenos de reflexão, refração, difração e ressonância.' },
+    'Termologia':      { url:'https://www.youtube.com/watch?v=u-7ajvTkDk0', prof:'Prof. Pedro Abalada', resumo:'Calor e temperatura, calorimetria (Q = m&middot;c&middot;&Delta;T), mudanças de estado, transferência de calor e as leis da termodinâmica que regem as máquinas térmicas.' },
+    'Eletrodinâmica':  { url:'https://www.youtube.com/watch?v=37ZgzVoikCY', prof:'Prof. (a confirmar)', resumo:'Corrente, tensão e resistência, a Lei de Ohm (V = R&middot;i), potência elétrica e o cálculo do consumo de energia na conta de luz.' },
+    'Eletromagnetismo':{ url:'https://www.youtube.com/watch?v=aaGx54PbdvA', prof:'Prof. (a confirmar)', resumo:'A ligação entre eletricidade e magnetismo: campo magnético, experimento de Oersted, indução de Faraday, geradores e transformadores.' }
+  };
+  const byTema = {};
+  QUESTOES.forEach(q => { (byTema[q.tema] = byTema[q.tema] || []).push(q); });
+  const order = ['Eletrodinâmica','Eletromagnetismo','Ondulatória','Óptica','Dinâmica','Cinemática','Energia','Termologia','Hidrostática','Gravitação'];
+  const temas = order.filter(t => byTema[t]);
+  const L = ['A','B','C','D','E'];
+  const list = document.getElementById('aulasEnemList');
+  if(!list) return;
+  list.innerHTML = temas.map(tema => {
+    const qs = byTema[tema];
+    const on = !!studied[tema];
+    const link = AULA_LINKS[tema];
+    const vid = VIDEOS[tema];
+    const qhtml = qs.map(q => `
+      <details class="qdet">
+        <summary><span class="badge vio">${q.ano}</span><span class="qsum">${q.enunciado.slice(0,62)}…</span><span class="chev">&#9660;</span></summary>
+        <div class="qbody">
+          <div class="q-text" style="font-size:14.5px;margin:8px 0 10px">${q.enunciado}</div>
+          ${q.alt.map((a,j) => `<div class="alt ${j===q.correta?'correct':''}" style="cursor:default;margin-bottom:6px;padding:9px 12px"><div class="alt-letter">${L[j]}</div><div class="alt-text" style="font-size:14px">${a}</div></div>`).join('')}
+          <div class="resolucao"><b>Resolução:</b> ${q.res}</div>
+        </div>
+      </details>`).join('');
+    return `<details class="tdet">
+      <summary>
+        <span class="a-ic">&#128218;</span>
+        <span class="tdet-title">${tema}</span>
+        <span class="badge">${qs.length} resolvidas</span>
+        ${on ? '<span class="badge grn">&#10003; estudado</span>' : ''}
+        <span class="chev">&#9660;</span>
+      </summary>
+      <div class="tdet-body">
+        <p style="font-size:14.5px;margin:10px 0 12px">${NOTA_ENEM[tema] || ''}</p>
+        <button class="btn ${on?'ghost':''} sm est-btn" data-studied="${tema}">${on ? '&#10003; Tema estudado' : 'Marcar como estudado'}</button>
+        ${link ? `<a class="open-link" href="${link.url}" style="display:inline-block;margin:0 0 14px 8px">&#9654; ${link.label}</a>` : ''}
+        ${vid ? `<div style="border:1px solid var(--line);background:rgba(139,92,255,0.06);border-radius:12px;padding:14px 16px;margin:2px 0 14px">
+          <div style="font-family:'Orbitron';font-weight:700;font-size:11.5px;letter-spacing:.5px;color:var(--violet);margin-bottom:8px">&#128250; VIDEOAULA RECOMENDADA</div>
+          <p style="font-size:14px;line-height:1.55;margin:0 0 8px;color:var(--txt-dim)">${vid.resumo}</p>
+          <div style="font-size:13.5px;margin-bottom:11px">Com <b>${vid.prof}</b></div>
+          <a class="open-link" href="${vid.url}" target="_blank" rel="noopener" style="display:inline-block">&#9654; Assistir no YouTube</a>
+        </div>` : ''}
+        <h3 style="font-size:13px;margin:10px 0 10px">Questões resolvidas (${qs.length})</h3>
+        ${qhtml}
+      </div>
+    </details>`;
+  }).join('');
+  list.querySelectorAll('.est-btn').forEach(b => {
+    b.addEventListener('click', ev => {
+      ev.preventDefault();
+      const t = b.dataset.studied;
+      Store.update(d => { d.aulasenem = d.aulasenem || {}; d.aulasenem[t] = !d.aulasenem[t]; });
+      renderAulasEnem();
+    });
+  });
+}
+
+function startSim(){
+  const qty = parseInt(document.getElementById('simQtyPills').dataset.sel, 10);
+  const pool = buildSimulado(qty);
+  if(pool.length === 0){ renderSimStart(); return; }
+  simState = {
+    questoes: pool,
+    respostas: new Array(pool.length).fill(null),
+    atual: 0,
+    total: SEC_POR_QUESTAO * pool.length,
+    restante: SEC_POR_QUESTAO * pool.length,
+    inicio: Date.now(),
+    timer: null,
+  };
+  document.getElementById('simStart').style.display = 'none';
+  document.getElementById('simResult').style.display = 'none';
+  document.getElementById('simQuiz').style.display = 'block';
+  document.getElementById('qTotal').textContent = pool.length;
+  renderQuestao();
+  simState.timer = setInterval(tick, 1000);
+  updateTimer();
+}
+
+function tick(){
+  simState.restante--;
+  if(simState.restante <= 0){
+    simState.restante = 0;
+    updateTimer();
+    finishSim();
+    return;
+  }
+  updateTimer();
+}
+
+function updateTimer(){
+  const el = document.getElementById('simTimer');
+  const m = Math.floor(simState.restante/60);
+  const s = simState.restante % 60;
+  el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  el.classList.toggle('warn', simState.restante <= 60 && simState.restante > 20);
+  el.classList.toggle('crit', simState.restante <= 20);
+}
+
+function renderQuestao(){
+  const s = simState;
+  const q = s.questoes[s.atual];
+  document.getElementById('qNow').textContent = s.atual + 1;
+  document.getElementById('qTema').textContent = q.tema;
+  document.getElementById('qAno').textContent = q.ano;
+  document.getElementById('qText').innerHTML = q.enunciado;
+  document.getElementById('simProgress').style.width = ((s.atual)/s.questoes.length*100) + '%';
+  const letras = ['A','B','C','D','E'];
+  const box = document.getElementById('qAlts');
+  box.innerHTML = q.alt.map((a,i)=>{
+    const sel = s.respostas[s.atual]===i ? 'sel' : '';
+    return `<div class="alt ${sel}" data-i="${i}">
+      <div class="alt-letter">${letras[i]}</div>
+      <div class="alt-text">${a}</div>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.alt').forEach(alt=>{
+    alt.addEventListener('click', ()=>{
+      s.respostas[s.atual] = parseInt(alt.dataset.i,10);
+      renderQuestao();
+    });
+  });
+  document.getElementById('btnPrev').disabled = s.atual===0;
+  const last = s.atual === s.questoes.length-1;
+  document.getElementById('btnNext').innerHTML = last ? 'Finalizar &#10003;' : 'Próxima &#9654;';
+}
+
+function nextQ(){
+  const s = simState;
+  if(s.atual === s.questoes.length-1){ finishSim(); return; }
+  s.atual++; renderQuestao();
+}
+function prevQ(){
+  if(simState.atual>0){ simState.atual--; renderQuestao(); }
+}
+
+function finishSim(){
+  clearInterval(simState.timer);
+  const s = simState;
+  const tempoGasto = Math.min(s.total, Math.round((Date.now()-s.inicio)/1000));
+  const result = { data:new Date().toISOString(), total:s.questoes.length, acertos:0, tempo:tempoGasto, porTema:{}, detalhe:[] };
+  s.questoes.forEach((q,i)=>{
+    const acertou = s.respostas[i]===q.correta;
+    if(!result.porTema[q.tema]) result.porTema[q.tema] = {acertos:0,total:0};
+    result.porTema[q.tema].total++;
+    if(acertou){ result.acertos++; result.porTema[q.tema].acertos++; }
+    result.detalhe.push({ tema:q.tema, ano:q.ano, enunciado:q.enunciado, alt:q.alt, correta:q.correta, marcada:s.respostas[i], res:q.res, remedy:q.remedy });
+  });
+  Store.update(d=>{
+    d.historico.push({ data:result.data, total:result.total, acertos:result.acertos, tempo:result.tempo, porTema:result.porTema });
+    d.qstate = d.qstate || {};
+    s.questoes.forEach((q,i)=>{
+      const st = d.qstate[q.id] || { att:0, mastered:false };
+      st.att++;
+      if(s.respostas[i] === q.correta) st.mastered = true;
+      d.qstate[q.id] = st;
+    });
+  });
+  showResult(result);
+}
+
+function showResult(r){
+  document.getElementById('simQuiz').style.display = 'none';
+  const pct = Math.round(r.acertos/r.total*100);
+  const cor = pct>=70 ? 'var(--green)' : pct>=50 ? 'var(--yellow)' : 'var(--red)';
+  const letras = ['A','B','C','D','E'];
+  const mm = Math.floor(r.tempo/60), ss = r.tempo%60;
+
+  let temaHtml = Object.keys(r.porTema).map(t=>{
+    const o = r.porTema[t]; const p = Math.round(o.acertos/o.total*100);
+    const c = p>=70?'var(--green)':p>=50?'var(--yellow)':'var(--red)';
+    return `<div class="theme-bar-row">
+      <div class="tbr-head"><span class="name">${t}</span><span class="val" style="color:${c}">${o.acertos}/${o.total}</span></div>
+      <div class="tbr-track"><div class="tbr-fill" style="width:${p}%;background:${c};box-shadow:0 0 10px ${c}"></div></div>
+    </div>`;
+  }).join('');
+
+  let revHtml = r.detalhe.map((d,i)=>{
+    const ok = d.marcada===d.correta;
+    const altsHtml = d.alt.map((a,j)=>{
+      let cls = '';
+      if(j===d.correta) cls = 'correct';
+      else if(j===d.marcada && !ok) cls = 'wrong';
+      return `<div class="alt ${cls}" style="cursor:default;margin-bottom:7px">
+        <div class="alt-letter">${letras[j]}</div><div class="alt-text">${a}</div></div>`;
+    }).join('');
+    const marcadaTxt = d.marcada===null ? 'Não respondida' : 'Você marcou '+letras[d.marcada];
+    const remedyHtml = (!ok && d.remedy)
+      ? `<a class="remedy" href="${d.remedy.url}">&#128279; Reforçar: ${d.remedy.nome}</a>` : '';
+    return `<div class="review-q">
+      <div class="rq-head">
+        <span class="rq-status ${ok?'ok':'no'}">${ok?'&#10003; Acertou':'&#10007; Errou'}</span>
+        <span class="badge">${d.tema}</span>
+        <span class="badge vio">${d.ano}</span>
+        <span style="margin-left:auto;font-size:12px;color:var(--txt-dim);font-family:'Orbitron'">Q${i+1}</span>
+      </div>
+      <div class="q-text" style="font-size:15.5px;margin-bottom:12px">${d.enunciado}</div>
+      ${altsHtml}
+      <div class="resolucao"><b>Resolução:</b> ${d.res}<br><span style="color:var(--txt-dim)">(${marcadaTxt})</span></div>
+      ${remedyHtml}
+    </div>`;
+  }).join('');
+
+  document.getElementById('simResult').style.display = 'block';
+  document.getElementById('simResult').innerHTML = `
+    <div class="card">
+      <div class="result-hero">
+        <div class="score-ring" style="background:radial-gradient(closest-side,var(--bg) 79%,transparent 80%),conic-gradient(${cor} ${pct}%, rgba(255,255,255,0.08) 0)">
+          <div class="pct">${pct}%</div><div class="sub">${r.acertos}/${r.total}</div>
+        </div>
+        <h2 style="justify-content:center">${pct>=70?'Excelente!':pct>=50?'Bom trabalho!':'Continue treinando!'}</h2>
+        <p class="muted">Tempo: ${mm}min ${String(ss).padStart(2,'0')}s &#183; salvo no seu relatório</p>
+      </div>
+      <div class="divider"></div>
+      <h3 style="margin-top:0">Desempenho por tema</h3>
+      ${temaHtml}
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap">
+        <button class="btn" onclick="resetSimView()">Novo Simulado</button>
+        <button class="btn ghost" onclick="goTab('relatorio')">Ver Relatório &#9654;</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2><span class="ic">&#128269;</span> Correção comentada</h2>
+      ${revHtml}
+    </div>`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetSimView(){
+  document.getElementById('simResult').style.display = 'none';
+  document.getElementById('simQuiz').style.display = 'none';
+  document.getElementById('simStart').style.display = 'block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* =====================================================================
+   RELATÓRIO DE DESEMPENHO
+   ===================================================================== */
+function renderReport(){
+  const data = Store.read();
+  const hist = data.historico || [];
+  const box = document.getElementById('reportContent');
+
+  if(hist.length===0){
+    box.innerHTML = `<div class="card"><div class="empty">
+      <div class="e-ic">&#128202;</div>
+      <p>Nenhum simulado realizado ainda.</p>
+      <p style="margin-top:6px">Faça seu primeiro simulado para começar a acompanhar sua evolução.</p>
+      <button class="btn" style="margin-top:18px" onclick="goTab('simulados')">Ir para Simulados &#9654;</button>
+    </div></div>`;
+    return;
+  }
+
+  const totalSim = hist.length;
+  const pcts = hist.map(h=>h.acertos/h.total*100);
+  const media = Math.round(pcts.reduce((a,b)=>a+b,0)/totalSim);
+  const melhor = Math.round(Math.max.apply(null,pcts));
+  const tempoMedio = Math.round(hist.reduce((a,h)=>a+h.tempo,0)/totalSim);
+  const tm = Math.floor(tempoMedio/60), ts = tempoMedio%60;
+
+  // agregação por tema
+  const ag = {};
+  hist.forEach(h=>{
+    for(const t in h.porTema){
+      if(!ag[t]) ag[t] = {acertos:0,total:0};
+      ag[t].acertos += h.porTema[t].acertos;
+      ag[t].total += h.porTema[t].total;
+    }
+  });
+  const temasOrden = Object.keys(ag).sort((a,b)=> (ag[a].acertos/ag[a].total) - (ag[b].acertos/ag[b].total));
+
+  const temaBars = temasOrden.map(t=>{
+    const o = ag[t]; const p = Math.round(o.acertos/o.total*100);
+    const c = p>=70?'var(--green)':p>=50?'var(--yellow)':'var(--red)';
+    return `<div class="theme-bar-row">
+      <div class="tbr-head"><span class="name">${t}</span><span class="val" style="color:${c}">${p}% (${o.acertos}/${o.total})</span></div>
+      <div class="tbr-track"><div class="tbr-fill" style="width:${p}%;background:${c};box-shadow:0 0 10px ${c}"></div></div>
+    </div>`;
+  }).join('');
+
+  // recomendações: temas fracos (< 60%)
+  const fracos = temasOrden.filter(t=> (ag[t].acertos/ag[t].total*100) < 60);
+  let recHtml = '';
+  if(fracos.length){
+    recHtml = fracos.map(t=>`<div class="recommend">
+      <span class="r-ic">&#128161;</span>
+      <div class="r-txt">Seu ponto a reforçar é <b>${t}</b>. Revise o resumo na aba Conteúdos e refaça questões desse tema.</div>
+    </div>`).join('');
+  }else{
+    recHtml = `<div class="recommend" style="border-color:rgba(39,232,138,0.3);background:rgba(39,232,138,0.05)">
+      <span class="r-ic">&#127881;</span>
+      <div class="r-txt" style="color:#a9f5cd">Mandando bem em todos os temas! Mantenha o ritmo e foque em simulados completos para ganhar resistência.</div>
+    </div>`;
+  }
+
+  // histórico (mais recente primeiro)
+  const histHtml = hist.slice().reverse().map(h=>{
+    const p = Math.round(h.acertos/h.total*100);
+    const c = p>=70?'var(--green)':p>=50?'var(--yellow)':'var(--red)';
+    const d = new Date(h.data);
+    const dStr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    const hm = Math.floor(h.tempo/60), hs = h.tempo%60;
+    return `<div class="hist-row">
+      <span class="hist-date">${dStr}</span>
+      <span class="hist-score" style="color:${c}">${h.acertos}/${h.total}</span>
+      <span class="badge" style="color:${c};border-color:${c}">${p}%</span>
+      <span class="hist-meta">${hm}min ${String(hs).padStart(2,'0')}s</span>
+    </div>`;
+  }).join('');
+
+  box.innerHTML = `
+    <div class="card">
+      <h2><span class="ic">&#128200;</span> Visão geral</h2>
+      <div class="stat-grid">
+        <div class="stat"><div class="v">${totalSim}</div><div class="k">Simulados</div></div>
+        <div class="stat"><div class="v">${media}%</div><div class="k">Média de acertos</div></div>
+        <div class="stat"><div class="v">${melhor}%</div><div class="k">Melhor resultado</div></div>
+        <div class="stat"><div class="v">${tm}:${String(ts).padStart(2,'0')}</div><div class="k">Tempo médio</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">&#127919;</span> Desempenho por tema</h2>
+      <p class="muted">Do mais fraco ao mais forte — priorize o que está no vermelho.</p>
+      <div style="margin-top:14px">${temaBars}</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">&#128221;</span> Recomendações de estudo</h2>
+      ${recHtml}
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">&#128336;</span> Histórico de simulados</h2>
+      <div style="margin-top:6px">${histHtml}</div>
+      <div class="divider"></div>
+      <button class="btn danger sm" onclick="limparDados()">&#128465; Limpar todos os dados</button>
+      <p class="note">Apaga simulados, progresso e checklists salvos neste aparelho.</p>
+    </div>`;
+}
+
+function limparDados(){
+  if(confirm('Tem certeza? Isso apaga todo o seu progresso e histórico de simulados deste aparelho.')){
+    Store.reset();
+    renderSobreChecklist(); renderAulas(); renderConteudos(); renderAulasEnem(); renderReport(); renderSimStart();
+  }
+}
+
+/* =====================================================================
+   INICIALIZAÇÃO
+   ===================================================================== */
+document.getElementById('btnNext').addEventListener('click', nextQ);
+document.getElementById('btnPrev').addEventListener('click', prevQ);
+
+renderTemaWeights();
+renderSobreChecklist();
+renderAulas();
+renderConteudos();
+renderAulasEnem();
+renderQtyPills();
+renderSimStart();
+</script>
+</body>
+</html>

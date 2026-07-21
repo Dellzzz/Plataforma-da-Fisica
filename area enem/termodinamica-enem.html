@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Termodinâmica do Zero — Aula ENEM | Plataforma da Física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a1a; --bg-2:#0d0f24; --panel:rgba(18,22,48,0.72); --panel-solid:#12162f;
+    --cyan:#00e5ff; --cyan-dim:#0792a8; --magenta:#ff3df0; --violet:#8b5cff;
+    --green:#27e88a; --yellow:#ffd23d; --orange:#ff9d3d; --red:#ff5a6e;
+    --txt:#dbe6f5; --txt-dim:#8492b4; --line:rgba(0,229,255,0.18); --line-soft:rgba(255,255,255,0.07);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body::before{content:'';position:fixed;inset:0;z-index:-2;background:
+    radial-gradient(1100px 620px at 78% -8%, rgba(255,157,61,0.10), transparent 60%),
+    radial-gradient(900px 520px at 8% 12%, rgba(255,90,110,0.08), transparent 60%),
+    radial-gradient(800px 800px at 50% 120%, rgba(0,229,255,0.05), transparent 60%), var(--bg);}
+  body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);
+    background-size:46px 46px;mask-image:radial-gradient(ellipse 100% 70% at 50% 0%,#000 30%,transparent 80%);}
+  ::selection{background:rgba(255,157,61,0.3);color:#fff}
+
+  .topbar{position:sticky;top:0;z-index:60;backdrop-filter:blur(12px);background:rgba(8,9,22,0.78);border-bottom:1px solid var(--line)}
+  .topbar-row{max-width:980px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:14px}
+  .tb-logo{font-family:'Orbitron';font-weight:700;font-size:14px;color:#eafcff;letter-spacing:.5px;display:flex;align-items:center;gap:9px;white-space:nowrap}
+  .tb-logo .spark{color:var(--orange);filter:drop-shadow(0 0 6px var(--orange))}
+  .tb-spacer{flex:1}
+  .tb-pct{font-family:'Orbitron';font-weight:700;font-size:13px;color:var(--green);min-width:42px;text-align:right}
+  .tb-toc-btn{font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:.4px;color:var(--orange);background:rgba(255,157,61,0.08);border:1px solid rgba(255,157,61,0.3);padding:8px 13px;border-radius:9px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .tb-toc-btn:hover{background:rgba(255,157,61,0.16)}
+  .progress-strip{height:3px;background:rgba(255,255,255,0.06)}
+  .progress-strip > div{height:100%;width:0;background:linear-gradient(90deg,var(--orange),var(--red));box-shadow:0 0 10px rgba(255,157,61,.6);transition:width .4s ease}
+
+  .toc{position:fixed;inset:0;z-index:70;display:none;background:rgba(4,5,14,0.72);backdrop-filter:blur(4px)}
+  .toc.open{display:block}
+  .toc-panel{position:absolute;right:0;top:0;height:100%;width:min(340px,86vw);background:var(--panel-solid);border-left:1px solid var(--line);padding:24px 20px;overflow-y:auto;transform:translateX(100%);transition:transform .3s ease}
+  .toc.open .toc-panel{transform:translateX(0)}
+  .toc-panel h3{font-family:'Orbitron';font-weight:700;font-size:14px;color:var(--orange);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+  .toc-x{cursor:pointer;color:var(--txt-dim);font-size:22px;line-height:1}
+  .toc a{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--txt);padding:11px 12px;border-radius:9px;margin-bottom:4px;font-size:16px;font-weight:500;transition:.18s;border:1px solid transparent}
+  .toc a:hover{background:rgba(255,157,61,0.06);border-color:rgba(255,157,61,0.3)}
+  .toc a .n{font-family:'Orbitron';font-size:11px;color:var(--orange);min-width:22px}
+  .toc a .dot{margin-left:auto;width:16px;height:16px;border-radius:50%;border:2px solid var(--cyan-dim);display:grid;place-items:center;font-size:10px;color:#04121a}
+  .toc a.done .dot{background:var(--green);border-color:var(--green)}
+
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  section.lesson{padding:60px 0;border-bottom:1px solid var(--line-soft)}
+  section.lesson:last-of-type{border-bottom:none}
+
+  .hero{position:relative;overflow:hidden;padding:0;border-bottom:1px solid var(--line)}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.6}
+  .hero-inner{position:relative;max-width:980px;margin:0 auto;padding:74px 20px 70px;text-align:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:2px;color:var(--orange);border:1px solid rgba(255,157,61,0.3);background:rgba(255,157,61,0.05);padding:7px 15px;border-radius:30px;text-transform:uppercase;margin-bottom:26px}
+  .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px var(--orange);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .hero h1{font-family:'Orbitron';font-weight:900;font-size:clamp(34px,8vw,62px);line-height:1.02;letter-spacing:-1px;color:#eafcff;text-shadow:0 0 34px rgba(255,157,61,0.35)}
+  .hero h1 .glow{color:var(--orange);text-shadow:0 0 30px rgba(255,157,61,0.7)}
+  .hero .sub{font-size:clamp(17px,2.6vw,21px);color:var(--txt);max-width:640px;margin:22px auto 0;font-weight:500}
+  .hero .sub b{color:#eafcff;font-weight:700}
+  .hero-meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+  .chip{font-family:'Orbitron';font-size:11px;font-weight:500;color:var(--txt-dim);border:1px solid var(--line-soft);background:rgba(255,255,255,0.02);padding:8px 13px;border-radius:8px}
+  .chip b{color:var(--orange);font-weight:700}
+  .scroll-cue{margin-top:42px;font-family:'Orbitron';font-size:11px;letter-spacing:1.5px;color:var(--txt-dim);animation:bob 2s infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
+
+  .kicker{font-family:'Orbitron';font-weight:500;font-size:12px;letter-spacing:1.6px;color:var(--orange);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .kicker .num{font-weight:900;font-size:13px;color:#180a04;background:var(--orange);width:30px;height:30px;display:grid;place-items:center;border-radius:9px;box-shadow:0 0 14px rgba(255,157,61,.5)}
+  h2.sec-title{font-family:'Orbitron';font-weight:700;font-size:clamp(24px,4.6vw,34px);color:#eafcff;line-height:1.12;letter-spacing:-.3px;margin-bottom:20px}
+  .lead{font-size:19px;color:var(--txt);font-weight:500;line-height:1.65;margin-bottom:18px}
+  p.body{font-size:17px;line-height:1.72;color:var(--txt);font-weight:400;margin-bottom:16px}
+  p.body b{color:#eafcff;font-weight:700}
+  p.body .hl{color:var(--orange);font-weight:600}
+  .unit{color:var(--violet);font-weight:700}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin:22px 0;backdrop-filter:blur(6px)}
+  .note{border-left:3px solid var(--orange);background:rgba(255,157,61,0.05);padding:15px 18px;border-radius:0 11px 11px 0;margin:20px 0;font-size:16.5px;line-height:1.6}
+  .note.tip{border-left-color:var(--green);background:rgba(39,232,138,0.06)}
+  .note.warn{border-left-color:var(--red);background:rgba(255,90,110,0.06)}
+  .note .tag{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.6px;display:block;margin-bottom:6px;color:var(--orange)}
+  .note.tip .tag{color:var(--green)}
+  .note.warn .tag{color:var(--red)}
+  .note b{color:#eafcff}
+
+  .formula{text-align:center;font-family:'Orbitron';font-weight:700;font-size:clamp(22px,5vw,30px);color:#eafcff;background:rgba(0,0,0,0.32);border:1px solid var(--line);border-radius:12px;padding:22px;margin:22px 0;letter-spacing:1px}
+  .formula .v{color:var(--orange)}
+  .formula .r{color:var(--yellow)}
+  .formula .i{color:var(--green)}
+  .formula .c{color:var(--cyan)}
+  .formula small{display:block;font-family:'Rajdhani';font-weight:500;font-size:14px;letter-spacing:0;color:var(--txt-dim);margin-top:12px}
+
+  .map{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden;margin:22px 0}
+  .map.two{grid-template-columns:repeat(2,1fr)}
+  .map .m{background:var(--panel-solid);padding:18px 16px;text-align:center}
+  .map .m .ic{font-size:26px;display:block;margin-bottom:8px}
+  .map .m .t{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;display:block;margin-bottom:6px}
+  .map .m .d{color:var(--txt-dim);font-size:14px;line-height:1.4}
+
+  .sim{background:linear-gradient(180deg,rgba(13,15,36,0.9),rgba(10,10,26,0.9));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:24px 0;box-shadow:0 8px 40px rgba(0,0,0,0.35)}
+  .sim-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(255,157,61,0.06);border-bottom:1px solid rgba(255,157,61,0.2)}
+  .sim-head .ic{font-size:16px}
+  .sim-head .ttl{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;letter-spacing:.4px}
+  .sim-head .lbl{margin-left:auto;font-family:'Orbitron';font-size:10px;color:var(--orange);border:1px solid rgba(255,157,61,0.3);padding:4px 9px;border-radius:20px}
+  .sim-canvas-wrap{position:relative;width:100%;background:radial-gradient(circle at 50% 40%,rgba(255,157,61,0.04),transparent 70%)}
+  .sim canvas{display:block;width:100%}
+  .sim-controls{padding:18px}
+  .ctrl{margin-bottom:16px}
+  .ctrl:last-child{margin-bottom:0}
+  .ctrl-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .ctrl-label .nm{font-family:'Orbitron';font-weight:500;font-size:12.5px;color:var(--txt);letter-spacing:.3px}
+  .ctrl-label .vl{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--orange)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--orange),rgba(255,255,255,0.08));outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--orange);box-shadow:0 0 12px rgba(255,157,61,0.7);border:2px solid #180a04;cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--orange);box-shadow:0 0 12px rgba(255,157,61,0.7);border:2px solid #180a04;cursor:pointer}
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .readout .ro{flex:1;min-width:90px;background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;text-align:center}
+  .readout .ro .k{font-family:'Orbitron';font-size:10px;letter-spacing:.5px;color:var(--txt-dim);display:block;margin-bottom:4px}
+  .readout .ro .v{font-family:'Orbitron';font-weight:700;font-size:19px;color:var(--orange)}
+  .readout .ro.g .v{color:var(--green)}
+  .readout .ro.c .v{color:var(--cyan)}
+  .readout .ro.r .v{color:var(--red)}
+  .sim-btn{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;background:rgba(255,157,61,0.1);color:var(--orange);border:1px solid rgba(255,157,61,0.3);padding:11px 18px;border-radius:10px;cursor:pointer;transition:.2s;margin-top:4px}
+  .sim-btn:hover{background:rgba(255,157,61,0.2)}
+
+  .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .calc-field{margin-bottom:6px}
+  .calc-field label{display:block;font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:.3px;color:var(--txt-dim);margin-bottom:7px}
+  input.num{width:100%;background:var(--panel-solid);color:#eafcff;border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-family:'Rajdhani';font-weight:600;font-size:16px;outline:none}
+  input.num:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,157,61,0.12)}
+  .calc-result{margin-top:16px;background:linear-gradient(135deg,rgba(255,157,61,0.1),rgba(255,90,110,0.08));border:1px solid rgba(255,157,61,0.3);border-radius:12px;padding:18px;text-align:center}
+  .calc-result .big{font-family:'Orbitron';font-weight:900;font-size:34px;color:var(--orange);text-shadow:0 0 16px rgba(255,157,61,0.4);line-height:1}
+  .calc-result .lbl{font-family:'Orbitron';font-size:11px;color:var(--txt-dim);letter-spacing:.5px;margin-top:8px}
+
+  .enem-q{border:1px solid var(--violet);border-radius:var(--radius);overflow:hidden;margin:26px 0;background:linear-gradient(180deg,rgba(139,92,255,0.06),rgba(10,10,26,0.4))}
+  .eq-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(139,92,255,0.1);border-bottom:1px solid rgba(139,92,255,0.25);flex-wrap:wrap}
+  .eq-badge{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.4px;color:var(--violet);border:1px solid rgba(139,92,255,0.4);background:rgba(139,92,255,0.08);padding:5px 11px;border-radius:20px}
+  .eq-tag{font-family:'Orbitron';font-size:11px;color:var(--txt-dim);letter-spacing:.5px}
+  .eq-tag.real{margin-left:auto;color:var(--green)}
+  .eq-body{padding:20px 18px}
+  .eq-enun{font-size:16.5px;line-height:1.62;color:var(--txt);margin-bottom:16px}
+  .eq-alts{display:flex;flex-direction:column;gap:8px}
+  .eq-alt{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;font-size:15.5px;transition:.25s}
+  .eq-alt .let{font-family:'Orbitron';font-weight:700;font-size:13px;width:26px;height:26px;flex-shrink:0;display:grid;place-items:center;border-radius:7px;border:1px solid var(--cyan-dim);color:var(--cyan)}
+  .eq-alt.correct{border-color:var(--green);background:rgba(39,232,138,0.1)}
+  .eq-alt.correct .let{background:var(--green);color:#04121a;border-color:var(--green)}
+  .reveal-btn{margin-top:16px;width:100%;font-family:'Orbitron';font-weight:700;font-size:13px;letter-spacing:.5px;background:linear-gradient(120deg,var(--violet),#6f4ad6);color:#fff;border:none;padding:13px;border-radius:11px;cursor:pointer;transition:.2s}
+  .reveal-btn:hover{filter:brightness(1.12);box-shadow:0 0 20px rgba(139,92,255,0.4)}
+  .eq-sol{margin-top:18px;border-top:1px dashed rgba(139,92,255,0.3);padding-top:18px;display:none}
+  .eq-sol.show{display:block;animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .eq-sol h4{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;color:var(--orange);margin:16px 0 8px;text-transform:uppercase}
+  .eq-sol h4:first-child{margin-top:0}
+  .eq-sol p{font-size:16px;line-height:1.62;color:var(--txt);margin-bottom:6px}
+  .eq-sol .calc-step{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--yellow);background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:9px;padding:11px 14px;margin:10px 0;letter-spacing:.5px}
+  .eq-answer{margin-top:16px;font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--green);background:rgba(39,232,138,0.1);border:1px solid rgba(39,232,138,0.3);border-radius:10px;padding:13px 16px;text-align:center}
+
+  .laws{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}
+  .laws .lw{background:var(--panel-solid);border:1px solid var(--line-soft);border-radius:12px;padding:18px 14px;text-align:center}
+  .laws .lw .n{font-size:26px}
+  .laws .lw .t{font-family:'Orbitron';font-weight:700;font-size:12px;color:#eafcff;margin:8px 0 6px;letter-spacing:.3px}
+  .laws .lw .d{font-size:13.5px;color:var(--txt-dim);line-height:1.45}
+
+  .sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0}
+  .sheet .f{background:var(--panel-solid);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .sheet .f .eq{font-family:'Orbitron';font-weight:700;font-size:17px;color:var(--orange);margin-bottom:7px}
+  .sheet .f .ds{font-size:13.5px;color:var(--txt-dim);line-height:1.4}
+  .takeaways{list-style:none;margin:18px 0}
+  .takeaways li{position:relative;padding:9px 0 9px 32px;font-size:16.5px;line-height:1.55;border-bottom:1px solid var(--line-soft)}
+  .takeaways li:last-child{border-bottom:none}
+  .takeaways li::before{content:'\1F525';position:absolute;left:0;top:8px;font-size:15px}
+  .takeaways li b{color:#eafcff}
+
+  .finish-card{text-align:center;background:linear-gradient(135deg,rgba(255,157,61,0.08),rgba(255,90,110,0.08));border:1px solid rgba(255,157,61,0.3)}
+  .btn{font-family:'Orbitron';font-weight:700;font-size:14px;letter-spacing:.5px;background:linear-gradient(120deg,var(--orange),#ffb765);color:#180a04;border:none;padding:15px 30px;border-radius:12px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:9px}
+  .btn:hover{filter:brightness(1.08);box-shadow:0 0 26px rgba(255,157,61,0.45);transform:translateY(-1px)}
+  .btn.done-state{background:linear-gradient(120deg,var(--green),#1fd07e);color:#04121a}
+  footer{padding:34px 20px 50px;text-align:center;color:var(--txt-dim);font-size:13.5px}
+  footer .ft-logo{font-family:'Orbitron';font-weight:700;color:var(--orange);font-size:14px}
+
+  @media(max-width:680px){
+    section.lesson{padding:46px 0}
+    .map,.map.two,.laws{grid-template-columns:1fr}
+    .hero-inner{padding:58px 20px 54px}
+    p.body,.lead{font-size:16.5px}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <span class="tb-logo"><span class="spark">&#128293;</span> Termodinâmica · Aula ENEM</span>
+    <span class="tb-spacer"></span>
+    <span class="tb-pct" id="tbPct">0%</span>
+    <button class="tb-toc-btn" id="tocBtn">&#9776; Conteúdo</button>
+  </div>
+  <div class="progress-strip"><div id="progBar"></div></div>
+</div>
+
+<div class="toc" id="toc">
+  <div class="toc-panel">
+    <h3>Conteúdo da aula <span class="toc-x" id="tocX">&times;</span></h3>
+    <nav id="tocNav"></nav>
+  </div>
+</div>
+
+<header class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="pulse"></span> Plataforma da Física · do zero ao ENEM</span>
+    <h1>Termodi<span class="glow">nâmica</span><br>do Zero</h1>
+    <p class="sub">Do café que esfria à geladeira e às usinas de energia — entenda calor, temperatura e as leis que regem tudo isso, com simulações interativas e <b>questões reais do ENEM</b> resolvidas passo a passo.</p>
+    <div class="hero-meta">
+      <span class="chip"><b>4</b> simulações interativas</span>
+      <span class="chip"><b>14</b> questões do ENEM</span>
+      <span class="chip"><b>0</b> pré-requisitos</span>
+    </div>
+    <div class="scroll-cue">&#9660; ROLE PARA COMEÇAR</div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 1. INTRO ============ -->
+<section class="lesson" id="s1" data-title="O que é termodinâmica">
+  <div class="wrap">
+    <div class="kicker"><span class="num">1</span> A grande ideia</div>
+    <h2 class="sec-title">O que é termodinâmica?</h2>
+    <p class="lead">Termodinâmica é o estudo do <b>calor</b> e de como ele se transforma em outras formas de energia — e vice-versa.</p>
+    <p class="body">Ela está por trás de coisas que você vive todo dia: o café que esfria na xícara, o cobertor que te aquece, a geladeira que gela a comida, o motor do carro e as usinas que geram a eletricidade da sua casa. Todas seguem as mesmas regras que vamos estudar aqui.</p>
+    <p class="body">Antes de tudo, é preciso acertar <b>duas palavras</b> que o dia a dia confunde, mas que a física separa com todo rigor — e que são a base de tudo:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#127777;</span><span class="t">TEMPERATURA</span><span class="d">o quão agitadas estão as moléculas de um corpo</span></div>
+      <div class="m"><span class="ic">&#128293;</span><span class="t">CALOR</span><span class="d">energia que passa de um corpo quente para um frio</span></div>
+    </div>
+    <p class="body">Essa diferença é a chave da matéria — e a primeira coisa que o ENEM cobra. Vamos a ela.</p>
+  </div>
+</section>
+
+<!-- ============ 2. TEMPERATURA x CALOR ============ -->
+<section class="lesson" id="s2" data-title="Temperatura × calor">
+  <div class="wrap">
+    <div class="kicker"><span class="num">2</span> A distinção que mais cai</div>
+    <h2 class="sec-title">Temperatura × calor</h2>
+    <p class="body"><b>Temperatura</b> mede a agitação das moléculas: quanto mais quentes, mais elas se mexem. <b>Calor</b> é diferente — é <span class="hl">energia térmica em trânsito</span>, que só existe enquanto flui de um corpo mais quente para um mais frio. Ninguém "tem" calor guardado; um corpo tem energia térmica, e chamamos de calor a parcela dessa energia que <b>passa</b> de um corpo para outro.</p>
+    <div class="note">
+      <span class="tag">REGRA DE OURO</span>
+      O calor <b>sempre</b> flui espontaneamente do corpo de <b>maior</b> temperatura para o de <b>menor</b> temperatura — nunca o contrário. Ele para de fluir quando os dois chegam à mesma temperatura: o <b>equilíbrio térmico</b>.
+    </div>
+    <p class="body">É por isso que uma colher de metal na sopa quente "esquenta": o calor flui da sopa para a colher. Veja o calor fluindo até o equilíbrio:</p>
+
+    <!-- SIM 1: equilíbrio térmico -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#127777;</span><span class="ttl">Simulação · Equilíbrio térmico</span><span class="lbl">arraste e observe</span></div>
+      <div class="sim-canvas-wrap"><canvas id="eqCanvas" height="180"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Temperatura do corpo quente</span><span class="vl" id="eqHval">80&deg;C</span></div>
+          <input type="range" id="eqH" min="45" max="95" value="80">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Temperatura do corpo frio</span><span class="vl" id="eqCval">10&deg;C</span></div>
+          <input type="range" id="eqC" min="0" max="40" value="10">
+        </div>
+        <div class="readout">
+          <div class="ro r"><span class="k">CORPO QUENTE</span><span class="v" id="eqHnow">—</span></div>
+          <div class="ro c"><span class="k">CORPO FRIO</span><span class="v" id="eqCnow">—</span></div>
+        </div>
+        <button class="sim-btn" id="eqReset">&#8635; Reiniciar contato</button>
+      </div>
+    </div>
+
+    <div class="note tip">
+      <span class="tag">ESCALAS DE TEMPERATURA</span>
+      No Brasil usamos <b>Celsius (&deg;C)</b>. A ciência usa o <b>Kelvin (K)</b>, que começa no zero absoluto (a menor temperatura possível): <b>K = &deg;C + 273</b>. Alguns países usam <b>Fahrenheit (&deg;F)</b>. No Kelvin não existe temperatura negativa.
+    </div>
+
+    <!-- ENEM p137 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">É comum ouvirmos expressões como "hoje está calor" quando a temperatura ambiente está alta. No contexto científico, é correto o significado de "calor" usado nessas expressões?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>Sim, pois o calor de um corpo depende de sua temperatura.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Sim, pois calor é sinônimo de alta temperatura.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>Não, pois calor é energia térmica em trânsito.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>Não, pois calor é a quantidade de energia térmica contida em um corpo.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>Não, pois o calor é diretamente proporcional à temperatura, mas são conceitos diferentes.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>Cientificamente, calor <b>não</b> é algo que um corpo "tem" nem é sinônimo de temperatura. Calor é <b>energia térmica em trânsito</b> — só existe quando a energia está passando de um corpo para outro.</p>
+          <h4>Por que as outras erram</h4>
+          <p>A alternativa D é a pegadinha: parece certa, mas diz que calor é energia "contida" no corpo — e não é (isso seria energia interna). Como o corpo não "contém calor", dizer "está calor" é cientificamente incorreto.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. CALORIMETRIA ============ -->
+<section class="lesson" id="s3" data-title="Calorimetria">
+  <div class="wrap">
+    <div class="kicker"><span class="num">3</span> Medindo o calor</div>
+    <h2 class="sec-title">Calor sensível e calorimetria</h2>
+    <p class="body">Quando o calor faz a temperatura de um corpo <b>subir ou descer</b> (sem mudar de estado), chamamos de <span class="hl">calor sensível</span>. A quantidade de calor necessária é dada por uma fórmula central do ENEM:</p>
+    <div class="formula"><span class="v">Q</span> = <span class="r">m</span> &middot; <span class="c">c</span> &middot; &Delta;<span style="color:var(--green)">T</span> <small>calor = massa &times; calor específico &times; variação de temperatura &nbsp;|&nbsp; em <span class="unit">calorias</span> ou joules</small></div>
+    <p class="body">O <b>calor específico (c)</b> é uma "teimosia" de cada material: diz quanto calor ele precisa para esquentar. A água tem calor específico alto (1 cal/g&middot;&deg;C) — por isso demora para ferver e para esfriar. Metais têm calor específico baixo — esquentam num instante.</p>
+    <p class="body">Quando um corpo quente e um frio se encontram, vale a regra do <b>equilíbrio</b>: todo o <span class="hl">calor cedido</span> pelo quente é igual ao <span class="hl">calor recebido</span> pelo frio. É assim que se acha a temperatura final de uma mistura:</p>
+
+    <!-- SIM 2: calorimetria -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#127865;</span><span class="ttl">Simulação · Mistura de águas (temperatura final)</span><span class="lbl">edite</span></div>
+      <div class="sim-controls">
+        <div class="calc-grid">
+          <div class="calc-field"><label>Água quente — massa (g)</label><input type="number" class="num" id="cmM1" value="200" min="1"></div>
+          <div class="calc-field"><label>Água quente — temperatura (&deg;C)</label><input type="number" class="num" id="cmT1" value="70" min="0"></div>
+          <div class="calc-field"><label>Água fria — massa (g)</label><input type="number" class="num" id="cmM2" value="300" min="1"></div>
+          <div class="calc-field"><label>Água fria — temperatura (&deg;C)</label><input type="number" class="num" id="cmT2" value="20" min="0"></div>
+        </div>
+        <div class="calc-result">
+          <div class="big" id="cmTf">—</div>
+          <div class="lbl">TEMPERATURA FINAL DA MISTURA (EQUILÍBRIO)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p136 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Um aquecedor solar eleva a água a 70&deg;C, mas a temperatura ideal do banho é 30&deg;C. Por isso, mistura-se a água quente com a água de outro reservatório, que está a 25&deg;C. Qual a razão entre a massa de água quente e a massa de água fria para o banho ficar a 30&deg;C?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>0,111</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>0,125</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>0,357</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>0,428</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>0,833</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Montando o equilíbrio</h4>
+          <p>O calor cedido pela água quente (que esfria de 70 para 30) é igual ao calor recebido pela fria (que esquenta de 25 para 30). Como é a mesma água, o calor específico c se cancela:</p>
+          <div class="calc-step">m&#7561; &middot; (70 - 30) = m&#6493; &middot; (30 - 25)</div>
+          <div class="calc-step">m&#7561; &middot; 40 = m&#6493; &middot; 5</div>
+          <h4>Isolando a razão</h4>
+          <p>Queremos m&#7561; / m&#6493;. Dividindo:</p>
+          <div class="calc-step">m&#7561; / m&#6493; = 5 / 40 = 0,125</div>
+          <p>Ou seja, para cada 1 parte de água fria, basta 0,125 de água quente — faz sentido, já que a fria só precisa subir 5&deg;C.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p140 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Para medir o valor calórico de um alimento, um técnico coloca água num recipiente isolado e queima dentro dele uma massa conhecida do alimento; o calor liberado aquece a água. Qual aparelho de medida é essencial nesse teste?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>Cronômetro.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Dinamômetro.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>Termômetro.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>Radiômetro.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>Potenciômetro.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Pela fórmula Q = m&middot;c&middot;&Delta;T, para descobrir o calor liberado (Q) o técnico mede a <b>variação de temperatura</b> (&Delta;T) da água, cuja massa e calor específico ele conhece.</p>
+          <p>Para medir temperatura, o aparelho essencial é o <b>termômetro</b>. Esse é justamente o princípio de um calorímetro.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. CALOR LATENTE ============ -->
+<section class="lesson" id="s4" data-title="Calor latente e estados">
+  <div class="wrap">
+    <div class="kicker"><span class="num">4</span> Quando o estado muda</div>
+    <h2 class="sec-title">Calor latente e mudanças de estado</h2>
+    <p class="body">Aqui está uma das ideias mais surpreendentes da termodinâmica: <b>durante uma mudança de estado, a temperatura não muda</b>, mesmo recebendo calor. A água fervendo fica em 100&deg;C do começo ao fim; todo o calor recebido é usado para <span class="hl">transformar líquido em vapor</span>, não para aumentar a temperatura. Esse é o <b>calor latente</b>:</p>
+    <div class="formula"><span class="v">Q</span> = <span class="r">m</span> &middot; <span class="c">L</span> <small>calor = massa &times; calor latente &nbsp;|&nbsp; L é próprio de cada mudança (fusão, vaporização...)</small></div>
+    <p class="body">Observe a "curva de aquecimento": os trechos inclinados são calor sensível (temperatura sobe); os trechos <b>planos</b> são calor latente (muda de estado, temperatura parada).</p>
+
+    <!-- SIM 3: curva de aquecimento -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#128200;</span><span class="ttl">Simulação · Curva de aquecimento da água</span><span class="lbl">assista</span></div>
+      <div class="sim-canvas-wrap"><canvas id="curveCanvas" height="230"></canvas></div>
+      <div class="sim-controls">
+        <div class="readout">
+          <div class="ro c"><span class="k">ESTADO ATUAL</span><span class="v" id="curveState" style="font-size:15px">—</span></div>
+          <div class="ro"><span class="k">TEMPERATURA</span><span class="v" id="curveTemp">—</span></div>
+        </div>
+        <button class="sim-btn" id="curvePlay">&#9654; Aquecer do gelo ao vapor</button>
+      </div>
+    </div>
+    <div class="note tip">
+      <span class="tag">POR QUE SUAR REFRESCA</span>
+      Para o suor <b>evaporar</b> da sua pele, ele precisa de calor latente — e tira esse calor do seu corpo. Por isso a evaporação do suor <b>resfria</b> você. É o mesmo motivo pelo qual sair molhado da piscina dá friagem.
+    </div>
+
+    <!-- ENEM p145 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2009</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">A água tem um valor muito elevado de calor latente de vaporização (540 cal/g), ou seja, precisa absorver muito calor para passar de líquida a vapor na mesma temperatura. Essa propriedade confere à água a capacidade de</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>servir como doador de elétrons no processo de fotossíntese.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>funcionar como regulador térmico para os organismos vivos.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>agir como solvente universal nos tecidos animais e vegetais.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>transportar os íons de ferro e magnésio nos tecidos vegetais.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>funcionar como mantenedora do metabolismo nos organismos vivos.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Como a água precisa de <b>muito</b> calor para evaporar (e libera muito ao condensar), ela consegue absorver ou ceder grandes quantidades de energia <b>sem</b> grandes variações de temperatura.</p>
+          <p>Isso a torna um excelente <b>regulador térmico</b>: é por isso que a transpiração controla a temperatura do corpo e que regiões litorâneas têm clima mais ameno que o interior.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p148 -->
+    <div class="enem-q" data-correct="3">
+      <div class="eq-head"><span class="eq-badge">ENEM 2009</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Para dessalinizar água, cobre-se um tanque de água salgada com um plástico transparente inclinado. A água evapora com o calor do Sol, condensa no plástico e escorre como água doce até um copo. Nesse processo, a energia solar cedida à água salgada</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>fica retida na água doce que cai no copo, tornando-a altamente energizada.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>fica armazenada como energia potencial gravitacional na água doce.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>é usada para provocar a reação química que transforma água salgada em doce.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>é cedida ao ambiente externo através do plástico, onde ocorre a condensação.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>é reemitida como calor no processo de evaporação da água salgada.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Seguindo a energia</h4>
+          <p>O Sol fornece calor latente para a água <b>evaporar</b>. Quando esse vapor toca o plástico mais frio, ele <b>condensa</b> — e ao condensar, devolve esse mesmo calor latente.</p>
+          <p>Esse calor é liberado no plástico e daí <b>cedido ao ambiente externo</b>. Não há reação química (a dessalinização é física: evaporar e condensar deixa o sal para trás).</p>
+          <div class="eq-answer">Resposta: alternativa D</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. TRANSFERÊNCIA DE CALOR ============ -->
+<section class="lesson" id="s5" data-title="Transferência de calor">
+  <div class="wrap">
+    <div class="kicker"><span class="num">5</span> Como o calor viaja</div>
+    <h2 class="sec-title">As três formas de transferir calor</h2>
+    <p class="body">O calor pode ir de um lugar a outro de três maneiras — e o ENEM adora pedir para você identificar qual é qual:</p>
+    <div class="laws">
+      <div class="lw"><span class="n">&#127859;</span><div class="t">CONDUÇÃO</div><div class="d">calor passa pelo <b>contato</b>, de molécula em molécula (a colher na panela)</div></div>
+      <div class="lw"><span class="n">&#127765;</span><div class="t">CONVECÇÃO</div><div class="d">o <b>fluido</b> quente sobe e o frio desce, criando correntes (o ar-condicionado)</div></div>
+      <div class="lw"><span class="n">&#9728;</span><div class="t">RADIAÇÃO</div><div class="d">calor viaja como <b>onda</b>, sem precisar de meio (o calor do Sol, do fogo)</div></div>
+    </div>
+    <p class="body">Na <b>condução</b>, materiais como metal conduzem bem (bons condutores); ar, lã, isopor e madeira conduzem mal (isolantes). Na <b>convecção</b>, o ar quente sobe — por isso o congelador fica em cima na geladeira e o ar-condicionado no alto. Na <b>radiação</b>, o calor atravessa o vácuo — é assim que o Sol nos aquece a 150 milhões de km.</p>
+
+    <!-- ENEM p142 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Em dias frios, usamos blusas de lã para diminuir a sensação de frio. Fisicamente, a sensação de frio ocorre porque o corpo libera calor para o ambiente. A blusa de lã diminui essa sensação porque</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>possui a propriedade de gerar calor.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>é feita de material denso, que não permite a entrada de ar frio.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>diminui a taxa de transferência de calor do corpo para o meio externo.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>absorve calor, facilitando o equilíbrio térmico.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>está em contato com o corpo, facilitando a transferência de calor por condução.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>Nenhuma roupa "gera" calor — quem produz o calor é o seu corpo. A lã é um bom <b>isolante térmico</b> (conduz mal o calor) e ainda prende ar entre as fibras.</p>
+          <h4>Raciocínio</h4>
+          <p>Assim, a lã <b>reduz a taxa de transferência de calor</b> do seu corpo para o ar frio. Você perde calor mais devagar e sente menos frio — mas é o seu próprio calor que está sendo conservado.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. DILATAÇÃO ============ -->
+<section class="lesson" id="s6" data-title="Dilatação térmica">
+  <div class="wrap">
+    <div class="kicker"><span class="num">6</span> O calor incha as coisas</div>
+    <h2 class="sec-title">Dilatação térmica</h2>
+    <p class="body">Quase todos os materiais <b>aumentam de tamanho quando esquentam</b> e encolhem quando esfriam — é a <span class="hl">dilatação térmica</span>. Ao aquecer, as moléculas se agitam mais e ocupam mais espaço.</p>
+    <p class="body">Esse efeito é pequeno, mas importante na engenharia e aparece no seu cotidiano:</p>
+    <div class="map">
+      <div class="m"><span class="ic">&#128741;</span><span class="t">TRILHOS E PONTES</span><span class="d">têm pequenos vãos para não entortar ao dilatar no calor</span></div>
+      <div class="m"><span class="ic">&#127777;</span><span class="t">TERMÔMETRO</span><span class="d">o líquido sobe porque dilata com a temperatura</span></div>
+      <div class="m"><span class="ic">&#128293;</span><span class="t">ABRIR TAMPA</span><span class="d">água quente dilata a tampa de metal e ela solta do vidro</span></div>
+    </div>
+    <div class="note tip">
+      <span class="tag">CURIOSIDADE: A ÁGUA É REBELDE</span>
+      A água tem um comportamento único: entre 0&deg;C e 4&deg;C, ela <b>encolhe</b> ao esquentar, em vez de dilatar. Por isso o gelo flutua e os lagos congelam de cima para baixo — o que permite a vida aquática sobreviver embaixo do gelo no inverno.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. 1ª LEI E MÁQUINAS TÉRMICAS ============ -->
+<section class="lesson" id="s7" data-title="1ª Lei e máquinas térmicas">
+  <div class="wrap">
+    <div class="kicker"><span class="num">7</span> Calor virando trabalho</div>
+    <h2 class="sec-title">1ª Lei e as máquinas térmicas</h2>
+    <p class="body">A <span class="hl">1ª Lei da Termodinâmica</span> é a conservação da energia aplicada ao calor: a energia não some, só muda de forma. Se você fornece calor a um gás, essa energia vira <b>trabalho</b> (o gás empurra algo) mais o aumento da sua <b>energia interna</b>.</p>
+    <p class="body">É esse o princípio de uma <span class="hl">máquina térmica</span>: ela recebe calor de uma fonte <b>quente</b>, transforma parte dele em <b>trabalho</b> útil, e joga o resto numa fonte <b>fria</b>. Motores de carro, turbinas e usinas funcionam assim:</p>
+
+    <!-- SIM 4: máquina térmica -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#9881;</span><span class="ttl">Simulação · Máquina térmica e rendimento</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="engineCanvas" height="240"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Calor recebido da fonte quente (Q<sub>q</sub>)</span><span class="vl" id="engQval">100 J</span></div>
+          <input type="range" id="engQ" min="60" max="200" value="100">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Rendimento da máquina</span><span class="vl" id="engEval">30%</span></div>
+          <input type="range" id="engE" min="5" max="60" value="30">
+        </div>
+        <div class="readout">
+          <div class="ro g"><span class="k">TRABALHO ÚTIL (W)</span><span class="v" id="engW">—</span></div>
+          <div class="ro c"><span class="k">CALOR PERDIDO (Q<sub>f</sub>)</span><span class="v" id="engQf">—</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="body">O rendimento (&eta;) diz qual fração do calor vira trabalho útil: <b>&eta; = W / Q<sub>q</sub></b>. Note que <b>nunca</b> chega a 100% — sempre sobra calor jogado fora. Guarde isso; é a 2ª Lei, que vem a seguir.</p>
+
+    <!-- ENEM p28 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Uma usina termelétrica a carvão transforma a energia do combustível em energia elétrica. Em que sequência ocorrem os processos dessa transformação?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>Transforma diretamente a energia química do carvão em elétrica, por fissão.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Queima o carvão gerando energia térmica, transformada em elétrica por transformadores.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>A queima gera calor, que vira vapor; o vapor move a turbina (energia mecânica), que aciona o gerador (energia elétrica).</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>A queima gera calor, transformado em energia potencial na torre, e daí em elétrica.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>A queima aquece a água, que vira energia química ao se decompor, gerando eletricidade.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Seguindo a cadeia de energia</h4>
+          <p>É a máquina térmica clássica, em quatro etapas encadeadas:</p>
+          <div class="calc-step">carvão (química) &rarr; calor (térmica) &rarr; vapor move a turbina (mecânica) &rarr; gerador (elétrica)</div>
+          <p>É a mesma sequência de quase toda usina (nuclear, geotérmica, a carvão): o que muda é só a fonte de calor. A alternativa C descreve exatamente esse caminho.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p34 -->
+    <div class="enem-q" data-correct="3">
+      <div class="eq-head"><span class="eq-badge">ENEM 2009</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Nas usinas geotérmicas, a água aquecida pelo calor interno da Terra vira vapor, que é usado para mover turbinas e gerar eletricidade. Sob o aspecto da conversão de energia, essas usinas</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>convertem energia potencial gravitacional em energia térmica.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>transformam energia solar em cinética e depois em térmica.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>aproveitam energia química transformada em térmica na dessalinização.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>assemelham-se às nucleares: convertem energia térmica em cinética e depois em elétrica.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>usam a mesma fonte primária das nucleares, tendo, portanto, riscos semelhantes.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Toda a mágica é a mesma da usina anterior: o calor (térmica) vira vapor que move a turbina (cinética/mecânica), que gera eletricidade (elétrica).</p>
+          <p>Por isso a geotérmica se <b>assemelha à nuclear</b> na conversão de energia — a diferença é só a origem do calor (o interior da Terra em vez da fissão). Isso não significa mesmos riscos.</p>
+          <div class="eq-answer">Resposta: alternativa D</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. 2ª LEI ============ -->
+<section class="lesson" id="s8" data-title="2ª Lei e refrigeradores">
+  <div class="wrap">
+    <div class="kicker"><span class="num">8</span> O limite da natureza</div>
+    <h2 class="sec-title">2ª Lei, eficiência e refrigeradores</h2>
+    <p class="body">A <span class="hl">2ª Lei da Termodinâmica</span> impõe um limite que nenhuma máquina escapa: <b>é impossível transformar todo o calor em trabalho</b>. Sempre sobra uma parte que se perde como calor para o ambiente. Por isso nenhum motor tem 100% de rendimento — não por falta de tecnologia, mas por uma lei da natureza.</p>
+    <div class="note warn">
+      <span class="tag">A OUTRA FACE DA 2ª LEI</span>
+      O calor <b>nunca flui sozinho</b> do frio para o quente. Para "empurrar" calor nesse sentido — como uma geladeira faz, tirando calor de dentro (frio) e jogando para fora (quente) — é preciso <b>gastar energia</b> (o motor do compressor). É por isso que a geladeira consome eletricidade.
+    </div>
+
+    <!-- ENEM p155 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2011</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Quando um motor funciona, parte da energia liberada na combustão não pode ser usada para realizar trabalho, "vazando" em outra forma. As transformações de energia no motor são decorrentes de a</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>liberação de calor dentro do motor ser impossível.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>realização de trabalho pelo motor ser incontrolável.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>conversão integral de calor em trabalho ser impossível.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>transformação de energia térmica em cinética ser impossível.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>utilização de energia potencial do combustível ser incontrolável.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave: a 2ª Lei</h4>
+          <p>A "fuga" de energia descrita é exatamente o que a 2ª Lei prevê: <b>é impossível converter integralmente calor em trabalho</b>. Uma parte sempre escapa como calor (pelo escapamento, pelo radiador).</p>
+          <p>Não é defeito nem descontrole do motor — é uma limitação fundamental de qualquer máquina térmica.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p147 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2009</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Numa geladeira, um gás circula entre o congelador (interior frio) e a parte externa, trocando calor por compressão e expansão. Sobre as transformações de energia no funcionamento da geladeira:</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>A expansão do gás cede a energia necessária ao resfriamento interno.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>O calor flui de forma não espontânea da parte fria (interior) para a quente (exterior).</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>A quantidade de calor cedida ao exterior é igual à retirada do interior.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>A eficiência é maior quanto menos isolado do ambiente for o interior.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>A energia retirada pode ser devolvida abrindo a porta, reduzindo o consumo.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>A geladeira faz o calor ir do interior <b>frio</b> para o exterior <b>quente</b> — o sentido <b>contrário</b> ao natural. Isso é um fluxo <b>não espontâneo</b>, que só acontece porque o compressor gasta energia elétrica para forçá-lo.</p>
+          <p>Por isso quanto <b>melhor</b> isolada a geladeira, menos ela gasta — e deixar a porta aberta só faz ela trabalhar mais.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p36 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2009</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Para melhorar o rendimento de uma usina a combustível fóssil sem reduzir sua geração, qual ação poderia economizar energia?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>Reduzir a quantidade de combustível queimado.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Reduzir o volume de água que circula no condensador.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>Reduzir o tamanho da bomba que devolve a água à caldeira.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>Melhorar a capacidade dos dutos de conduzir calor para o ambiente.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>Usar o calor liberado pela chaminé para mover um outro gerador.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>A 2ª Lei garante que parte do calor será perdida — mas nada impede <b>reaproveitar</b> esse calor que iria embora. Usar o calor da chaminé para mover outro gerador aproveita energia que seria desperdiçada.</p>
+          <p>Isso aumenta o rendimento global (é a ideia de <b>cogeração</b>) sem mexer na geração principal. As outras opções ou reduzem a geração ou aumentam as perdas.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. APLICAÇÕES ============ -->
+<section class="lesson" id="s9" data-title="Aplicações no ENEM">
+  <div class="wrap">
+    <div class="kicker"><span class="num">9</span> No mundo real</div>
+    <h2 class="sec-title">Termodinâmica no dia a dia do ENEM</h2>
+    <p class="body">O ENEM veste a termodinâmica de tecnologia e meio ambiente. Veja três contextos frequentes, todos saindo do que você já domina.</p>
+
+    <!-- ENEM p31 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2010</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Para testar a eficiência de fornos de micro-ondas, aqueceu-se em 10&deg;C amostras iguais em cinco fornos, cada um na potência máxima. O forno mais eficiente foi aquele que</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>forneceu a maior quantidade de energia às amostras.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>cedeu energia à amostra de maior massa em mais tempo.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>forneceu a mesma quantidade de energia em menos tempo.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>cedeu energia à amostra de menor calor específico mais lentamente.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>forneceu a menor quantidade de energia às amostras em menos tempo.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Todas as amostras são iguais e sobem os mesmos 10&deg;C — então, por Q = m&middot;c&middot;&Delta;T, todas recebem a <b>mesma</b> quantidade de energia. A energia não distingue os fornos.</p>
+          <p>O que muda é o <b>tempo</b>: mais eficiente é o forno que entrega essa mesma energia em <b>menos tempo</b> (maior potência útil). Potência = energia &divide; tempo.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p134 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2014</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Usinas nucleares podem causar poluição térmica, elevando a temperatura das águas próximas e reduzindo o oxigênio dissolvido. Que parte do ciclo de geração de energia está associada a essa poluição térmica?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>Fissão do material radioativo.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Condensação do vapor-d'água no final do processo.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>Conversão de energia das turbinas pelos geradores.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>Aquecimento da água líquida para gerar vapor.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>Lançamento do vapor sobre as pás das turbinas.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Onde o calor é despejado</h4>
+          <p>Lembre da 2ª Lei: a usina precisa jogar fora o calor não aproveitado. Isso acontece na <b>condensação</b>, quando o vapor que já passou pela turbina precisa virar água de novo — e para condensar, ele <b>libera</b> calor.</p>
+          <p>Esse calor é despejado na água de rios ou do mar usada para resfriar o condensador, aquecendo o ambiente. É a etapa de <b>condensação</b> que gera a poluição térmica.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p33 -->
+    <div class="enem-q" data-correct="0">
+      <div class="eq-head"><span class="eq-badge">ENEM 2010</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Muito calor que sairia como desperdício pode ser reaproveitado por um processo chamado cogeração. Em um exemplo de cogeração para produzir energia elétrica, a perda global de energia é reduzida pela transformação de energia</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>térmica em mecânica.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>mecânica em térmica.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>química em térmica.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>química em mecânica.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>elétrica em luminosa.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Na cogeração, o calor residual (energia <b>térmica</b>) que seria jogado fora é reaproveitado para gerar trabalho útil — movendo turbinas, ou seja, virando energia <b>mecânica</b>.</p>
+          <p>Reaproveitar essa térmica em mecânica é o que reduz a perda global e aumenta a eficiência total do processo.</p>
+          <div class="eq-answer">Resposta: alternativa A</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. RESUMO ============ -->
+<section class="lesson" id="s10" data-title="Resumo e fórmulas">
+  <div class="wrap">
+    <div class="kicker"><span class="num">10</span> Leve no bolso</div>
+    <h2 class="sec-title">Resumo e fórmulas</h2>
+    <p class="body">A termodinâmica do ENEM se resolve com poucas ideias e fórmulas. As essenciais:</p>
+    <div class="sheet">
+      <div class="f"><div class="eq">Q = m&middot;c&middot;&Delta;T</div><div class="ds">Calor sensível<br>(muda a temperatura)</div></div>
+      <div class="f"><div class="eq">Q = m&middot;L</div><div class="ds">Calor latente<br>(muda o estado)</div></div>
+      <div class="f"><div class="eq">K = &deg;C + 273</div><div class="ds">Celsius para<br>Kelvin</div></div>
+      <div class="f"><div class="eq">&eta; = W / Q<sub>q</sub></div><div class="ds">Rendimento da<br>máquina térmica</div></div>
+    </div>
+
+    <h3 style="font-family:'Orbitron';font-weight:700;font-size:16px;color:var(--orange);margin:26px 0 6px">As ideias que mais caem</h3>
+    <ul class="takeaways">
+      <li><b>Calor</b> é energia em trânsito; <b>temperatura</b> é a agitação das moléculas. Não são a mesma coisa.</li>
+      <li>Calor flui espontaneamente do <b>quente para o frio</b>, até o equilíbrio térmico.</li>
+      <li>Durante uma <b>mudança de estado</b>, a temperatura fica parada (calor latente).</li>
+      <li>Calor viaja por <b>condução</b> (contato), <b>convecção</b> (fluidos) e <b>radiação</b> (ondas, até no vácuo).</li>
+      <li>Máquina térmica: calor da fonte quente vira <b>trabalho</b> + calor jogado na fonte fria.</li>
+      <li>Pela <b>2ª Lei</b>, é impossível converter todo o calor em trabalho, e o calor não flui sozinho do frio para o quente.</li>
+    </ul>
+
+    <div class="card finish-card">
+      <p style="font-family:'Orbitron';font-weight:700;font-size:18px;color:#eafcff;margin-bottom:8px">Você chegou ao fim! &#128293;</p>
+      <p class="body" style="margin-bottom:20px">Agora encare o simulado na Área ENEM para fixar tudo — as questões que você acertar saem da fila, e as que errar voltam para você dominar.</p>
+      <button class="btn" id="finishBtn">Marcar aula como concluída &#10003;</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="ft-logo">&#128293; Plataforma da Física</div>
+  <p style="margin-top:8px">Aula interativa de Termodinâmica · questões do ENEM para fins educacionais</p>
+</footer>
+
+<script>
+'use strict';
+const Store = (function(){
+  const KEY = 'plataphysica_termo_aula';
+  let mem = null;
+  function read(){ try{ const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : (mem || {visited:[], done:false}); }catch(e){ return mem || {visited:[], done:false}; } }
+  function write(d){ mem = d; try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){} }
+  return { read, write };
+})();
+
+const secs = Array.from(document.querySelectorAll('section.lesson'));
+const data = Store.read();
+const visited = new Set(data.visited || []);
+const tocNav = document.getElementById('tocNav');
+tocNav.innerHTML = secs.map((s,i)=>`<a href="#${s.id}" data-go="${s.id}"><span class="n">${String(i+1).padStart(2,'0')}</span><span>${s.dataset.title}</span><span class="dot">&#10003;</span></a>`).join('');
+function refreshProgress(){
+  const pct = Math.round(visited.size / secs.length * 100);
+  document.getElementById('progBar').style.width = pct + '%';
+  document.getElementById('tbPct').textContent = pct + '%';
+  tocNav.querySelectorAll('a').forEach(a=> a.classList.toggle('done', visited.has(a.dataset.go)));
+}
+function markVisited(id){ if(visited.has(id)) return; visited.add(id); const d = Store.read(); d.visited = Array.from(visited); Store.write(d); refreshProgress(); }
+refreshProgress();
+if('IntersectionObserver' in window){
+  const obs = new IntersectionObserver((entries)=>{ entries.forEach(en=>{ if(en.isIntersecting) markVisited(en.target.id); }); }, { threshold:0.35 });
+  secs.forEach(s=>obs.observe(s));
+} else { secs.forEach(s=>markVisited(s.id)); }
+const toc = document.getElementById('toc');
+document.getElementById('tocBtn').onclick = ()=> toc.classList.add('open');
+document.getElementById('tocX').onclick = ()=> toc.classList.remove('open');
+toc.onclick = (e)=>{ if(e.target === toc) toc.classList.remove('open'); };
+tocNav.querySelectorAll('a').forEach(a=> a.onclick = ()=> toc.classList.remove('open'));
+const finishBtn = document.getElementById('finishBtn');
+function paintDone(){ finishBtn.classList.add('done-state'); finishBtn.innerHTML = '&#10003; Aula concluída'; }
+if(data.done) paintDone();
+finishBtn.onclick = ()=>{ secs.forEach(s=>visited.add(s.id)); const d = Store.read(); d.visited = Array.from(visited); d.done = true; Store.write(d); refreshProgress(); paintDone(); window.scrollTo({ top:0, behavior:'smooth' }); };
+
+document.querySelectorAll('.enem-q').forEach(q=>{
+  const btn = q.querySelector('.reveal-btn'), sol = q.querySelector('.eq-sol');
+  const correct = parseInt(q.dataset.correct, 10), alts = q.querySelectorAll('.eq-alt');
+  btn.onclick = ()=>{ const open = sol.classList.toggle('show'); if(open){ if(alts[correct]) alts[correct].classList.add('correct'); btn.innerHTML = 'Ocultar resolução &#9650;'; } else { btn.innerHTML = 'Ver resolução passo a passo &#9660;'; } };
+});
+
+function fitCanvas(cv, cssH){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = cv.clientWidth || cv.parentElement.clientWidth;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(cssH * dpr); cv.style.height = cssH + 'px';
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w, h: cssH };
+}
+function tempColor(t){ // 0..100 -> azul..vermelho
+  const x = Math.max(0, Math.min(1, t/100));
+  const r = Math.round(40 + x*205), g = Math.round(90 + (0.5-Math.abs(x-0.5))*180), b = Math.round(245 - x*205);
+  return `rgb(${r},${g},${b})`;
+}
+
+/* HERO — partículas térmicas subindo (cor = temperatura) */
+(function(){
+  const cv = document.getElementById('heroCanvas'); if(!cv) return;
+  let W, H, ps = [];
+  function setup(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = cv.clientWidth; H = cv.clientHeight || 360;
+    cv.width = W*dpr; cv.height = H*dpr; cv.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+    ps = [];
+    const n = Math.max(28, Math.round(W/16));
+    for(let i=0;i<n;i++) ps.push(reset({}, true));
+  }
+  function reset(p, init){ p.x = Math.random()*W; p.y = init ? Math.random()*H : H+10; p.vy = 0.4 + Math.random()*1.4; p.vx = (Math.random()*2-1)*0.4; p.r = 1.5 + Math.random()*3; p.life = Math.random(); return p; }
+  const ctx = cv.getContext('2d');
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    ps.forEach(p=>{
+      p.y -= p.vy; p.x += p.vx; p.life = p.y / H;
+      if(p.y < -10) reset(p, false);
+      const t = (1 - p.life) * 100;             // quente embaixo
+      const col = tempColor(t);
+      const a = Math.max(0, p.life*0.7);
+      ctx.fillStyle = col.replace('rgb','rgba').replace(')', `,${a})`);
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.28); ctx.fill();
+    });
+    requestAnimationFrame(frame);
+  }
+  setup(); frame();
+  window.addEventListener('resize', setup);
+})();
+
+/* SIM 1 — equilíbrio térmico */
+(function(){
+  const cv = document.getElementById('eqCanvas');
+  const sH = document.getElementById('eqH'), sC = document.getElementById('eqC');
+  if(!cv) return;
+  let ctx, W, H, tH = 80, tC = 10, mixing = false;
+  function build(){ const r = fitCanvas(cv, 180); ctx = r.ctx; W = r.w; H = r.h; reset(); }
+  function reset(){ tH = parseFloat(sH.value); tC = parseFloat(sC.value); mixing = false; }
+  document.getElementById('eqReset').onclick = reset;
+  sH.addEventListener('input', ()=>{ if(!mixing) tH = parseFloat(sH.value); });
+  sC.addEventListener('input', ()=>{ if(!mixing) tC = parseFloat(sC.value); });
+  function frame(){
+    // ao chegar perto, começam a trocar calor
+    const target = (tH + tC)/2;
+    if(Math.abs(tH - tC) > 0.3){ mixing = true; tH += (target - tH)*0.012; tC += (target - tC)*0.012; }
+    const bw = W*0.34, bh = H*0.6, by = (H-bh)/2, gap = W*0.06;
+    const x1 = W/2 - gap/2 - bw, x2 = W/2 + gap/2;
+    ctx.clearRect(0,0,W,H);
+    function box(x, t, label){
+      ctx.fillStyle = tempColor(t); ctx.globalAlpha = 0.85;
+      roundRect(ctx, x, by, bw, bh, 10); ctx.fill(); ctx.globalAlpha = 1;
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 1.5; ctx.stroke();
+      // partículas de agitação (mais quentes = mais)
+      const n = Math.round(4 + t/8);
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      for(let i=0;i<n;i++){ const px = x+8+Math.random()*(bw-16), py = by+8+Math.random()*(bh-16); ctx.beginPath(); ctx.arc(px,py,1.5,0,6.28); ctx.fill(); }
+      ctx.fillStyle = '#fff'; ctx.font="700 20px Orbitron"; ctx.textAlign='center';
+      ctx.fillText(Math.round(t)+'\u00B0', x+bw/2, by+bh/2+7);
+      ctx.fillStyle = 'rgba(219,230,245,0.8)'; ctx.font="600 10px Orbitron";
+      ctx.fillText(label, x+bw/2, by+bh+18);
+    }
+    box(x1, tH, 'QUENTE');
+    box(x2, tC, 'FRIO');
+    // seta de calor entre eles
+    if(mixing && Math.abs(tH-tC) > 0.6){
+      const ay = H/2, ax1 = x1+bw, ax2 = x2;
+      ctx.strokeStyle = 'rgba(255,157,61,0.9)'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(ax1+4, ay); ctx.lineTo(ax2-4, ay); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ax2-4, ay); ctx.lineTo(ax2-11, ay-5); ctx.lineTo(ax2-11, ay+5); ctx.closePath(); ctx.fillStyle='rgba(255,157,61,0.9)'; ctx.fill();
+      ctx.fillStyle='rgba(255,157,61,0.95)'; ctx.font="600 9px Orbitron"; ctx.textAlign='center';
+      ctx.fillText('calor', (ax1+ax2)/2, ay-9);
+    }
+    document.getElementById('eqHval').textContent = Math.round(parseFloat(sH.value))+'\u00B0C';
+    document.getElementById('eqCval').textContent = Math.round(parseFloat(sC.value))+'\u00B0C';
+    document.getElementById('eqHnow').textContent = Math.round(tH)+'\u00B0C';
+    document.getElementById('eqCnow').textContent = Math.round(tC)+'\u00B0C';
+    requestAnimationFrame(frame);
+  }
+  function roundRect(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* SIM 2 — calorimetria (mistura) */
+(function(){
+  const ids = ['cmM1','cmT1','cmM2','cmT2'].map(i=>document.getElementById(i));
+  if(ids.some(x=>!x)) return;
+  function calc(){
+    const m1 = parseFloat(ids[0].value)||0, t1 = parseFloat(ids[1].value)||0;
+    const m2 = parseFloat(ids[2].value)||0, t2 = parseFloat(ids[3].value)||0;
+    const out = document.getElementById('cmTf');
+    if(m1+m2 <= 0){ out.textContent = '—'; return; }
+    const tf = (m1*t1 + m2*t2)/(m1+m2);        // mesma água: c se cancela
+    out.textContent = tf.toFixed(1) + '\u00B0C';
+  }
+  ids.forEach(i=> i.addEventListener('input', calc));
+  calc();
+})();
+
+/* SIM 3 — curva de aquecimento */
+(function(){
+  const cv = document.getElementById('curveCanvas');
+  const btn = document.getElementById('curvePlay');
+  if(!cv) return;
+  let ctx, W, H, prog = 0, playing = false;
+  // fases: [fração do total, tipo, tempInicio, tempFim, rótulo]
+  const phases = [
+    { d:0.12, type:'s', t0:-20, t1:0,   label:'Gelo (sólido)' },
+    { d:0.18, type:'l', t0:0,   t1:0,   label:'Derretendo (fusão)' },
+    { d:0.20, type:'s', t0:0,   t1:100, label:'Água (líquido)' },
+    { d:0.35, type:'l', t0:100, t1:100, label:'Fervendo (vaporização)' },
+    { d:0.15, type:'s', t0:100, t1:120, label:'Vapor (gás)' }
+  ];
+  function build(){ const r = fitCanvas(cv, 230); ctx = r.ctx; W = r.w; H = r.h; draw(); }
+  btn.onclick = ()=>{ prog = 0; playing = true; };
+  function tempAt(p){
+    let acc = 0;
+    for(const ph of phases){ if(p <= acc + ph.d){ const f = (p-acc)/ph.d; return { temp: ph.t0 + (ph.t1-ph.t0)*f, label: ph.label }; } acc += ph.d; }
+    const last = phases[phases.length-1]; return { temp: last.t1, label: last.label };
+  }
+  function draw(){
+    const padL = 44, padB = 30, padT = 16, padR = 14;
+    const gx = padL, gw = W - padL - padR, gy = padT, gh = H - padT - padB;
+    ctx.clearRect(0,0,W,H);
+    // eixos
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx, gy+gh); ctx.lineTo(gx+gw, gy+gh); ctx.stroke();
+    ctx.fillStyle = 'rgba(132,146,180,0.9)'; ctx.font="600 10px Orbitron";
+    ctx.textAlign='right'; ctx.fillText('120\u00B0', gx-6, gy+8);
+    ctx.fillText('100\u00B0', gx-6, gy + gh*(1-(100+20)/140) + 4);
+    ctx.fillText('0\u00B0', gx-6, gy + gh*(1-(0+20)/140) + 4);
+    ctx.save(); ctx.translate(12, gy+gh/2); ctx.rotate(-Math.PI/2); ctx.textAlign='center'; ctx.fillText('Temperatura', 0, 0); ctx.restore();
+    ctx.textAlign='center'; ctx.fillText('Calor adicionado \u2192', gx+gw/2, gy+gh+22);
+    function XY(p, temp){ const x = gx + p*gw; const y = gy + gh*(1 - (temp+20)/140); return [x,y]; }
+    // curva completa (fundo)
+    ctx.strokeStyle = 'rgba(255,157,61,0.25)'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    for(let p=0;p<=1;p+=0.005){ const {temp}=tempAt(p); const [x,y]=XY(p,temp); if(p===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+    ctx.stroke();
+    // curva percorrida
+    const pnow = playing ? prog : 1;
+    ctx.strokeStyle = 'rgba(255,157,61,0.95)'; ctx.lineWidth = 3.5;
+    ctx.shadowColor='rgba(255,157,61,0.5)'; ctx.shadowBlur=8;
+    ctx.beginPath();
+    for(let p=0;p<=pnow;p+=0.005){ const {temp}=tempAt(p); const [x,y]=XY(p,temp); if(p===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+    ctx.stroke(); ctx.shadowBlur=0;
+    // ponto atual
+    const cur = tempAt(pnow);
+    const [cx,cy] = XY(pnow, cur.temp);
+    ctx.fillStyle = tempColor(Math.max(0,Math.min(100,cur.temp)));
+    ctx.beginPath(); ctx.arc(cx, cy, 6, 0, 6.28); ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
+    document.getElementById('curveState').textContent = cur.label;
+    document.getElementById('curveTemp').textContent = Math.round(cur.temp)+'\u00B0C';
+  }
+  function frame(){ if(playing){ prog += 0.0032; if(prog >= 1){ prog = 1; playing = false; } } draw(); requestAnimationFrame(frame); }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* SIM 4 — máquina térmica */
+(function(){
+  const cv = document.getElementById('engineCanvas');
+  const sQ = document.getElementById('engQ'), sE = document.getElementById('engE');
+  if(!cv) return;
+  let ctx, W, H, t = 0;
+  function build(){ const r = fitCanvas(cv, 240); ctx = r.ctx; W = r.w; H = r.h; }
+  function frame(){
+    const Qh = parseFloat(sQ.value), eff = parseFloat(sE.value)/100;
+    const Wk = Qh*eff, Qc = Qh - Wk;
+    ctx.clearRect(0,0,W,H);
+    const cx = W/2;
+    // fonte quente (topo)
+    ctx.fillStyle = 'rgba(255,90,110,0.85)'; roundRect(ctx, cx-90, 14, 180, 34, 8); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font="700 12px Orbitron"; ctx.textAlign='center';
+    ctx.fillText('FONTE QUENTE', cx, 35);
+    // fonte fria (base)
+    ctx.fillStyle = 'rgba(0,229,255,0.7)'; roundRect(ctx, cx-90, H-48, 180, 34, 8); ctx.fill();
+    ctx.fillStyle = '#04121a'; ctx.fillText('FONTE FRIA', cx, H-27);
+    // máquina (centro)
+    const my = H/2 - 26;
+    ctx.fillStyle = 'rgba(255,157,61,0.9)'; roundRect(ctx, cx-46, my, 92, 52, 10); ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=1.5; ctx.stroke();
+    // engrenagem girando
+    ctx.save(); ctx.translate(cx, my+26); ctx.rotate(t*2);
+    ctx.strokeStyle='#180a04'; ctx.lineWidth=3;
+    for(let i=0;i<8;i++){ const a=i*Math.PI/4; ctx.beginPath(); ctx.moveTo(Math.cos(a)*9, Math.sin(a)*9); ctx.lineTo(Math.cos(a)*16, Math.sin(a)*16); ctx.stroke(); }
+    ctx.beginPath(); ctx.arc(0,0,9,0,6.28); ctx.stroke(); ctx.restore();
+    // fluxo Qh (quente -> máquina), largura ~ Qh
+    const wQh = Math.max(6, Qh/8);
+    flow(cx, 48, cx, my, wQh, 'rgba(255,90,110,0.8)', t, 'Q\u2095='+Math.round(Qh));
+    // fluxo Qc (máquina -> fria), largura ~ Qc
+    const wQc = Math.max(4, Qc/8);
+    flow(cx, my+52, cx, H-48, wQc, 'rgba(0,229,255,0.7)', t, 'Q_f='+Math.round(Qc));
+    // trabalho (máquina -> direita), largura ~ W
+    const wW = Math.max(4, Wk/8);
+    ctx.strokeStyle = 'rgba(39,232,138,0.9)'; ctx.lineWidth = wW;
+    ctx.beginPath(); ctx.moveTo(cx+46, my+26); ctx.lineTo(W-70, my+26); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W-70, my+26); ctx.lineTo(W-80, my+26-7); ctx.lineTo(W-80, my+26+7); ctx.closePath(); ctx.fillStyle='rgba(39,232,138,0.9)'; ctx.fill();
+    ctx.fillStyle='rgba(39,232,138,0.95)'; ctx.font="700 12px Orbitron"; ctx.textAlign='center';
+    ctx.fillText('W='+Math.round(Wk), W-62, my+20);
+    ctx.fillStyle='rgba(219,230,245,0.6)'; ctx.font="600 9px Orbitron";
+    ctx.fillText('(trabalho)', W-62, my+40);
+    document.getElementById('engQval').textContent = Math.round(Qh)+' J';
+    document.getElementById('engEval').textContent = Math.round(eff*100)+'%';
+    document.getElementById('engW').textContent = Math.round(Wk)+' J';
+    document.getElementById('engQf').textContent = Math.round(Qc)+' J';
+    t += 0.02;
+    requestAnimationFrame(frame);
+  }
+  function flow(x1,y1,x2,y2,w,col,t,label){
+    ctx.strokeStyle = col; ctx.lineWidth = w;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    // partículas descendo/subindo
+    const dir = y2>y1?1:1;
+    for(let i=0;i<3;i++){ const f = ((t*0.4 + i/3)%1); const py = y1 + (y2-y1)*f; ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.beginPath(); ctx.arc(x1, py, Math.max(1.5,w/4), 0, 6.28); ctx.fill(); }
+    ctx.fillStyle = col.replace(/,[^,]*\)$/, ',0.95)'); ctx.font="700 10px Orbitron"; ctx.textAlign='left';
+    ctx.fillText(label, x1+w/2+8, (y1+y2)/2);
+  }
+  function roundRect(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+</script>
+</body>
+</html>

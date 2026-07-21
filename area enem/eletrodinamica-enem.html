@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eletrodinâmica do Zero — Aula ENEM | Plataforma da Física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a1a;
+    --bg-2:#0d0f24;
+    --panel:rgba(18,22,48,0.72);
+    --panel-solid:#12162f;
+    --cyan:#00e5ff;
+    --cyan-dim:#0792a8;
+    --magenta:#ff3df0;
+    --violet:#8b5cff;
+    --green:#27e88a;
+    --yellow:#ffd23d;
+    --orange:#ff9d3d;
+    --red:#ff5a6e;
+    --txt:#dbe6f5;
+    --txt-dim:#8492b4;
+    --line:rgba(0,229,255,0.18);
+    --line-soft:rgba(255,255,255,0.07);
+    --glow:0 0 18px rgba(0,229,255,0.35);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Rajdhani',sans-serif;
+    background:var(--bg);
+    color:var(--txt);
+    min-height:100vh;
+    line-height:1.5;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:'';position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(1100px 620px at 78% -8%, rgba(0,229,255,0.10), transparent 60%),
+      radial-gradient(900px 520px at 8% 12%, rgba(139,92,255,0.10), transparent 60%),
+      radial-gradient(800px 800px at 50% 120%, rgba(39,232,138,0.05), transparent 60%),
+      var(--bg);
+  }
+  body::after{
+    content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);
+    background-size:46px 46px;
+    mask-image:radial-gradient(ellipse 100% 70% at 50% 0%,#000 30%,transparent 80%);
+  }
+  ::selection{background:rgba(0,229,255,0.3);color:#fff}
+
+  /* ===== Top bar / progresso ===== */
+  .topbar{
+    position:sticky;top:0;z-index:60;
+    backdrop-filter:blur(12px);
+    background:rgba(8,9,22,0.78);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-row{
+    max-width:980px;margin:0 auto;padding:11px 20px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .tb-logo{font-family:'Orbitron';font-weight:700;font-size:14px;color:#eafcff;letter-spacing:.5px;display:flex;align-items:center;gap:9px;white-space:nowrap}
+  .tb-logo .spark{color:var(--cyan);filter:drop-shadow(0 0 6px var(--cyan))}
+  .tb-spacer{flex:1}
+  .tb-pct{font-family:'Orbitron';font-weight:700;font-size:13px;color:var(--green);min-width:42px;text-align:right}
+  .tb-toc-btn{
+    font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:.4px;
+    color:var(--cyan);background:rgba(0,229,255,0.07);border:1px solid var(--line);
+    padding:8px 13px;border-radius:9px;cursor:pointer;transition:.2s;white-space:nowrap;
+  }
+  .tb-toc-btn:hover{background:rgba(0,229,255,0.14)}
+  .progress-strip{height:3px;background:rgba(255,255,255,0.06)}
+  .progress-strip > div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--violet));box-shadow:0 0 10px rgba(0,229,255,.6);transition:width .4s ease}
+
+  /* ===== TOC overlay ===== */
+  .toc{
+    position:fixed;inset:0;z-index:70;display:none;
+    background:rgba(4,5,14,0.72);backdrop-filter:blur(4px);
+  }
+  .toc.open{display:block}
+  .toc-panel{
+    position:absolute;right:0;top:0;height:100%;width:min(340px,86vw);
+    background:var(--panel-solid);border-left:1px solid var(--line);
+    padding:24px 20px;overflow-y:auto;
+    transform:translateX(100%);transition:transform .3s ease;
+  }
+  .toc.open .toc-panel{transform:translateX(0)}
+  .toc-panel h3{font-family:'Orbitron';font-weight:700;font-size:14px;color:var(--cyan);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+  .toc-x{cursor:pointer;color:var(--txt-dim);font-size:22px;line-height:1}
+  .toc a{
+    display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--txt);
+    padding:11px 12px;border-radius:9px;margin-bottom:4px;font-size:16px;font-weight:500;
+    transition:.18s;border:1px solid transparent;
+  }
+  .toc a:hover{background:rgba(0,229,255,0.06);border-color:var(--line)}
+  .toc a .n{font-family:'Orbitron';font-size:11px;color:var(--cyan-dim);min-width:22px}
+  .toc a .dot{margin-left:auto;width:16px;height:16px;border-radius:50%;border:2px solid var(--cyan-dim);display:grid;place-items:center;font-size:10px;color:#04121a}
+  .toc a.done .dot{background:var(--green);border-color:var(--green)}
+
+  /* ===== layout ===== */
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  section.lesson{padding:60px 0;border-bottom:1px solid var(--line-soft)}
+  section.lesson:last-of-type{border-bottom:none}
+
+  /* ===== hero ===== */
+  .hero{position:relative;overflow:hidden;padding:0;border-bottom:1px solid var(--line)}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+  .hero-inner{position:relative;max-width:980px;margin:0 auto;padding:74px 20px 70px;text-align:center}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:2px;
+    color:var(--cyan);border:1px solid var(--line);background:rgba(0,229,255,0.05);
+    padding:7px 15px;border-radius:30px;text-transform:uppercase;margin-bottom:26px;
+  }
+  .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .hero h1{
+    font-family:'Orbitron';font-weight:900;
+    font-size:clamp(34px,8vw,62px);line-height:1.02;letter-spacing:-1px;
+    color:#eafcff;text-shadow:0 0 34px rgba(0,229,255,0.35);
+  }
+  .hero h1 .glow{color:var(--cyan);text-shadow:0 0 30px rgba(0,229,255,0.7)}
+  .hero .sub{
+    font-size:clamp(17px,2.6vw,21px);color:var(--txt);max-width:620px;margin:22px auto 0;font-weight:500;
+  }
+  .hero .sub b{color:#eafcff;font-weight:700}
+  .hero-meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+  .chip{
+    font-family:'Orbitron';font-size:11px;font-weight:500;color:var(--txt-dim);
+    border:1px solid var(--line-soft);background:rgba(255,255,255,0.02);padding:8px 13px;border-radius:8px;
+  }
+  .chip b{color:var(--cyan);font-weight:700}
+  .scroll-cue{margin-top:42px;font-family:'Orbitron';font-size:11px;letter-spacing:1.5px;color:var(--txt-dim);animation:bob 2s infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
+
+  /* ===== typography in sections ===== */
+  .kicker{
+    font-family:'Orbitron';font-weight:500;font-size:12px;letter-spacing:1.6px;
+    color:var(--cyan);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:16px;
+  }
+  .kicker .num{
+    font-weight:900;font-size:13px;color:#04121a;background:var(--cyan);
+    width:30px;height:30px;display:grid;place-items:center;border-radius:9px;box-shadow:0 0 14px rgba(0,229,255,.5);
+  }
+  h2.sec-title{
+    font-family:'Orbitron';font-weight:700;font-size:clamp(24px,4.6vw,34px);
+    color:#eafcff;line-height:1.12;letter-spacing:-.3px;margin-bottom:20px;
+  }
+  .lead{font-size:19px;color:var(--txt);font-weight:500;line-height:1.65;margin-bottom:18px}
+  p.body{font-size:17px;line-height:1.72;color:var(--txt);font-weight:400;margin-bottom:16px}
+  p.body b{color:#eafcff;font-weight:700}
+  p.body .hl{color:var(--cyan);font-weight:600}
+  .unit{color:var(--violet);font-weight:700}
+
+  /* ===== cards & callouts ===== */
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px;margin:22px 0;backdrop-filter:blur(6px);
+  }
+  .note{
+    border-left:3px solid var(--cyan);background:rgba(0,229,255,0.05);
+    padding:15px 18px;border-radius:0 11px 11px 0;margin:20px 0;font-size:16.5px;line-height:1.6;
+  }
+  .note.tip{border-left-color:var(--green);background:rgba(39,232,138,0.06)}
+  .note.warn{border-left-color:var(--orange);background:rgba(255,157,61,0.06)}
+  .note .tag{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.6px;display:block;margin-bottom:6px}
+  .note.tip .tag{color:var(--green)}
+  .note .tag.cy{color:var(--cyan)}
+  .note.warn .tag{color:var(--orange)}
+  .note b{color:#eafcff}
+
+  /* ===== formula ===== */
+  .formula{
+    text-align:center;font-family:'Orbitron';font-weight:700;
+    font-size:clamp(22px,5vw,30px);color:#eafcff;
+    background:rgba(0,0,0,0.32);border:1px solid var(--line);border-radius:12px;
+    padding:22px;margin:22px 0;letter-spacing:1px;
+  }
+  .formula .v{color:var(--cyan)}
+  .formula .r{color:var(--yellow)}
+  .formula .i{color:var(--green)}
+  .formula .p{color:var(--magenta)}
+  .formula small{display:block;font-family:'Rajdhani';font-weight:500;font-size:14px;letter-spacing:0;color:var(--txt-dim);margin-top:12px}
+
+  /* ===== analogy table ===== */
+  .analogy{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden;margin:22px 0}
+  .analogy .h{background:rgba(0,229,255,0.08);font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;color:var(--cyan);padding:13px 16px;text-align:center}
+  .analogy .h.w{color:var(--violet);background:rgba(139,92,255,0.08)}
+  .analogy .c{background:var(--panel-solid);padding:14px 16px;font-size:16px}
+  .analogy .c .t{font-weight:700;color:#eafcff;display:block;font-size:16.5px}
+  .analogy .c .d{color:var(--txt-dim);font-size:14.5px}
+
+  /* ===== interactive widgets ===== */
+  .sim{
+    background:linear-gradient(180deg,rgba(13,15,36,0.9),rgba(10,10,26,0.9));
+    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:24px 0;
+    box-shadow:0 8px 40px rgba(0,0,0,0.35);
+  }
+  .sim-head{
+    display:flex;align-items:center;gap:10px;padding:13px 18px;
+    background:rgba(0,229,255,0.05);border-bottom:1px solid var(--line);
+  }
+  .sim-head .ic{font-size:16px}
+  .sim-head .ttl{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;letter-spacing:.4px}
+  .sim-head .lbl{margin-left:auto;font-family:'Orbitron';font-size:10px;color:var(--cyan);border:1px solid var(--line);padding:4px 9px;border-radius:20px}
+  .sim-canvas-wrap{position:relative;width:100%;background:radial-gradient(circle at 50% 40%,rgba(0,229,255,0.04),transparent 70%)}
+  .sim canvas{display:block;width:100%}
+  .sim-controls{padding:18px}
+  .ctrl{margin-bottom:16px}
+  .ctrl:last-child{margin-bottom:0}
+  .ctrl-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .ctrl-label .nm{font-family:'Orbitron';font-weight:500;font-size:12.5px;color:var(--txt);letter-spacing:.3px}
+  .ctrl-label .vl{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--cyan)}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;
+    background:linear-gradient(90deg,var(--cyan-dim),rgba(255,255,255,0.08));outline:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--cyan);
+    box-shadow:0 0 12px rgba(0,229,255,0.7);border:2px solid #051018;cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px rgba(0,229,255,0.7);border:2px solid #051018;cursor:pointer}
+  .readout{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;
+  }
+  .readout .ro{
+    flex:1;min-width:90px;background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:10px;
+    padding:11px 13px;text-align:center;
+  }
+  .readout .ro .k{font-family:'Orbitron';font-size:10px;letter-spacing:.5px;color:var(--txt-dim);display:block;margin-bottom:4px}
+  .readout .ro .v{font-family:'Orbitron';font-weight:700;font-size:19px;color:var(--cyan)}
+  .readout .ro.g .v{color:var(--green)}
+  .readout .ro.m .v{color:var(--magenta)}
+  .readout .ro.y .v{color:var(--yellow)}
+
+  /* calculadora de consumo */
+  .calc-field{margin-bottom:15px}
+  .calc-field label{display:block;font-family:'Orbitron';font-weight:500;font-size:12px;letter-spacing:.3px;color:var(--txt-dim);margin-bottom:7px}
+  select,input.num{
+    width:100%;background:var(--panel-solid);color:#eafcff;border:1px solid var(--line);
+    border-radius:10px;padding:12px 14px;font-family:'Rajdhani';font-weight:600;font-size:16px;outline:none;
+  }
+  select:focus,input.num:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,0.12)}
+  .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .calc-result{
+    margin-top:18px;background:linear-gradient(135deg,rgba(0,229,255,0.1),rgba(139,92,255,0.08));
+    border:1px solid var(--line);border-radius:12px;padding:18px;text-align:center;
+  }
+  .calc-result .big{font-family:'Orbitron';font-weight:900;font-size:34px;color:var(--green);text-shadow:0 0 16px rgba(39,232,138,0.4);line-height:1}
+  .calc-result .lbl{font-family:'Orbitron';font-size:11px;color:var(--txt-dim);letter-spacing:.5px;margin-top:8px}
+  .calc-result .sub{font-size:15px;color:var(--txt);margin-top:10px}
+  .calc-result .sub b{color:var(--cyan)}
+
+  /* ===== ENEM worked example ===== */
+  .enem-q{
+    border:1px solid var(--violet);border-radius:var(--radius);overflow:hidden;margin:26px 0;
+    background:linear-gradient(180deg,rgba(139,92,255,0.06),rgba(10,10,26,0.4));
+  }
+  .eq-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(139,92,255,0.1);border-bottom:1px solid rgba(139,92,255,0.25);flex-wrap:wrap}
+  .eq-badge{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.4px;color:var(--violet);border:1px solid rgba(139,92,255,0.4);background:rgba(139,92,255,0.08);padding:5px 11px;border-radius:20px}
+  .eq-tag{font-family:'Orbitron';font-size:11px;color:var(--txt-dim);letter-spacing:.5px}
+  .eq-tag.real{margin-left:auto;color:var(--green)}
+  .eq-body{padding:20px 18px}
+  .eq-enun{font-size:16.5px;line-height:1.62;color:var(--txt);margin-bottom:16px}
+  .eq-alts{display:flex;flex-direction:column;gap:8px}
+  .eq-alt{
+    display:flex;gap:11px;align-items:flex-start;
+    border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;font-size:15.5px;
+    transition:.25s;
+  }
+  .eq-alt .let{font-family:'Orbitron';font-weight:700;font-size:13px;width:26px;height:26px;flex-shrink:0;display:grid;place-items:center;border-radius:7px;border:1px solid var(--cyan-dim);color:var(--cyan)}
+  .eq-alt.correct{border-color:var(--green);background:rgba(39,232,138,0.1)}
+  .eq-alt.correct .let{background:var(--green);color:#04121a;border-color:var(--green)}
+  .reveal-btn{
+    margin-top:16px;width:100%;font-family:'Orbitron';font-weight:700;font-size:13px;letter-spacing:.5px;
+    background:linear-gradient(120deg,var(--violet),#6f4ad6);color:#fff;border:none;
+    padding:13px;border-radius:11px;cursor:pointer;transition:.2s;
+  }
+  .reveal-btn:hover{filter:brightness(1.12);box-shadow:0 0 20px rgba(139,92,255,0.4)}
+  .eq-sol{margin-top:18px;border-top:1px dashed rgba(139,92,255,0.3);padding-top:18px;display:none}
+  .eq-sol.show{display:block;animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .eq-sol h4{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;color:var(--cyan);margin:16px 0 8px;text-transform:uppercase}
+  .eq-sol h4:first-child{margin-top:0}
+  .eq-sol p{font-size:16px;line-height:1.62;color:var(--txt);margin-bottom:6px}
+  .eq-sol .calc-step{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--yellow);background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:9px;padding:11px 14px;margin:10px 0;letter-spacing:.5px}
+  .eq-answer{margin-top:16px;font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--green);background:rgba(39,232,138,0.1);border:1px solid rgba(39,232,138,0.3);border-radius:10px;padding:13px 16px;text-align:center}
+
+  /* ===== series/parallel mini diagram ===== */
+  .circ-compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:22px 0}
+  .circ-compare .cc{background:var(--panel-solid);border:1px solid var(--line-soft);border-radius:12px;padding:18px;text-align:center}
+  .circ-compare .cc h4{font-family:'Orbitron';font-weight:700;font-size:14px;color:#eafcff;margin-bottom:6px}
+  .circ-compare .cc .desc{font-size:14.5px;color:var(--txt-dim);line-height:1.5;margin-top:10px}
+  .circ-compare .cc canvas{width:100%;height:90px;margin:4px 0}
+
+  /* ===== summary / formula sheet ===== */
+  .sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin:22px 0}
+  .sheet .f{background:var(--panel-solid);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .sheet .f .eq{font-family:'Orbitron';font-weight:700;font-size:18px;color:var(--cyan);margin-bottom:7px}
+  .sheet .f .ds{font-size:13.5px;color:var(--txt-dim);line-height:1.4}
+  .takeaways{list-style:none;margin:18px 0}
+  .takeaways li{position:relative;padding:9px 0 9px 32px;font-size:16.5px;line-height:1.55;border-bottom:1px solid var(--line-soft)}
+  .takeaways li:last-child{border-bottom:none}
+  .takeaways li::before{content:'\26A1';position:absolute;left:0;top:9px;color:var(--cyan);filter:drop-shadow(0 0 6px var(--cyan))}
+  .takeaways li b{color:#eafcff}
+
+  /* ===== finish ===== */
+  .finish-card{text-align:center;background:linear-gradient(135deg,rgba(0,229,255,0.08),rgba(139,92,255,0.08));border:1px solid var(--line)}
+  .btn{
+    font-family:'Orbitron';font-weight:700;font-size:14px;letter-spacing:.5px;
+    background:linear-gradient(120deg,var(--cyan),#33b6ff);color:#04121a;border:none;
+    padding:15px 30px;border-radius:12px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:9px;
+  }
+  .btn:hover{filter:brightness(1.08);box-shadow:0 0 26px rgba(0,229,255,0.45);transform:translateY(-1px)}
+  .btn.done-state{background:linear-gradient(120deg,var(--green),#1fd07e)}
+  footer{padding:34px 20px 50px;text-align:center;color:var(--txt-dim);font-size:13.5px}
+  footer .ft-logo{font-family:'Orbitron';font-weight:700;color:var(--cyan);font-size:14px}
+
+  @media(max-width:680px){
+    section.lesson{padding:46px 0}
+    .analogy{grid-template-columns:1fr}
+    .analogy .h.w{display:none}
+    .analogy .h{grid-column:1}
+    .calc-grid{grid-template-columns:1fr}
+    .circ-compare{grid-template-columns:1fr}
+    .hero-inner{padding:58px 20px 54px}
+    p.body,.lead{font-size:16.5px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== TOP BAR ===================== -->
+<div class="topbar">
+  <div class="topbar-row">
+    <span class="tb-logo"><span class="spark">&#9889;</span> Eletrodinâmica · Aula ENEM</span>
+    <span class="tb-spacer"></span>
+    <span class="tb-pct" id="tbPct">0%</span>
+    <button class="tb-toc-btn" id="tocBtn">&#9776; Conteúdo</button>
+  </div>
+  <div class="progress-strip"><div id="progBar"></div></div>
+</div>
+
+<!-- ===================== TOC ===================== -->
+<div class="toc" id="toc">
+  <div class="toc-panel">
+    <h3>Conteúdo da aula <span class="toc-x" id="tocX">&times;</span></h3>
+    <nav id="tocNav"></nav>
+  </div>
+</div>
+
+<!-- ===================== HERO ===================== -->
+<header class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="pulse"></span> Plataforma da Física · do zero ao ENEM</span>
+    <h1>Eletro<span class="glow">dinâmica</span><br>do Zero</h1>
+    <p class="sub">Entenda a eletricidade que faz tudo funcionar — da lâmpada ao chuveiro — com simulações que você controla e <b>questões reais do ENEM</b> resolvidas passo a passo.</p>
+    <div class="hero-meta">
+      <span class="chip"><b>3</b> simulações interativas</span>
+      <span class="chip"><b>8</b> questões do ENEM</span>
+      <span class="chip"><b>0</b> pré-requisitos</span>
+    </div>
+    <div class="scroll-cue">&#9660; ROLE PARA COMEÇAR</div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 1. INTRODUÇÃO ============ -->
+<section class="lesson" id="s1" data-title="O que é eletrodinâmica">
+  <div class="wrap">
+    <div class="kicker"><span class="num">1</span> Por onde começar</div>
+    <h2 class="sec-title">O que é eletrodinâmica?</h2>
+    <p class="lead">Eletrodinâmica é o estudo das <b>cargas elétricas em movimento</b>. Ou seja: é a eletricidade que faz as coisas acontecerem — a lâmpada acender, o chuveiro esquentar, o celular carregar.</p>
+    <p class="body">É o assunto que <span class="hl">mais cai em Física no ENEM</span>, e quase sempre vem ligado ao dia a dia: conta de luz, eletrodomésticos, segurança elétrica. A boa notícia é que dá para entender tudo com uma única analogia simples que vamos usar a aula inteira: a <b>água encanada</b>.</p>
+
+    <div class="analogy">
+      <div class="h">No fio (eletricidade)</div>
+      <div class="h w">No cano (água)</div>
+      <div class="c"><span class="t">Corrente elétrica</span><span class="d">quantos elétrons passam por segundo</span></div>
+      <div class="c"><span class="t">Vazão da água</span><span class="d">quantos litros passam por segundo</span></div>
+      <div class="c"><span class="t">Tensão (voltagem)</span><span class="d">o empurrão que move os elétrons</span></div>
+      <div class="c"><span class="t">Pressão / desnível</span><span class="d">o que empurra a água a descer</span></div>
+      <div class="c"><span class="t">Resistência</span><span class="d">a dificuldade que o fio impõe</span></div>
+      <div class="c"><span class="t">Cano estreito</span><span class="d">dificulta a passagem da água</span></div>
+      <div class="c"><span class="t">Pilha / tomada</span><span class="d">mantém o empurrão constante</span></div>
+      <div class="c"><span class="t">Bomba d'água</span><span class="d">mantém a água circulando</span></div>
+    </div>
+    <p class="body">Guarde essa tabela. Sempre que algo parecer abstrato, volte para a água: ela quase nunca falha como intuição.</p>
+  </div>
+</section>
+
+<!-- ============ 2. CORRENTE ============ -->
+<section class="lesson" id="s2" data-title="Corrente elétrica">
+  <div class="wrap">
+    <div class="kicker"><span class="num">2</span> O que circula</div>
+    <h2 class="sec-title">Corrente elétrica</h2>
+    <p class="body">Toda a matéria é feita de átomos, e os átomos têm <b>elétrons</b> — partículas de carga <b>negativa</b>. Em metais como o cobre, alguns elétrons ficam soltos e livres para se mover. Quando esses elétrons se movem <b>de forma ordenada</b>, todos no mesmo sentido, temos uma <span class="hl">corrente elétrica</span>.</p>
+    <p class="body">Corrente é, então, a quantidade de carga que passa por um ponto do fio <b>a cada segundo</b>:</p>
+
+    <div class="formula">
+      <span class="i">i</span> = Q / t
+      <small>i = corrente (<span class="unit">ampère, A</span>) &nbsp;·&nbsp; Q = carga (coulomb, C) &nbsp;·&nbsp; t = tempo (s)</small>
+    </div>
+    <p class="body">A unidade é o <b>ampère (A)</b>. Uma corrente de 1 ampère significa 1 coulomb de carga atravessando o fio por segundo. Quanto mais elétrons passam por segundo, maior a corrente.</p>
+
+    <!-- SIM 1: fluxo -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#128268;</span><span class="ttl">Simulação · Fluxo de elétrons</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="flowCanvas" height="170"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Corrente (i)</span><span class="vl" id="flowVal">2.0 A</span></div>
+          <input type="range" id="flowRange" min="0" max="100" value="35">
+        </div>
+        <div class="readout">
+          <div class="ro"><span class="k">ELÉTRONS / s</span><span class="v" id="flowRate">—</span></div>
+          <div class="ro g"><span class="k">BRILHO DA LÂMPADA</span><span class="v" id="flowGlow">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="tag cy">CURIOSIDADE QUE CAI NO ENEM</span>
+      Quando você aperta o interruptor, a lâmpada acende <b>quase na hora</b>. Mas os elétrons em si andam devagar, poucos milímetros por segundo. O que viaja quase à velocidade da luz é o <b>campo elétrico</b>, que "avisa" todos os elétrons do circuito para começarem a se mover ao mesmo tempo — como abrir um registro e a água sair na outra ponta na hora, mesmo sem nenhuma molécula ter percorrido o cano inteiro.
+    </div>
+
+    <!-- ENEM Q108 -->
+    <div class="enem-q" data-correct="3">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Um circuito em série é formado por uma pilha, uma lâmpada incandescente e uma chave interruptora. Ao se ligar a chave, a lâmpada acende quase instantaneamente. Popularmente, associa-se isso a um "desgaste" da corrente ao atravessar o filamento. Essa explicação está em desacordo com o modelo clássico de corrente. Segundo esse modelo, a lâmpada acender quase instantaneamente está relacionado à rapidez com que</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>o fluido elétrico se desloca no circuito.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>as cargas negativas móveis atravessam o circuito.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>a bateria libera cargas móveis para o filamento da lâmpada.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>o campo elétrico se estabelece em todos os pontos do circuito.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>as cargas positivas e negativas se chocam no filamento da lâmpada.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>O que a questão pede</h4>
+          <p>Por que a lâmpada acende quase na hora, mesmo os elétrons sendo lentos?</p>
+          <h4>Conceito-chave</h4>
+          <p>A corrente é o movimento ordenado dos elétrons, mas eles avançam devagar. Quem se propaga rápido é o <b>campo elétrico</b>.</p>
+          <h4>Raciocínio</h4>
+          <p>Ao fechar a chave, o campo elétrico se estabelece em todo o circuito quase à velocidade da luz. Ele coloca praticamente todos os elétrons em movimento ao mesmo tempo — inclusive os que já estavam dentro do filamento. Por isso a lâmpada brilha de imediato, sem precisar esperar um elétron sair da pilha e chegar até ela.</p>
+          <div class="eq-answer">Resposta: alternativa D</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. TENSÃO ============ -->
+<section class="lesson" id="s3" data-title="Tensão (voltagem)">
+  <div class="wrap">
+    <div class="kicker"><span class="num">3</span> O que empurra</div>
+    <h2 class="sec-title">Tensão: o empurrão elétrico</h2>
+    <p class="body">Se os elétrons estão soltos no metal, por que eles não se movem sozinhos o tempo todo? Porque falta um <b>empurrão</b>. Esse empurrão é a <span class="hl">tensão elétrica</span>, também chamada de <b>diferença de potencial (ddp)</b> ou, no popular, <b>voltagem</b>.</p>
+    <p class="body">Volte para a água: ela só desce se houver <b>desnível</b>. Quanto maior o desnível, com mais força a água desce. A tensão é exatamente esse desnível para os elétrons. A <b>pilha</b> ou a <b>tomada</b> funciona como uma bomba que cria e mantém esse desnível, garantindo que a corrente continue circulando.</p>
+
+    <div class="formula">
+      Tensão medida em <span class="v">volts (V)</span>
+      <small>Tomada residencial no Brasil: geralmente 127 V ou 220 V</small>
+    </div>
+
+    <div class="note tip">
+      <span class="tag">PARA NÃO ESQUECER</span>
+      <b>Sem tensão, não há corrente.</b> Os elétrons só se movem de forma ordenada enquanto existe uma diferença de potencial empurrando-os. Desligou a tomada, sumiu o desnível, parou a corrente.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. RESISTÊNCIA ============ -->
+<section class="lesson" id="s4" data-title="Resistência elétrica">
+  <div class="wrap">
+    <div class="kicker"><span class="num">4</span> O que dificulta</div>
+    <h2 class="sec-title">Resistência elétrica</h2>
+    <p class="body">Nem todo material deixa a corrente passar com a mesma facilidade. A <span class="hl">resistência elétrica</span> mede o quanto um material <b>dificulta</b> a passagem da corrente. A unidade é o <b>ohm</b>, representado pela letra grega ômega: <span class="unit">&#937;</span>.</p>
+    <p class="body">A resistência de um fio depende de <b>quatro fatores</b>:</p>
+    <p class="body">&#9679; <b>Material</b> — o cobre conduz melhor que o ferro (resiste menos).<br>
+    &#9679; <b>Comprimento (L)</b> — fio mais longo resiste <b>mais</b> (como um cano comprido).<br>
+    &#9679; <b>Espessura (área A)</b> — fio mais grosso resiste <b>menos</b> (cano largo deixa passar mais).<br>
+    &#9679; <b>Temperatura</b> — em geral, mais quente resiste mais.</p>
+
+    <div class="formula">
+      <span class="r">R</span> = &rho; &middot; L / A
+      <small>R = resistência (<span class="unit">&#937;</span>) &nbsp;·&nbsp; &rho; (rô) = resistividade do material &nbsp;·&nbsp; L = comprimento &nbsp;·&nbsp; A = área da seção</small>
+    </div>
+
+    <!-- SIM 2: resistencia -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#127981;</span><span class="ttl">Simulação · O que muda a resistência</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="resCanvas" height="150"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Comprimento do fio (L)</span><span class="vl" id="resLval">médio</span></div>
+          <input type="range" id="resL" min="1" max="100" value="45">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Espessura do fio (área A)</span><span class="vl" id="resAval">média</span></div>
+          <input type="range" id="resA" min="1" max="100" value="50">
+        </div>
+        <div class="readout">
+          <div class="ro y"><span class="k">RESISTÊNCIA RELATIVA</span><span class="v" id="resOut">—</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="body">Note o padrão: aumentar o <b>comprimento</b> aumenta a resistência; aumentar a <b>espessura</b> diminui. É a relação <span class="hl">R proporcional a L/A</span> em ação.</p>
+
+    <!-- ENEM Q116 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2010</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">A resistência de um fio depende de suas dimensões e do material. A condutividade caracteriza o material: quanto maior a condutividade, menor a resistência. A tabela traz a condutividade (em S&middot;m/mm²) de alguns materiais: Alumínio 34,2 · Cobre 61,7 · Ferro 10,2 · Prata 62,5 · Tungstênio 18,8. Mantendo as mesmas dimensões, o fio de <b>menor resistência</b> é o de</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>tungstênio.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>alumínio.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>ferro.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>cobre.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>prata.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>O que a questão pede</h4>
+          <p>Entre os materiais, qual fio tem a menor resistência (com as mesmas dimensões).</p>
+          <h4>Conceito-chave</h4>
+          <p>Condutividade e resistência são <b>inversas</b>: quanto maior a condutividade, menor a resistência. Como as dimensões são iguais, só o material decide.</p>
+          <h4>Raciocínio</h4>
+          <p>Basta achar a <b>maior</b> condutividade da tabela. A prata tem 62,5 — o maior valor. Logo, é o fio de menor resistência.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. LEI DE OHM ============ -->
+<section class="lesson" id="s5" data-title="Lei de Ohm">
+  <div class="wrap">
+    <div class="kicker"><span class="num">5</span> A fórmula-mestra</div>
+    <h2 class="sec-title">A Lei de Ohm</h2>
+    <p class="body">Agora juntamos os três personagens: <span style="color:var(--cyan)">tensão</span>, <span style="color:var(--yellow)">resistência</span> e <span style="color:var(--green)">corrente</span>. Para muitos materiais vale uma relação simples e poderosa, a <span class="hl">Lei de Ohm</span>:</p>
+
+    <div class="formula">
+      <span class="v">V</span> = <span class="r">R</span> &middot; <span class="i">i</span>
+      <small>tensão = resistência &times; corrente &nbsp;|&nbsp; daí: <span class="i">i</span> = <span class="v">V</span> / <span class="r">R</span></small>
+    </div>
+    <p class="body">Ela diz tudo o que a intuição da água já sugeria: <b>mais tensão</b> (mais empurrão) gera <b>mais corrente</b>; <b>mais resistência</b> (mais dificuldade) gera <b>menos corrente</b>. É a fórmula mais usada de toda a eletrodinâmica. Brinque com ela abaixo:</p>
+
+    <!-- SIM 3: lei de ohm -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#9889;</span><span class="ttl">Simulação · Lei de Ohm ao vivo</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="ohmCanvas" height="210"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Tensão da fonte (V)</span><span class="vl" id="ohmVval">120 V</span></div>
+          <input type="range" id="ohmV" min="0" max="220" value="120">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Resistência (R)</span><span class="vl" id="ohmRval">24 &#937;</span></div>
+          <input type="range" id="ohmR" min="2" max="100" value="24">
+        </div>
+        <div class="readout">
+          <div class="ro g"><span class="k">CORRENTE i = V/R</span><span class="v" id="ohmI">—</span></div>
+          <div class="ro m"><span class="k">POTÊNCIA P = V·i</span><span class="v" id="ohmP">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note tip">
+      <span class="tag">EXEMPLO RELÂMPAGO</span>
+      Um ferro de passar tem resistência de <b>22 &#937;</b> e é ligado numa tomada de <b>220 V</b>. Qual a corrente?<br>
+      i = V / R = 220 / 22 = <b style="color:var(--green)">10 A</b>. Simples assim — é só dividir.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. POTÊNCIA ============ -->
+<section class="lesson" id="s6" data-title="Potência elétrica">
+  <div class="wrap">
+    <div class="kicker"><span class="num">6</span> O quanto gasta</div>
+    <h2 class="sec-title">Potência elétrica</h2>
+    <p class="body">A <span class="hl">potência elétrica</span> é a <b>rapidez</b> com que um aparelho consome energia. Um aparelho de <b>100 W</b> gasta 100 joules de energia <b>a cada segundo</b>. Quanto maior a potência, mais "faminto" por energia é o aparelho. A fórmula básica:</p>
+
+    <div class="formula">
+      <span class="p">P</span> = <span class="v">V</span> &middot; <span class="i">i</span>
+      <small>potência = tensão &times; corrente &nbsp;|&nbsp; unidade: <span class="unit">watt (W)</span></small>
+    </div>
+    <p class="body">Juntando com a Lei de Ohm (V = R&middot;i), a mesma potência pode ser escrita de <b>três jeitos</b> equivalentes — escolha o que combina com os dados da questão:</p>
+    <div class="formula" style="font-size:clamp(19px,4.4vw,26px)">
+      <span class="p">P</span> = <span class="v">V</span>&middot;<span class="i">i</span> = <span class="r">R</span>&middot;<span class="i">i</span>&sup2; = <span class="v">V</span>&sup2;/<span class="r">R</span>
+    </div>
+
+    <!-- ENEM Q88 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">A eficiência de uma lâmpada é a razão entre a luz produzida (fluxo luminoso, em lúmen, lm) e a potência consumida (em watt, W). Por exemplo, uma lâmpada incandescente de 40 W emite cerca de 600 lm, enquanto uma fluorescente de 40 W emite cerca de 3000 lm. A eficiência de uma lâmpada incandescente de 40 W é</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>maior que a de uma fluorescente de 8 W, que produz menor quantidade de luz.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>maior que a de uma fluorescente de 40 W, que produz menor quantidade de luz.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>menor que a de uma fluorescente de 8 W, que produz a mesma quantidade de luz.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>menor que a de uma fluorescente de 40 W, pois consome maior quantidade de energia.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>igual à de uma fluorescente de 40 W, que consome a mesma quantidade de energia.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>O que a questão pede</h4>
+          <p>Comparar a eficiência (luz por watt) da lâmpada incandescente de 40 W com outras.</p>
+          <h4>Conceito-chave</h4>
+          <p>Eficiência = lúmens &divide; watt. Mais luz com a mesma potência significa <b>mais</b> eficiência.</p>
+          <h4>Raciocínio</h4>
+          <div class="calc-step">Incandescente 40 W &rarr; 600 lm &nbsp;|&nbsp; Fluorescente 40 W &rarr; 3000 lm</div>
+          <p>Com a mesma potência (40 W), a fluorescente dá 5&times; mais luz. Logo, a incandescente é <b>menos eficiente</b>. Para produzir os mesmos 600 lm, bastaria uma fluorescente de cerca de 8 W — ou seja, a incandescente é menos eficiente que uma fluorescente que produz a mesma quantidade de luz.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q106 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Um chuveiro projetado para 110 V pode ser adaptado para 220 V mantendo <b>inalterada a sua potência</b>. Uma forma de fazer isso é trocar a resistência por outra, de mesmo material e com o(a)</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>dobro do comprimento do fio.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>metade do comprimento do fio.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>metade da área da seção reta do fio.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>quádruplo da área da seção reta do fio.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>quarta parte da área da seção reta do fio.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>O que a questão pede</h4>
+          <p>Como mudar a resistência para a potência continuar a mesma quando a tensão passa de 110 V para 220 V.</p>
+          <h4>Conceito-chave</h4>
+          <p>Aqui a potência depende da tensão e da resistência: P = V&sup2;/R. E a resistência depende das dimensões: R = &rho;L/A.</p>
+          <h4>Raciocínio</h4>
+          <div class="calc-step">P = V&sup2;/R &nbsp;·&nbsp; V dobra (110&rarr;220) &rArr; V&sup2; fica 4&times; maior</div>
+          <p>Para a potência P <b>não</b> mudar, a resistência R precisa ficar <b>4&times; maior</b> (assim o "4" de cima cancela com o "4" de baixo).</p>
+          <div class="calc-step">R = &rho;L/A &nbsp;·&nbsp; para R ficar 4&times;, com mesmo material e L &rArr; A vira A/4</div>
+          <p>Diminuir a área para a quarta parte quadruplica a resistência. Pronto.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. ENERGIA / CONTA DE LUZ ============ -->
+<section class="lesson" id="s7" data-title="Energia e conta de luz">
+  <div class="wrap">
+    <div class="kicker"><span class="num">7</span> A conta no fim do mês</div>
+    <h2 class="sec-title">Energia elétrica e a conta de luz</h2>
+    <p class="body">Se potência é energia <b>por tempo</b>, então a energia consumida é simplesmente potência <b>vezes</b> tempo:</p>
+    <div class="formula">
+      <span style="color:var(--orange)">E</span> = <span class="p">P</span> &middot; t
+      <small>energia = potência &times; tempo</small>
+    </div>
+    <p class="body">A companhia de luz cobra pela <b>energia</b>, e a unidade da conta é o <span class="hl">quilowatt-hora (kWh)</span>: é a energia de um aparelho de <b>1000 W (1 kW)</b> ligado por <b>1 hora</b>. Para achar o custo, multiplique o consumo em kWh pela <b>tarifa</b> (R$ por kWh) da sua região. É o cálculo mais cobrado no ENEM — e o de baixo faz isso pra você:</p>
+
+    <!-- SIM 4: calculadora consumo -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#128202;</span><span class="ttl">Simulação · Calculadora de consumo</span><span class="lbl">edite</span></div>
+      <div class="sim-controls">
+        <div class="calc-field">
+          <label>Aparelho</label>
+          <select id="calcAp">
+            <option value="5500">Chuveiro elétrico — 5500 W</option>
+            <option value="1400">Ar-condicionado — 1400 W</option>
+            <option value="1200">Micro-ondas — 1200 W</option>
+            <option value="1000">Ferro de passar — 1000 W</option>
+            <option value="200">Geladeira — 200 W</option>
+            <option value="100">Televisor — 100 W</option>
+            <option value="60">Lâmpada incandescente — 60 W</option>
+            <option value="9">Lâmpada LED — 9 W</option>
+          </select>
+        </div>
+        <div class="calc-grid">
+          <div class="calc-field">
+            <label>Horas por dia</label>
+            <input type="number" class="num" id="calcH" value="1" min="0" step="0.5">
+          </div>
+          <div class="calc-field">
+            <label>Dias no mês</label>
+            <input type="number" class="num" id="calcD" value="30" min="0" step="1">
+          </div>
+        </div>
+        <div class="calc-field">
+          <label>Tarifa (R$ por kWh)</label>
+          <input type="number" class="num" id="calcT" value="0.75" min="0" step="0.01">
+        </div>
+        <div class="calc-result">
+          <div class="big" id="calcCost">R$ 0,00</div>
+          <div class="lbl">CUSTO ESTIMADO NO MÊS</div>
+          <div class="sub">Consumo: <b id="calcKwh">0 kWh</b> &nbsp;·&nbsp; E = P &times; t</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="tag cy">EXEMPLO NO ESTILO ENEM</span>
+      Um chuveiro de <b>5500 W</b> é usado em 2 banhos de 8 minutos por dia, durante 30 dias, com tarifa de R$ 0,75/kWh. Custo do mês?<br>
+      &#9679; Tempo por dia: 2 &times; 8 = 16 min &rarr; em 30 dias = 480 min = <b>8 horas</b>.<br>
+      &#9679; Energia: 5,5 kW &times; 8 h = <b>44 kWh</b>.<br>
+      &#9679; Custo: 44 &times; 0,75 = <b style="color:var(--green)">R$ 33,00</b>.<br>
+      Confira ajustando a calculadora acima: 8 minutos &times; 2 = ~0,27 h/dia.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. CIRCUITOS ============ -->
+<section class="lesson" id="s8" data-title="Série e paralelo">
+  <div class="wrap">
+    <div class="kicker"><span class="num">8</span> Como ligar</div>
+    <h2 class="sec-title">Circuitos: série e paralelo</h2>
+    <p class="body">Há duas formas básicas de ligar componentes. Entender a diferença explica desde o pisca-pisca de Natal até por que você pode ligar a TV sem desligar a geladeira.</p>
+
+    <div class="circ-compare">
+      <div class="cc">
+        <h4 style="color:var(--cyan)">Em série</h4>
+        <canvas class="ccSeries" height="90"></canvas>
+        <p class="desc">Um caminho só. A <b>mesma corrente</b> passa por todos. As resistências <b>somam</b>: R = R&#8321; + R&#8322;. Se um queima, <b>todos</b> apagam (como certos pisca-piscas).</p>
+      </div>
+      <div class="cc">
+        <h4 style="color:var(--green)">Em paralelo</h4>
+        <canvas class="ccParallel" height="90"></canvas>
+        <p class="desc">Vários caminhos. <b>Mesma tensão</b> em cada um; as correntes se <b>somam</b>. Se um queima, os outros <b>continuam</b>. É assim que as tomadas da sua casa são ligadas.</p>
+      </div>
+    </div>
+
+    <div class="note warn">
+      <span class="tag">CUIDADO REAL</span>
+      Como as tomadas estão em <b>paralelo</b>, ligar muitos aparelhos no mesmo ponto faz as correntes <b>somarem</b>. Se a soma passar do limite do fio ou da tomada, ele esquenta e pode derreter ou pegar fogo. É exatamente o que a próxima questão cobra.
+    </div>
+
+    <!-- ENEM Q105 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2014</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Manuais de micro-ondas desaconselham ligá-los em paralelo com outros eletrodomésticos por meio de tomadas múltiplas (os "benjamins" ou "tês"), devido ao alto risco de incêndio e derretimento das tomadas. Esses riscos decorrem da</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>resistividade da conexão, que diminui com a variação de temperatura.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>corrente elétrica superior ao máximo que a tomada múltipla suporta.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>resistência elétrica elevada na conexão simultânea de aparelhos.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>tensão insuficiente para manter todos os aparelhos funcionando.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>intensidade do campo elétrico que rompe a rigidez dielétrica da tomada.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>O que a questão pede</h4>
+          <p>A causa do risco de incêndio ao ligar vários aparelhos numa tomada múltipla.</p>
+          <h4>Conceito-chave</h4>
+          <p>Aparelhos em paralelo têm suas <b>correntes somadas</b>. Cada tomada e cada fio aguentam uma corrente máxima.</p>
+          <h4>Raciocínio</h4>
+          <p>Ligando muitos aparelhos juntos, a corrente total ultrapassa o limite que a tomada suporta. O excesso de corrente aquece o material (efeito Joule), podendo derreter e causar incêndio.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. APLICAÇÕES ============ -->
+<section class="lesson" id="s9" data-title="Aplicações no ENEM">
+  <div class="wrap">
+    <div class="kicker"><span class="num">9</span> No mundo real</div>
+    <h2 class="sec-title">Aplicações que o ENEM adora</h2>
+    <p class="body">O ENEM raramente pede conta seca: ele veste a física de cotidiano. Veja os contextos campeões — e perceba que todos saem do que você já aprendeu.</p>
+
+    <div class="note">
+      <span class="tag cy">CHUVEIRO: VERÃO &times; INVERNO</span>
+      Na posição <b>inverno</b>, o chuveiro usa <b>menos resistência</b>. Por P = V&sup2;/R, menos resistência significa <b>mais potência</b> — e mais potência aquece mais a água. Por isso "inverno" esquenta mais que "verão".
+    </div>
+
+    <!-- ENEM Q141 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Em um chuveiro elétrico, aumentar o fluxo de água (abrir o registro) reduz a temperatura da água. Isso acontece porque</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>aumenta a área da superfície da água, elevando a perda de calor por radiação.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>aumenta o calor específico da água, dificultando seu aquecimento.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>diminui a capacidade térmica do conjunto água/chuveiro.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>diminui o contato entre a corrente elétrica e a água.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>diminui o tempo de contato entre a água e a resistência, reduzindo a transferência de calor.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>A resistência aquece a água conforme o <b>tempo de contato</b>. Mais água passando = menos tempo para cada porção.</p>
+          <h4>Raciocínio</h4>
+          <p>Ao abrir o registro, cada porção de água passa <b>mais rápido</b> pela resistência, recebendo menos calor. Por isso sai mais fria, mesmo com a mesma potência aquecendo.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note tip">
+      <span class="tag">DISJUNTOR E FIO TERRA: SEGURANÇA</span>
+      O <b>disjuntor</b> usa uma lâmina de dois metais que se <b>dilatam diferente</b> ao esquentar: com corrente excessiva, ela entorta e corta o circuito. O <b>fio terra</b> dá um caminho seguro para fugas de corrente escoarem para o solo, evitando choques.
+    </div>
+
+    <!-- ENEM Q150 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2014</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Disjuntores são feitos de uma lâmina bimetálica (dois metais soldados). Quando a corrente passa do limite, a lâmina se curva e abre o circuito. Isso ocorre porque os dois metais respondem de forma diferente à mesma corrente. A característica física observada é a</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>dureza.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>elasticidade.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>dilatação térmica.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>compressibilidade.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>condutividade elétrica.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>A corrente alta aquece a lâmina (efeito Joule). Dois metais diferentes se <b>dilatam</b> em medidas diferentes ao aquecer.</p>
+          <h4>Raciocínio</h4>
+          <p>Como um metal dilata mais que o outro, a lâmina entorta para um lado e se afasta do contato, interrompendo o circuito. A propriedade que faz isso é a <b>dilatação térmica</b>.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q111 -->
+    <div class="enem-q" data-correct="0">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">O manual de uma máquina de lavar traz um símbolo de aterramento, orientando o consumidor sobre a necessidade de a máquina ser ligada a</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>um fio terra, para evitar sobrecarga elétrica.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>um fio neutro, para evitar sobrecarga elétrica.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>um fio terra, para aproveitar as cargas elétricas do solo.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>uma rede de coleta de água da chuva.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>uma rede de coleta de esgoto doméstico.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>O fio terra (aterramento) oferece um caminho seguro para correntes de fuga irem para o solo, protegendo a pessoa contra choque e a instalação contra sobrecarga.</p>
+          <h4>Raciocínio</h4>
+          <p>O símbolo de aterramento indica justamente isso: a máquina deve ser ligada a um <b>fio terra para evitar sobrecarga elétrica</b> e choques.</p>
+          <div class="eq-answer">Resposta: alternativa A</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. RESUMO ============ -->
+<section class="lesson" id="s10" data-title="Resumo e fórmulas">
+  <div class="wrap">
+    <div class="kicker"><span class="num">10</span> Leve no bolso</div>
+    <h2 class="sec-title">Resumo e fórmulas</h2>
+    <p class="body">Tudo o que você precisa para resolver a maioria das questões de eletrodinâmica do ENEM cabe aqui:</p>
+
+    <div class="sheet">
+      <div class="f"><div class="eq">i = Q/t</div><div class="ds">Corrente<br>(ampère, A)</div></div>
+      <div class="f"><div class="eq">V = R&middot;i</div><div class="ds">Lei de Ohm<br>(volt, V)</div></div>
+      <div class="f"><div class="eq">R = &rho;L/A</div><div class="ds">Resistência<br>(ohm, &#937;)</div></div>
+      <div class="f"><div class="eq">P = V&middot;i</div><div class="ds">Potência<br>(watt, W)</div></div>
+      <div class="f"><div class="eq">P = V&sup2;/R</div><div class="ds">Potência<br>(útil em chuveiros)</div></div>
+      <div class="f"><div class="eq">E = P&middot;t</div><div class="ds">Energia<br>(kWh na conta)</div></div>
+    </div>
+
+    <h3 style="font-family:'Orbitron';font-weight:700;font-size:16px;color:var(--cyan);margin:26px 0 6px">As ideias que mais caem</h3>
+    <ul class="takeaways">
+      <li>A lâmpada acende na hora por causa do <b>campo elétrico</b>, não da velocidade dos elétrons.</li>
+      <li><b>Mais resistência, menos corrente</b> — e fio mais longo/fino resiste mais (R &prop; L/A).</li>
+      <li>No chuveiro, <b>menos resistência = mais potência</b> (P = V&sup2;/R): por isso "inverno" esquenta mais.</li>
+      <li>A conta vem em <b>kWh</b>: energia = potência &times; tempo, e custo = kWh &times; tarifa.</li>
+      <li>Tomadas em <b>paralelo</b> somam correntes — excesso esquenta e causa incêndio.</li>
+      <li><b>Fio terra</b> protege contra choque; o <b>disjuntor</b> corta por dilatação térmica.</li>
+    </ul>
+
+    <div class="card finish-card">
+      <p style="font-family:'Orbitron';font-weight:700;font-size:18px;color:#eafcff;margin-bottom:8px">Você chegou ao fim! &#9889;</p>
+      <p class="body" style="margin-bottom:20px">Agora encare o simulado de Eletrodinâmica na Área ENEM para fixar tudo — as questões que você acertar saem da fila, e as que errar voltam para você dominar.</p>
+      <button class="btn" id="finishBtn">Marcar aula como concluída &#10003;</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="ft-logo">&#9889; Plataforma da Física</div>
+  <p style="margin-top:8px">Aula interativa de Eletrodinâmica · questões do ENEM para fins educacionais</p>
+</footer>
+
+<script>
+'use strict';
+/* =====================================================================
+   Persistência (com fallback em memória para o preview do artefato)
+   ===================================================================== */
+const Store = (function(){
+  const KEY = 'plataphysica_eletro_aula';
+  let mem = null;
+  function read(){
+    try{ const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : (mem || {visited:[], done:false}); }
+    catch(e){ return mem || {visited:[], done:false}; }
+  }
+  function write(d){
+    mem = d;
+    try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){}
+  }
+  return { read, write };
+})();
+
+/* =====================================================================
+   Progresso + sumário
+   ===================================================================== */
+const secs = Array.from(document.querySelectorAll('section.lesson'));
+const data = Store.read();
+const visited = new Set(data.visited || []);
+
+// monta o sumário
+const tocNav = document.getElementById('tocNav');
+tocNav.innerHTML = secs.map((s,i)=>`<a href="#${s.id}" data-go="${s.id}"><span class="n">${String(i+1).padStart(2,'0')}</span><span>${s.dataset.title}</span><span class="dot">&#10003;</span></a>`).join('');
+
+function refreshProgress(){
+  const pct = Math.round(visited.size / secs.length * 100);
+  document.getElementById('progBar').style.width = pct + '%';
+  document.getElementById('tbPct').textContent = pct + '%';
+  tocNav.querySelectorAll('a').forEach(a=>{
+    a.classList.toggle('done', visited.has(a.dataset.go));
+  });
+}
+function markVisited(id){
+  if(visited.has(id)) return;
+  visited.add(id);
+  const d = Store.read(); d.visited = Array.from(visited); Store.write(d);
+  refreshProgress();
+}
+refreshProgress();
+
+// observa as seções entrando na tela
+if('IntersectionObserver' in window){
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{ if(en.isIntersecting) markVisited(en.target.id); });
+  }, { threshold:0.35 });
+  secs.forEach(s=>obs.observe(s));
+} else {
+  secs.forEach(s=>markVisited(s.id));
+}
+
+// TOC abrir/fechar
+const toc = document.getElementById('toc');
+document.getElementById('tocBtn').onclick = ()=> toc.classList.add('open');
+document.getElementById('tocX').onclick = ()=> toc.classList.remove('open');
+toc.onclick = (e)=>{ if(e.target === toc) toc.classList.remove('open'); };
+tocNav.querySelectorAll('a').forEach(a=> a.onclick = ()=> toc.classList.remove('open'));
+
+// concluir
+const finishBtn = document.getElementById('finishBtn');
+function paintDone(){
+  finishBtn.classList.add('done-state');
+  finishBtn.innerHTML = '&#10003; Aula concluída';
+}
+if(data.done) paintDone();
+finishBtn.onclick = ()=>{
+  secs.forEach(s=>visited.add(s.id));
+  const d = Store.read(); d.visited = Array.from(visited); d.done = true; Store.write(d);
+  refreshProgress(); paintDone();
+  window.scrollTo({ top:0, behavior:'smooth' });
+};
+
+/* =====================================================================
+   Revelar resolução das questões
+   ===================================================================== */
+document.querySelectorAll('.enem-q').forEach(q=>{
+  const btn = q.querySelector('.reveal-btn');
+  const sol = q.querySelector('.eq-sol');
+  const correct = parseInt(q.dataset.correct, 10);
+  const alts = q.querySelectorAll('.eq-alt');
+  btn.onclick = ()=>{
+    const open = sol.classList.toggle('show');
+    if(open){
+      if(alts[correct]) alts[correct].classList.add('correct');
+      btn.innerHTML = 'Ocultar resolução &#9650;';
+    } else {
+      btn.innerHTML = 'Ver resolução passo a passo &#9660;';
+    }
+  };
+});
+
+/* =====================================================================
+   Util de canvas com densidade de pixels
+   ===================================================================== */
+function fitCanvas(cv, cssH){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = cv.clientWidth || cv.parentElement.clientWidth;
+  cv.width = Math.round(w * dpr);
+  cv.height = Math.round(cssH * dpr);
+  cv.style.height = cssH + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w, h: cssH };
+}
+
+/* =====================================================================
+   HERO — riachos de elétrons ao fundo
+   ===================================================================== */
+(function(){
+  const cv = document.getElementById('heroCanvas');
+  if(!cv) return;
+  let W, H, lanes = [];
+  function setup(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = cv.clientWidth; H = cv.clientHeight || 360;
+    cv.width = W * dpr; cv.height = H * dpr;
+    cv.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+    lanes = [];
+    const n = Math.max(4, Math.round(H / 70));
+    for(let i=0;i<n;i++){
+      const y = (i + 0.5) * (H / n);
+      const dots = [];
+      const count = Math.round(W / 60);
+      for(let k=0;k<count;k++) dots.push(Math.random() * W);
+      lanes.push({ y, dots, sp: 0.5 + Math.random() * 0.9 });
+    }
+  }
+  const ctx = cv.getContext('2d');
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    lanes.forEach(l=>{
+      ctx.strokeStyle = 'rgba(0,229,255,0.05)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, l.y); ctx.lineTo(W, l.y); ctx.stroke();
+      l.dots.forEach((x,idx)=>{
+        x += l.sp; if(x > W + 10) x = -10; l.dots[idx] = x;
+        const g = ctx.createRadialGradient(x, l.y, 0, x, l.y, 7);
+        g.addColorStop(0, 'rgba(120,240,255,0.9)');
+        g.addColorStop(1, 'rgba(0,229,255,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(x, l.y, 7, 0, Math.PI*2); ctx.fill();
+      });
+    });
+    requestAnimationFrame(frame);
+  }
+  setup(); frame();
+  window.addEventListener('resize', setup);
+})();
+
+/* =====================================================================
+   SIM 1 — fluxo de elétrons
+   ===================================================================== */
+(function(){
+  const cv = document.getElementById('flowCanvas');
+  const range = document.getElementById('flowRange');
+  if(!cv || !range) return;
+  let ctx, W, H, electrons = [];
+  function build(){
+    const r = fitCanvas(cv, 170); ctx = r.ctx; W = r.w; H = r.h;
+    electrons = [];
+    for(let i=0;i<60;i++) electrons.push({ x: Math.random()*W, y: H/2 + (Math.random()*40 - 20), ph: Math.random()*6.28 });
+  }
+  function val(){ return parseInt(range.value,10)/100; } // 0..1
+  function amps(){ return (val()*9.8 + 0.2); }
+  const wireY = ()=> H/2;
+  function frame(){
+    const v = val(), i = amps();
+    ctx.clearRect(0,0,W,H);
+    const lampX = W - 46;
+    // fio
+    ctx.strokeStyle = 'rgba(0,229,255,0.35)'; ctx.lineWidth = 22; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(20, wireY()); ctx.lineTo(lampX - 26, wireY()); ctx.stroke();
+    // elétrons
+    const speed = 0.4 + v*4.2;
+    const visible = Math.round(8 + v*52);
+    electrons.forEach((e,idx)=>{
+      if(idx > visible){ return; }
+      e.x += speed; e.ph += 0.08;
+      if(e.x > lampX - 28){ e.x = 22; e.y = wireY() + (Math.random()*30 - 15); }
+      const yy = e.y + Math.sin(e.ph)*1.5;
+      const g = ctx.createRadialGradient(e.x, yy, 0, e.x, yy, 5);
+      g.addColorStop(0,'rgba(150,250,255,1)'); g.addColorStop(1,'rgba(0,229,255,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(e.x, yy, 5, 0, 6.28); ctx.fill();
+    });
+    // lâmpada
+    const glow = Math.pow(v, 0.8);
+    const lg = ctx.createRadialGradient(lampX, wireY(), 2, lampX, wireY(), 34);
+    lg.addColorStop(0, `rgba(255,228,140,${0.25 + glow*0.75})`);
+    lg.addColorStop(0.5, `rgba(255,200,60,${glow*0.5})`);
+    lg.addColorStop(1, 'rgba(255,200,60,0)');
+    ctx.fillStyle = lg; ctx.beginPath(); ctx.arc(lampX, wireY(), 34, 0, 6.28); ctx.fill();
+    ctx.fillStyle = glow > 0.05 ? `rgba(255,236,170,${0.5+glow*0.5})` : 'rgba(120,130,160,0.6)';
+    ctx.beginPath(); ctx.arc(lampX, wireY(), 11, 0, 6.28); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,229,255,0.5)'; ctx.lineWidth = 2; ctx.stroke();
+    // readouts
+    document.getElementById('flowVal').textContent = i.toFixed(1) + ' A';
+    document.getElementById('flowRate').textContent = Math.round(i*30) + ' bi';
+    document.getElementById('flowGlow').textContent = Math.round(glow*100) + '%';
+    requestAnimationFrame(frame);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* =====================================================================
+   SIM 2 — resistência (L e A)
+   ===================================================================== */
+(function(){
+  const cv = document.getElementById('resCanvas');
+  const rL = document.getElementById('resL');
+  const rA = document.getElementById('resA');
+  if(!cv || !rL || !rA) return;
+  let ctx, W, H;
+  function build(){ const r = fitCanvas(cv, 150); ctx = r.ctx; W = r.w; H = r.h; draw(); }
+  function lbl(v){ return v < 33 ? 'curto' : (v < 66 ? 'médio' : 'longo'); }
+  function lblA(v){ return v < 33 ? 'fino' : (v < 66 ? 'médio' : 'grosso'); }
+  function draw(){
+    const L = parseInt(rL.value,10), A = parseInt(rA.value,10);
+    ctx.clearRect(0,0,W,H);
+    // fio: comprimento -> largura desenhada; área -> espessura
+    const margin = 30;
+    const wireLen = margin + (L/100) * (W - 2*margin - 10);
+    const thick = 6 + (A/100) * 34;
+    const y = H/2;
+    // terminais
+    ctx.fillStyle = 'rgba(0,229,255,0.8)';
+    ctx.fillRect(18, y - 16, 6, 32);
+    ctx.fillRect(wireLen, y - 16, 6, 32);
+    // fio
+    const grad = ctx.createLinearGradient(24, 0, wireLen, 0);
+    grad.addColorStop(0, 'rgba(0,229,255,0.5)');
+    grad.addColorStop(1, 'rgba(139,92,255,0.5)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(24, y - thick/2, wireLen - 24, thick);
+    ctx.strokeStyle = 'rgba(0,229,255,0.4)'; ctx.lineWidth = 1;
+    ctx.strokeRect(24, y - thick/2, wireLen - 24, thick);
+    // rótulos
+    ctx.fillStyle = 'rgba(219,230,245,0.8)';
+    ctx.font = "600 12px Rajdhani"; ctx.textAlign='center';
+    ctx.fillText('L', (24 + wireLen)/2, y - thick/2 - 8);
+    ctx.fillText('A', wireLen + 22, y + 4);
+    // R relativa: proporcional a L/A (normalizado pra ~1.0 no centro)
+    const Rrel = (L / A) * (50/45);
+    document.getElementById('resLval').textContent = lbl(L);
+    document.getElementById('resAval').textContent = lblA(A);
+    document.getElementById('resOut').textContent = Rrel.toFixed(2) + '×';
+  }
+  rL.addEventListener('input', draw);
+  rA.addEventListener('input', draw);
+  build();
+  window.addEventListener('resize', build);
+})();
+
+/* =====================================================================
+   SIM 3 — Lei de Ohm (circuito vivo)
+   ===================================================================== */
+(function(){
+  const cv = document.getElementById('ohmCanvas');
+  const sV = document.getElementById('ohmV');
+  const sR = document.getElementById('ohmR');
+  if(!cv || !sV || !sR) return;
+  let ctx, W, H, loop = [], total = 0, dots = [];
+  function buildLoop(){
+    const m = 34, top = 28, bot = H - 28, left = m, right = W - m;
+    // perímetro retangular em sentido horário a partir do canto sup-esquerdo
+    const pts = [ {x:left,y:top}, {x:right,y:top}, {x:right,y:bot}, {x:left,y:bot} ];
+    loop = []; total = 0;
+    for(let i=0;i<pts.length;i++){
+      const a = pts[i], b = pts[(i+1)%pts.length];
+      const len = Math.hypot(b.x-a.x, b.y-a.y);
+      loop.push({ a, b, len, acc: total }); total += len;
+    }
+  }
+  function build(){
+    const r = fitCanvas(cv, 210); ctx = r.ctx; W = r.w; H = r.h;
+    buildLoop();
+    dots = []; for(let i=0;i<70;i++) dots.push(Math.random()*total);
+  }
+  function posAt(d){
+    d = ((d % total) + total) % total;
+    for(const s of loop){ if(d <= s.acc + s.len){ const t = (d - s.acc)/s.len; return { x: s.a.x + (s.b.x-s.a.x)*t, y: s.a.y + (s.b.y-s.a.y)*t }; } }
+    return loop[0].a;
+  }
+  function frame(){
+    const V = parseInt(sV.value,10), R = parseInt(sR.value,10);
+    const i = V / R;                 // corrente
+    const P = V * i;                 // potência
+    ctx.clearRect(0,0,W,H);
+    // trilho
+    ctx.strokeStyle = 'rgba(0,229,255,0.22)'; ctx.lineWidth = 10; ctx.lineJoin='round';
+    ctx.beginPath();
+    loop.forEach((s,idx)=>{ if(idx===0) ctx.moveTo(s.a.x,s.a.y); ctx.lineTo(s.b.x,s.b.y); });
+    ctx.closePath(); ctx.stroke();
+
+    // bateria (lado esquerdo, vertical) — placas
+    const lx = loop[3].a.x, ly = (loop[3].a.y + loop[3].b.y)/2;
+    ctx.strokeStyle = 'rgba(120,240,255,0.95)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(lx-9, ly-13); ctx.lineTo(lx+9, ly-13); ctx.stroke();   // placa longa (+)
+    ctx.lineWidth = 6;
+    ctx.beginPath(); ctx.moveTo(lx-5, ly+13); ctx.lineTo(lx+5, ly+13); ctx.stroke();   // placa curta (-)
+    ctx.fillStyle = 'rgba(0,229,255,0.95)';
+    ctx.font="700 12px Orbitron"; ctx.textAlign='center';
+    ctx.fillText(V + ' V', lx + 26, ly + 4);
+
+    // resistor (topo, zigue-zague)
+    const ty = loop[0].a.y, x0 = W*0.40, x1 = W*0.60;
+    ctx.strokeStyle = 'rgba(255,210,61,0.95)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(x0, ty);
+    const zig = 6, seg = (x1-x0)/zig;
+    for(let k=0;k<zig;k++){ ctx.lineTo(x0 + seg*(k+0.5), ty + (k%2?7:-7)); ctx.lineTo(x0 + seg*(k+1), ty); }
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,210,61,0.95)'; ctx.fillText(R + ' \u03A9', (x0+x1)/2, ty - 12);
+
+    // lâmpada (lado direito) — brilho conforme potência
+    const rx = loop[1].b.x, ry = (loop[1].a.y + loop[1].b.y)/2;
+    const glow = Math.min(1, P / 1200);
+    const lg = ctx.createRadialGradient(rx, ry, 2, rx, ry, 30);
+    lg.addColorStop(0, `rgba(255,228,140,${0.2 + glow*0.8})`);
+    lg.addColorStop(1, 'rgba(255,200,60,0)');
+    ctx.fillStyle = lg; ctx.beginPath(); ctx.arc(rx, ry, 30, 0, 6.28); ctx.fill();
+    ctx.fillStyle = glow > 0.04 ? `rgba(255,236,170,${0.5+glow*0.5})` : 'rgba(120,130,160,0.6)';
+    ctx.beginPath(); ctx.arc(rx, ry, 9, 0, 6.28); ctx.fill();
+
+    // elétrons — velocidade conforme corrente
+    const speed = 0.3 + Math.min(i, 12) * 0.5;
+    const visible = Math.round(10 + Math.min(i,12) * 5);
+    ctx.fillStyle = 'rgba(150,250,255,0.95)';
+    for(let k=0;k<dots.length;k++){
+      if(k > visible) break;
+      dots[k] = (dots[k] + speed) % total;
+      const p = posAt(dots[k]);
+      ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, 6.28); ctx.fill();
+    }
+    // readouts
+    document.getElementById('ohmVval').textContent = V + ' V';
+    document.getElementById('ohmRval').textContent = R + ' \u03A9';
+    document.getElementById('ohmI').textContent = i.toFixed(1) + ' A';
+    document.getElementById('ohmP').textContent = (P >= 1000 ? (P/1000).toFixed(1)+' kW' : Math.round(P)+' W');
+    requestAnimationFrame(frame);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* =====================================================================
+   SIM 4 — calculadora de consumo
+   ===================================================================== */
+(function(){
+  const ap = document.getElementById('calcAp');
+  const h = document.getElementById('calcH');
+  const d = document.getElementById('calcD');
+  const t = document.getElementById('calcT');
+  if(!ap) return;
+  function num(el, def){ const v = parseFloat(el.value); return isNaN(v) ? def : v; }
+  function calc(){
+    const P = parseFloat(ap.value);           // watts
+    const horas = num(h, 0), dias = num(d, 0), tar = num(t, 0);
+    const kwh = (P / 1000) * horas * dias;    // kWh no mês
+    const custo = kwh * tar;
+    document.getElementById('calcKwh').textContent = kwh.toFixed(1).replace('.', ',') + ' kWh';
+    document.getElementById('calcCost').textContent = 'R$ ' + custo.toFixed(2).replace('.', ',');
+  }
+  [ap, h, d, t].forEach(el=> el.addEventListener('input', calc));
+  calc();
+})();
+
+/* =====================================================================
+   Mini-diagramas série / paralelo
+   ===================================================================== */
+(function(){
+  function drawMini(cv, mode){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = cv.clientWidth, hh = 90;
+    cv.width = w*dpr; cv.height = hh*dpr;
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,hh);
+    ctx.strokeStyle = 'rgba(0,229,255,0.6)'; ctx.lineWidth = 2;
+    function lamp(x,y,color){
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x,y,7,0,6.28); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,210,61,0.7)'; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.strokeStyle = 'rgba(0,229,255,0.6)'; ctx.lineWidth=2;
+    }
+    function batt(x,y){
+      ctx.strokeStyle='rgba(120,240,255,0.95)';
+      ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x,y-7); ctx.lineTo(x,y+7); ctx.stroke();
+      ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(x+5,y-4); ctx.lineTo(x+5,y+4); ctx.stroke();
+      ctx.strokeStyle='rgba(0,229,255,0.6)'; ctx.lineWidth=2;
+    }
+    const col = mode==='series' ? 'rgba(255,236,170,0.95)' : 'rgba(170,255,210,0.95)';
+    if(mode === 'series'){
+      const y = hh/2;
+      ctx.beginPath(); ctx.rect(16, 18, w-32, hh-36); ctx.stroke();
+      batt(16, y);
+      lamp(w*0.42, 18, col); lamp(w*0.62, 18, col);
+    } else {
+      ctx.beginPath(); ctx.moveTo(16,18); ctx.lineTo(w-16,18); ctx.moveTo(16,hh-18); ctx.lineTo(w-16,hh-18); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(16,18); ctx.lineTo(16,hh-18); ctx.stroke();
+      batt(16, hh/2);
+      [0.45,0.7].forEach(fx=>{ const x=w*fx; ctx.beginPath(); ctx.moveTo(x,18); ctx.lineTo(x,hh-18); ctx.stroke(); lamp(x, hh/2, col); });
+    }
+  }
+  function all(){
+    document.querySelectorAll('.ccSeries').forEach(c=>drawMini(c,'series'));
+    document.querySelectorAll('.ccParallel').forEach(c=>drawMini(c,'parallel'));
+  }
+  all();
+  window.addEventListener('resize', all);
+})();
+</script>
+</body>
+</html>

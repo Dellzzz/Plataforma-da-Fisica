@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ondulatória do Zero — Aula ENEM | Plataforma da Física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a1a;
+    --bg-2:#0d0f24;
+    --panel:rgba(18,22,48,0.72);
+    --panel-solid:#12162f;
+    --cyan:#00e5ff;
+    --cyan-dim:#0792a8;
+    --magenta:#ff3df0;
+    --violet:#8b5cff;
+    --green:#27e88a;
+    --yellow:#ffd23d;
+    --orange:#ff9d3d;
+    --red:#ff5a6e;
+    --txt:#dbe6f5;
+    --txt-dim:#8492b4;
+    --line:rgba(0,229,255,0.18);
+    --line-soft:rgba(255,255,255,0.07);
+    --glow:0 0 18px rgba(0,229,255,0.35);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Rajdhani',sans-serif;
+    background:var(--bg);
+    color:var(--txt);
+    min-height:100vh;
+    line-height:1.5;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:'';position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(1100px 620px at 78% -8%, rgba(0,229,255,0.10), transparent 60%),
+      radial-gradient(900px 520px at 8% 12%, rgba(139,92,255,0.10), transparent 60%),
+      radial-gradient(800px 800px at 50% 120%, rgba(255,61,240,0.05), transparent 60%),
+      var(--bg);
+  }
+  body::after{
+    content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);
+    background-size:46px 46px;
+    mask-image:radial-gradient(ellipse 100% 70% at 50% 0%,#000 30%,transparent 80%);
+  }
+  ::selection{background:rgba(0,229,255,0.3);color:#fff}
+
+  /* ===== Top bar / progresso ===== */
+  .topbar{position:sticky;top:0;z-index:60;backdrop-filter:blur(12px);background:rgba(8,9,22,0.78);border-bottom:1px solid var(--line)}
+  .topbar-row{max-width:980px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:14px}
+  .tb-logo{font-family:'Orbitron';font-weight:700;font-size:14px;color:#eafcff;letter-spacing:.5px;display:flex;align-items:center;gap:9px;white-space:nowrap}
+  .tb-logo .spark{color:var(--cyan);filter:drop-shadow(0 0 6px var(--cyan))}
+  .tb-spacer{flex:1}
+  .tb-pct{font-family:'Orbitron';font-weight:700;font-size:13px;color:var(--green);min-width:42px;text-align:right}
+  .tb-toc-btn{font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:.4px;color:var(--cyan);background:rgba(0,229,255,0.07);border:1px solid var(--line);padding:8px 13px;border-radius:9px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .tb-toc-btn:hover{background:rgba(0,229,255,0.14)}
+  .progress-strip{height:3px;background:rgba(255,255,255,0.06)}
+  .progress-strip > div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--violet));box-shadow:0 0 10px rgba(0,229,255,.6);transition:width .4s ease}
+
+  /* ===== TOC overlay ===== */
+  .toc{position:fixed;inset:0;z-index:70;display:none;background:rgba(4,5,14,0.72);backdrop-filter:blur(4px)}
+  .toc.open{display:block}
+  .toc-panel{position:absolute;right:0;top:0;height:100%;width:min(340px,86vw);background:var(--panel-solid);border-left:1px solid var(--line);padding:24px 20px;overflow-y:auto;transform:translateX(100%);transition:transform .3s ease}
+  .toc.open .toc-panel{transform:translateX(0)}
+  .toc-panel h3{font-family:'Orbitron';font-weight:700;font-size:14px;color:var(--cyan);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+  .toc-x{cursor:pointer;color:var(--txt-dim);font-size:22px;line-height:1}
+  .toc a{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--txt);padding:11px 12px;border-radius:9px;margin-bottom:4px;font-size:16px;font-weight:500;transition:.18s;border:1px solid transparent}
+  .toc a:hover{background:rgba(0,229,255,0.06);border-color:var(--line)}
+  .toc a .n{font-family:'Orbitron';font-size:11px;color:var(--cyan-dim);min-width:22px}
+  .toc a .dot{margin-left:auto;width:16px;height:16px;border-radius:50%;border:2px solid var(--cyan-dim);display:grid;place-items:center;font-size:10px;color:#04121a}
+  .toc a.done .dot{background:var(--green);border-color:var(--green)}
+
+  /* ===== layout ===== */
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  section.lesson{padding:60px 0;border-bottom:1px solid var(--line-soft)}
+  section.lesson:last-of-type{border-bottom:none}
+
+  /* ===== hero ===== */
+  .hero{position:relative;overflow:hidden;padding:0;border-bottom:1px solid var(--line)}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+  .hero-inner{position:relative;max-width:980px;margin:0 auto;padding:74px 20px 70px;text-align:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:2px;color:var(--cyan);border:1px solid var(--line);background:rgba(0,229,255,0.05);padding:7px 15px;border-radius:30px;text-transform:uppercase;margin-bottom:26px}
+  .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .hero h1{font-family:'Orbitron';font-weight:900;font-size:clamp(34px,8vw,62px);line-height:1.02;letter-spacing:-1px;color:#eafcff;text-shadow:0 0 34px rgba(0,229,255,0.35)}
+  .hero h1 .glow{color:var(--cyan);text-shadow:0 0 30px rgba(0,229,255,0.7)}
+  .hero .sub{font-size:clamp(17px,2.6vw,21px);color:var(--txt);max-width:640px;margin:22px auto 0;font-weight:500}
+  .hero .sub b{color:#eafcff;font-weight:700}
+  .hero-meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+  .chip{font-family:'Orbitron';font-size:11px;font-weight:500;color:var(--txt-dim);border:1px solid var(--line-soft);background:rgba(255,255,255,0.02);padding:8px 13px;border-radius:8px}
+  .chip b{color:var(--cyan);font-weight:700}
+  .scroll-cue{margin-top:42px;font-family:'Orbitron';font-size:11px;letter-spacing:1.5px;color:var(--txt-dim);animation:bob 2s infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
+
+  /* ===== typography ===== */
+  .kicker{font-family:'Orbitron';font-weight:500;font-size:12px;letter-spacing:1.6px;color:var(--cyan);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .kicker .num{font-weight:900;font-size:13px;color:#04121a;background:var(--cyan);width:30px;height:30px;display:grid;place-items:center;border-radius:9px;box-shadow:0 0 14px rgba(0,229,255,.5)}
+  h2.sec-title{font-family:'Orbitron';font-weight:700;font-size:clamp(24px,4.6vw,34px);color:#eafcff;line-height:1.12;letter-spacing:-.3px;margin-bottom:20px}
+  .lead{font-size:19px;color:var(--txt);font-weight:500;line-height:1.65;margin-bottom:18px}
+  p.body{font-size:17px;line-height:1.72;color:var(--txt);font-weight:400;margin-bottom:16px}
+  p.body b{color:#eafcff;font-weight:700}
+  p.body .hl{color:var(--cyan);font-weight:600}
+  .unit{color:var(--violet);font-weight:700}
+
+  /* ===== cards & callouts ===== */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin:22px 0;backdrop-filter:blur(6px)}
+  .note{border-left:3px solid var(--cyan);background:rgba(0,229,255,0.05);padding:15px 18px;border-radius:0 11px 11px 0;margin:20px 0;font-size:16.5px;line-height:1.6}
+  .note.tip{border-left-color:var(--green);background:rgba(39,232,138,0.06)}
+  .note.warn{border-left-color:var(--orange);background:rgba(255,157,61,0.06)}
+  .note .tag{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.6px;display:block;margin-bottom:6px}
+  .note.tip .tag{color:var(--green)}
+  .note .tag.cy{color:var(--cyan)}
+  .note.warn .tag{color:var(--orange)}
+  .note b{color:#eafcff}
+
+  /* ===== formula ===== */
+  .formula{text-align:center;font-family:'Orbitron';font-weight:700;font-size:clamp(22px,5vw,30px);color:#eafcff;background:rgba(0,0,0,0.32);border:1px solid var(--line);border-radius:12px;padding:22px;margin:22px 0;letter-spacing:1px}
+  .formula .v{color:var(--cyan)}
+  .formula .r{color:var(--yellow)}
+  .formula .i{color:var(--green)}
+  .formula .p{color:var(--magenta)}
+  .formula small{display:block;font-family:'Rajdhani';font-weight:500;font-size:14px;letter-spacing:0;color:var(--txt-dim);margin-top:12px}
+
+  /* ===== map / property tables ===== */
+  .map{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden;margin:22px 0}
+  .map.two{grid-template-columns:repeat(2,1fr)}
+  .map .m{background:var(--panel-solid);padding:18px 16px;text-align:center}
+  .map .m .ic{font-size:26px;display:block;margin-bottom:8px}
+  .map .m .t{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;display:block;margin-bottom:6px}
+  .map .m .d{color:var(--txt-dim);font-size:14px;line-height:1.4}
+
+  /* ===== interactive widgets ===== */
+  .sim{background:linear-gradient(180deg,rgba(13,15,36,0.9),rgba(10,10,26,0.9));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:24px 0;box-shadow:0 8px 40px rgba(0,0,0,0.35)}
+  .sim-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(0,229,255,0.05);border-bottom:1px solid var(--line)}
+  .sim-head .ic{font-size:16px}
+  .sim-head .ttl{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;letter-spacing:.4px}
+  .sim-head .lbl{margin-left:auto;font-family:'Orbitron';font-size:10px;color:var(--cyan);border:1px solid var(--line);padding:4px 9px;border-radius:20px}
+  .sim-canvas-wrap{position:relative;width:100%;background:radial-gradient(circle at 50% 40%,rgba(0,229,255,0.04),transparent 70%)}
+  .sim canvas{display:block;width:100%}
+  .sim-controls{padding:18px}
+  .ctrl{margin-bottom:16px}
+  .ctrl:last-child{margin-bottom:0}
+  .ctrl-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .ctrl-label .nm{font-family:'Orbitron';font-weight:500;font-size:12.5px;color:var(--txt);letter-spacing:.3px}
+  .ctrl-label .vl{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--cyan)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--cyan-dim),rgba(255,255,255,0.08));outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px rgba(0,229,255,0.7);border:2px solid #051018;cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px rgba(0,229,255,0.7);border:2px solid #051018;cursor:pointer}
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .readout .ro{flex:1;min-width:90px;background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;text-align:center}
+  .readout .ro .k{font-family:'Orbitron';font-size:10px;letter-spacing:.5px;color:var(--txt-dim);display:block;margin-bottom:4px}
+  .readout .ro .v{font-family:'Orbitron';font-weight:700;font-size:19px;color:var(--cyan)}
+  .readout .ro.g .v{color:var(--green)}
+  .readout .ro.m .v{color:var(--magenta)}
+  .readout .ro.y .v{color:var(--yellow)}
+  .sim-btn{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;background:rgba(0,229,255,0.1);color:var(--cyan);border:1px solid var(--line);padding:11px 18px;border-radius:10px;cursor:pointer;transition:.2s;margin-top:4px}
+  .sim-btn:hover{background:rgba(0,229,255,0.2)}
+
+  /* spectrum widget */
+  .spec-info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  .spec-info .si{background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:10px;padding:12px 14px}
+  .spec-info .si .k{font-family:'Orbitron';font-size:10px;letter-spacing:.5px;color:var(--txt-dim);display:block;margin-bottom:5px}
+  .spec-info .si .v{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--cyan)}
+  .spec-info .si.use{grid-column:1 / -1}
+  .spec-info .si.use .v{color:var(--green);font-size:16px;font-family:'Rajdhani';font-weight:600}
+  .spec-name{font-family:'Orbitron';font-weight:900;font-size:22px;text-align:center;margin:4px 0 14px;letter-spacing:.5px}
+
+  /* ===== ENEM worked example ===== */
+  .enem-q{border:1px solid var(--violet);border-radius:var(--radius);overflow:hidden;margin:26px 0;background:linear-gradient(180deg,rgba(139,92,255,0.06),rgba(10,10,26,0.4))}
+  .eq-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(139,92,255,0.1);border-bottom:1px solid rgba(139,92,255,0.25);flex-wrap:wrap}
+  .eq-badge{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.4px;color:var(--violet);border:1px solid rgba(139,92,255,0.4);background:rgba(139,92,255,0.08);padding:5px 11px;border-radius:20px}
+  .eq-tag{font-family:'Orbitron';font-size:11px;color:var(--txt-dim);letter-spacing:.5px}
+  .eq-tag.real{margin-left:auto;color:var(--green)}
+  .eq-body{padding:20px 18px}
+  .eq-enun{font-size:16.5px;line-height:1.62;color:var(--txt);margin-bottom:16px}
+  .eq-alts{display:flex;flex-direction:column;gap:8px}
+  .eq-alt{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;font-size:15.5px;transition:.25s}
+  .eq-alt .let{font-family:'Orbitron';font-weight:700;font-size:13px;width:26px;height:26px;flex-shrink:0;display:grid;place-items:center;border-radius:7px;border:1px solid var(--cyan-dim);color:var(--cyan)}
+  .eq-alt.correct{border-color:var(--green);background:rgba(39,232,138,0.1)}
+  .eq-alt.correct .let{background:var(--green);color:#04121a;border-color:var(--green)}
+  .reveal-btn{margin-top:16px;width:100%;font-family:'Orbitron';font-weight:700;font-size:13px;letter-spacing:.5px;background:linear-gradient(120deg,var(--violet),#6f4ad6);color:#fff;border:none;padding:13px;border-radius:11px;cursor:pointer;transition:.2s}
+  .reveal-btn:hover{filter:brightness(1.12);box-shadow:0 0 20px rgba(139,92,255,0.4)}
+  .eq-sol{margin-top:18px;border-top:1px dashed rgba(139,92,255,0.3);padding-top:18px;display:none}
+  .eq-sol.show{display:block;animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .eq-sol h4{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;color:var(--cyan);margin:16px 0 8px;text-transform:uppercase}
+  .eq-sol h4:first-child{margin-top:0}
+  .eq-sol p{font-size:16px;line-height:1.62;color:var(--txt);margin-bottom:6px}
+  .eq-sol .calc-step{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--yellow);background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:9px;padding:11px 14px;margin:10px 0;letter-spacing:.5px}
+  .eq-answer{margin-top:16px;font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--green);background:rgba(39,232,138,0.1);border:1px solid rgba(39,232,138,0.3);border-radius:10px;padding:13px 16px;text-align:center}
+
+  /* ===== phenomena strip ===== */
+  .laws{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}
+  .laws .lw{background:var(--panel-solid);border:1px solid var(--line-soft);border-radius:12px;padding:16px 12px;text-align:center}
+  .laws .lw .n{font-size:24px}
+  .laws .lw .t{font-family:'Orbitron';font-weight:700;font-size:11.5px;color:#eafcff;margin:8px 0 6px;letter-spacing:.3px}
+  .laws .lw .d{font-size:13px;color:var(--txt-dim);line-height:1.4}
+
+  /* ===== summary ===== */
+  .sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0}
+  .sheet .f{background:var(--panel-solid);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .sheet .f .eq{font-family:'Orbitron';font-weight:700;font-size:17px;color:var(--cyan);margin-bottom:7px}
+  .sheet .f .ds{font-size:13.5px;color:var(--txt-dim);line-height:1.4}
+  .takeaways{list-style:none;margin:18px 0}
+  .takeaways li{position:relative;padding:9px 0 9px 32px;font-size:16.5px;line-height:1.55;border-bottom:1px solid var(--line-soft)}
+  .takeaways li:last-child{border-bottom:none}
+  .takeaways li::before{content:'\3030';position:absolute;left:0;top:7px;color:var(--cyan);filter:drop-shadow(0 0 6px var(--cyan));font-size:18px}
+  .takeaways li b{color:#eafcff}
+
+  .finish-card{text-align:center;background:linear-gradient(135deg,rgba(0,229,255,0.08),rgba(139,92,255,0.08));border:1px solid var(--line)}
+  .btn{font-family:'Orbitron';font-weight:700;font-size:14px;letter-spacing:.5px;background:linear-gradient(120deg,var(--cyan),#33b6ff);color:#04121a;border:none;padding:15px 30px;border-radius:12px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:9px}
+  .btn:hover{filter:brightness(1.08);box-shadow:0 0 26px rgba(0,229,255,0.45);transform:translateY(-1px)}
+  .btn.done-state{background:linear-gradient(120deg,var(--green),#1fd07e)}
+  footer{padding:34px 20px 50px;text-align:center;color:var(--txt-dim);font-size:13.5px}
+  footer .ft-logo{font-family:'Orbitron';font-weight:700;color:var(--cyan);font-size:14px}
+
+  @media(max-width:680px){
+    section.lesson{padding:46px 0}
+    .map{grid-template-columns:1fr}
+    .map.two{grid-template-columns:1fr}
+    .laws{grid-template-columns:repeat(2,1fr)}
+    .spec-info{grid-template-columns:1fr}
+    .hero-inner{padding:58px 20px 54px}
+    p.body,.lead{font-size:16.5px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <span class="tb-logo"><span class="spark">&#12336;</span> Ondulatória · Aula ENEM</span>
+    <span class="tb-spacer"></span>
+    <span class="tb-pct" id="tbPct">0%</span>
+    <button class="tb-toc-btn" id="tocBtn">&#9776; Conteúdo</button>
+  </div>
+  <div class="progress-strip"><div id="progBar"></div></div>
+</div>
+
+<div class="toc" id="toc">
+  <div class="toc-panel">
+    <h3>Conteúdo da aula <span class="toc-x" id="tocX">&times;</span></h3>
+    <nav id="tocNav"></nav>
+  </div>
+</div>
+
+<header class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="pulse"></span> Plataforma da Física · do zero ao ENEM</span>
+    <h1>Ondula<span class="glow">tória</span><br>do Zero</h1>
+    <p class="sub">Do som do violão à luz do Sol, tudo é onda. Aprenda a física das ondas com simulações que você controla e <b>questões reais do ENEM</b> resolvidas passo a passo.</p>
+    <div class="hero-meta">
+      <span class="chip"><b>4</b> simulações interativas</span>
+      <span class="chip"><b>14</b> questões do ENEM</span>
+      <span class="chip"><b>0</b> pré-requisitos</span>
+    </div>
+    <div class="scroll-cue">&#9660; ROLE PARA COMEÇAR</div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 1. INTRODUÇÃO ============ -->
+<section class="lesson" id="s1" data-title="O que é uma onda">
+  <div class="wrap">
+    <div class="kicker"><span class="num">1</span> A grande ideia</div>
+    <h2 class="sec-title">O que é uma onda?</h2>
+    <p class="lead">Uma onda é uma <b>perturbação que se propaga transportando energia</b> — mas sem transportar matéria de um lugar para outro.</p>
+    <p class="body">Essa última parte é o pulo do gato. Pense na <span class="hl">"ola" de um estádio</span>: a "onda" dá a volta no estádio inteiro, mas nenhuma pessoa sai do lugar — cada uma só levanta e senta. O que viaja é o <b>movimento</b>, não as pessoas. Uma rolha boiando no mar sobe e desce quando uma onda passa, mas não viaja junto com ela: a água fica praticamente parada, só a energia se desloca.</p>
+    <p class="body">Esse mesmo princípio explica fenômenos que parecem completamente diferentes:</p>
+    <div class="map">
+      <div class="m"><span class="ic">&#127925;</span><span class="t">SOM</span><span class="d">vibração do ar chegando ao seu ouvido</span></div>
+      <div class="m"><span class="ic">&#9728;</span><span class="t">LUZ</span><span class="d">onda eletromagnética vinda do Sol</span></div>
+      <div class="m"><span class="ic">&#127754;</span><span class="t">MAR, CORDAS, TERREMOTOS</span><span class="d">a mesma física por trás de todos</span></div>
+    </div>
+    <p class="body">Entendendo as regras de uma onda, você entende todas. Vamos começar destrinchando as suas partes.</p>
+  </div>
+</section>
+
+<!-- ============ 2. ANATOMIA ============ -->
+<section class="lesson" id="s2" data-title="Anatomia da onda">
+  <div class="wrap">
+    <div class="kicker"><span class="num">2</span> As partes de uma onda</div>
+    <h2 class="sec-title">Amplitude, comprimento, frequência</h2>
+    <p class="body">Toda onda tem quatro medidas-chave. Três delas você vê no desenho de uma onda; a quarta é o ritmo dela no tempo:</p>
+    <p class="body">&#9679; <b>Amplitude (A)</b> — a "altura" da onda, do meio até o topo. Diz o quanto de <span class="hl">energia</span> ela carrega. No som, é o volume; na luz, o brilho.<br>
+    &#9679; <b>Comprimento de onda (&lambda;)</b> — a distância entre duas cristas seguidas (dois "topos"). Mede-se em metros.<br>
+    &#9679; <b>Período (T)</b> — o tempo que leva para uma onda completa passar. Em segundos.<br>
+    &#9679; <b>Frequência (f)</b> — quantas ondas passam por segundo. Em <span class="unit">hertz (Hz)</span>.</p>
+    <div class="formula"><span class="i">f</span> = 1 / <span class="v">T</span> <small>frequência e período são inversos: mais ondas por segundo = cada uma dura menos tempo</small></div>
+
+    <!-- SIM 1: onda transversal -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#12336;</span><span class="ttl">Simulação · Anatomia de uma onda</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="waveCanvas" height="200"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Amplitude (A)</span><span class="vl" id="waveAval">médio</span></div>
+          <input type="range" id="waveA" min="8" max="46" value="28">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Frequência (f)</span><span class="vl" id="waveFval">1.0 Hz</span></div>
+          <input type="range" id="waveF" min="5" max="30" value="10">
+        </div>
+        <div class="readout">
+          <div class="ro"><span class="k">FREQUÊNCIA</span><span class="v" id="waveFout">—</span></div>
+          <div class="ro g"><span class="k">COMPRIMENTO &lambda;</span><span class="v" id="waveLout">—</span></div>
+          <div class="ro y"><span class="k">VELOCIDADE v = &lambda;&middot;f</span><span class="v" id="waveVout">—</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="body">Repare na simulação: mexer na <b>amplitude</b> muda só a altura (a energia), sem afetar o resto. Já a <b>frequência</b> e o <b>comprimento de onda</b> estão amarrados — quando uma sobe, a outra desce. O próximo passo explica por quê.</p>
+
+    <!-- ENEM Q63 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Para reduzir a poluição sonora, uma cidade aprovou uma lei que impõe o limite máximo de 40 dB (decibéis) para o nível sonoro após as 22 horas. Ao aprovar essa lei, os vereadores estão limitando qual característica da onda sonora?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>A altura da onda sonora.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>A amplitude da onda sonora.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>A frequência da onda sonora.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>A velocidade da onda sonora.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>O timbre da onda sonora.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>O decibel mede o <b>volume</b> (intensidade) do som. E o volume está ligado à <b>amplitude</b> da onda: quanto maior a amplitude, mais alto o som.</p>
+          <h4>Cuidado com a pegadinha</h4>
+          <p>"Altura" (alternativa A) em física <b>não</b> é volume — altura é o quão <b>agudo ou grave</b> é o som, ou seja, a frequência. Limitar decibéis é limitar a <b>amplitude</b>.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. EQUAÇÃO FUNDAMENTAL ============ -->
+<section class="lesson" id="s3" data-title="Equação v = λ·f">
+  <div class="wrap">
+    <div class="kicker"><span class="num">3</span> A fórmula mestra</div>
+    <h2 class="sec-title">A equação fundamental: v = &lambda; &middot; f</h2>
+    <p class="body">Uma única equação conecta as três grandezas mais importantes de qualquer onda — é a fórmula que mais aparece no ENEM:</p>
+    <div class="formula"><span class="v">v</span> = <span class="i">&lambda;</span> &middot; <span class="r">f</span> <small>velocidade = comprimento de onda &times; frequência</small></div>
+    <p class="body">A grande sacada: a <b>velocidade de uma onda depende do meio</b> em que ela viaja, não de quem a produziu. O som tem uma velocidade fixa no ar (~340 m/s); a luz tem a sua no vácuo. Se o meio não muda, <b>v fica constante</b>.</p>
+    <div class="note tip">
+      <span class="tag">A CONSEQUÊNCIA QUE CAI NA PROVA</span>
+      Como v = &lambda;&middot;f e a velocidade é fixa pelo meio, frequência e comprimento de onda são <b>inversamente proporcionais</b>: se a frequência <b>dobra</b>, o comprimento de onda cai pela <b>metade</b>. Mais frequência sempre significa onda mais "curtinha".
+    </div>
+
+    <!-- ENEM Q67 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Em uma piscina coberta, uma goteira pinga no centro e forma ondas circulares. Caíam 2 gotas por segundo, a distância entre duas cristas era de 25 cm, e cada onda se aproximava da borda a 1,0 m/s. Depois a chuva diminuiu e passou a cair 1 gota por segundo. Com isso, a distância entre as cristas e a velocidade de propagação ficaram</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>maior que 25 cm e maior que 1,0 m/s.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>maior que 25 cm e igual a 1,0 m/s.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>menor que 25 cm e menor que 1,0 m/s.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>menor que 25 cm e igual a 1,0 m/s.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>igual a 25 cm e igual a 1,0 m/s.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Passo 1 — a velocidade muda?</h4>
+          <p>A velocidade da onda depende do <b>meio</b> (a água da piscina), que não mudou. Logo, v continua <b>1,0 m/s</b>. O ritmo das gotas não altera a velocidade de propagação.</p>
+          <h4>Passo 2 — o que acontece com &lambda;?</h4>
+          <p>A frequência das gotas caiu pela metade (de 2 para 1 por segundo). Como v = &lambda;&middot;f e v é fixo, se f diminui, &lambda; precisa <b>aumentar</b>:</p>
+          <div class="calc-step">&lambda; = v / f &rarr; com f menor, &lambda; fica MAIOR que 25 cm</div>
+          <p>Então: comprimento de onda <b>maior</b> que 25 cm e velocidade <b>igual</b> a 1,0 m/s.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q72 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Num violão afinado, a corda Lá tocada solta (no seu comprimento inteiro) produz som de 440 Hz. Se a mesma corda for pressionada na metade do comprimento, a frequência do novo som</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>se reduz à metade, porque o comprimento de onda dobrou.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>dobra, porque o comprimento de onda foi reduzido à metade.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>quadruplica, porque o comprimento de onda foi reduzido à metade.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>quadruplica, porque o comprimento de onda foi reduzido à quarta parte.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>não se modifica, pois independe do comprimento da corda.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>A velocidade da onda na corda é fixa (depende da tensão e do material, que não mudaram). Pressionar a corda na metade faz o comprimento de onda cair pela <b>metade</b>.</p>
+          <h4>Aplicando v = &lambda;&middot;f</h4>
+          <p>Com v constante, se &lambda; cai pela metade, f tem que <b>dobrar</b>:</p>
+          <div class="calc-step">f = v / &lambda; &rarr; &lambda; pela metade &rarr; f dobra: 440 Hz &rarr; 880 Hz</div>
+          <p>É por isso que apertar a corda mais perto do corpo do violão produz notas mais agudas.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. TIPOS DE ONDA ============ -->
+<section class="lesson" id="s4" data-title="Tipos de onda">
+  <div class="wrap">
+    <div class="kicker"><span class="num">4</span> Duas grandes divisões</div>
+    <h2 class="sec-title">Tipos de onda</h2>
+    <p class="body">As ondas se classificam de duas formas. A primeira é pela <b>direção</b> em que vibram:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#8597;</span><span class="t">TRANSVERSAL</span><span class="d">vibra perpendicular ao movimento (corda de violão, luz, mar)</span></div>
+      <div class="m"><span class="ic">&#8596;</span><span class="t">LONGITUDINAL</span><span class="d">vibra na mesma direção do movimento (som, mola comprimindo)</span></div>
+    </div>
+
+    <!-- SIM 2: transversal vs longitudinal -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#128260;</span><span class="ttl">Simulação · Transversal × Longitudinal</span><span class="lbl">observe</span></div>
+      <div class="sim-canvas-wrap"><canvas id="tlCanvas" height="220"></canvas></div>
+      <div class="sim-controls">
+        <p style="font-size:14.5px;color:var(--txt-dim);text-align:center;margin:0">Em cima, a <b style="color:var(--cyan)">transversal</b>: os pontos sobem e descem. Embaixo, a <b style="color:var(--green)">longitudinal</b>: os pontos se comprimem e espaçam. Nos dois casos, a energia caminha para a direita &rarr; sem levar os pontos junto.</p>
+      </div>
+    </div>
+
+    <p class="body">A segunda divisão é pela <b>necessidade de um meio</b> para se propagar — e essa é decisiva no ENEM:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#127932;</span><span class="t">MECÂNICA</span><span class="d"><b style="color:#eafcff">Precisa</b> de um meio (ar, água, sólido). Ex.: som. No vácuo, não anda.</span></div>
+      <div class="m"><span class="ic">&#128225;</span><span class="t">ELETROMAGNÉTICA</span><span class="d"><b style="color:#eafcff">Não precisa</b> de meio. Ex.: luz. Viaja até no vácuo.</span></div>
+    </div>
+    <div class="note warn">
+      <span class="tag">PEGADINHA CLÁSSICA</span>
+      No espaço (vácuo), <b>não existe som</b> — explosões de filme de ficção seriam silenciosas. Mas a <b>luz do Sol</b> chega até nós atravessando milhões de quilômetros de vácuo, porque é uma onda eletromagnética e não precisa de meio.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. SOM ============ -->
+<section class="lesson" id="s5" data-title="O som">
+  <div class="wrap">
+    <div class="kicker"><span class="num">5</span> A onda que ouvimos</div>
+    <h2 class="sec-title">O som e suas qualidades</h2>
+    <p class="body">O som é uma onda <b>mecânica</b> e <b>longitudinal</b>: ele comprime e descomprime o ar até chegar ao seu ouvido. Ele tem três qualidades que o ENEM adora separar:</p>
+    <div class="laws">
+      <div class="lw"><span class="n">&#127929;</span><div class="t">ALTURA</div><div class="d">agudo ou grave = a <b>frequência</b></div></div>
+      <div class="lw"><span class="n">&#128266;</span><div class="t">INTENSIDADE</div><div class="d">volume = a <b>amplitude</b></div></div>
+      <div class="lw"><span class="n">&#127932;</span><div class="t">TIMBRE</div><div class="d">a "cor" do som = a <b>forma da onda</b></div></div>
+    </div>
+    <p class="body">A <b>altura</b> distingue um som agudo (apito, frequência alta) de um grave (trovão, frequência baixa). O <b>timbre</b> é o que te faz reconhecer que um piano e um violão tocam a mesma nota, mas soam diferentes: a forma da onda de cada instrumento é única.</p>
+    <div class="note tip">
+      <span class="tag">EFEITO DOPPLER</span>
+      Você já notou a sirene da ambulância ficar mais aguda ao se aproximar e mais grave ao se afastar? É o <b>efeito Doppler</b>: o movimento entre a fonte e você "espreme" ou "estica" as ondas, mudando a frequência que chega ao seu ouvido — mesmo que a sirene emita sempre a mesma nota.
+    </div>
+
+    <!-- ENEM Q59 -->
+    <div class="enem-q" data-correct="0">
+      <div class="eq-head"><span class="eq-badge">ENEM 2014</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">O "ouvido absoluto" é a capacidade rara de algumas pessoas de identificar uma nota musical isolada, sem precisar compará-la com outra nota de referência. Para identificar a nota, essa pessoa reconhece, na prática, a sua</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>frequência.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>intensidade.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>forma da onda.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>amplitude da onda.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>velocidade de propagação.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>O que define qual é a <b>nota musical</b> (Dó, Ré, Lá...) é a <b>frequência</b> do som. Cada nota corresponde a uma frequência específica — o Lá padrão, por exemplo, é 440 Hz.</p>
+          <h4>Raciocínio</h4>
+          <p>Quem tem ouvido absoluto reconhece diretamente a frequência do som. Intensidade (volume) e timbre não mudam <b>qual</b> é a nota — só o quão alta ela soa ou em que instrumento foi tocada.</p>
+          <div class="eq-answer">Resposta: alternativa A</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q65 -->
+    <div class="enem-q" data-correct="3">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Para afinar um violão, um músico usa a nota Lá de um piano como referência e ajusta a corda até tocarem a mesma nota. Mesmo soando a mesma nota, ainda é possível distinguir o som do piano do som do violão. Isso é possível porque</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>a ressonância do som emitido pelo piano é maior.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>a potência do som emitido pelo piano é maior.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>a intensidade do som de cada instrumento é diferente.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>o timbre do som produzido por cada instrumento é diferente.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>a amplitude do som de cada instrumento é diferente.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Como tocam a <b>mesma nota</b>, a frequência é igual nos dois. Como podem tocar no mesmo volume, a intensidade também pode ser igual. O que ainda os diferencia é a <b>forma da onda</b> — e isso é exatamente o <b>timbre</b>.</p>
+          <p>Cada instrumento gera uma mistura própria de frequências secundárias (harmônicos), criando uma "assinatura sonora" única. Por isso o ouvido reconhece o piano e o violão de imediato.</p>
+          <div class="eq-answer">Resposta: alternativa D</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. FENÔMENOS I ============ -->
+<section class="lesson" id="s6" data-title="Reflexão, refração, difração">
+  <div class="wrap">
+    <div class="kicker"><span class="num">6</span> O que as ondas fazem</div>
+    <h2 class="sec-title">Reflexão, refração e difração</h2>
+    <p class="body">Quando uma onda encontra um obstáculo ou muda de meio, acontecem fenômenos com nomes que o ENEM cobra direto. Os três principais:</p>
+    <div class="laws">
+      <div class="lw"><span class="n">&#129518;</span><div class="t">REFLEXÃO</div><div class="d">a onda <b>volta</b> ao bater num obstáculo (o eco, o espelho)</div></div>
+      <div class="lw"><span class="n">&#128167;</span><div class="t">REFRAÇÃO</div><div class="d">a onda <b>muda de direção</b> ao mudar de meio (a luz na água)</div></div>
+      <div class="lw"><span class="n">&#127754;</span><div class="t">DIFRAÇÃO</div><div class="d">a onda <b>contorna</b> obstáculos e cantos (o som vira a esquina)</div></div>
+    </div>
+    <p class="body">A <b>refração</b> é a estrela das pegadinhas: quando a luz passa de um meio para outro (da água para o ar, por exemplo), ela "entorta". Por isso um canudo dentro do copo parece quebrado, e um peixe parece estar num lugar diferente de onde realmente está.</p>
+
+    <!-- ENEM Q90 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Alguns povos indígenas pescam com lança. Para fisgar um peixe em um lago de águas tranquilas, o índio precisa mirar <b>abaixo</b> da posição em que enxerga o peixe. Ele deve fazer isso porque os raios de luz</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>refletidos pelo peixe não descrevem trajetória retilínea dentro da água.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>emitidos pelos olhos do índio desviam ao passar do ar para a água.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>espalhados pelo peixe são refletidos pela superfície da água.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>emitidos pelos olhos do índio são espalhados pela superfície.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>refletidos pelo peixe desviam a trajetória ao passar da água para o ar.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave: refração</h4>
+          <p>A luz que sai do peixe atravessa a fronteira <b>água &rarr; ar</b> para chegar aos olhos do índio. Nessa passagem, ela muda de direção (refração).</p>
+          <h4>Por que mirar abaixo?</h4>
+          <p>Por causa desse desvio, o cérebro do índio projeta o peixe numa posição mais <b>alta e rasa</b> do que ele realmente está. Para acertar a lança no peixe de verdade, é preciso mirar <b>abaixo</b> da imagem. (E note: a luz vai dos olhos para fora é uma ideia errada — quem enxerga recebe a luz que vem do peixe.)</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q70 -->
+    <div class="enem-q" data-correct="0">
+      <div class="eq-head"><span class="eq-badge">ENEM 2014</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Numa apresentação musical, um ouvinte na plateia consegue ouvir quase perfeitamente o som da banda, mas perde nitidez nas notas mais agudas. Há pessoas altas à sua frente, bloqueando a visão direta do palco e dos alto-falantes. Qual fenômeno ondulatório explica ele ainda conseguir ouvir o som?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>Difração.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Reflexão.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>Refração.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>Atenuação.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>Interferência.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave: difração</h4>
+          <p>Mesmo com pessoas bloqueando o caminho direto, o som chega ao ouvinte porque <b>contorna</b> os obstáculos. Essa capacidade de "dobrar" em torno de barreiras é a <b>difração</b>.</p>
+          <h4>Por que perde os agudos?</h4>
+          <p>A difração é mais eficiente para ondas de <b>maior comprimento</b> (sons graves). Os agudos têm comprimento de onda menor e contornam menos os obstáculos — por isso chegam mais fracos. É por isso também que, de longe, você ouve mais o "grave" da música do vizinho.</p>
+          <div class="eq-answer">Resposta: alternativa A</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. FENÔMENOS II ============ -->
+<section class="lesson" id="s7" data-title="Ressonância e interferência">
+  <div class="wrap">
+    <div class="kicker"><span class="num">7</span> Ondas que se somam</div>
+    <h2 class="sec-title">Ressonância e interferência</h2>
+    <p class="body">Quando ondas se encontram, elas se <b>somam</b>. Onde duas cristas coincidem, a onda fica mais forte (<span class="hl">interferência construtiva</span>); onde uma crista encontra um vale, elas se cancelam (<span class="hl">interferência destrutiva</span>). É esse princípio que os fones com "cancelamento de ruído" usam: criam uma onda que anula o barulho externo.</p>
+
+    <!-- SIM 3: interferencia -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#128280;</span><span class="ttl">Simulação · Interferência de duas fontes</span><span class="lbl">observe</span></div>
+      <div class="sim-canvas-wrap"><canvas id="interfCanvas" height="180"></canvas></div>
+      <div class="sim-controls">
+        <p style="font-size:14.5px;color:var(--txt-dim);text-align:center;margin:0">Duas fontes emitem ondas iguais. As linhas <b style="color:var(--cyan)">claras</b> são onde as ondas se reforçam (construtiva); as <b>escuras</b>, onde se cancelam (destrutiva). É o mesmo padrão das ondas na água quando você joga duas pedras.</p>
+      </div>
+    </div>
+
+    <p class="body">Já a <span class="hl">ressonância</span> acontece quando você "empurra" um sistema na sua frequência natural, e ele responde com vibração máxima — como dar impulso num balanço no ritmo certo. É assim que o rádio sintoniza uma estação: o circuito é ajustado para ressoar com a frequência daquela emissora e ignorar as outras.</p>
+
+    <!-- ENEM Q71 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2014</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Ao sintonizar uma estação de rádio ou um canal de TV, alteramos características elétricas do circuito receptor. Das inúmeras ondas eletromagnéticas que chegam ao mesmo tempo, somente aquelas que oscilam com uma frequência específica resultam em máxima absorção de energia. O fenômeno descrito é a</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>difração.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>refração.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>polarização.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>interferência.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>ressonância.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave: ressonância</h4>
+          <p>A palavra-chave do enunciado é "<b>máxima absorção de energia</b>" em uma frequência específica. Isso é a definição de ressonância: o sistema vibra com intensidade máxima quando estimulado na sua frequência natural.</p>
+          <h4>Raciocínio</h4>
+          <p>Ao sintonizar, você ajusta o circuito para que a frequência natural dele coincida com a da emissora desejada. Só essa estação "ressoa" e é captada com força; as demais são praticamente ignoradas.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q74 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Em voos, pede-se o desligamento de aparelhos que emitam ou recebam ondas eletromagnéticas, para evitar interferência na comunicação por rádio entre os pilotos e a torre. A propriedade das ondas emitidas que justifica esse procedimento é o fato de</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>terem fases opostas.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>serem ambas audíveis.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>terem intensidades inversas.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>serem de mesma amplitude.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>terem frequências próximas.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>A interferência entre dois sinais é significativa quando eles têm <b>frequências próximas</b> — aí eles se misturam e atrapalham um ao outro.</p>
+          <p>Se os aparelhos dos passageiros emitem ondas com frequências parecidas às da comunicação dos pilotos, podem se sobrepor a esses sinais e prejudicar a transmissão. Por isso o desligamento é solicitado por precaução.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. LUZ E ESPECTRO ============ -->
+<section class="lesson" id="s8" data-title="Luz e espectro EM">
+  <div class="wrap">
+    <div class="kicker"><span class="num">8</span> A família da luz</div>
+    <h2 class="sec-title">Luz e o espectro eletromagnético</h2>
+    <p class="body">A luz visível é apenas uma pequena faixa de uma grande família: as <b>ondas eletromagnéticas</b>. Todas viajam à mesma velocidade no vácuo (a velocidade da luz, ~300 000 km/s) e diferem apenas na <b>frequência</b> — e, portanto, no comprimento de onda.</p>
+    <p class="body">Da menor para a maior frequência: ondas de <span class="hl">rádio</span>, <span class="hl">micro-ondas</span>, <span class="hl">infravermelho</span>, <span class="hl">luz visível</span>, <span class="hl">ultravioleta</span>, <span class="hl">raios X</span> e <span class="hl">raios gama</span>. Quanto maior a frequência, mais energia a onda carrega. Explore:</p>
+
+    <!-- SIM 4: espectro -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#127752;</span><span class="ttl">Simulação · Espectro eletromagnético</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="specCanvas" height="150"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Deslize pelo espectro</span><span class="vl" id="specPos">&larr; menor f &nbsp;|&nbsp; maior f &rarr;</span></div>
+          <input type="range" id="specSlider" min="0" max="100" value="46">
+        </div>
+        <div class="spec-name" id="specName">Luz visível</div>
+        <div class="spec-info">
+          <div class="si"><span class="k">FREQUÊNCIA</span><span class="v" id="specFreq">—</span></div>
+          <div class="si"><span class="k">COMPRIMENTO DE ONDA</span><span class="v" id="specWave">—</span></div>
+          <div class="si use"><span class="k">ONDE APARECE</span><span class="v" id="specUse">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q64 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">O bronzeamento da pele é provocado pela luz <b>ultravioleta</b>, que estimula a produção de melanina. Querendo se bronzear, uma garota deitou-se de biquíni embaixo de uma lâmpada incandescente comum por várias horas e não conseguiu resultado algum. O bronzeamento não ocorreu porque a luz da lâmpada incandescente é de</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>baixa intensidade.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>baixa frequência.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>um espectro contínuo.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>amplitude inadequada.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>curto comprimento de onda.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>O bronzeamento exige radiação <b>ultravioleta</b>, que tem frequência <b>alta</b> (maior que a da luz visível). A lâmpada incandescente emite principalmente luz visível e infravermelho (calor) — radiações de frequência <b>mais baixa</b> que o UV.</p>
+          <h4>Raciocínio</h4>
+          <p>Faltou frequência alta o suficiente para chegar à faixa do ultravioleta. Sem UV, a pele não produz melanina e não bronzeia, por mais horas que a garota fique ali.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q78 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2010</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">O efeito Tyndall é o que torna possível ver as partículas de poeira suspensas no ar quando um feixe de luz (uma réstia de sol, o farol do carro na neblina) atravessa o ambiente. Esse efeito ocorre devido</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>à absorção do feixe de luz por este meio.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>à interferência do feixe de luz neste meio.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>à transmissão do feixe de luz neste meio.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>à polarização do feixe de luz por este meio.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>ao espalhamento do feixe de luz neste meio.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave: espalhamento</h4>
+          <p>Vemos as partículas porque elas <b>espalham</b> (refletem em todas as direções) parte da luz do feixe que as atinge. Esse desvio da luz em várias direções é o <b>espalhamento</b>.</p>
+          <h4>Curiosidade</h4>
+          <p>É o mesmo espalhamento que torna o <b>céu azul</b>: as moléculas do ar espalham mais a luz azul do Sol do que as outras cores.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. APLICAÇÕES ============ -->
+<section class="lesson" id="s9" data-title="Aplicações no ENEM">
+  <div class="wrap">
+    <div class="kicker"><span class="num">9</span> No mundo real</div>
+    <h2 class="sec-title">Tecnologias que são pura ondulatória</h2>
+    <p class="body">O ENEM adora vestir a teoria de ondas em tecnologia do dia a dia. Três campeãs, todas saindo do que você já aprendeu.</p>
+
+    <!-- ENEM Q68 -->
+    <div class="enem-q" data-correct="3">
+      <div class="eq-head"><span class="eq-badge">ENEM 2009</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">A ultrassonografia gera imagens do interior do corpo a partir da <b>reflexão</b> de pulsos de ultrassom: o aparelho emite o pulso, que reflete ao passar de um órgão para outro, gerando ecos captados de volta. Para calcular a que profundidade está cada estrutura, o aparelho precisa conhecer</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>a intensidade do som e a frequência desses sons.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>a quantidade de luz usada e a velocidade do som nos tecidos.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>a quantidade de pulsos por segundo e a frequência dos sons.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>a velocidade do som nos tecidos e o tempo entre os ecos.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>o tempo entre os ecos e a quantidade de pulsos por segundo.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>É o princípio do eco: distância = velocidade &times; tempo. Para descobrir a profundidade, o aparelho usa a <b>velocidade do som no tecido</b> e mede o <b>tempo</b> que o eco leva para voltar.</p>
+          <div class="calc-step">distância = (velocidade do som &times; tempo do eco) &divide; 2</div>
+          <p>Divide-se por 2 porque o som faz o caminho de ida <b>e</b> volta. Com velocidade e tempo, calcula-se a profundidade de cada estrutura e monta-se a imagem.</p>
+          <div class="eq-answer">Resposta: alternativa D</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q87 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">A fibra óptica transmite internet em alta velocidade conduzindo luz por um fino fio de material transparente. Para que a luz fique "presa" dentro da fibra e percorra grandes distâncias sem escapar pelas laterais, o índice de refração do núcleo deve ser ___ ao da casca, de modo a ocorrer ___.</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>superior e ocorrer difração.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>superior e ocorrer reflexão interna total.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>inferior e ocorrer reflexão interna parcial.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>inferior e ocorrer interferência destrutiva.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>inferior e ocorrer interferência construtiva.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave: reflexão interna total</h4>
+          <p>Quando a luz tenta sair de um meio mais "denso" (maior índice de refração) para um menos denso com ângulo bem inclinado, ela não atravessa: <b>reflete totalmente</b> de volta para dentro. É a reflexão interna total.</p>
+          <h4>Raciocínio</h4>
+          <p>Para isso funcionar na fibra, o <b>núcleo</b> precisa ter índice de refração <b>maior</b> que o da casca. Assim a luz vai "quicando" dentro do núcleo, presa, percorrendo quilômetros sem vazar.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q76 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2010</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Uma única antena de rádio FM cobre uma cidade inteira, mas os celulares precisam de várias antenas. O FM opera em MHz (ondas de rádio), e os celulares em GHz (micro-ondas), que têm comprimento de onda menor. O alcance do celular é menor porque as ondas de rádio FM (de maior comprimento de onda) são</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>facilmente absorvidas pela ionosfera.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>capazes de contornar obstáculos como árvores, edifícios e elevações.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>mais refratadas pela atmosfera, que tem maior índice de refração para elas.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>menos atenuadas por interferência de outros aparelhos.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>constituídas por pequenos comprimentos de onda de alto poder de penetração.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave: difração e comprimento de onda</h4>
+          <p>Ondas de <b>maior</b> comprimento de onda (rádio FM) sofrem mais <b>difração</b> — conseguem contornar prédios, árvores e morros, alcançando longe. Por isso uma antena cobre a cidade toda.</p>
+          <h4>Por que o celular precisa de muitas antenas?</h4>
+          <p>As micro-ondas do celular têm comprimento de onda <b>menor</b>, difratam pouco e são bloqueadas pelos mesmos obstáculos. Como não contornam bem as construções, precisam de várias antenas espalhadas para manter o sinal.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. RESUMO ============ -->
+<section class="lesson" id="s10" data-title="Resumo e fórmulas">
+  <div class="wrap">
+    <div class="kicker"><span class="num">10</span> Leve no bolso</div>
+    <h2 class="sec-title">Resumo e fórmulas</h2>
+    <p class="body">Quase toda questão de ondulatória do ENEM gira em torno de poucas ideias. As essenciais:</p>
+
+    <div class="sheet">
+      <div class="f"><div class="eq">v = &lambda;&middot;f</div><div class="ds">Equação fundamental<br>(a mais cobrada)</div></div>
+      <div class="f"><div class="eq">f = 1/T</div><div class="ds">Frequência e<br>período</div></div>
+      <div class="f"><div class="eq">Amplitude</div><div class="ds">energia / volume<br>(altura da onda)</div></div>
+      <div class="f"><div class="eq">d = v&middot;t/2</div><div class="ds">Eco e ultrassom<br>(ida e volta)</div></div>
+    </div>
+
+    <h3 style="font-family:'Orbitron';font-weight:700;font-size:16px;color:var(--cyan);margin:26px 0 6px">As ideias que mais caem</h3>
+    <ul class="takeaways">
+      <li>Onda transporta <b>energia</b>, não matéria (lembre da "ola" no estádio).</li>
+      <li><b>v = &lambda;&middot;f</b>: a velocidade é fixa pelo meio; por isso f e &lambda; são inversos.</li>
+      <li>No som: <b>altura</b> = frequência, <b>volume</b> = amplitude, <b>timbre</b> = forma da onda.</li>
+      <li>Ondas <b>mecânicas</b> (som) precisam de meio; <b>eletromagnéticas</b> (luz) não — não há som no vácuo.</li>
+      <li>Saiba distinguir <b>reflexão</b> (volta), <b>refração</b> (entorta ao mudar de meio), <b>difração</b> (contorna) e <b>ressonância</b> (vibração máxima na frequência certa).</li>
+      <li>No espectro EM, maior <b>frequência</b> = mais energia: rádio &rarr; micro &rarr; infra &rarr; visível &rarr; UV &rarr; X &rarr; gama.</li>
+    </ul>
+
+    <div class="card finish-card">
+      <p style="font-family:'Orbitron';font-weight:700;font-size:18px;color:#eafcff;margin-bottom:8px">Você chegou ao fim! &#12336;</p>
+      <p class="body" style="margin-bottom:20px">Agora encare o simulado na Área ENEM para fixar tudo — as questões que você acertar saem da fila, e as que errar voltam para você dominar.</p>
+      <button class="btn" id="finishBtn">Marcar aula como concluída &#10003;</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="ft-logo">&#12336; Plataforma da Física</div>
+  <p style="margin-top:8px">Aula interativa de Ondulatória · questões do ENEM para fins educacionais</p>
+</footer>
+
+<script>
+'use strict';
+/* ===================================================================
+   Persistência (fallback em memória para o preview)
+   =================================================================== */
+const Store = (function(){
+  const KEY = 'plataphysica_ondulatoria_aula';
+  let mem = null;
+  function read(){
+    try{ const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : (mem || {visited:[], done:false}); }
+    catch(e){ return mem || {visited:[], done:false}; }
+  }
+  function write(d){ mem = d; try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){} }
+  return { read, write };
+})();
+
+/* ===================================================================
+   Progresso + sumário
+   =================================================================== */
+const secs = Array.from(document.querySelectorAll('section.lesson'));
+const data = Store.read();
+const visited = new Set(data.visited || []);
+const tocNav = document.getElementById('tocNav');
+tocNav.innerHTML = secs.map((s,i)=>`<a href="#${s.id}" data-go="${s.id}"><span class="n">${String(i+1).padStart(2,'0')}</span><span>${s.dataset.title}</span><span class="dot">&#10003;</span></a>`).join('');
+
+function refreshProgress(){
+  const pct = Math.round(visited.size / secs.length * 100);
+  document.getElementById('progBar').style.width = pct + '%';
+  document.getElementById('tbPct').textContent = pct + '%';
+  tocNav.querySelectorAll('a').forEach(a=> a.classList.toggle('done', visited.has(a.dataset.go)));
+}
+function markVisited(id){
+  if(visited.has(id)) return;
+  visited.add(id);
+  const d = Store.read(); d.visited = Array.from(visited); Store.write(d);
+  refreshProgress();
+}
+refreshProgress();
+
+if('IntersectionObserver' in window){
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{ if(en.isIntersecting) markVisited(en.target.id); });
+  }, { threshold:0.35 });
+  secs.forEach(s=>obs.observe(s));
+} else { secs.forEach(s=>markVisited(s.id)); }
+
+const toc = document.getElementById('toc');
+document.getElementById('tocBtn').onclick = ()=> toc.classList.add('open');
+document.getElementById('tocX').onclick = ()=> toc.classList.remove('open');
+toc.onclick = (e)=>{ if(e.target === toc) toc.classList.remove('open'); };
+tocNav.querySelectorAll('a').forEach(a=> a.onclick = ()=> toc.classList.remove('open'));
+
+const finishBtn = document.getElementById('finishBtn');
+function paintDone(){ finishBtn.classList.add('done-state'); finishBtn.innerHTML = '&#10003; Aula concluída'; }
+if(data.done) paintDone();
+finishBtn.onclick = ()=>{
+  secs.forEach(s=>visited.add(s.id));
+  const d = Store.read(); d.visited = Array.from(visited); d.done = true; Store.write(d);
+  refreshProgress(); paintDone();
+  window.scrollTo({ top:0, behavior:'smooth' });
+};
+
+/* ===================================================================
+   Revelar resolução das questões
+   =================================================================== */
+document.querySelectorAll('.enem-q').forEach(q=>{
+  const btn = q.querySelector('.reveal-btn');
+  const sol = q.querySelector('.eq-sol');
+  const correct = parseInt(q.dataset.correct, 10);
+  const alts = q.querySelectorAll('.eq-alt');
+  btn.onclick = ()=>{
+    const open = sol.classList.toggle('show');
+    if(open){
+      if(alts[correct]) alts[correct].classList.add('correct');
+      btn.innerHTML = 'Ocultar resolução &#9650;';
+    } else { btn.innerHTML = 'Ver resolução passo a passo &#9660;'; }
+  };
+});
+
+/* ===================================================================
+   Util canvas
+   =================================================================== */
+function fitCanvas(cv, cssH){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = cv.clientWidth || cv.parentElement.clientWidth;
+  cv.width = Math.round(w * dpr);
+  cv.height = Math.round(cssH * dpr);
+  cv.style.height = cssH + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w, h: cssH };
+}
+
+/* ===================================================================
+   HERO — ondas senoidais fluindo
+   =================================================================== */
+(function(){
+  const cv = document.getElementById('heroCanvas');
+  if(!cv) return;
+  let W, H, t = 0;
+  const layers = [
+    { amp:24, k:0.012, sp:0.9, col:'rgba(0,229,255,', off:0.50 },
+    { amp:30, k:0.008, sp:0.6, col:'rgba(139,92,255,', off:0.58 },
+    { amp:18, k:0.018, sp:1.3, col:'rgba(255,61,240,', off:0.44 }
+  ];
+  function setup(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = cv.clientWidth; H = cv.clientHeight || 360;
+    cv.width = W*dpr; cv.height = H*dpr;
+    cv.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+  }
+  const ctx = cv.getContext('2d');
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    layers.forEach(L=>{
+      ctx.beginPath();
+      for(let x=0;x<=W;x+=4){
+        const y = H*L.off + Math.sin(x*L.k + t*L.sp)*L.amp + Math.sin(x*L.k*2.3 + t*L.sp*1.4)*L.amp*0.3;
+        if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle = L.col + '0.5)'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+      const g = ctx.createLinearGradient(0,H*L.off-L.amp,0,H);
+      g.addColorStop(0, L.col + '0.10)'); g.addColorStop(1, L.col + '0)');
+      ctx.fillStyle = g; ctx.fill();
+    });
+    t += 0.03;
+    requestAnimationFrame(frame);
+  }
+  setup(); frame();
+  window.addEventListener('resize', setup);
+})();
+
+/* ===================================================================
+   SIM 1 — onda transversal (amplitude + frequência)
+   =================================================================== */
+(function(){
+  const cv = document.getElementById('waveCanvas');
+  const sA = document.getElementById('waveA'), sF = document.getElementById('waveF');
+  if(!cv) return;
+  let ctx, W, H, t = 0;
+  const V_MED = 2.0;            // velocidade fixa do "meio" (m/s, valor didático)
+  const PX_PER_M = 78;          // escala px por metro
+  function build(){ const r = fitCanvas(cv, 200); ctx = r.ctx; W = r.w; H = r.h; }
+  function frame(){
+    const A = parseFloat(sA.value);
+    const f = parseFloat(sF.value) / 10;          // 0.5 .. 3.0 Hz
+    const lambda = V_MED / f;                       // metros
+    const lampx = lambda * PX_PER_M;                // px
+    const k = (2*Math.PI) / lampx;
+    const omega = 2*Math.PI*f;
+    const mid = H/2;
+    ctx.clearRect(0,0,W,H);
+    // linha de equilíbrio
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0,mid); ctx.lineTo(W,mid); ctx.stroke();
+    // onda
+    ctx.beginPath();
+    for(let x=0;x<=W;x+=2){
+      const y = mid - A*Math.sin(k*x - omega*t);
+      if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle = 'rgba(0,229,255,0.95)'; ctx.lineWidth = 3;
+    ctx.shadowColor = 'rgba(0,229,255,0.6)'; ctx.shadowBlur = 10; ctx.stroke(); ctx.shadowBlur = 0;
+    // marcador de amplitude (seta vertical em x fixo na crista)
+    const xc = ((Math.PI/2) + omega*t) / k;         // posição de uma crista
+    let cx = xc % lampx; if(cx < 30) cx += lampx;
+    ctx.strokeStyle = 'rgba(255,210,61,0.9)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(cx, mid); ctx.lineTo(cx, mid - A); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,210,61,0.95)'; ctx.font="700 11px Orbitron"; ctx.textAlign='left';
+    ctx.fillText('A', cx + 6, mid - A/2 + 4);
+    // marcador de comprimento de onda (entre duas cristas)
+    const x1 = cx, x2 = cx + lampx;
+    if(x2 < W - 4){
+      ctx.strokeStyle = 'rgba(39,232,138,0.9)'; ctx.lineWidth = 2;
+      const yb = mid + Math.min(A + 22, H/2 - 10);
+      ctx.beginPath(); ctx.moveTo(x1, yb); ctx.lineTo(x2, yb); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x1, yb-4); ctx.lineTo(x1, yb+4); ctx.moveTo(x2, yb-4); ctx.lineTo(x2, yb+4); ctx.stroke();
+      ctx.fillStyle = 'rgba(39,232,138,0.95)'; ctx.textAlign='center';
+      ctx.fillText('\u03BB', (x1+x2)/2, yb - 6);
+    }
+    // readouts
+    document.getElementById('waveAval').textContent = A < 18 ? 'baixa' : (A < 36 ? 'média' : 'alta');
+    document.getElementById('waveFval').textContent = f.toFixed(1) + ' Hz';
+    document.getElementById('waveFout').textContent = f.toFixed(1) + ' Hz';
+    document.getElementById('waveLout').textContent = lambda.toFixed(2) + ' m';
+    document.getElementById('waveVout').textContent = (lambda*f).toFixed(1) + ' m/s';
+    t += 1/60;
+    requestAnimationFrame(frame);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* ===================================================================
+   SIM 2 — transversal vs longitudinal
+   =================================================================== */
+(function(){
+  const cv = document.getElementById('tlCanvas');
+  if(!cv) return;
+  let ctx, W, H, t = 0;
+  function build(){ const r = fitCanvas(cv, 220); ctx = r.ctx; W = r.w; H = r.h; }
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    const k = 0.03, omega = 2.2;
+    // ---- TRANSVERSAL (cima) ----
+    const yT = H*0.28;
+    ctx.fillStyle = 'rgba(0,229,255,0.85)'; ctx.font="700 11px Orbitron"; ctx.textAlign='left';
+    ctx.fillText('TRANSVERSAL', 14, 20);
+    for(let i=0;i<=40;i++){
+      const x = 20 + i*((W-40)/40);
+      const y = yT + Math.sin(k*x*1.0 - omega*t)*18;
+      const bright = 0.4 + 0.6*Math.abs(Math.sin(k*x - omega*t));
+      ctx.fillStyle = `rgba(0,229,255,${bright})`;
+      ctx.beginPath(); ctx.arc(x, y, 3.4, 0, 6.28); ctx.fill();
+    }
+    // seta energia
+    arrowRight(ctx, W-70, yT-34, 'rgba(0,229,255,0.8)');
+    // ---- LONGITUDINAL (baixo) ----
+    const yL = H*0.72;
+    ctx.fillStyle = 'rgba(39,232,138,0.85)'; ctx.font="700 11px Orbitron";
+    ctx.fillText('LONGITUDINAL', 14, H*0.56 + 4);
+    for(let i=0;i<=46;i++){
+      const base = 20 + i*((W-40)/46);
+      const disp = Math.sin(k*base*1.0 - omega*t)*9;   // deslocamento horizontal
+      const x = base + disp;
+      // densidade -> brilho (onde as bolinhas se juntam, mais claro)
+      const dens = 0.45 + 0.55*Math.max(0, Math.cos(k*base - omega*t));
+      ctx.fillStyle = `rgba(39,232,138,${dens})`;
+      ctx.beginPath(); ctx.arc(x, yL, 3.4, 0, 6.28); ctx.fill();
+    }
+    arrowRight(ctx, W-70, yL-34, 'rgba(39,232,138,0.8)');
+    t += 1/60;
+    requestAnimationFrame(frame);
+  }
+  function arrowRight(c, x, y, col){
+    c.strokeStyle = col; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(x, y); c.lineTo(x+44, y); c.stroke();
+    c.beginPath(); c.moveTo(x+44, y); c.lineTo(x+36, y-5); c.lineTo(x+36, y+5); c.closePath(); c.fillStyle=col; c.fill();
+    c.fillStyle = col; c.font="600 9px Orbitron"; c.textAlign='center';
+    c.fillText('energia', x+22, y-8);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* ===================================================================
+   SIM 3 — interferência de duas fontes (mapa de intensidade)
+   =================================================================== */
+(function(){
+  const cv = document.getElementById('interfCanvas');
+  if(!cv) return;
+  let ctx, W, H, t = 0, cell = 7;
+  let s1, s2;
+  function build(){ const r = fitCanvas(cv, 180); ctx = r.ctx; W = r.w; H = r.h; s1 = {x:W*0.32, y:H/2}; s2 = {x:W*0.68, y:H/2}; }
+  function frame(){
+    const k = 0.10, omega = 3.0;
+    for(let gy=0; gy<H; gy+=cell){
+      for(let gx=0; gx<W; gx+=cell){
+        const d1 = Math.hypot(gx - s1.x, gy - s1.y);
+        const d2 = Math.hypot(gx - s2.x, gy - s2.y);
+        const val = Math.sin(k*d1 - omega*t) + Math.sin(k*d2 - omega*t); // -2 .. 2
+        const b = (val + 2) / 4;   // 0 .. 1
+        const r = Math.round(10 + b*10);
+        const g = Math.round(60 + b*169);
+        const bl = Math.round(90 + b*165);
+        ctx.fillStyle = `rgb(${r},${g},${bl})`;
+        ctx.fillRect(gx, gy, cell, cell);
+      }
+    }
+    // fontes
+    [s1,s2].forEach(s=>{
+      ctx.fillStyle = 'rgba(255,210,61,0.95)';
+      ctx.beginPath(); ctx.arc(s.x, s.y, 5, 0, 6.28); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth=1.5; ctx.stroke();
+    });
+    t += 1/60;
+    requestAnimationFrame(frame);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* ===================================================================
+   SIM 4 — espectro eletromagnético
+   =================================================================== */
+(function(){
+  const cv = document.getElementById('specCanvas');
+  const sl = document.getElementById('specSlider');
+  if(!cv) return;
+  let ctx, W, H, t = 0;
+  const bands = [
+    { name:'Ondas de rádio', col:'#ff5a6e', f:'~ 1 MHz a 100 MHz', w:'metros a km',     use:'Rádio AM/FM, TV', wl:60 },
+    { name:'Micro-ondas',    col:'#ff9d3d', f:'~ 1 GHz a 100 GHz', w:'centímetros',      use:'Forno, celular, Wi-Fi, radar', wl:42 },
+    { name:'Infravermelho',  col:'#ffd23d', f:'~ 10\u00B9\u00B2 a 10\u00B9\u2074 Hz', w:'micrômetros', use:'Controle remoto, visão noturna, calor', wl:30 },
+    { name:'Luz visível',    col:'#27e88a', f:'~ 4 a 8 \u00D7 10\u00B9\u2074 Hz', w:'400 a 700 nm', use:'A luz que enxergamos', wl:22 },
+    { name:'Ultravioleta',   col:'#00e5ff', f:'~ 10\u00B9\u2075 a 10\u00B9\u2077 Hz', w:'dezenas de nm', use:'Bronzeamento, esterilização', wl:16 },
+    { name:'Raios X',        col:'#8b5cff', f:'~ 10\u00B9\u2077 a 10\u00B9\u2079 Hz', w:'~ 1 nm a 1 pm', use:'Radiografia, segurança', wl:11 },
+    { name:'Raios gama',     col:'#ff3df0', f:'acima de 10\u00B9\u2079 Hz', w:'menor que 1 pm', use:'Radioterapia, usinas nucleares', wl:7 }
+  ];
+  function build(){ const r = fitCanvas(cv, 150); ctx = r.ctx; W = r.w; H = r.h; }
+  function frame(){
+    const pos = parseFloat(sl.value)/100;
+    const idx = Math.min(bands.length-1, Math.floor(pos * bands.length));
+    const B = bands[idx];
+    ctx.clearRect(0,0,W,H);
+    // barra de gradiente
+    const barY = H - 34, barH = 22;
+    const g = ctx.createLinearGradient(0,0,W,0);
+    bands.forEach((b,i)=> g.addColorStop(i/(bands.length-1), b.col));
+    ctx.fillStyle = g; roundRect(ctx, 10, barY, W-20, barH, 6); ctx.fill();
+    // marcador
+    const mx = 10 + pos*(W-20);
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(mx, barY-6); ctx.lineTo(mx, barY+barH+6); ctx.stroke();
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(mx, barY-6, 4, 0, 6.28); ctx.fill();
+    // onda representando o comprimento da banda
+    const waveY = 46, amp = 16;
+    ctx.beginPath();
+    for(let x=10;x<=W-10;x+=2){
+      const y = waveY - amp*Math.sin((x - 10)/B.wl - t*2.4);
+      if(x===10) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle = B.col; ctx.lineWidth = 3;
+    ctx.shadowColor = B.col; ctx.shadowBlur = 12; ctx.stroke(); ctx.shadowBlur = 0;
+    // rótulos extremos
+    ctx.fillStyle = 'rgba(132,146,180,0.9)'; ctx.font="600 10px Orbitron";
+    ctx.textAlign='left';  ctx.fillText('maior \u03BB / menor f', 12, barY - 12);
+    ctx.textAlign='right'; ctx.fillText('menor \u03BB / maior f', W-12, barY - 12);
+    // info
+    document.getElementById('specName').textContent = B.name;
+    document.getElementById('specName').style.color = B.col;
+    document.getElementById('specFreq').textContent = B.f;
+    document.getElementById('specWave').textContent = B.w;
+    document.getElementById('specUse').textContent = B.use;
+    t += 1/60;
+    requestAnimationFrame(frame);
+  }
+  function roundRect(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+</script>
+</body>
+</html>

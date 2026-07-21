@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mecânica do Zero — Aula ENEM | Plataforma da Física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a1a;
+    --bg-2:#0d0f24;
+    --panel:rgba(18,22,48,0.72);
+    --panel-solid:#12162f;
+    --cyan:#00e5ff;
+    --cyan-dim:#0792a8;
+    --magenta:#ff3df0;
+    --violet:#8b5cff;
+    --green:#27e88a;
+    --yellow:#ffd23d;
+    --orange:#ff9d3d;
+    --red:#ff5a6e;
+    --txt:#dbe6f5;
+    --txt-dim:#8492b4;
+    --line:rgba(0,229,255,0.18);
+    --line-soft:rgba(255,255,255,0.07);
+    --glow:0 0 18px rgba(0,229,255,0.35);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Rajdhani',sans-serif;
+    background:var(--bg);
+    color:var(--txt);
+    min-height:100vh;
+    line-height:1.5;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:'';position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(1100px 620px at 78% -8%, rgba(0,229,255,0.10), transparent 60%),
+      radial-gradient(900px 520px at 8% 12%, rgba(139,92,255,0.10), transparent 60%),
+      radial-gradient(800px 800px at 50% 120%, rgba(39,232,138,0.05), transparent 60%),
+      var(--bg);
+  }
+  body::after{
+    content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);
+    background-size:46px 46px;
+    mask-image:radial-gradient(ellipse 100% 70% at 50% 0%,#000 30%,transparent 80%);
+  }
+  ::selection{background:rgba(0,229,255,0.3);color:#fff}
+
+  /* ===== Top bar / progresso ===== */
+  .topbar{position:sticky;top:0;z-index:60;backdrop-filter:blur(12px);background:rgba(8,9,22,0.78);border-bottom:1px solid var(--line)}
+  .topbar-row{max-width:980px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:14px}
+  .tb-logo{font-family:'Orbitron';font-weight:700;font-size:14px;color:#eafcff;letter-spacing:.5px;display:flex;align-items:center;gap:9px;white-space:nowrap}
+  .tb-logo .spark{color:var(--cyan);filter:drop-shadow(0 0 6px var(--cyan))}
+  .tb-spacer{flex:1}
+  .tb-pct{font-family:'Orbitron';font-weight:700;font-size:13px;color:var(--green);min-width:42px;text-align:right}
+  .tb-toc-btn{font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:.4px;color:var(--cyan);background:rgba(0,229,255,0.07);border:1px solid var(--line);padding:8px 13px;border-radius:9px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .tb-toc-btn:hover{background:rgba(0,229,255,0.14)}
+  .progress-strip{height:3px;background:rgba(255,255,255,0.06)}
+  .progress-strip > div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--violet));box-shadow:0 0 10px rgba(0,229,255,.6);transition:width .4s ease}
+
+  /* ===== TOC overlay ===== */
+  .toc{position:fixed;inset:0;z-index:70;display:none;background:rgba(4,5,14,0.72);backdrop-filter:blur(4px)}
+  .toc.open{display:block}
+  .toc-panel{position:absolute;right:0;top:0;height:100%;width:min(340px,86vw);background:var(--panel-solid);border-left:1px solid var(--line);padding:24px 20px;overflow-y:auto;transform:translateX(100%);transition:transform .3s ease}
+  .toc.open .toc-panel{transform:translateX(0)}
+  .toc-panel h3{font-family:'Orbitron';font-weight:700;font-size:14px;color:var(--cyan);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+  .toc-x{cursor:pointer;color:var(--txt-dim);font-size:22px;line-height:1}
+  .toc a{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--txt);padding:11px 12px;border-radius:9px;margin-bottom:4px;font-size:16px;font-weight:500;transition:.18s;border:1px solid transparent}
+  .toc a:hover{background:rgba(0,229,255,0.06);border-color:var(--line)}
+  .toc a .n{font-family:'Orbitron';font-size:11px;color:var(--cyan-dim);min-width:22px}
+  .toc a .dot{margin-left:auto;width:16px;height:16px;border-radius:50%;border:2px solid var(--cyan-dim);display:grid;place-items:center;font-size:10px;color:#04121a}
+  .toc a.done .dot{background:var(--green);border-color:var(--green)}
+
+  /* ===== layout ===== */
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  section.lesson{padding:60px 0;border-bottom:1px solid var(--line-soft)}
+  section.lesson:last-of-type{border-bottom:none}
+
+  /* ===== hero ===== */
+  .hero{position:relative;overflow:hidden;padding:0;border-bottom:1px solid var(--line)}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.6}
+  .hero-inner{position:relative;max-width:980px;margin:0 auto;padding:74px 20px 70px;text-align:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:2px;color:var(--cyan);border:1px solid var(--line);background:rgba(0,229,255,0.05);padding:7px 15px;border-radius:30px;text-transform:uppercase;margin-bottom:26px}
+  .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .hero h1{font-family:'Orbitron';font-weight:900;font-size:clamp(34px,8vw,62px);line-height:1.02;letter-spacing:-1px;color:#eafcff;text-shadow:0 0 34px rgba(0,229,255,0.35)}
+  .hero h1 .glow{color:var(--cyan);text-shadow:0 0 30px rgba(0,229,255,0.7)}
+  .hero .sub{font-size:clamp(17px,2.6vw,21px);color:var(--txt);max-width:640px;margin:22px auto 0;font-weight:500}
+  .hero .sub b{color:#eafcff;font-weight:700}
+  .hero-meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+  .chip{font-family:'Orbitron';font-size:11px;font-weight:500;color:var(--txt-dim);border:1px solid var(--line-soft);background:rgba(255,255,255,0.02);padding:8px 13px;border-radius:8px}
+  .chip b{color:var(--cyan);font-weight:700}
+  .scroll-cue{margin-top:42px;font-family:'Orbitron';font-size:11px;letter-spacing:1.5px;color:var(--txt-dim);animation:bob 2s infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
+
+  /* ===== typography ===== */
+  .kicker{font-family:'Orbitron';font-weight:500;font-size:12px;letter-spacing:1.6px;color:var(--cyan);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .kicker .num{font-weight:900;font-size:13px;color:#04121a;background:var(--cyan);width:30px;height:30px;display:grid;place-items:center;border-radius:9px;box-shadow:0 0 14px rgba(0,229,255,.5)}
+  h2.sec-title{font-family:'Orbitron';font-weight:700;font-size:clamp(24px,4.6vw,34px);color:#eafcff;line-height:1.12;letter-spacing:-.3px;margin-bottom:20px}
+  .lead{font-size:19px;color:var(--txt);font-weight:500;line-height:1.65;margin-bottom:18px}
+  p.body{font-size:17px;line-height:1.72;color:var(--txt);font-weight:400;margin-bottom:16px}
+  p.body b{color:#eafcff;font-weight:700}
+  p.body .hl{color:var(--cyan);font-weight:600}
+  .unit{color:var(--violet);font-weight:700}
+
+  /* ===== cards & callouts ===== */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin:22px 0;backdrop-filter:blur(6px)}
+  .note{border-left:3px solid var(--cyan);background:rgba(0,229,255,0.05);padding:15px 18px;border-radius:0 11px 11px 0;margin:20px 0;font-size:16.5px;line-height:1.6}
+  .note.tip{border-left-color:var(--green);background:rgba(39,232,138,0.06)}
+  .note.warn{border-left-color:var(--orange);background:rgba(255,157,61,0.06)}
+  .note .tag{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.6px;display:block;margin-bottom:6px}
+  .note.tip .tag{color:var(--green)}
+  .note .tag.cy{color:var(--cyan)}
+  .note.warn .tag{color:var(--orange)}
+  .note b{color:#eafcff}
+
+  /* ===== formula ===== */
+  .formula{text-align:center;font-family:'Orbitron';font-weight:700;font-size:clamp(22px,5vw,30px);color:#eafcff;background:rgba(0,0,0,0.32);border:1px solid var(--line);border-radius:12px;padding:22px;margin:22px 0;letter-spacing:1px}
+  .formula .v{color:var(--cyan)}
+  .formula .r{color:var(--yellow)}
+  .formula .i{color:var(--green)}
+  .formula .p{color:var(--magenta)}
+  .formula small{display:block;font-family:'Rajdhani';font-weight:500;font-size:14px;letter-spacing:0;color:var(--txt-dim);margin-top:12px}
+
+  /* ===== map table ===== */
+  .map{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden;margin:22px 0}
+  .map .m{background:var(--panel-solid);padding:18px 16px;text-align:center}
+  .map .m .ic{font-size:26px;display:block;margin-bottom:8px}
+  .map .m .t{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;display:block;margin-bottom:6px}
+  .map .m .d{color:var(--txt-dim);font-size:14px;line-height:1.4}
+
+  /* ===== interactive widgets ===== */
+  .sim{background:linear-gradient(180deg,rgba(13,15,36,0.9),rgba(10,10,26,0.9));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:24px 0;box-shadow:0 8px 40px rgba(0,0,0,0.35)}
+  .sim-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(0,229,255,0.05);border-bottom:1px solid var(--line)}
+  .sim-head .ic{font-size:16px}
+  .sim-head .ttl{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;letter-spacing:.4px}
+  .sim-head .lbl{margin-left:auto;font-family:'Orbitron';font-size:10px;color:var(--cyan);border:1px solid var(--line);padding:4px 9px;border-radius:20px}
+  .sim-canvas-wrap{position:relative;width:100%;background:radial-gradient(circle at 50% 40%,rgba(0,229,255,0.04),transparent 70%)}
+  .sim canvas{display:block;width:100%}
+  .sim-controls{padding:18px}
+  .ctrl{margin-bottom:16px}
+  .ctrl:last-child{margin-bottom:0}
+  .ctrl-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .ctrl-label .nm{font-family:'Orbitron';font-weight:500;font-size:12.5px;color:var(--txt);letter-spacing:.3px}
+  .ctrl-label .vl{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--cyan)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--cyan-dim),rgba(255,255,255,0.08));outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px rgba(0,229,255,0.7);border:2px solid #051018;cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px rgba(0,229,255,0.7);border:2px solid #051018;cursor:pointer}
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .readout .ro{flex:1;min-width:90px;background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;text-align:center}
+  .readout .ro .k{font-family:'Orbitron';font-size:10px;letter-spacing:.5px;color:var(--txt-dim);display:block;margin-bottom:4px}
+  .readout .ro .v{font-family:'Orbitron';font-weight:700;font-size:19px;color:var(--cyan)}
+  .readout .ro.g .v{color:var(--green)}
+  .readout .ro.m .v{color:var(--magenta)}
+  .readout .ro.y .v{color:var(--yellow)}
+  .sim-btn{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;background:rgba(0,229,255,0.1);color:var(--cyan);border:1px solid var(--line);padding:11px 18px;border-radius:10px;cursor:pointer;transition:.2s;margin-top:4px}
+  .sim-btn:hover{background:rgba(0,229,255,0.2)}
+
+  /* widget UI (peso em mundos) */
+  .calc-field{margin-bottom:15px}
+  .calc-field label{display:block;font-family:'Orbitron';font-weight:500;font-size:12px;letter-spacing:.3px;color:var(--txt-dim);margin-bottom:7px}
+  select,input.num{width:100%;background:var(--panel-solid);color:#eafcff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-family:'Rajdhani';font-weight:600;font-size:16px;outline:none}
+  select:focus,input.num:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,0.12)}
+  .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .calc-result{margin-top:18px;background:linear-gradient(135deg,rgba(0,229,255,0.1),rgba(139,92,255,0.08));border:1px solid var(--line);border-radius:12px;padding:18px;text-align:center}
+  .calc-result .big{font-family:'Orbitron';font-weight:900;font-size:34px;color:var(--green);text-shadow:0 0 16px rgba(39,232,138,0.4);line-height:1}
+  .calc-result .lbl{font-family:'Orbitron';font-size:11px;color:var(--txt-dim);letter-spacing:.5px;margin-top:8px}
+  .calc-result .sub{font-size:15px;color:var(--txt);margin-top:10px}
+  .calc-result .sub b{color:var(--cyan)}
+
+  /* ===== ENEM worked example ===== */
+  .enem-q{border:1px solid var(--violet);border-radius:var(--radius);overflow:hidden;margin:26px 0;background:linear-gradient(180deg,rgba(139,92,255,0.06),rgba(10,10,26,0.4))}
+  .eq-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(139,92,255,0.1);border-bottom:1px solid rgba(139,92,255,0.25);flex-wrap:wrap}
+  .eq-badge{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.4px;color:var(--violet);border:1px solid rgba(139,92,255,0.4);background:rgba(139,92,255,0.08);padding:5px 11px;border-radius:20px}
+  .eq-badge.aut{color:var(--cyan);border-color:var(--line);background:rgba(0,229,255,0.07)}
+  .eq-tag{font-family:'Orbitron';font-size:11px;color:var(--txt-dim);letter-spacing:.5px}
+  .eq-tag.real{margin-left:auto;color:var(--green)}
+  .eq-tag.demo{margin-left:auto;color:var(--cyan)}
+  .eq-body{padding:20px 18px}
+  .eq-enun{font-size:16.5px;line-height:1.62;color:var(--txt);margin-bottom:16px}
+  .eq-alts{display:flex;flex-direction:column;gap:8px}
+  .eq-alt{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;font-size:15.5px;transition:.25s}
+  .eq-alt .let{font-family:'Orbitron';font-weight:700;font-size:13px;width:26px;height:26px;flex-shrink:0;display:grid;place-items:center;border-radius:7px;border:1px solid var(--cyan-dim);color:var(--cyan)}
+  .eq-alt.correct{border-color:var(--green);background:rgba(39,232,138,0.1)}
+  .eq-alt.correct .let{background:var(--green);color:#04121a;border-color:var(--green)}
+  .reveal-btn{margin-top:16px;width:100%;font-family:'Orbitron';font-weight:700;font-size:13px;letter-spacing:.5px;background:linear-gradient(120deg,var(--violet),#6f4ad6);color:#fff;border:none;padding:13px;border-radius:11px;cursor:pointer;transition:.2s}
+  .reveal-btn:hover{filter:brightness(1.12);box-shadow:0 0 20px rgba(139,92,255,0.4)}
+  .eq-sol{margin-top:18px;border-top:1px dashed rgba(139,92,255,0.3);padding-top:18px;display:none}
+  .eq-sol.show{display:block;animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .eq-sol h4{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;color:var(--cyan);margin:16px 0 8px;text-transform:uppercase}
+  .eq-sol h4:first-child{margin-top:0}
+  .eq-sol p{font-size:16px;line-height:1.62;color:var(--txt);margin-bottom:6px}
+  .eq-sol .calc-step{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--yellow);background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:9px;padding:11px 14px;margin:10px 0;letter-spacing:.5px}
+  .eq-answer{margin-top:16px;font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--green);background:rgba(39,232,138,0.1);border:1px solid rgba(39,232,138,0.3);border-radius:10px;padding:13px 16px;text-align:center}
+
+  /* ===== three laws strip ===== */
+  .laws{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}
+  .laws .lw{background:var(--panel-solid);border:1px solid var(--line-soft);border-radius:12px;padding:18px 16px;text-align:center}
+  .laws .lw .n{font-family:'Orbitron';font-weight:900;font-size:24px;color:var(--cyan);text-shadow:0 0 12px rgba(0,229,255,.4)}
+  .laws .lw .t{font-family:'Orbitron';font-weight:700;font-size:12px;color:#eafcff;margin:8px 0 6px;letter-spacing:.3px}
+  .laws .lw .d{font-size:14px;color:var(--txt-dim);line-height:1.45}
+
+  /* ===== summary ===== */
+  .sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0}
+  .sheet .f{background:var(--panel-solid);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .sheet .f .eq{font-family:'Orbitron';font-weight:700;font-size:17px;color:var(--cyan);margin-bottom:7px}
+  .sheet .f .ds{font-size:13.5px;color:var(--txt-dim);line-height:1.4}
+  .takeaways{list-style:none;margin:18px 0}
+  .takeaways li{position:relative;padding:9px 0 9px 32px;font-size:16.5px;line-height:1.55;border-bottom:1px solid var(--line-soft)}
+  .takeaways li:last-child{border-bottom:none}
+  .takeaways li::before{content:'\26A1';position:absolute;left:0;top:9px;color:var(--cyan);filter:drop-shadow(0 0 6px var(--cyan))}
+  .takeaways li b{color:#eafcff}
+
+  .finish-card{text-align:center;background:linear-gradient(135deg,rgba(0,229,255,0.08),rgba(139,92,255,0.08));border:1px solid var(--line)}
+  .btn{font-family:'Orbitron';font-weight:700;font-size:14px;letter-spacing:.5px;background:linear-gradient(120deg,var(--cyan),#33b6ff);color:#04121a;border:none;padding:15px 30px;border-radius:12px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:9px}
+  .btn:hover{filter:brightness(1.08);box-shadow:0 0 26px rgba(0,229,255,0.45);transform:translateY(-1px)}
+  .btn.done-state{background:linear-gradient(120deg,var(--green),#1fd07e)}
+  footer{padding:34px 20px 50px;text-align:center;color:var(--txt-dim);font-size:13.5px}
+  footer .ft-logo{font-family:'Orbitron';font-weight:700;color:var(--cyan);font-size:14px}
+
+  @media(max-width:680px){
+    section.lesson{padding:46px 0}
+    .map{grid-template-columns:1fr}
+    .laws{grid-template-columns:1fr}
+    .calc-grid{grid-template-columns:1fr}
+    .hero-inner{padding:58px 20px 54px}
+    p.body,.lead{font-size:16.5px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <span class="tb-logo"><span class="spark">&#9881;</span> Mecânica · Aula ENEM</span>
+    <span class="tb-spacer"></span>
+    <span class="tb-pct" id="tbPct">0%</span>
+    <button class="tb-toc-btn" id="tocBtn">&#9776; Conteúdo</button>
+  </div>
+  <div class="progress-strip"><div id="progBar"></div></div>
+</div>
+
+<div class="toc" id="toc">
+  <div class="toc-panel">
+    <h3>Conteúdo da aula <span class="toc-x" id="tocX">&times;</span></h3>
+    <nav id="tocNav"></nav>
+  </div>
+</div>
+
+<header class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="pulse"></span> Plataforma da Física · do zero ao ENEM</span>
+    <h1>Mecâ<span class="glow">nica</span><br>do Zero</h1>
+    <p class="sub">Entenda por que as coisas se movem — da maçã que cai ao satélite em órbita — com simulações que você controla e <b>questões reais do ENEM</b> resolvidas passo a passo.</p>
+    <div class="hero-meta">
+      <span class="chip"><b>4</b> simulações interativas</span>
+      <span class="chip"><b>13</b> questões do ENEM</span>
+      <span class="chip"><b>0</b> pré-requisitos</span>
+    </div>
+    <div class="scroll-cue">&#9660; ROLE PARA COMEÇAR</div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 1. INTRODUÇÃO ============ -->
+<section class="lesson" id="s1" data-title="O que é mecânica">
+  <div class="wrap">
+    <div class="kicker"><span class="num">1</span> Por onde começar</div>
+    <h2 class="sec-title">O que é mecânica?</h2>
+    <p class="lead">Mecânica é o estudo do <b>movimento</b> e das <b>forças</b> que o causam. É a parte da física que explica desde um chute numa bola até a Lua girando em torno da Terra.</p>
+    <p class="body">A boa notícia: você já é especialista em mecânica sem saber. Quando o ônibus freia e seu corpo é jogado para a frente, quando você empurra um carrinho de compras, quando caminha — você está <span class="hl">sentindo</span> as leis que vamos estudar. Nossa missão é só dar nome e fórmula ao que sua intuição já conhece.</p>
+    <p class="body">Para organizar a aula, divida a mecânica em <b>três grandes perguntas</b>:</p>
+
+    <div class="map">
+      <div class="m"><span class="ic">&#128208;</span><span class="t">Cinemática</span><span class="d"><b style="color:#eafcff">Como</b> se move?<br>velocidade e aceleração</span></div>
+      <div class="m"><span class="ic">&#129891;</span><span class="t">Dinâmica</span><span class="d"><b style="color:#eafcff">Por que</b> se move?<br>as Leis de Newton</span></div>
+      <div class="m"><span class="ic">&#9889;</span><span class="t">Energia e momento</span><span class="d"><b style="color:#eafcff">Com o quê</b>?<br>a moeda do movimento</span></div>
+    </div>
+    <p class="body">Vamos passar por todas, sempre com a física do dia a dia. Comece pela mais simples: descrever o movimento.</p>
+  </div>
+</section>
+
+<!-- ============ 2. CINEMÁTICA ============ -->
+<section class="lesson" id="s2" data-title="Cinemática">
+  <div class="wrap">
+    <div class="kicker"><span class="num">2</span> Como se move</div>
+    <h2 class="sec-title">Cinemática: descrevendo o movimento</h2>
+    <p class="body">Antes de explicar <b>por que</b> algo se move, precisamos <b>descrever</b> esse movimento. Para isso bastam duas grandezas.</p>
+    <p class="body"><b>Velocidade</b> é o quanto a posição muda por segundo — o ritmo do deslocamento:</p>
+    <div class="formula"><span class="v">v</span> = &Delta;s / &Delta;t <small>velocidade = deslocamento &divide; tempo &nbsp;|&nbsp; unidade: <span class="unit">m/s</span></small></div>
+    <p class="body"><b>Aceleração</b> é o quanto a velocidade muda por segundo — o quão rápido você ganha (ou perde) velocidade:</p>
+    <div class="formula"><span class="i">a</span> = &Delta;v / &Delta;t <small>aceleração = variação da velocidade &divide; tempo &nbsp;|&nbsp; unidade: <span class="unit">m/s&sup2;</span></small></div>
+
+    <div class="note tip">
+      <span class="tag">TRUQUE DE PROVA: km/h &harr; m/s</span>
+      Para passar de <b>km/h para m/s</b>, divida por 3,6. Para voltar, multiplique por 3,6. Ex.: 72 km/h &divide; 3,6 = <b>20 m/s</b>.
+    </div>
+
+    <p class="body">Há dois movimentos básicos: o <span class="hl">MRU</span> (aceleração zero, velocidade constante — o carro no piloto automático) e o <span class="hl">MRUV</span> (aceleração constante, velocidade muda de forma uniforme — o carro acelerando ou freando). Veja a diferença ao vivo:</p>
+
+    <!-- SIM 1: cinematica -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#128663;</span><span class="ttl">Simulação · MRU e MRUV</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="kinCanvas" height="180"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Velocidade inicial</span><span class="vl" id="kinVval">12 m/s</span></div>
+          <input type="range" id="kinV" min="0" max="30" value="12">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Aceleração</span><span class="vl" id="kinAval">0.0 m/s&sup2;</span></div>
+          <input type="range" id="kinA" min="-30" max="30" value="0">
+        </div>
+        <div class="readout">
+          <div class="ro"><span class="k">TIPO DE MOVIMENTO</span><span class="v" id="kinType" style="font-size:15px">MRU</span></div>
+          <div class="ro g"><span class="k">VELOCIDADE ATUAL</span><span class="v" id="kinNow">—</span></div>
+        </div>
+        <button class="sim-btn" id="kinReset">&#8635; Reiniciar</button>
+      </div>
+    </div>
+
+    <!-- ENEM Q5 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Um trem freava cerca de 400 m antes da estação. Com uma nova tecnologia de frenagem, passou a frear em apenas 250 m, parando na estação. Considerando que o trem se move a 20 m/s (72 km/h) antes de iniciar a frenagem, qual a diferença entre as desacelerações nas duas situações?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>0,08 m/s&sup2;</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>0,30 m/s&sup2;</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>1,10 m/s&sup2;</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>1,60 m/s&sup2;</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>3,90 m/s&sup2;</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>O que a questão pede</h4>
+          <p>A diferença entre as acelerações de frenagem para parar em 400 m e em 250 m, partindo de 20 m/s.</p>
+          <h4>Fórmula-chave (Torricelli)</h4>
+          <p>Quando o trem para, a velocidade final é zero. Usamos v&sup2; = v&#8320;&sup2; - 2&middot;a&middot;d, que para a parada vira a = v&#8320;&sup2; / (2d).</p>
+          <h4>Contas</h4>
+          <div class="calc-step">a&#8321; = 20&sup2; / (2 &times; 400) = 400 / 800 = 0,5 m/s&sup2;</div>
+          <div class="calc-step">a&#8322; = 20&sup2; / (2 &times; 250) = 400 / 500 = 0,8 m/s&sup2;</div>
+          <p>A diferença é 0,8 - 0,5 = <b>0,30 m/s&sup2;</b>. Faz sentido: parar numa distância menor exige frear mais forte.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q3 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Durante a Primeira Guerra, um piloto francês, voando a 2000 m de altitude, percebeu algo parado perto de seu rosto. Ao apanhá-lo, viu que era um projétil de arma de fogo. O piloto conseguiu pegar o projétil porque</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>ele foi disparado em direção ao avião, freado pelo ar, e parou bem na frente do piloto.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>o avião se movia no mesmo sentido que ele, com velocidade visivelmente superior.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>ele foi disparado para cima com velocidade constante, no instante em que o avião passou.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>o avião se movia no sentido oposto ao dele, com velocidade de mesmo valor.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>o avião se movia no mesmo sentido que ele, com velocidade de mesmo valor.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave: velocidade relativa</h4>
+          <p>O que importa para o piloto é a velocidade do projétil <b>em relação a ele</b>, não em relação ao chão.</p>
+          <h4>Raciocínio</h4>
+          <p>Se o avião e o projétil viajam no <b>mesmo sentido</b> e com a <b>mesma velocidade</b>, a velocidade de um em relação ao outro é praticamente <b>zero</b> — por isso o projétil parecia "parado" no ar ao lado do piloto, e ele pôde apanhá-lo. É o mesmo motivo pelo qual dois carros lado a lado na estrada, na mesma velocidade, parecem parados um para o outro.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. 1ª LEI ============ -->
+<section class="lesson" id="s3" data-title="1ª Lei: Inércia">
+  <div class="wrap">
+    <div class="kicker"><span class="num">3</span> Por que se move &middot; parte 1</div>
+    <h2 class="sec-title">1ª Lei de Newton: a Inércia</h2>
+    <p class="body">Agora o "por quê". Tudo começa com a ideia mais contraintuitiva da física: <b>nenhum objeto muda seu movimento sozinho</b>. A <span class="hl">1ª Lei de Newton</span>, ou Lei da Inércia, diz:</p>
+    <div class="note">
+      <span class="tag cy">LEI DA INÉRCIA</span>
+      Um corpo <b>em repouso</b> tende a continuar em repouso, e um corpo <b>em movimento</b> tende a continuar em movimento retilíneo e com velocidade constante — <b>a menos que uma força atue sobre ele</b>.
+    </div>
+    <p class="body">Ou seja, força não é o que <b>mantém</b> o movimento — força é o que <b>muda</b> o movimento. Você sente isso o tempo todo: quando o ônibus <b>freia</b>, seu corpo é "jogado" para a frente. Na verdade, ninguém te empurrou: seu corpo só estava <b>mantendo</b> a velocidade que tinha, por inércia, enquanto o ônibus desacelerava. É também por isso que o cinto de segurança existe.</p>
+
+    <div class="note tip">
+      <span class="tag">MASSA = MEDIDA DA INÉRCIA</span>
+      Quanto <b>mais massa</b> um corpo tem, mais ele "resiste" a mudar de movimento. Empurrar um carrinho vazio é fácil; cheio, é difícil. A massa mede essa preguiça de mudar.
+    </div>
+
+    <!-- ENEM Q22 -->
+    <div class="enem-q" data-correct="0">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Em 1543, Copérnico propôs a Terra girando em torno do próprio eixo, de oeste para leste. Os aristotélicos diziam que, se fosse assim, nuvens e pássaros (que não estão presos ao solo) deveriam sempre parecer se mover de leste para oeste. O princípio físico que rebate esse argumento dos aristotélicos é</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>a lei da inércia.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>ação e reação.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>a segunda lei de Newton.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>a conservação da energia.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>o princípio da equivalência.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>O ar, as nuvens e os pássaros já se movem <b>junto</b> com a Terra, por inércia — eles "carregam" a mesma velocidade do planeta. Por isso não ficam para trás. É o mesmo que jogar uma bola para cima dentro de um trem em movimento: ela cai de volta na sua mão, porque a bola mantém, por inércia, a velocidade do trem.</p>
+          <div class="eq-answer">Resposta: alternativa A</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q40 -->
+    <div class="enem-q" data-correct="0">
+      <div class="eq-head"><span class="eq-badge">ENEM 2014</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Galileu estudou uma esfera descendo um plano inclinado sem atrito e subindo outro. Ela sempre atinge, na subida, no máximo a mesma altura de onde partiu. Se o plano de subida tiver sua inclinação reduzida a zero (ficar horizontal), a esfera</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>manterá sua velocidade constante, pois a força resultante sobre ela será nula.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>manterá sua velocidade constante, pois o impulso da descida continuará a empurrá-la.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>diminuirá a velocidade, pois não haverá mais impulso para empurrá-la.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>diminuirá a velocidade, pois a força resultante será contrária ao movimento.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>aumentará a velocidade, pois não haverá nenhum impulso contrário.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Sem subida e sem atrito, não há nada para frear a esfera nem para acelerá-la: a <b>força resultante é nula</b>. Pela 1ª Lei, ela então mantém a velocidade constante, para sempre. Foi exatamente esse raciocínio de Galileu que abriu caminho para a Lei da Inércia de Newton.</p>
+          <div class="eq-answer">Resposta: alternativa A</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. 2ª LEI ============ -->
+<section class="lesson" id="s4" data-title="2ª Lei: F = m·a">
+  <div class="wrap">
+    <div class="kicker"><span class="num">4</span> Por que se move &middot; parte 2</div>
+    <h2 class="sec-title">2ª Lei de Newton: F = m &middot; a</h2>
+    <p class="body">Se uma força muda o movimento, <b>quanto</b> ele muda? A <span class="hl">2ª Lei de Newton</span> dá a resposta exata e é, provavelmente, a fórmula mais importante da mecânica:</p>
+    <div class="formula"><span class="p">F</span> = <span class="r">m</span> &middot; <span class="i">a</span> <small>força resultante = massa &times; aceleração &nbsp;|&nbsp; unidade de força: <span class="unit">newton (N)</span></small></div>
+    <p class="body">Ela confirma a intuição: para uma <b>mesma massa</b>, mais força gera mais aceleração. E para uma <b>mesma força</b>, mais massa gera menos aceleração (custa mais para mover). Empurre uma caixa leve e uma pesada com a mesma força: a leve dispara, a pesada quase não anda. Teste:</p>
+
+    <!-- SIM 2: F = ma -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#128230;</span><span class="ttl">Simulação · Força, massa e aceleração</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="fmaCanvas" height="190"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Força aplicada (F)</span><span class="vl" id="fmaFval">40 N</span></div>
+          <input type="range" id="fmaF" min="0" max="100" value="40">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Massa da caixa (m)</span><span class="vl" id="fmaMval">8 kg</span></div>
+          <input type="range" id="fmaM" min="1" max="20" value="8">
+        </div>
+        <div class="readout">
+          <div class="ro g"><span class="k">ACELERAÇÃO a = F/m</span><span class="v" id="fmaA">—</span></div>
+          <div class="ro"><span class="k">VELOCIDADE ATUAL</span><span class="v" id="fmaV">—</span></div>
+        </div>
+        <button class="sim-btn" id="fmaReset">&#8635; Reiniciar</button>
+      </div>
+    </div>
+
+    <!-- ENEM Q11 -->
+    <div class="enem-q" data-correct="3">
+      <div class="eq-head"><span class="eq-badge">ENEM 2011</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Para medir o tempo de reação, uma pessoa solta uma régua na vertical e a outra tenta segurá-la o mais rápido possível. A distância que a régua cai indica o tempo de reação. Isso funciona porque, durante a queda, a</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>energia mecânica da régua aumenta, o que a faz cair mais rápido.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>resistência do ar aumenta, o que faz a régua cair com menor velocidade.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>aceleração de queda da régua varia, o que provoca um movimento acelerado.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>força peso da régua tem valor constante, o que gera um movimento acelerado.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>velocidade da régua é constante, o que provoca uma passagem linear de tempo.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>Na queda, a única força relevante é o <b>peso</b>, que é constante. Pela 2ª Lei (F = m&middot;a), força constante significa <b>aceleração constante</b>.</p>
+          <h4>Raciocínio</h4>
+          <p>Com aceleração constante (a gravidade, ~10 m/s&sup2;), a régua faz um movimento <b>uniformemente acelerado</b>: a distância de queda cresce de forma previsível com o tempo. Por isso a posição onde a pessoa pega a régua revela o tempo de reação.</p>
+          <div class="eq-answer">Resposta: alternativa D</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. 3ª LEI ============ -->
+<section class="lesson" id="s5" data-title="3ª Lei: Ação e reação">
+  <div class="wrap">
+    <div class="kicker"><span class="num">5</span> Por que se move &middot; parte 3</div>
+    <h2 class="sec-title">3ª Lei de Newton: Ação e Reação</h2>
+    <p class="body">A <span class="hl">3ª Lei de Newton</span> revela que forças nunca vêm sozinhas — elas sempre aparecem aos <b>pares</b>:</p>
+    <div class="note">
+      <span class="tag cy">AÇÃO E REAÇÃO</span>
+      Se um corpo A faz uma força em um corpo B, então B faz em A uma força de <b>mesma intensidade</b>, mesma direção e <b>sentido oposto</b>.
+    </div>
+    <p class="body">Mas atenção ao detalhe que o ENEM adora cobrar: as duas forças do par atuam em <b>corpos diferentes</b> (uma em A, outra em B). Por isso elas <b>não se anulam</b> — cada uma age em um objeto.</p>
+    <p class="body">Você anda graças a isso: seu pé empurra o chão para trás (ação) e o chão te empurra para a frente (reação). Um foguete sobe expelindo gás para baixo; o gás empurra o foguete para cima. Nadar, remar, dar um tiro — tudo é a 3ª Lei em ação.</p>
+
+    <div class="laws">
+      <div class="lw"><span class="n">&#128694;</span><div class="t">CAMINHAR</div><div class="d">Pé empurra o chão para trás; o chão empurra você para a frente.</div></div>
+      <div class="lw"><span class="n">&#128640;</span><div class="t">FOGUETE</div><div class="d">Expele gás para baixo; o gás impulsiona o foguete para cima.</div></div>
+      <div class="lw"><span class="n">&#127946;</span><div class="t">NADAR</div><div class="d">Mãos empurram a água para trás; a água empurra você para a frente.</div></div>
+    </div>
+
+    <!-- ENEM Q23 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Para escapar de ajudar na faxina, um garoto disse que não poderia puxar um móvel, pois "pela 3ª Lei de Newton, se ele puxar o móvel, o móvel o puxará de volta com força igual, e assim ele nunca conseguiria movê-lo". Qual argumento a mãe usa para mostrar o erro?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>A força de ação é aquela exercida pelo garoto.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>A força resultante sobre o móvel é sempre nula.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>As forças que o chão exerce sobre o garoto se anulam.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>A força de ação é um pouco maior que a força de reação.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>O par de forças de ação e reação não atua em um mesmo corpo.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>O erro do garoto</h4>
+          <p>Ele acha que as duas forças do par se cancelam. Mas elas atuam em <b>corpos diferentes</b>: a força do garoto atua <b>no móvel</b>, e a do móvel atua <b>no garoto</b>.</p>
+          <h4>Raciocínio</h4>
+          <p>Para saber se o móvel se move, olhamos só as forças <b>sobre o móvel</b>. A força do garoto sobre ele não é anulada pela reação (que está no garoto). Se essa força vencer o atrito, o móvel anda normalmente.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. PESO, MASSA E ATRITO ============ -->
+<section class="lesson" id="s6" data-title="Peso, massa e atrito">
+  <div class="wrap">
+    <div class="kicker"><span class="num">6</span> Forças do cotidiano</div>
+    <h2 class="sec-title">Peso, massa e atrito</h2>
+    <p class="body">Duas palavras que o dia a dia trata como sinônimos, mas a física separa com rigor — e o ENEM adora a diferença:</p>
+    <p class="body">&#9679; <b>Massa</b> é a quantidade de matéria de um corpo. É <b>sempre a mesma</b>, esteja você na Terra, na Lua ou flutuando no espaço. Mede-se em <b>quilogramas (kg)</b>.<br>
+    &#9679; <b>Peso</b> é a <b>força</b> com que a gravidade puxa esse corpo. Depende da gravidade do lugar, então <b>muda</b> de um planeta para outro. Mede-se em <b>newtons (N)</b>.</p>
+    <div class="formula"><span class="p">P</span> = <span class="r">m</span> &middot; g <small>peso = massa &times; gravidade &nbsp;|&nbsp; na Terra, g &asymp; 10 m/s&sup2;</small></div>
+
+    <!-- WIDGET: peso em mundos -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#127759;</span><span class="ttl">Simulação · Seu peso pelo Sistema Solar</span><span class="lbl">edite</span></div>
+      <div class="sim-controls">
+        <div class="calc-grid">
+          <div class="calc-field">
+            <label>Sua massa (kg)</label>
+            <input type="number" class="num" id="wMass" value="70" min="1" step="1">
+          </div>
+          <div class="calc-field">
+            <label>Onde você está</label>
+            <select id="wWorld">
+              <option value="9.8">Terra — g = 9,8</option>
+              <option value="1.6">Lua — g = 1,6</option>
+              <option value="3.7">Marte — g = 3,7</option>
+              <option value="24.8">Júpiter — g = 24,8</option>
+              <option value="274">Sol — g = 274</option>
+            </select>
+          </div>
+        </div>
+        <div class="calc-result">
+          <div class="big" id="wWeight">686 N</div>
+          <div class="lbl">SEU PESO NESSE LUGAR</div>
+          <div class="sub">Sua massa continua <b id="wMassEcho">70 kg</b> em qualquer lugar — só o peso muda.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q20 -->
+    <div class="enem-q" data-correct="3">
+      <div class="eq-head"><span class="eq-badge">ENEM 2009</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Em órbita a 560 km de altura, um astronauta, ao manusear o telescópio Hubble, exclamou: "este telescópio tem massa grande, mas peso pequeno". A respeito dessa afirmação, considerando os conceitos da física, ela</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>se justifica porque o tamanho do telescópio determina sua massa, enquanto o pequeno peso decorre da falta de ar.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>se justifica porque a inércia do telescópio é grande, e isso reduz seu peso na órbita.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>não se justifica, pois massa e peso de objetos em órbita seguem leis diferentes das da Terra.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>não se justifica, pois o peso é a força da gravidade terrestre, que naquela altura ainda é considerável.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>não se justifica, pois a força-peso implica uma reação contrária que a anularia.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>A 560 km de altura a gravidade ainda é forte (cerca de 85% da gravidade na superfície). Logo, o peso do telescópio <b>não</b> é "pequeno" — ele continua considerável.</p>
+          <h4>Por que parece flutuar, então?</h4>
+          <p>Os astronautas e objetos flutuam porque estão em <b>queda livre</b> orbitando a Terra, não porque o peso sumiu. A afirmação do astronauta sobre "peso pequeno" não se justifica.</p>
+          <div class="eq-answer">Resposta: alternativa D</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="body">Falta uma força essencial do cotidiano: o <span class="hl">atrito</span>. Ele se opõe ao deslizamento entre superfícies. Tem dois tipos: o <b>atrito estático</b> (enquanto o objeto ainda não desliza — é o mais forte) e o <b>atrito cinético</b> (já deslizando — um pouco mais fraco). Sem atrito você não conseguiria andar nem segurar um copo.</p>
+
+    <!-- ENEM Q17 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Uma pessoa precisa do atrito nos pés para se mover. Ao subir uma rampa em linha reta, ela é auxiliada pelo atrito que o chão faz em seus pés. Qual a direção e o sentido dessa força de atrito?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>Perpendicular ao plano e no mesmo sentido do movimento.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Paralelo ao plano e no sentido contrário ao movimento.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>Paralelo ao plano e no mesmo sentido do movimento.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>Horizontal e no mesmo sentido do movimento.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>Vertical e com sentido para cima.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Ao subir, o pé empurra a rampa para <b>trás</b> (para baixo, ao longo da rampa). Pela 3ª Lei, a rampa responde empurrando o pé para <b>a frente</b> — ou seja, <b>paralelo ao plano e no mesmo sentido do movimento</b> (subindo). É essa reação do atrito que impulsiona a pessoa rampa acima.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. TRABALHO E ENERGIA ============ -->
+<section class="lesson" id="s7" data-title="Trabalho e energia">
+  <div class="wrap">
+    <div class="kicker"><span class="num">7</span> A moeda do movimento</div>
+    <h2 class="sec-title">Trabalho e energia</h2>
+    <p class="body">Existe uma forma mais poderosa de analisar o movimento sem precisar de todas as forças instante a instante: a <b>energia</b>. Comece pelo <span class="hl">trabalho</span>, que é como uma força "transfere" energia ao mover algo:</p>
+    <div class="formula"><span style="color:var(--orange)">W</span> = <span class="p">F</span> &middot; d <small>trabalho = força &times; deslocamento (na direção da força) &nbsp;|&nbsp; unidade: <span class="unit">joule (J)</span></small></div>
+    <p class="body">A energia aparece em duas formas-chave na mecânica:</p>
+    <div class="formula" style="font-size:clamp(19px,4.4vw,26px)">
+      <span class="i">E&#8331;</span> = m&middot;v&sup2;/2 &nbsp;&nbsp; &middot; &nbsp;&nbsp; <span class="v">E&#7523;</span> = m&middot;g&middot;h
+      <small><span class="i">cinética</span> (energia do movimento) &nbsp;|&nbsp; <span class="v">potencial gravitacional</span> (energia da altura)</small>
+    </div>
+    <p class="body">E aqui está a ideia mais bela da mecânica, a <span class="hl">conservação da energia</span>: sem atrito, a soma <b>cinética + potencial</b> se mantém constante. A energia só troca de forma. Numa montanha-russa, a altura (potencial) vira velocidade (cinética) na descida, e o contrário na subida. Veja num pêndulo:</p>
+
+    <!-- SIM 3: pendulo energia -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#9203;</span><span class="ttl">Simulação · Conservação de energia (pêndulo)</span><span class="lbl">observe</span></div>
+      <div class="sim-canvas-wrap"><canvas id="penCanvas" height="240"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Soltar de que altura (amplitude)</span><span class="vl" id="penAval">médio</span></div>
+          <input type="range" id="penAmp" min="20" max="80" value="60">
+        </div>
+        <div class="readout">
+          <div class="ro g"><span class="k">CINÉTICA (movimento)</span><span class="v" id="penKE">—</span></div>
+          <div class="ro"><span class="k">POTENCIAL (altura)</span><span class="v" id="penPE">—</span></div>
+          <div class="ro y"><span class="k">TOTAL (constante)</span><span class="v" id="penTot">—</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="body">Repare: a cinética e a potencial sobem e descem em sentidos opostos, mas a <b>soma fica fixa</b>. No ponto mais baixo, toda a energia é cinética (máxima velocidade); nos extremos, toda potencial (parado por um instante).</p>
+
+    <!-- ENEM Q27 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Em um carrinho de brinquedo movido a corda, uma mola interna é comprimida quando se puxa o carrinho para trás. Ao soltar, o carrinho anda enquanto a mola volta à forma original. O mesmo processo de conversão de energia ocorre em</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>um dínamo.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>um freio de automóvel.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>um motor a combustão.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>uma usina hidroelétrica.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>uma atiradeira (estilingue).</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>No carrinho, a mola comprimida guarda <b>energia potencial elástica</b> e a libera como <b>energia cinética</b> (movimento).</p>
+          <h4>Raciocínio</h4>
+          <p>Procuramos onde acontece a mesma troca: elástica &rarr; cinética. No <b>estilingue</b>, o elástico esticado guarda energia potencial elástica que vira energia cinética da pedra ao ser solto. Mesma física do carrinho.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q29 -->
+    <div class="enem-q" data-correct="3">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Um carro desce uma ladeira mantendo a velocidade escalar <b>constante</b> (o motorista segura o freio). Durante a descida, o que acontece com as energias potencial, cinética e mecânica do carro?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>A energia mecânica se mantém constante, pois a velocidade não varia.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>A energia cinética aumenta, pois a potencial diminui.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>A energia potencial se mantém constante, pois só há forças conservativas.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>A energia mecânica diminui, pois a cinética se mantém, mas a potencial diminui.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>A energia cinética se mantém, pois não há trabalho realizado sobre o carro.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Analisando cada energia</h4>
+          <p>&#9679; <b>Cinética</b>: depende da velocidade, que é constante &rarr; <b>não muda</b>.<br>
+          &#9679; <b>Potencial</b>: depende da altura, que diminui na descida &rarr; <b>diminui</b>.</p>
+          <h4>Conclusão</h4>
+          <p>Mecânica = cinética + potencial. Como a cinética fica igual e a potencial cai, a <b>mecânica diminui</b>. Para onde foi essa energia? Virou <b>calor</b> no freio (atrito). Aqui a energia mecânica <b>não</b> se conserva, justamente por causa do atrito.</p>
+          <div class="eq-answer">Resposta: alternativa D</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. MOMENTO ============ -->
+<section class="lesson" id="s8" data-title="Momento e colisões">
+  <div class="wrap">
+    <div class="kicker"><span class="num">8</span> A moeda do movimento &middot; parte 2</div>
+    <h2 class="sec-title">Quantidade de movimento e colisões</h2>
+    <p class="body">Há outra grandeza que se conserva e explica colisões e explosões: a <span class="hl">quantidade de movimento</span> (ou momento). Ela combina massa e velocidade:</p>
+    <div class="formula"><span class="p">p</span> = <span class="r">m</span> &middot; <span class="v">v</span> <small>momento = massa &times; velocidade &nbsp;|&nbsp; unidade: kg&middot;m/s</small></div>
+    <p class="body">A regra de ouro: em colisões e explosões, sem forças externas, o <b>momento total se conserva</b>. O que um corpo ganha, o outro perde. É por isso que uma arma "coice" para trás ao disparar, e que um patinador desliza para trás ao empurrar algo. Veja duas bolas colidirem e confira que o momento total não muda:</p>
+
+    <!-- SIM 4: colisao -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#9899;</span><span class="ttl">Simulação · Colisão e conservação do momento</span><span class="lbl">arraste e lance</span></div>
+      <div class="sim-canvas-wrap"><canvas id="colCanvas" height="170"></canvas></div>
+      <div class="sim-controls">
+        <div class="calc-grid">
+          <div class="ctrl">
+            <div class="ctrl-label"><span class="nm">Massa azul</span><span class="vl" id="colM1val">3 kg</span></div>
+            <input type="range" id="colM1" min="1" max="8" value="3">
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-label"><span class="nm">Massa verde</span><span class="vl" id="colM2val">5 kg</span></div>
+            <input type="range" id="colM2" min="1" max="8" value="5">
+          </div>
+        </div>
+        <div class="readout">
+          <div class="ro y"><span class="k">MOMENTO TOTAL (antes e depois)</span><span class="v" id="colP">—</span></div>
+        </div>
+        <button class="sim-btn" id="colLaunch">&#9654; Lançar as bolas</button>
+      </div>
+    </div>
+
+    <div class="note tip">
+      <span class="tag">IMPULSO: POR QUE O AIRBAG SALVA</span>
+      A força de uma batida está ligada ao <b>tempo</b> que ela dura: força &times; tempo = variação do momento. O airbag e o cinto <b>aumentam o tempo</b> da desaceleração do corpo. Como a variação de momento é a mesma, mais tempo significa <b>menos força</b> sobre você — e é isso que reduz as lesões.
+    </div>
+
+    <!-- Exemplo autoral (estilo ENEM) -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge aut">EXEMPLO</span><span class="eq-tag">estilo ENEM</span><span class="eq-tag demo">criado para a aula</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Um patinador de 60 kg está parado sobre o gelo, sem atrito. Ele empurra para a frente uma mochila de 4 kg, que sai a 6 m/s. Com que velocidade o patinador recua?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>0,1 m/s</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>0,4 m/s</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>1,5 m/s</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>6,0 m/s</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>24 m/s</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>Antes do empurrão, tudo está parado: o momento total é <b>zero</b>. Sem forças externas, ele continua zero depois.</p>
+          <h4>Contas</h4>
+          <div class="calc-step">0 = m&#7350;&middot;v&#7350; + m&#7523;&middot;v&#7523; &rarr; 0 = 60&middot;v&#7350; + 4&middot;6</div>
+          <p>Isolando a velocidade do patinador (v&#7350;): 60&middot;v&#7350; = 24, então v&#7350; = 24/60 = <b>0,4 m/s</b> (no sentido oposto ao da mochila).</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. APLICAÇÕES ============ -->
+<section class="lesson" id="s9" data-title="Aplicações no ENEM">
+  <div class="wrap">
+    <div class="kicker"><span class="num">9</span> No mundo real</div>
+    <h2 class="sec-title">Aplicações que o ENEM adora</h2>
+    <p class="body">O ENEM raramente pede conta pura — ele veste a mecânica de trânsito, esporte e astronomia. Veja três contextos campeões, todos saindo do que você já aprendeu.</p>
+
+    <div class="note warn">
+      <span class="tag">SEGURANÇA NO TRÂNSITO</span>
+      Quase tudo no carro é mecânica aplicada: o <b>cinto e o airbag</b> reduzem a força aumentando o tempo da batida (impulso); o <b>encosto de cabeça</b> evita o "chicote" do pescoço (inércia); e o <b>freio ABS</b> usa o atrito estático, mais forte, para parar em menos espaço.
+    </div>
+
+    <!-- ENEM Q24 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">O freio ABS evita que as rodas travem e derrapem durante uma frenagem forte. Testes mostram que, a partir de certa velocidade, a distância de frenagem é menor sem o travamento das rodas. Esse ganho de eficiência ocorre porque</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>o atrito estático se torna igual ao dinâmico momentos antes da derrapagem.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>o coeficiente de atrito estático é maior que o dinâmico, independentemente da superfície.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>o coeficiente de atrito estático é menor que o dinâmico, independentemente da superfície.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>a superfície de contato dos pneus é maior com as rodas desbloqueadas.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>a superfície de contato é maior e o atrito também muda com as rodas desbloqueadas.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>O atrito <b>estático</b> (roda girando sem deslizar) é <b>maior</b> que o atrito <b>cinético</b> (roda travada deslizando).</p>
+          <h4>Raciocínio</h4>
+          <p>O ABS impede o travamento, mantendo a roda no regime de atrito <b>estático</b>, que é mais forte e freia melhor. Com a roda travada, o atrito cai para o cinético (mais fraco) e o carro precisa de mais espaço para parar — além de perder o controle de direção.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM Q1 -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2014</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">No lançamento oblíquo de um objeto (uma bola chutada, por exemplo), desprezando a resistência do ar, qual a direção e o sentido da força resultante sobre o objeto no ponto mais alto da trajetória?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>Indefinido, pois ela é nula, assim como a velocidade vertical nesse ponto.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Vertical e para baixo, pois somente o peso atua durante o movimento.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>Horizontal, no sentido do movimento, pois por inércia o objeto continua.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>Inclinada na direção do lançamento, pois a força inicial é constante.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>Inclinada para baixo e no sentido do movimento, apontando para onde vai cair.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>Desprezando o ar, a <b>única</b> força que atua sobre o objeto em voo é o <b>peso</b> — sempre vertical e para baixo, em todos os instantes.</p>
+          <h4>Cuidado com a pegadinha</h4>
+          <p>No ponto mais alto, a velocidade <b>vertical</b> é zero, mas o objeto ainda se move na <b>horizontal</b> e continua sendo puxado pelo peso. Por isso a força resultante não é nula: ela é <b>vertical para baixo</b>. A velocidade não precisa ter o mesmo sentido da força.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="tag cy">GRAVITAÇÃO: O CÉU TAMBÉM É MECÂNICA</span>
+      A mesma gravidade que faz a maçã cair mantém os planetas em órbita. Um satélite "não cai" porque está em <b>queda livre</b> permanente, contornando a Terra. E os planetas, vistos da Terra, às vezes parecem "andar para trás" no céu.
+    </div>
+
+    <!-- ENEM Q42 -->
+    <div class="enem-q" data-correct="0">
+      <div class="eq-head"><span class="eq-badge">ENEM 2012</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Observando Marte por vários dias, nota-se que ele às vezes parece se mover "para trás" em relação às estrelas fixas (movimento retrógrado). Qual a causa dessa trajetória aparente de Marte vista da Terra?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>A maior velocidade orbital da Terra faz com que, em certas épocas, ela ultrapasse Marte.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Outras estrelas desviam a trajetória de Marte por atração gravitacional.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>A órbita de Marte é muito mais elíptica que a dos demais planetas.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>A atração entre Terra e Marte deixa a órbita de Marte irregular.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>A proximidade de Marte com Júpiter interfere em seu movimento.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave</h4>
+          <p>A Terra está mais perto do Sol, então orbita <b>mais rápido</b> que Marte. É um efeito de <b>velocidade relativa</b>, igual ao da questão do avião lá do começo.</p>
+          <h4>Raciocínio</h4>
+          <p>Quando a Terra "ultrapassa" Marte por dentro, Marte parece andar para trás no céu por alguns dias — assim como um carro mais lento parece recuar quando você o ultrapassa na estrada. É só uma ilusão de perspectiva, não uma mudança real na órbita de Marte.</p>
+          <div class="eq-answer">Resposta: alternativa A</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. RESUMO ============ -->
+<section class="lesson" id="s10" data-title="Resumo e fórmulas">
+  <div class="wrap">
+    <div class="kicker"><span class="num">10</span> Leve no bolso</div>
+    <h2 class="sec-title">Resumo e fórmulas</h2>
+    <p class="body">Quase toda questão de mecânica do ENEM se resolve com estas ferramentas:</p>
+
+    <div class="sheet">
+      <div class="f"><div class="eq">v = &Delta;s/&Delta;t</div><div class="ds">Velocidade<br>(m/s)</div></div>
+      <div class="f"><div class="eq">a = &Delta;v/&Delta;t</div><div class="ds">Aceleração<br>(m/s&sup2;)</div></div>
+      <div class="f"><div class="eq">F = m&middot;a</div><div class="ds">2ª Lei de Newton<br>(newton, N)</div></div>
+      <div class="f"><div class="eq">P = m&middot;g</div><div class="ds">Peso<br>(força, N)</div></div>
+      <div class="f"><div class="eq">W = F&middot;d</div><div class="ds">Trabalho<br>(joule, J)</div></div>
+      <div class="f"><div class="eq">E&#8331; = mv&sup2;/2</div><div class="ds">Energia cinética<br>(J)</div></div>
+      <div class="f"><div class="eq">E&#7523; = mgh</div><div class="ds">Energia potencial<br>(J)</div></div>
+      <div class="f"><div class="eq">p = m&middot;v</div><div class="ds">Quantidade de<br>movimento</div></div>
+    </div>
+
+    <h3 style="font-family:'Orbitron';font-weight:700;font-size:16px;color:var(--cyan);margin:26px 0 6px">As ideias que mais caem</h3>
+    <ul class="takeaways">
+      <li>Força não mantém o movimento — força <b>muda</b> o movimento (inércia).</li>
+      <li><b>F = m&middot;a</b>: mais força acelera mais; mais massa acelera menos.</li>
+      <li>Ação e reação atuam em <b>corpos diferentes</b>, por isso não se anulam.</li>
+      <li><b>Massa</b> é constante; <b>peso</b> (P = m&middot;g) muda com a gravidade do lugar.</li>
+      <li>Sem atrito, <b>cinética + potencial se conservam</b>; com atrito, parte vira calor.</li>
+      <li>Em colisões, o <b>momento total se conserva</b>; airbag reduz a força aumentando o tempo.</li>
+    </ul>
+
+    <div class="card finish-card">
+      <p style="font-family:'Orbitron';font-weight:700;font-size:18px;color:#eafcff;margin-bottom:8px">Você chegou ao fim! &#9881;</p>
+      <p class="body" style="margin-bottom:20px">Agora encare o simulado na Área ENEM para fixar tudo — as questões que você acertar saem da fila, e as que errar voltam para você dominar.</p>
+      <button class="btn" id="finishBtn">Marcar aula como concluída &#10003;</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="ft-logo">&#9881; Plataforma da Física</div>
+  <p style="margin-top:8px">Aula interativa de Mecânica · questões do ENEM para fins educacionais</p>
+</footer>
+
+<script>
+'use strict';
+/* ===================================================================
+   Persistência (fallback em memória para o preview)
+   =================================================================== */
+const Store = (function(){
+  const KEY = 'plataphysica_mecanica_aula';
+  let mem = null;
+  function read(){
+    try{ const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : (mem || {visited:[], done:false}); }
+    catch(e){ return mem || {visited:[], done:false}; }
+  }
+  function write(d){ mem = d; try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){} }
+  return { read, write };
+})();
+
+/* ===================================================================
+   Progresso + sumário
+   =================================================================== */
+const secs = Array.from(document.querySelectorAll('section.lesson'));
+const data = Store.read();
+const visited = new Set(data.visited || []);
+const tocNav = document.getElementById('tocNav');
+tocNav.innerHTML = secs.map((s,i)=>`<a href="#${s.id}" data-go="${s.id}"><span class="n">${String(i+1).padStart(2,'0')}</span><span>${s.dataset.title}</span><span class="dot">&#10003;</span></a>`).join('');
+
+function refreshProgress(){
+  const pct = Math.round(visited.size / secs.length * 100);
+  document.getElementById('progBar').style.width = pct + '%';
+  document.getElementById('tbPct').textContent = pct + '%';
+  tocNav.querySelectorAll('a').forEach(a=> a.classList.toggle('done', visited.has(a.dataset.go)));
+}
+function markVisited(id){
+  if(visited.has(id)) return;
+  visited.add(id);
+  const d = Store.read(); d.visited = Array.from(visited); Store.write(d);
+  refreshProgress();
+}
+refreshProgress();
+
+if('IntersectionObserver' in window){
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{ if(en.isIntersecting) markVisited(en.target.id); });
+  }, { threshold:0.35 });
+  secs.forEach(s=>obs.observe(s));
+} else { secs.forEach(s=>markVisited(s.id)); }
+
+const toc = document.getElementById('toc');
+document.getElementById('tocBtn').onclick = ()=> toc.classList.add('open');
+document.getElementById('tocX').onclick = ()=> toc.classList.remove('open');
+toc.onclick = (e)=>{ if(e.target === toc) toc.classList.remove('open'); };
+tocNav.querySelectorAll('a').forEach(a=> a.onclick = ()=> toc.classList.remove('open'));
+
+const finishBtn = document.getElementById('finishBtn');
+function paintDone(){ finishBtn.classList.add('done-state'); finishBtn.innerHTML = '&#10003; Aula concluída'; }
+if(data.done) paintDone();
+finishBtn.onclick = ()=>{
+  secs.forEach(s=>visited.add(s.id));
+  const d = Store.read(); d.visited = Array.from(visited); d.done = true; Store.write(d);
+  refreshProgress(); paintDone();
+  window.scrollTo({ top:0, behavior:'smooth' });
+};
+
+/* ===================================================================
+   Revelar resolução das questões
+   =================================================================== */
+document.querySelectorAll('.enem-q').forEach(q=>{
+  const btn = q.querySelector('.reveal-btn');
+  const sol = q.querySelector('.eq-sol');
+  const correct = parseInt(q.dataset.correct, 10);
+  const alts = q.querySelectorAll('.eq-alt');
+  btn.onclick = ()=>{
+    const open = sol.classList.toggle('show');
+    if(open){
+      if(alts[correct]) alts[correct].classList.add('correct');
+      btn.innerHTML = 'Ocultar resolução &#9650;';
+    } else { btn.innerHTML = 'Ver resolução passo a passo &#9660;'; }
+  };
+});
+
+/* ===================================================================
+   Util canvas
+   =================================================================== */
+function fitCanvas(cv, cssH){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = cv.clientWidth || cv.parentElement.clientWidth;
+  cv.width = Math.round(w * dpr);
+  cv.height = Math.round(cssH * dpr);
+  cv.style.height = cssH + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w, h: cssH };
+}
+
+/* ===================================================================
+   HERO — bolinhas com gravidade e quique (movimento)
+   =================================================================== */
+(function(){
+  const cv = document.getElementById('heroCanvas');
+  if(!cv) return;
+  let W, H, balls = [];
+  const cols = ['rgba(0,229,255,', 'rgba(139,92,255,', 'rgba(39,232,138,', 'rgba(255,210,61,'];
+  function setup(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = cv.clientWidth; H = cv.clientHeight || 360;
+    cv.width = W*dpr; cv.height = H*dpr;
+    cv.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+    balls = [];
+    const n = Math.max(5, Math.round(W/150));
+    for(let i=0;i<n;i++){
+      balls.push({ x: Math.random()*W, y: Math.random()*H*0.5, vx:(Math.random()*2-1)*1.4, vy:0, r:5+Math.random()*5, c:cols[i%cols.length], trail:[] });
+    }
+  }
+  const ctx = cv.getContext('2d');
+  const g = 0.16;
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    balls.forEach(b=>{
+      b.vy += g; b.x += b.vx; b.y += b.vy;
+      if(b.y > H - b.r){ b.y = H - b.r; b.vy *= -0.82; }
+      if(b.x < b.r){ b.x = b.r; b.vx *= -1; }
+      if(b.x > W - b.r){ b.x = W - b.r; b.vx *= -1; }
+      b.trail.push({x:b.x,y:b.y}); if(b.trail.length > 14) b.trail.shift();
+      b.trail.forEach((p,i)=>{ const a = i/b.trail.length*0.3; ctx.fillStyle = b.c + a + ')'; ctx.beginPath(); ctx.arc(p.x,p.y,b.r*(i/b.trail.length),0,6.28); ctx.fill(); });
+      const grd = ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r*2);
+      grd.addColorStop(0, b.c + '0.95)'); grd.addColorStop(1, b.c + '0)');
+      ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(b.x,b.y,b.r*2,0,6.28); ctx.fill();
+      ctx.fillStyle = b.c + '0.95)'; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,6.28); ctx.fill();
+    });
+    requestAnimationFrame(frame);
+  }
+  setup(); frame();
+  window.addEventListener('resize', setup);
+})();
+
+/* ===================================================================
+   SIM 1 — cinemática (MRU / MRUV)
+   =================================================================== */
+(function(){
+  const cv = document.getElementById('kinCanvas');
+  const sV = document.getElementById('kinV'), sA = document.getElementById('kinA');
+  if(!cv) return;
+  let ctx, W, H, x = 40, v = 12, t0 = 0;
+  function build(){ const r = fitCanvas(cv, 180); ctx = r.ctx; W = r.w; H = r.h; reset(); }
+  function reset(){ x = 40; v = parseFloat(sV.value); }
+  document.getElementById('kinReset').onclick = reset;
+  function frame(){
+    const v0 = parseFloat(sV.value), a = parseFloat(sA.value);
+    const dt = 1/60;
+    v += a * dt;
+    if(v < 0) v = 0;
+    x += v * 4 * dt * 6;
+    const road = H - 42;
+    ctx.clearRect(0,0,W,H);
+    // pista
+    ctx.strokeStyle = 'rgba(0,229,255,0.25)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, road+24); ctx.lineTo(W, road+24); ctx.stroke();
+    ctx.fillStyle = 'rgba(0,229,255,0.18)';
+    for(let i=0;i<W;i+=46){ ctx.fillRect((i - (x*2)%46), road+22, 22, 4); }
+    // carro
+    if(x > W + 30){ x = -30; }
+    const cx = x, cy = road;
+    ctx.fillStyle = 'rgba(0,229,255,0.9)';
+    roundRect(ctx, cx-22, cy-14, 44, 18, 5); ctx.fill();
+    ctx.fillStyle = 'rgba(150,240,255,0.85)';
+    roundRect(ctx, cx-12, cy-24, 22, 12, 4); ctx.fill();
+    ctx.fillStyle = '#04121a';
+    ctx.beginPath(); ctx.arc(cx-12, cy+5, 5, 0, 6.28); ctx.arc(cx+12, cy+5, 5, 0, 6.28); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,229,255,0.8)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(cx-12, cy+5, 5, 0, 6.28); ctx.arc(cx+12, cy+5, 5, 0, 6.28); ctx.stroke();
+    // seta de velocidade
+    if(v > 0.3){
+      ctx.strokeStyle = 'rgba(39,232,138,0.9)'; ctx.lineWidth = 3;
+      const al = Math.min(60, v*2.2);
+      ctx.beginPath(); ctx.moveTo(cx+24, cy-20); ctx.lineTo(cx+24+al, cy-20); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx+24+al, cy-20); ctx.lineTo(cx+24+al-7, cy-24); ctx.lineTo(cx+24+al-7, cy-16); ctx.closePath(); ctx.fillStyle='rgba(39,232,138,0.9)'; ctx.fill();
+    }
+    // labels
+    document.getElementById('kinVval').textContent = v0.toFixed(0) + ' m/s';
+    document.getElementById('kinAval').textContent = a.toFixed(1) + ' m/s\u00B2';
+    document.getElementById('kinNow').textContent = v.toFixed(1) + ' m/s';
+    const tp = Math.abs(a) < 0.05 ? 'MRU' : (a > 0 ? 'MRUV (acelera)' : 'MRUV (freia)');
+    document.getElementById('kinType').textContent = tp;
+    requestAnimationFrame(frame);
+  }
+  function roundRect(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
+  sV.addEventListener('input', ()=>{ v = parseFloat(sV.value); });
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* ===================================================================
+   SIM 2 — F = m·a
+   =================================================================== */
+(function(){
+  const cv = document.getElementById('fmaCanvas');
+  const sF = document.getElementById('fmaF'), sM = document.getElementById('fmaM');
+  if(!cv) return;
+  let ctx, W, H, x = 60, vx = 0;
+  function build(){ const r = fitCanvas(cv, 190); ctx = r.ctx; W = r.w; H = r.h; reset(); }
+  function reset(){ x = 60; vx = 0; }
+  document.getElementById('fmaReset').onclick = reset;
+  function frame(){
+    const F = parseFloat(sF.value), m = parseFloat(sM.value);
+    const a = F / m;                 // aceleração
+    const dt = 1/60;
+    vx += a * dt * 4;
+    x += vx * dt * 6;
+    const ground = H - 34;
+    ctx.clearRect(0,0,W,H);
+    // chão
+    ctx.strokeStyle = 'rgba(0,229,255,0.3)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, ground); ctx.lineTo(W, ground); ctx.stroke();
+    for(let i=0;i<W;i+=22){ ctx.strokeStyle='rgba(0,229,255,0.1)'; ctx.beginPath(); ctx.moveTo(i,ground); ctx.lineTo(i-8,ground+9); ctx.stroke(); }
+    if(x > W + 40){ x = -40; vx = 0; }
+    // caixa: tamanho cresce com massa
+    const size = 28 + m*2.2;
+    const bx = x, by = ground - size;
+    const grd = ctx.createLinearGradient(bx, by, bx, by+size);
+    grd.addColorStop(0,'rgba(139,92,255,0.85)'); grd.addColorStop(1,'rgba(0,229,255,0.6)');
+    ctx.fillStyle = grd;
+    roundRect2(ctx, bx, by, size, size, 6); ctx.fill();
+    ctx.strokeStyle = 'rgba(150,240,255,0.7)'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = '#eafcff'; ctx.font = "700 13px Orbitron"; ctx.textAlign='center';
+    ctx.fillText(m.toFixed(0)+'kg', bx+size/2, by+size/2+4);
+    // seta de força
+    if(F > 0){
+      const al = 18 + F*0.7;
+      ctx.strokeStyle = 'rgba(255,93,110,0.95)'; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(bx-al, by+size/2); ctx.lineTo(bx-3, by+size/2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(bx-3, by+size/2); ctx.lineTo(bx-12, by+size/2-6); ctx.lineTo(bx-12, by+size/2+6); ctx.closePath(); ctx.fillStyle='rgba(255,93,110,0.95)'; ctx.fill();
+      ctx.fillStyle = 'rgba(255,93,110,0.95)'; ctx.font="700 12px Orbitron"; ctx.textAlign='center';
+      ctx.fillText(F.toFixed(0)+' N', bx-al/2-3, by+size/2-12);
+    }
+    document.getElementById('fmaFval').textContent = F.toFixed(0) + ' N';
+    document.getElementById('fmaMval').textContent = m.toFixed(0) + ' kg';
+    document.getElementById('fmaA').textContent = a.toFixed(1) + ' m/s\u00B2';
+    document.getElementById('fmaV').textContent = vx.toFixed(1) + ' m/s';
+    requestAnimationFrame(frame);
+  }
+  function roundRect2(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* ===================================================================
+   SIM 3 — pêndulo (conservação de energia)
+   =================================================================== */
+(function(){
+  const cv = document.getElementById('penCanvas');
+  const sAmp = document.getElementById('penAmp');
+  if(!cv) return;
+  let ctx, W, H, theta = 1, omega = 0, L, ox, oy, amp0;
+  function build(){ const r = fitCanvas(cv, 240); ctx = r.ctx; W = r.w; H = r.h; ox = W/2; oy = 26; L = H - 90; setAmp(); }
+  function setAmp(){ amp0 = (parseFloat(sAmp.value)/100) * 1.3; theta = amp0; omega = 0; }
+  sAmp.addEventListener('input', setAmp);
+  function frame(){
+    const g = 9.8, dt = 1/60;
+    const alpha = -(g / (L/100)) * Math.sin(theta);   // pêndulo real
+    omega += alpha * dt;
+    theta += omega * dt;
+    const bx = ox + Math.sin(theta) * L;
+    const by = oy + Math.cos(theta) * L;
+    ctx.clearRect(0,0,W,H);
+    // energia
+    const hMax = L * (1 - Math.cos(amp0));
+    const h = L * (1 - Math.cos(theta));
+    const peFrac = hMax > 0 ? h / hMax : 0;
+    const keFrac = 1 - peFrac;
+    // arco de referencia
+    ctx.strokeStyle = 'rgba(0,229,255,0.12)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(ox, oy, L, Math.PI/2 - amp0, Math.PI/2 + amp0); ctx.stroke();
+    // haste
+    ctx.strokeStyle = 'rgba(0,229,255,0.55)'; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(bx, by); ctx.stroke();
+    ctx.fillStyle = 'rgba(0,229,255,0.8)'; ctx.beginPath(); ctx.arc(ox, oy, 4, 0, 6.28); ctx.fill();
+    // bob com brilho conforme energia cinetica
+    const glow = 0.3 + keFrac*0.7;
+    const grd = ctx.createRadialGradient(bx, by, 2, bx, by, 26);
+    grd.addColorStop(0, `rgba(39,232,138,${glow})`); grd.addColorStop(1, 'rgba(39,232,138,0)');
+    ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(bx, by, 26, 0, 6.28); ctx.fill();
+    ctx.fillStyle = 'rgba(120,255,200,0.95)'; ctx.beginPath(); ctx.arc(bx, by, 13, 0, 6.28); ctx.fill();
+    // barras de energia (canto)
+    const bw = 16, bh = H - 70, bxk = 22, bxp = 50, byb = 40;
+    function bar(x, frac, col){
+      ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.fillRect(x, byb, bw, bh);
+      ctx.fillStyle = col; ctx.fillRect(x, byb + bh*(1-frac), bw, bh*frac);
+    }
+    bar(bxk, keFrac, 'rgba(39,232,138,0.85)');
+    bar(bxp, peFrac, 'rgba(0,229,255,0.7)');
+    ctx.fillStyle = 'rgba(219,230,245,0.7)'; ctx.font="600 10px Orbitron"; ctx.textAlign='center';
+    ctx.fillText('Ec', bxk+bw/2, byb+bh+14);
+    ctx.fillText('Ep', bxp+bw/2, byb+bh+14);
+    // readouts
+    document.getElementById('penAval').textContent = parseFloat(sAmp.value) < 40 ? 'baixo' : (parseFloat(sAmp.value) < 65 ? 'médio' : 'alto');
+    document.getElementById('penKE').textContent = Math.round(keFrac*100) + '%';
+    document.getElementById('penPE').textContent = Math.round(peFrac*100) + '%';
+    document.getElementById('penTot').textContent = '100%';
+    requestAnimationFrame(frame);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* ===================================================================
+   SIM 4 — colisão (conservação do momento)
+   =================================================================== */
+(function(){
+  const cv = document.getElementById('colCanvas');
+  const sM1 = document.getElementById('colM1'), sM2 = document.getElementById('colM2');
+  if(!cv) return;
+  let ctx, W, H, b1, b2, running = false;
+  function radius(m){ return 10 + m*3.4; }
+  function build(){ const r = fitCanvas(cv, 170); ctx = r.ctx; W = r.w; H = r.h; resetPos(); }
+  function resetPos(){
+    const m1 = parseFloat(sM1.value), m2 = parseFloat(sM2.value);
+    b1 = { x: 70, m:m1, v:0, c:'rgba(0,229,255,' };
+    b2 = { x: W-70, m:m2, v:0, c:'rgba(39,232,138,' };
+    running = false; draw();
+  }
+  function launch(){
+    const m1 = parseFloat(sM1.value), m2 = parseFloat(sM2.value);
+    b1 = { x: 70, m:m1, v:2.4, c:'rgba(0,229,255,' };
+    b2 = { x: W-70, m:m2, v:-2.0, c:'rgba(39,232,138,' };
+    running = true;
+  }
+  document.getElementById('colLaunch').onclick = launch;
+  sM1.addEventListener('input', resetPos);
+  sM2.addEventListener('input', resetPos);
+  function momentum(){ return (b1.m*b1.v + b2.m*b2.v); }
+  function draw(){
+    const y = H/2;
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle = 'rgba(0,229,255,0.2)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, y+radius(8)+6); ctx.lineTo(W, y+radius(8)+6); ctx.stroke();
+    [b1,b2].forEach(b=>{
+      const r = radius(b.m);
+      const grd = ctx.createRadialGradient(b.x, y, 2, b.x, y, r);
+      grd.addColorStop(0, b.c + '0.95)'); grd.addColorStop(1, b.c + '0.35)');
+      ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(b.x, y, r, 0, 6.28); ctx.fill();
+      ctx.strokeStyle = b.c + '0.9)'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = '#04121a'; ctx.font="700 12px Orbitron"; ctx.textAlign='center';
+      ctx.fillText(b.m.toFixed(0), b.x, y+4);
+    });
+    document.getElementById('colP').textContent = momentum().toFixed(1) + ' kg\u00B7m/s';
+  }
+  function frame(){
+    if(running){
+      const y = H/2;
+      b1.x += b1.v; b2.x += b2.v;
+      const r1 = radius(b1.m), r2 = radius(b2.m);
+      // colisão elástica 1D
+      if(b1.x + r1 >= b2.x - r2 && b1.v - b2.v > 0){
+        const m1=b1.m, m2=b2.m, u1=b1.v, u2=b2.v;
+        b1.v = ((m1-m2)*u1 + 2*m2*u2)/(m1+m2);
+        b2.v = ((m2-m1)*u2 + 2*m1*u1)/(m1+m2);
+        const overlap = (b1.x + r1) - (b2.x - r2);
+        b1.x -= overlap/2; b2.x += overlap/2;
+      }
+      // paredes
+      if(b1.x < r1){ b1.x = r1; b1.v *= -1; }
+      if(b2.x > W - r2){ b2.x = W - r2; b2.v *= -1; }
+      if(b1.x < r1 || b2.x > W) {}
+    }
+    draw();
+    requestAnimationFrame(frame);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* ===================================================================
+   WIDGET — peso pelo Sistema Solar
+   =================================================================== */
+(function(){
+  const m = document.getElementById('wMass'), w = document.getElementById('wWorld');
+  if(!m) return;
+  function calc(){
+    const mass = parseFloat(m.value) || 0;
+    const g = parseFloat(w.value);
+    const peso = mass * g;
+    document.getElementById('wWeight').textContent = Math.round(peso) + ' N';
+    document.getElementById('wMassEcho').textContent = mass.toFixed(0) + ' kg';
+  }
+  m.addEventListener('input', calc); w.addEventListener('change', calc);
+  calc();
+})();
+</script>
+</body>
+</html>

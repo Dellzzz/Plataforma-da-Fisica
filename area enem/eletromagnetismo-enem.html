@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eletromagnetismo do Zero — Aula ENEM | Plataforma da Física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a1a; --bg-2:#0d0f24; --panel:rgba(18,22,48,0.72); --panel-solid:#12162f;
+    --cyan:#00e5ff; --cyan-dim:#0792a8; --magenta:#ff3df0; --violet:#8b5cff;
+    --green:#27e88a; --yellow:#ffd23d; --orange:#ff9d3d; --red:#ff5a6e;
+    --txt:#dbe6f5; --txt-dim:#8492b4; --line:rgba(139,92,255,0.22); --line-soft:rgba(255,255,255,0.07);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body::before{content:'';position:fixed;inset:0;z-index:-2;background:
+    radial-gradient(1100px 620px at 78% -8%, rgba(139,92,255,0.12), transparent 60%),
+    radial-gradient(900px 520px at 8% 12%, rgba(255,61,240,0.08), transparent 60%),
+    radial-gradient(800px 800px at 50% 120%, rgba(0,229,255,0.05), transparent 60%), var(--bg);}
+  body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(139,92,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,255,0.03) 1px,transparent 1px);
+    background-size:46px 46px;mask-image:radial-gradient(ellipse 100% 70% at 50% 0%,#000 30%,transparent 80%);}
+  ::selection{background:rgba(139,92,255,0.3);color:#fff}
+
+  .topbar{position:sticky;top:0;z-index:60;backdrop-filter:blur(12px);background:rgba(8,9,22,0.78);border-bottom:1px solid var(--line)}
+  .topbar-row{max-width:980px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:14px}
+  .tb-logo{font-family:'Orbitron';font-weight:700;font-size:14px;color:#eafcff;letter-spacing:.5px;display:flex;align-items:center;gap:9px;white-space:nowrap}
+  .tb-logo .spark{color:var(--violet);filter:drop-shadow(0 0 6px var(--violet))}
+  .tb-spacer{flex:1}
+  .tb-pct{font-family:'Orbitron';font-weight:700;font-size:13px;color:var(--green);min-width:42px;text-align:right}
+  .tb-toc-btn{font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:.4px;color:var(--violet);background:rgba(139,92,255,0.09);border:1px solid var(--line);padding:8px 13px;border-radius:9px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .tb-toc-btn:hover{background:rgba(139,92,255,0.18)}
+  .progress-strip{height:3px;background:rgba(255,255,255,0.06)}
+  .progress-strip > div{height:100%;width:0;background:linear-gradient(90deg,var(--violet),var(--magenta));box-shadow:0 0 10px rgba(139,92,255,.6);transition:width .4s ease}
+
+  .toc{position:fixed;inset:0;z-index:70;display:none;background:rgba(4,5,14,0.72);backdrop-filter:blur(4px)}
+  .toc.open{display:block}
+  .toc-panel{position:absolute;right:0;top:0;height:100%;width:min(340px,86vw);background:var(--panel-solid);border-left:1px solid var(--line);padding:24px 20px;overflow-y:auto;transform:translateX(100%);transition:transform .3s ease}
+  .toc.open .toc-panel{transform:translateX(0)}
+  .toc-panel h3{font-family:'Orbitron';font-weight:700;font-size:14px;color:var(--violet);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+  .toc-x{cursor:pointer;color:var(--txt-dim);font-size:22px;line-height:1}
+  .toc a{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--txt);padding:11px 12px;border-radius:9px;margin-bottom:4px;font-size:16px;font-weight:500;transition:.18s;border:1px solid transparent}
+  .toc a:hover{background:rgba(139,92,255,0.06);border-color:var(--line)}
+  .toc a .n{font-family:'Orbitron';font-size:11px;color:var(--violet);min-width:22px}
+  .toc a .dot{margin-left:auto;width:16px;height:16px;border-radius:50%;border:2px solid var(--cyan-dim);display:grid;place-items:center;font-size:10px;color:#04121a}
+  .toc a.done .dot{background:var(--green);border-color:var(--green)}
+
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  section.lesson{padding:60px 0;border-bottom:1px solid var(--line-soft)}
+  section.lesson:last-of-type{border-bottom:none}
+
+  .hero{position:relative;overflow:hidden;padding:0;border-bottom:1px solid var(--line)}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.6}
+  .hero-inner{position:relative;max-width:980px;margin:0 auto;padding:74px 20px 70px;text-align:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:2px;color:var(--violet);border:1px solid var(--line);background:rgba(139,92,255,0.05);padding:7px 15px;border-radius:30px;text-transform:uppercase;margin-bottom:26px}
+  .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--violet);box-shadow:0 0 8px var(--violet);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .hero h1{font-family:'Orbitron';font-weight:900;font-size:clamp(30px,7.5vw,58px);line-height:1.04;letter-spacing:-1px;color:#eafcff;text-shadow:0 0 34px rgba(139,92,255,0.35)}
+  .hero h1 .glow{color:var(--violet);text-shadow:0 0 30px rgba(139,92,255,0.7)}
+  .hero .sub{font-size:clamp(17px,2.6vw,21px);color:var(--txt);max-width:650px;margin:22px auto 0;font-weight:500}
+  .hero .sub b{color:#eafcff;font-weight:700}
+  .hero-meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px}
+  .chip{font-family:'Orbitron';font-size:11px;font-weight:500;color:var(--txt-dim);border:1px solid var(--line-soft);background:rgba(255,255,255,0.02);padding:8px 13px;border-radius:8px}
+  .chip b{color:var(--violet);font-weight:700}
+  .scroll-cue{margin-top:42px;font-family:'Orbitron';font-size:11px;letter-spacing:1.5px;color:var(--txt-dim);animation:bob 2s infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
+
+  .kicker{font-family:'Orbitron';font-weight:500;font-size:12px;letter-spacing:1.6px;color:var(--violet);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .kicker .num{font-weight:900;font-size:13px;color:#fff;background:var(--violet);width:30px;height:30px;display:grid;place-items:center;border-radius:9px;box-shadow:0 0 14px rgba(139,92,255,.5)}
+  h2.sec-title{font-family:'Orbitron';font-weight:700;font-size:clamp(23px,4.4vw,33px);color:#eafcff;line-height:1.12;letter-spacing:-.3px;margin-bottom:20px}
+  .lead{font-size:19px;color:var(--txt);font-weight:500;line-height:1.65;margin-bottom:18px}
+  p.body{font-size:17px;line-height:1.72;color:var(--txt);font-weight:400;margin-bottom:16px}
+  p.body b{color:#eafcff;font-weight:700}
+  p.body .hl{color:var(--violet);font-weight:600}
+  .unit{color:var(--cyan);font-weight:700}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin:22px 0;backdrop-filter:blur(6px)}
+  .note{border-left:3px solid var(--violet);background:rgba(139,92,255,0.05);padding:15px 18px;border-radius:0 11px 11px 0;margin:20px 0;font-size:16.5px;line-height:1.6}
+  .note.tip{border-left-color:var(--green);background:rgba(39,232,138,0.06)}
+  .note.warn{border-left-color:var(--orange);background:rgba(255,157,61,0.06)}
+  .note .tag{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.6px;display:block;margin-bottom:6px;color:var(--violet)}
+  .note.tip .tag{color:var(--green)}
+  .note.warn .tag{color:var(--orange)}
+  .note b{color:#eafcff}
+
+  .formula{text-align:center;font-family:'Orbitron';font-weight:700;font-size:clamp(20px,4.6vw,28px);color:#eafcff;background:rgba(0,0,0,0.32);border:1px solid var(--line);border-radius:12px;padding:22px;margin:22px 0;letter-spacing:1px}
+  .formula .v{color:var(--violet)}
+  .formula .r{color:var(--yellow)}
+  .formula .i{color:var(--green)}
+  .formula .c{color:var(--cyan)}
+  .formula small{display:block;font-family:'Rajdhani';font-weight:500;font-size:14px;letter-spacing:0;color:var(--txt-dim);margin-top:12px}
+
+  .map{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden;margin:22px 0}
+  .map.two{grid-template-columns:repeat(2,1fr)}
+  .map .m{background:var(--panel-solid);padding:18px 16px;text-align:center}
+  .map .m .ic{font-size:26px;display:block;margin-bottom:8px}
+  .map .m .t{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;display:block;margin-bottom:6px}
+  .map .m .d{color:var(--txt-dim);font-size:14px;line-height:1.4}
+
+  .sim{background:linear-gradient(180deg,rgba(13,15,36,0.9),rgba(10,10,26,0.9));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:24px 0;box-shadow:0 8px 40px rgba(0,0,0,0.35)}
+  .sim-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(139,92,255,0.07);border-bottom:1px solid var(--line)}
+  .sim-head .ic{font-size:16px}
+  .sim-head .ttl{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;letter-spacing:.4px}
+  .sim-head .lbl{margin-left:auto;font-family:'Orbitron';font-size:10px;color:var(--violet);border:1px solid var(--line);padding:4px 9px;border-radius:20px}
+  .sim-canvas-wrap{position:relative;width:100%;background:radial-gradient(circle at 50% 40%,rgba(139,92,255,0.05),transparent 70%)}
+  .sim canvas{display:block;width:100%}
+  .sim-controls{padding:18px}
+  .ctrl{margin-bottom:16px}
+  .ctrl:last-child{margin-bottom:0}
+  .ctrl-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .ctrl-label .nm{font-family:'Orbitron';font-weight:500;font-size:12.5px;color:var(--txt);letter-spacing:.3px}
+  .ctrl-label .vl{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--violet)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--violet),rgba(255,255,255,0.08));outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--violet);box-shadow:0 0 12px rgba(139,92,255,0.7);border:2px solid #0b0518;cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--violet);box-shadow:0 0 12px rgba(139,92,255,0.7);border:2px solid #0b0518;cursor:pointer}
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .readout .ro{flex:1;min-width:90px;background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;text-align:center}
+  .readout .ro .k{font-family:'Orbitron';font-size:10px;letter-spacing:.5px;color:var(--txt-dim);display:block;margin-bottom:4px}
+  .readout .ro .v{font-family:'Orbitron';font-weight:700;font-size:18px;color:var(--violet)}
+  .readout .ro.g .v{color:var(--green)}
+  .readout .ro.c .v{color:var(--cyan)}
+  .readout .ro.y .v{color:var(--yellow)}
+  .sim-btn{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;background:rgba(139,92,255,0.12);color:var(--violet);border:1px solid var(--line);padding:11px 18px;border-radius:10px;cursor:pointer;transition:.2s;margin-top:4px}
+  .sim-btn:hover{background:rgba(139,92,255,0.22)}
+
+  .enem-q{border:1px solid var(--violet);border-radius:var(--radius);overflow:hidden;margin:26px 0;background:linear-gradient(180deg,rgba(139,92,255,0.06),rgba(10,10,26,0.4))}
+  .eq-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(139,92,255,0.1);border-bottom:1px solid rgba(139,92,255,0.25);flex-wrap:wrap}
+  .eq-badge{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.4px;color:var(--violet);border:1px solid rgba(139,92,255,0.4);background:rgba(139,92,255,0.08);padding:5px 11px;border-radius:20px}
+  .eq-badge.aut{color:var(--cyan);border-color:var(--cyan-dim);background:rgba(0,229,255,0.07)}
+  .eq-tag{font-family:'Orbitron';font-size:11px;color:var(--txt-dim);letter-spacing:.5px}
+  .eq-tag.real{margin-left:auto;color:var(--green)}
+  .eq-tag.demo{margin-left:auto;color:var(--cyan)}
+  .eq-body{padding:20px 18px}
+  .eq-enun{font-size:16.5px;line-height:1.62;color:var(--txt);margin-bottom:16px}
+  .eq-alts{display:flex;flex-direction:column;gap:8px}
+  .eq-alt{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;font-size:15.5px;transition:.25s}
+  .eq-alt .let{font-family:'Orbitron';font-weight:700;font-size:13px;width:26px;height:26px;flex-shrink:0;display:grid;place-items:center;border-radius:7px;border:1px solid var(--cyan-dim);color:var(--cyan)}
+  .eq-alt.correct{border-color:var(--green);background:rgba(39,232,138,0.1)}
+  .eq-alt.correct .let{background:var(--green);color:#04121a;border-color:var(--green)}
+  .reveal-btn{margin-top:16px;width:100%;font-family:'Orbitron';font-weight:700;font-size:13px;letter-spacing:.5px;background:linear-gradient(120deg,var(--violet),#6f4ad6);color:#fff;border:none;padding:13px;border-radius:11px;cursor:pointer;transition:.2s}
+  .reveal-btn:hover{filter:brightness(1.12);box-shadow:0 0 20px rgba(139,92,255,0.4)}
+  .eq-sol{margin-top:18px;border-top:1px dashed rgba(139,92,255,0.3);padding-top:18px;display:none}
+  .eq-sol.show{display:block;animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .eq-sol h4{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;color:var(--violet);margin:16px 0 8px;text-transform:uppercase}
+  .eq-sol h4:first-child{margin-top:0}
+  .eq-sol p{font-size:16px;line-height:1.62;color:var(--txt);margin-bottom:6px}
+  .eq-sol .calc-step{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--yellow);background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:9px;padding:11px 14px;margin:10px 0;letter-spacing:.5px}
+  .eq-answer{margin-top:16px;font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--green);background:rgba(39,232,138,0.1);border:1px solid rgba(39,232,138,0.3);border-radius:10px;padding:13px 16px;text-align:center}
+
+  .laws{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:22px 0}
+  .laws .lw{background:var(--panel-solid);border:1px solid var(--line-soft);border-radius:12px;padding:18px 14px;text-align:center}
+  .laws .lw .n{font-size:26px}
+  .laws .lw .t{font-family:'Orbitron';font-weight:700;font-size:12px;color:#eafcff;margin:8px 0 6px;letter-spacing:.3px}
+  .laws .lw .d{font-size:13.5px;color:var(--txt-dim);line-height:1.45}
+
+  .sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0}
+  .sheet .f{background:var(--panel-solid);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .sheet .f .eq{font-family:'Orbitron';font-weight:700;font-size:16px;color:var(--violet);margin-bottom:7px}
+  .sheet .f .ds{font-size:13.5px;color:var(--txt-dim);line-height:1.4}
+  .takeaways{list-style:none;margin:18px 0}
+  .takeaways li{position:relative;padding:9px 0 9px 32px;font-size:16.5px;line-height:1.55;border-bottom:1px solid var(--line-soft)}
+  .takeaways li:last-child{border-bottom:none}
+  .takeaways li::before{content:'\1F9F2';position:absolute;left:0;top:8px;font-size:15px}
+  .takeaways li b{color:#eafcff}
+
+  .finish-card{text-align:center;background:linear-gradient(135deg,rgba(139,92,255,0.08),rgba(255,61,240,0.06));border:1px solid var(--line)}
+  .btn{font-family:'Orbitron';font-weight:700;font-size:14px;letter-spacing:.5px;background:linear-gradient(120deg,var(--violet),#a678ff);color:#fff;border:none;padding:15px 30px;border-radius:12px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:9px}
+  .btn:hover{filter:brightness(1.08);box-shadow:0 0 26px rgba(139,92,255,0.45);transform:translateY(-1px)}
+  .btn.done-state{background:linear-gradient(120deg,var(--green),#1fd07e);color:#04121a}
+  footer{padding:34px 20px 50px;text-align:center;color:var(--txt-dim);font-size:13.5px}
+  footer .ft-logo{font-family:'Orbitron';font-weight:700;color:var(--violet);font-size:14px}
+
+  @media(max-width:680px){
+    section.lesson{padding:46px 0}
+    .map,.map.two,.laws{grid-template-columns:1fr}
+    .hero-inner{padding:58px 20px 54px}
+    p.body,.lead{font-size:16.5px}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <span class="tb-logo"><span class="spark">&#129522;</span> Eletromagnetismo · Aula ENEM</span>
+    <span class="tb-spacer"></span>
+    <span class="tb-pct" id="tbPct">0%</span>
+    <button class="tb-toc-btn" id="tocBtn">&#9776; Conteúdo</button>
+  </div>
+  <div class="progress-strip"><div id="progBar"></div></div>
+</div>
+
+<div class="toc" id="toc">
+  <div class="toc-panel">
+    <h3>Conteúdo da aula <span class="toc-x" id="tocX">&times;</span></h3>
+    <nav id="tocNav"></nav>
+  </div>
+</div>
+
+<header class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="pulse"></span> Plataforma da Física · do zero ao ENEM</span>
+    <h1>Eletromag<span class="glow">netismo</span><br>do Zero</h1>
+    <p class="sub">A ponte entre eletricidade e magnetismo — dos ímãs e bússolas aos geradores que produzem a energia da sua casa. Com simulações interativas e <b>questões reais do ENEM</b> resolvidas passo a passo.</p>
+    <div class="hero-meta">
+      <span class="chip"><b>4</b> simulações interativas</span>
+      <span class="chip"><b>3</b> questões do ENEM + 2 exemplos</span>
+      <span class="chip"><b>0</b> pré-requisitos</span>
+    </div>
+    <div class="scroll-cue">&#9660; ROLE PARA COMEÇAR</div>
+  </div>
+</header>
+
+<main>
+
+<!-- 1. INTRO -->
+<section class="lesson" id="s1" data-title="Ímãs e magnetismo">
+  <div class="wrap">
+    <div class="kicker"><span class="num">1</span> A grande ideia</div>
+    <h2 class="sec-title">Ímãs e magnetismo</h2>
+    <p class="lead">Eletromagnetismo é a descoberta de que <b>eletricidade e magnetismo são duas faces da mesma moeda</b>: corrente elétrica cria magnetismo, e magnetismo em movimento cria eletricidade.</p>
+    <p class="body">Comece pelo que todo mundo conhece: o <span class="hl">ímã</span>. Todo ímã tem dois polos, <b>Norte (N)</b> e <b>Sul (S)</b>. E a regra é como a das cargas: polos <b>iguais se repelem</b>, polos <b>diferentes se atraem</b>.</p>
+    <div class="note">
+      <span class="tag">A REGRA QUE O ENEM ADORA</span>
+      Se você <b>quebrar</b> um ímã ao meio, não separa o N do S — você ganha <b>dois ímãs</b> menores, cada um com seu N e seu S. Não existe "polo magnético isolado" (monopolo). Por menor que seja o pedaço, sempre haverá os dois polos.
+    </div>
+    <p class="body">Esse comportamento vem da região invisível de influência ao redor do ímã: o <b>campo magnético</b>. É por onde começamos.</p>
+  </div>
+</section>
+
+<!-- 2. CAMPO MAGNÉTICO -->
+<section class="lesson" id="s2" data-title="Campo magnético">
+  <div class="wrap">
+    <div class="kicker"><span class="num">2</span> A região de influência</div>
+    <h2 class="sec-title">Campo magnético e a bússola</h2>
+    <p class="body">O <span class="hl">campo magnético</span> é a região em volta de um ímã onde ele exerce força. Representamos esse campo por <b>linhas de campo</b> que, por convenção, <b>saem do polo Norte e entram no polo Sul</b>. Onde as linhas estão mais juntas, o campo é mais forte.</p>
+    <p class="body">Uma <b>bússola</b> nada mais é que um pequeno ímã que gira livre: sua agulha sempre se <b>alinha</b> com o campo magnético do lugar. Arraste a bússola em volta do ímã e veja a agulha acompanhar as linhas de campo:</p>
+
+    <!-- SIM 1 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#129517;</span><span class="ttl">Simulação · Ímã, linhas de campo e bússola</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="magCanvas" height="220"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Posição da bússola ao redor do ímã</span><span class="vl" id="magPos">&rarr;</span></div>
+          <input type="range" id="magAngle" min="0" max="360" value="30">
+        </div>
+        <p style="font-size:14px;color:var(--txt-dim);text-align:center;margin:0">A ponta <b style="color:var(--red)">vermelha</b> da agulha aponta no sentido do campo (do N para o S por fora do ímã).</p>
+      </div>
+    </div>
+
+    <div class="note tip">
+      <span class="tag">A TERRA É UM GRANDE ÍMÃ</span>
+      A bússola aponta para o norte porque o próprio planeta é um imenso ímã. Curiosidade: o "norte geográfico" da Terra funciona, magneticamente, como um polo <b>sul</b> — é por isso que o polo <b>norte</b> da agulha é atraído para lá.
+    </div>
+  </div>
+</section>
+
+<!-- 3. OERSTED -->
+<section class="lesson" id="s3" data-title="Corrente gera campo (Oersted)">
+  <div class="wrap">
+    <div class="kicker"><span class="num">3</span> Eletricidade vira magnetismo</div>
+    <h2 class="sec-title">Corrente elétrica gera campo (Oersted)</h2>
+    <p class="body">Em 1820, o físico Oersted fez uma descoberta acidental que uniu dois mundos: ao ligar a corrente em um fio, notou que a agulha de uma <b>bússola próxima se mexia</b>. Conclusão: <span class="hl">toda corrente elétrica cria um campo magnético</span> ao seu redor.</p>
+    <p class="body">Esse campo forma círculos em torno do fio, e é mais forte quanto <b>maior a corrente</b>. Ajuste a corrente e veja a bússola reagir:</p>
+
+    <!-- SIM 2 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#129516;</span><span class="ttl">Simulação · Experimento de Oersted</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="oerstedCanvas" height="200"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Corrente no fio (i)</span><span class="vl" id="oeVal">sem corrente</span></div>
+          <input type="range" id="oeCurrent" min="-100" max="100" value="0">
+        </div>
+        <p style="font-size:14px;color:var(--txt-dim);text-align:center;margin:0">Sem corrente, a bússola aponta para o norte. Com corrente, o campo do fio a <b>desvia</b> — e inverter a corrente inverte o desvio.</p>
+      </div>
+    </div>
+
+    <div class="note tip">
+      <span class="tag">O ELETROÍMÃ</span>
+      Se você enrola o fio em muitas voltas (uma <b>bobina</b>), os campos de cada volta se somam e criam um ímã forte que você <b>liga e desliga</b> com um interruptor: o <b>eletroímã</b>. Ele está nos guindastes de ferro-velho, nas campainhas, nos alto-falantes e no coração dos motores.
+    </div>
+  </div>
+</section>
+
+<!-- 4. EFEITO MOTOR -->
+<section class="lesson" id="s4" data-title="O efeito motor">
+  <div class="wrap">
+    <div class="kicker"><span class="num">4</span> Magnetismo vira força</div>
+    <h2 class="sec-title">O efeito motor: força sobre a corrente</h2>
+    <p class="body">Se a corrente cria campo, o contrário também vale para a força: um fio com corrente, <b>dentro</b> de um campo magnético, sofre uma <span class="hl">força</span> que o empurra. Inverta a corrente (ou o ímã) e a força inverte de sentido.</p>
+    <p class="body">Esse é o princípio do <b>motor elétrico</b>: uma espira com corrente, colocada entre ímãs, é empurrada e começa a <b>girar</b>. Assim a energia elétrica vira movimento.</p>
+    <div class="laws">
+      <div class="lw"><span class="n">&#127788;</span><div class="t">VENTILADOR</div><div class="d">motor gira as pás</div></div>
+      <div class="lw"><span class="n">&#128266;</span><div class="t">ALTO-FALANTE</div><div class="d">força move o cone e gera som</div></div>
+      <div class="lw"><span class="n">&#128663;</span><div class="t">CARRO ELÉTRICO</div><div class="d">motor converte bateria em movimento</div></div>
+    </div>
+    <div class="note">
+      <span class="tag cy" style="color:var(--violet)">GUARDE O PAR</span>
+      <b>Corrente + campo &rarr; força (motor).</b> É a base de tudo que "gira" com eletricidade. Na próxima seção vem o inverso, que é ainda mais poderoso: fazer o movimento gerar eletricidade.
+    </div>
+  </div>
+</section>
+
+<!-- 5. INDUÇÃO -->
+<section class="lesson" id="s5" data-title="Indução de Faraday">
+  <div class="wrap">
+    <div class="kicker"><span class="num">5</span> Magnetismo vira eletricidade</div>
+    <h2 class="sec-title">Indução eletromagnética (Faraday)</h2>
+    <p class="body">Aqui está a ideia mais importante de toda a aula — a que gera praticamente toda a eletricidade do mundo. Faraday descobriu que, se o campo magnético que atravessa uma bobina <b>varia</b>, aparece uma <span class="hl">corrente elétrica induzida</span> na bobina.</p>
+    <div class="note warn">
+      <span class="tag">A PALAVRA MÁGICA É "VARIAÇÃO"</span>
+      Um ímã <b>parado</b> perto da bobina não gera nada. Só o <b>movimento</b> — o ímã entrando ou saindo, o campo aumentando ou diminuindo — produz corrente. Sem variação, sem corrente.
+    </div>
+    <p class="body">Mova o ímã para dentro e para fora da bobina e observe o galvanômetro (medidor de corrente). Pare o ímã e a corrente some:</p>
+
+    <!-- SIM 3 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#9889;</span><span class="ttl">Simulação · Indução de Faraday</span><span class="lbl">arraste o ímã</span></div>
+      <div class="sim-canvas-wrap"><canvas id="faradayCanvas" height="210"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Posição do ímã (mova rápido!)</span><span class="vl" id="fdPos">—</span></div>
+          <input type="range" id="fdMag" min="0" max="100" value="10">
+        </div>
+        <div class="readout">
+          <div class="ro g"><span class="k">CORRENTE INDUZIDA</span><span class="v" id="fdCur">0</span></div>
+          <div class="ro"><span class="k">LÂMPADA</span><span class="v" id="fdLamp" style="font-size:15px">apagada</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. LENZ -->
+<section class="lesson" id="s6" data-title="Lei de Lenz">
+  <div class="wrap">
+    <div class="kicker"><span class="num">6</span> A natureza reage</div>
+    <h2 class="sec-title">Lei de Lenz: a corrente que se opõe</h2>
+    <p class="body">A corrente induzida não aparece em qualquer sentido: a <span class="hl">Lei de Lenz</span> diz que ela sempre surge no sentido que <b>se opõe à variação que a criou</b>. Se você aproxima um ímã, a bobina "reage" criando um campo que o <b>empurra de volta</b>; se você afasta, ela tenta <b>segurá-lo</b>.</p>
+    <p class="body">Isso é simplesmente a <b>conservação de energia</b>: para gerar eletricidade, você precisa fazer <b>força</b> contra essa oposição. A energia elétrica não sai de graça — ela vem do trabalho que você (ou a turbina) realiza.</p>
+
+    <!-- Exemplo autoral 1 (Lenz) -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge aut">EXEMPLO</span><span class="eq-tag">estilo ENEM</span><span class="eq-tag demo">criado para a aula</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Ao soltar um ímã dentro de um tubo vertical de cobre (metal que não é atraído por ímãs), observa-se que ele cai <b>muito mais devagar</b> do que cairia em queda livre no ar. A explicação para esse fenômeno é que</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>o cobre atrai magneticamente o ímã, segurando-o durante a queda.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>o ímã em movimento induz correntes no tubo, cujo campo magnético se opõe à queda.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>o atrito com o ar preso dentro do tubo é que freia o ímã.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>o contato com o cobre vai desmagnetizando o ímã ao longo da queda.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>o tubo de cobre gera um campo elétrico permanente que repele o ímã.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Aplicando Faraday e Lenz</h4>
+          <p>O ímã caindo faz o campo magnético <b>variar</b> ao longo do tubo — isso induz correntes elétricas nas paredes de cobre (correntes de Foucault).</p>
+          <h4>A oposição de Lenz</h4>
+          <p>Pela Lei de Lenz, essas correntes criam um campo que <b>se opõe ao movimento</b> do ímã, freando a queda. O cobre não atrai ímã (a letra A está errada), mas reage à variação do campo. É o mesmo princípio dos freios magnéticos de trens e montanhas-russas.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. GERADORES -->
+<section class="lesson" id="s7" data-title="Geradores e dínamos">
+  <div class="wrap">
+    <div class="kicker"><span class="num">7</span> De onde vem a energia</div>
+    <h2 class="sec-title">Geradores, dínamos e usinas</h2>
+    <p class="body">Um <span class="hl">gerador</span> é a aplicação direta da indução: em vez de mover um ímã com a mão, ele <b>gira</b> uma espira (ou um ímã) continuamente dentro de um campo magnético. Essa rotação faz o campo variar sem parar, gerando corrente o tempo todo.</p>
+    <p class="body">Como a espira gira, a corrente muda de sentido a cada meia-volta: é a <b>corrente alternada (CA)</b> que chega na sua casa. Veja a espira girando e a corrente oscilando:</p>
+
+    <!-- SIM 4 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#9881;</span><span class="ttl">Simulação · Gerador de corrente alternada</span><span class="lbl">assista</span></div>
+      <div class="sim-canvas-wrap"><canvas id="genCanvas" height="220"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Velocidade de rotação</span><span class="vl" id="genVval">média</span></div>
+          <input type="range" id="genSpeed" min="20" max="100" value="55">
+        </div>
+        <p style="font-size:14px;color:var(--txt-dim);text-align:center;margin:0">A onda mostra a tensão gerada: positiva e negativa alternadamente — isso é a <b>corrente alternada</b>. Girar mais rápido gera mais tensão.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="tag" style="color:var(--violet)">TODA USINA É UM GERADOR</span>
+      Não importa a fonte — água (hidrelétrica), vapor (nuclear, térmica), vento (eólica): no fim, tudo serve para <b>girar o gerador</b>. A energia vira eletricidade sempre por indução. A exceção é a solar fotovoltaica, que gera de outro jeito.
+    </div>
+
+    <!-- ENEM p132 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2010</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Dínamos de bicicleta acendem uma lâmpada: sua parte móvel encosta no pneu e, quando a roda gira, gera eletricidade. Dentro do dínamo há um ímã e uma bobina. O funcionamento se explica porque a</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>corrente elétrica no circuito fechado gera um campo magnético.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>bobina imersa no campo magnético em circuito fechado gera corrente.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>bobina em atrito com o campo magnético gera corrente.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>corrente é gerada pela simples presença do campo magnético.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>corrente é gerada quando há variação do campo magnético no circuito fechado.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Conceito-chave: indução</h4>
+          <p>A palavra decisiva é <b>variação</b>. O dínamo só gera corrente porque a roda girando faz o ímã girar, e isso faz o campo magnético na bobina <b>variar</b> continuamente.</p>
+          <h4>Por que as outras erram</h4>
+          <p>A alternativa D (simples presença do campo) é a pegadinha: campo parado não gera nada. Não é atrito (C) nem a corrente que cria o campo (A) — é a variação do campo que induz a corrente.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. TRANSFORMADORES -->
+<section class="lesson" id="s8" data-title="Transformadores">
+  <div class="wrap">
+    <div class="kicker"><span class="num">8</span> Mudando a tensão</div>
+    <h2 class="sec-title">Transformadores</h2>
+    <p class="body">O <span class="hl">transformador</span> usa a indução para <b>aumentar ou diminuir a tensão</b>. Ele tem duas bobinas: a corrente alternada na primeira (primário) cria um campo variável que induz tensão na segunda (secundário). A relação depende só do número de voltas de cada bobina:</p>
+    <div class="formula"><span class="v">V<sub>p</sub></span> / <span class="i">V<sub>s</sub></span> = <span class="r">N<sub>p</sub></span> / <span class="c">N<sub>s</sub></span> <small>tensão &prop; número de espiras &nbsp;|&nbsp; só funciona com corrente <b>alternada</b></small></div>
+    <p class="body">É por isso que a energia é transmitida em <b>altíssima tensão</b> nas torres (para perder menos nos fios) e depois <b>rebaixada</b> por transformadores até os 127 V ou 220 V da tomada. O "carregador" do celular também tem um transformador que abaixa a tensão.</p>
+
+    <!-- Exemplo autoral 2 (transformador) -->
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge aut">EXEMPLO</span><span class="eq-tag">estilo ENEM</span><span class="eq-tag demo">criado para a aula</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Um transformador ideal tem 200 espiras no primário, ligado a uma tensão de 120 V, e 40 espiras no secundário. Qual é a tensão no secundário?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>5 V</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>24 V</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>120 V</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>480 V</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>600 V</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Aplicando a fórmula</h4>
+          <p>V<sub>p</sub>/V<sub>s</sub> = N<sub>p</sub>/N<sub>s</sub>. Substituindo os valores:</p>
+          <div class="calc-step">120 / V&#8347; = 200 / 40 = 5</div>
+          <p>Isolando a tensão do secundário:</p>
+          <div class="calc-step">V&#8347; = 120 / 5 = 24 V</div>
+          <p>Como o secundário tem <b>menos</b> espiras que o primário, é um transformador <b>abaixador</b> — a tensão caiu de 120 V para 24 V.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. APLICAÇÕES -->
+<section class="lesson" id="s9" data-title="Aplicações no ENEM">
+  <div class="wrap">
+    <div class="kicker"><span class="num">9</span> No mundo real</div>
+    <h2 class="sec-title">Tecnologias que são puro eletromagnetismo</h2>
+    <p class="body">Quase toda a eletrônica do seu dia depende de indução. Veja duas questões reais que vestem a teoria de tecnologia — e note como ambas dependem da mesma ideia de variação de campo.</p>
+
+    <!-- ENEM p130 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2011</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">O captador de uma guitarra elétrica é uma bobina em torno de um ímã. As cordas de aço, ao vibrarem perto do ímã, variam o campo magnético na bobina e induzem uma corrente que vira som no amplificador. Um guitarrista trocou as cordas de aço por cordas de náilon e o amplificador parou de emitir som, porque a corda de náilon</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>isola a passagem de corrente da bobina para o alto-falante.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>varia seu comprimento mais intensamente do que o aço.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>apresenta magnetização desprezível sob a ação do ímã.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>induz correntes na bobina mais intensas que a capacidade do captador.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>oscila com frequência menor do que a percebida pelo captador.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>O captador só funciona se a corda for feita de material <b>magnetizável</b> (como o aço). A corda de aço, perto do ímã, vira um imãzinho e, ao vibrar, faz o campo variar — induzindo corrente.</p>
+          <p>O <b>náilon não se magnetiza</b>: mesmo vibrando, não perturba o campo do ímã e não induz corrente na bobina. Sem corrente induzida, o amplificador fica mudo.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM p131 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2010</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Alguns tratamentos cerebrais precisam estimular áreas do cérebro com correntes elétricas. Para evitar introduzir eletrodos, usam-se bobinas fora da cabeça, capazes de induzir correntes no tecido cerebral. Para o tratamento funcionar, é necessário que</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>haja muitas espiras nas bobinas, o que diminui a voltagem induzida.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>o campo magnético das bobinas seja constante, para haver indução.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>a intensidade das correntes induzidas dependa da intensidade da corrente nas bobinas.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>a corrente nas bobinas seja contínua, para o campo ser intenso.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>o campo magnético dirija a corrente das bobinas para dentro do cérebro.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Para induzir corrente no tecido, o campo precisa <b>variar</b> — então a corrente nas bobinas deve ser variável (alternada), não constante (elimina B e D).</p>
+          <p>E quanto <b>mais intensa</b> a corrente (variável) nas bobinas, mais intenso o campo que varia e, portanto, mais intensa a corrente induzida no cérebro. A intensidade da corrente induzida depende da intensidade da corrente nas bobinas.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note tip">
+      <span class="tag">MAIS EXEMPLOS QUE JÁ CAÍRAM</span>
+      <b>Fogão de indução</b> (bobina induz corrente na panela de metal, que esquenta), <b>cartão magnético e crachá</b> (a tarja passa perto de uma bobina e induz o sinal), <b>ressonância magnética</b> (fortes campos variáveis) e o <b>carregador sem fio</b> do celular — todos são indução eletromagnética em ação.
+    </div>
+  </div>
+</section>
+
+<!-- 10. RESUMO -->
+<section class="lesson" id="s10" data-title="Resumo e fórmulas">
+  <div class="wrap">
+    <div class="kicker"><span class="num">10</span> Leve no bolso</div>
+    <h2 class="sec-title">Resumo e mapa mental</h2>
+    <p class="body">O eletromagnetismo do ENEM gira em torno de três conexões entre eletricidade e magnetismo. Guarde este mapa:</p>
+    <div class="sheet">
+      <div class="f"><div class="eq">i &rarr; B</div><div class="ds">Oersted: corrente<br>gera campo</div></div>
+      <div class="f"><div class="eq">B + i &rarr; F</div><div class="ds">Motor: campo faz<br>força na corrente</div></div>
+      <div class="f"><div class="eq">&Delta;B &rarr; i</div><div class="ds">Faraday: campo que<br>varia gera corrente</div></div>
+      <div class="f"><div class="eq">V<sub>p</sub>/V<sub>s</sub>=N<sub>p</sub>/N<sub>s</sub></div><div class="ds">Transformador<br>(só com CA)</div></div>
+    </div>
+
+    <h3 style="font-family:'Orbitron';font-weight:700;font-size:16px;color:var(--violet);margin:26px 0 6px">As ideias que mais caem</h3>
+    <ul class="takeaways">
+      <li>Todo ímã tem <b>dois polos</b> (N e S); quebrá-lo gera dois ímãs — não existe monopolo.</li>
+      <li>A bússola se <b>alinha</b> ao campo magnético; a Terra é um grande ímã.</li>
+      <li><b>Corrente gera campo</b> (Oersted) — enrolar o fio faz o eletroímã.</li>
+      <li><b>Indução de Faraday</b>: só a <b>variação</b> do campo gera corrente (ímã parado não induz nada).</li>
+      <li><b>Lei de Lenz</b>: a corrente induzida se opõe à variação — é a conservação de energia.</li>
+      <li><b>Geradores</b> giram para gerar corrente alternada; <b>transformadores</b> mudam a tensão, só com CA.</li>
+    </ul>
+
+    <div class="card finish-card">
+      <p style="font-family:'Orbitron';font-weight:700;font-size:18px;color:#eafcff;margin-bottom:8px">Você chegou ao fim! &#129522;</p>
+      <p class="body" style="margin-bottom:20px">Agora encare o simulado na Área ENEM para fixar tudo — as questões que você acertar saem da fila, e as que errar voltam para você dominar.</p>
+      <button class="btn" id="finishBtn">Marcar aula como concluída &#10003;</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="ft-logo">&#129522; Plataforma da Física</div>
+  <p style="margin-top:8px">Aula interativa de Eletromagnetismo · questões do ENEM para fins educacionais</p>
+</footer>
+
+<script>
+'use strict';
+const Store = (function(){
+  const KEY = 'plataphysica_eletromag_aula';
+  let mem = null;
+  function read(){ try{ const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : (mem || {visited:[], done:false}); }catch(e){ return mem || {visited:[], done:false}; } }
+  function write(d){ mem = d; try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){} }
+  return { read, write };
+})();
+
+const secs = Array.from(document.querySelectorAll('section.lesson'));
+const data = Store.read();
+const visited = new Set(data.visited || []);
+const tocNav = document.getElementById('tocNav');
+tocNav.innerHTML = secs.map((s,i)=>`<a href="#${s.id}" data-go="${s.id}"><span class="n">${String(i+1).padStart(2,'0')}</span><span>${s.dataset.title}</span><span class="dot">&#10003;</span></a>`).join('');
+function refreshProgress(){
+  const pct = Math.round(visited.size / secs.length * 100);
+  document.getElementById('progBar').style.width = pct + '%';
+  document.getElementById('tbPct').textContent = pct + '%';
+  tocNav.querySelectorAll('a').forEach(a=> a.classList.toggle('done', visited.has(a.dataset.go)));
+}
+function markVisited(id){ if(visited.has(id)) return; visited.add(id); const d = Store.read(); d.visited = Array.from(visited); Store.write(d); refreshProgress(); }
+refreshProgress();
+if('IntersectionObserver' in window){
+  const obs = new IntersectionObserver((entries)=>{ entries.forEach(en=>{ if(en.isIntersecting) markVisited(en.target.id); }); }, { threshold:0.35 });
+  secs.forEach(s=>obs.observe(s));
+} else { secs.forEach(s=>markVisited(s.id)); }
+const toc = document.getElementById('toc');
+document.getElementById('tocBtn').onclick = ()=> toc.classList.add('open');
+document.getElementById('tocX').onclick = ()=> toc.classList.remove('open');
+toc.onclick = (e)=>{ if(e.target === toc) toc.classList.remove('open'); };
+tocNav.querySelectorAll('a').forEach(a=> a.onclick = ()=> toc.classList.remove('open'));
+const finishBtn = document.getElementById('finishBtn');
+function paintDone(){ finishBtn.classList.add('done-state'); finishBtn.innerHTML = '&#10003; Aula concluída'; }
+if(data.done) paintDone();
+finishBtn.onclick = ()=>{ secs.forEach(s=>visited.add(s.id)); const d = Store.read(); d.visited = Array.from(visited); d.done = true; Store.write(d); refreshProgress(); paintDone(); window.scrollTo({ top:0, behavior:'smooth' }); };
+
+document.querySelectorAll('.enem-q').forEach(q=>{
+  const btn = q.querySelector('.reveal-btn'), sol = q.querySelector('.eq-sol');
+  const correct = parseInt(q.dataset.correct, 10), alts = q.querySelectorAll('.eq-alt');
+  btn.onclick = ()=>{ const open = sol.classList.toggle('show'); if(open){ if(alts[correct]) alts[correct].classList.add('correct'); btn.innerHTML = 'Ocultar resolução &#9650;'; } else { btn.innerHTML = 'Ver resolução passo a passo &#9660;'; } };
+});
+
+function fitCanvas(cv, cssH){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = cv.clientWidth || cv.parentElement.clientWidth;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(cssH * dpr); cv.style.height = cssH + 'px';
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w, h: cssH };
+}
+
+/* HERO — linhas de campo dipolo com partículas */
+(function(){
+  const cv = document.getElementById('heroCanvas'); if(!cv) return;
+  let W, H, t = 0;
+  function setup(){ const dpr = Math.min(window.devicePixelRatio||1,2); W=cv.clientWidth; H=cv.clientHeight||360; cv.width=W*dpr; cv.height=H*dpr; cv.getContext('2d').setTransform(dpr,0,0,dpr,0,0); }
+  const ctx = cv.getContext('2d');
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    const cx = W/2, cy = H*0.5, sep = Math.min(W*0.16, 120);
+    const N = {x:cx-sep, y:cy}, S = {x:cx+sep, y:cy};
+    for(let k=1;k<=5;k++){
+      const h = k*Math.min(H*0.13, 60);
+      ['up','down'].forEach(dir=>{
+        ctx.beginPath();
+        for(let a=0;a<=1;a+=0.02){
+          const x = N.x + (S.x-N.x)*a;
+          const arc = Math.sin(a*Math.PI)*h*(dir==='up'?-1:1);
+          const y = cy + arc;
+          if(a===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle = 'rgba(139,92,255,'+(0.28 - k*0.03)+')'; ctx.lineWidth=1.5; ctx.stroke();
+        // partícula viajando
+        const a = ((t*0.12 + k*0.2)%1);
+        const x = N.x + (S.x-N.x)*a;
+        const y = cy + Math.sin(a*Math.PI)*h*(dir==='up'?-1:1);
+        ctx.fillStyle = 'rgba(255,61,240,0.8)'; ctx.beginPath(); ctx.arc(x,y,2.2,0,6.28); ctx.fill();
+      });
+    }
+    // polos
+    ctx.fillStyle='rgba(255,90,110,0.9)'; ctx.beginPath(); ctx.arc(N.x,N.y,6,0,6.28); ctx.fill();
+    ctx.fillStyle='rgba(0,229,255,0.9)'; ctx.beginPath(); ctx.arc(S.x,S.y,6,0,6.28); ctx.fill();
+    t += 0.05;
+    requestAnimationFrame(frame);
+  }
+  setup(); frame();
+  window.addEventListener('resize', setup);
+})();
+
+/* SIM 1 — ímã + linhas de campo + bússola */
+(function(){
+  const cv = document.getElementById('magCanvas');
+  const sA = document.getElementById('magAngle');
+  if(!cv) return;
+  let ctx, W, H;
+  function build(){ const r = fitCanvas(cv, 220); ctx = r.ctx; W = r.w; H = r.h; }
+  function dipoleDir(px, py, mx, my){
+    // campo de dipolo com momento ao longo de +x (do S para o N interno -> aponta +x)
+    const dx = px - mx, dy = py - my;
+    const r = Math.hypot(dx, dy) || 1;
+    const rxn = dx/r, ryn = dy/r;
+    const mdotr = rxn; // m = (1,0)
+    let bx = 3*mdotr*rxn - 1;
+    let by = 3*mdotr*ryn - 0;
+    const bl = Math.hypot(bx,by) || 1;
+    return { x: bx/bl, y: by/bl };
+  }
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    const cx = W/2, cy = H/2;
+    const magW = Math.min(W*0.34, 170), magH = 40;
+    // linhas de campo (arcos)
+    for(let k=1;k<=4;k++){
+      const h = k*24;
+      [-1,1].forEach(sgn=>{
+        ctx.beginPath();
+        const x0 = cx - magW/2, x1 = cx + magW/2;
+        for(let a=0;a<=1;a+=0.02){ const x = x0 + (x1-x0)*a; const y = cy + sgn*Math.sin(a*Math.PI)*h; if(a===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+        ctx.strokeStyle = 'rgba(139,92,255,0.22)'; ctx.lineWidth = 1.2; ctx.stroke();
+      });
+    }
+    // ímã (N vermelho à esquerda, S azul à direita)
+    ctx.fillStyle = 'rgba(255,90,110,0.9)'; ctx.fillRect(cx-magW/2, cy-magH/2, magW/2, magH);
+    ctx.fillStyle = 'rgba(0,229,255,0.85)'; ctx.fillRect(cx, cy-magH/2, magW/2, magH);
+    ctx.fillStyle = '#fff'; ctx.font="700 16px Orbitron"; ctx.textAlign='center';
+    ctx.fillText('N', cx-magW/4, cy+6); ctx.fillText('S', cx+magW/4, cy+6);
+    // bússola
+    const ang = parseFloat(sA.value) * Math.PI/180;
+    const rad = Math.min(W,H)*0.34;
+    const bx = cx + Math.cos(ang)*rad, by = cy + Math.sin(ang)*rad*0.8;
+    const dir = dipoleDir(bx, by, cx, cy);
+    // corpo da bússola
+    ctx.beginPath(); ctx.arc(bx, by, 20, 0, 6.28); ctx.fillStyle='rgba(13,15,36,0.95)'; ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=2; ctx.stroke();
+    // agulha alinhada ao campo
+    const nx = dir.x, ny = dir.y;
+    ctx.strokeStyle='rgba(255,90,110,0.95)'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx+nx*16, by+ny*16); ctx.stroke();
+    ctx.strokeStyle='rgba(180,190,220,0.9)';
+    ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx-nx*16, by-ny*16); ctx.stroke();
+    ctx.fillStyle='rgba(255,90,110,0.95)'; ctx.beginPath(); ctx.arc(bx+nx*16, by+ny*16, 3, 0, 6.28); ctx.fill();
+    // label
+    const deg = parseFloat(sA.value);
+    document.getElementById('magPos').textContent = deg<45||deg>315?'direita':deg<135?'abaixo':deg<225?'esquerda':'acima';
+    requestAnimationFrame(frame);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* SIM 2 — Oersted */
+(function(){
+  const cv = document.getElementById('oerstedCanvas');
+  const sI = document.getElementById('oeCurrent');
+  if(!cv) return;
+  let ctx, W, H, t = 0;
+  function build(){ const r = fitCanvas(cv, 200); ctx = r.ctx; W = r.w; H = r.h; }
+  function frame(){
+    const i = parseFloat(sI.value)/100;   // -1..1
+    ctx.clearRect(0,0,W,H);
+    const wy = H*0.4;
+    // círculos de campo (densidade ~ |i|)
+    const nCircles = Math.round(Math.abs(i)*6);
+    for(let k=1;k<=nCircles;k++){
+      const rr = k*16;
+      ctx.strokeStyle = 'rgba(139,92,255,'+(0.4 - k*0.05)+')'; ctx.lineWidth=1.4;
+      ctx.beginPath(); ctx.ellipse(W/2, wy, rr, rr*0.42, 0, 0, 6.28); ctx.stroke();
+    }
+    // fio horizontal
+    ctx.strokeStyle = Math.abs(i)>0.02 ? 'rgba(255,210,61,0.95)' : 'rgba(150,160,190,0.7)';
+    ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(20, wy); ctx.lineTo(W-20, wy); ctx.stroke();
+    // partículas de corrente
+    if(Math.abs(i)>0.02){
+      for(let p=0;p<6;p++){ const f=((t*0.5*Math.sign(i)+p/6)%1+1)%1; const x=20+(W-40)*f; ctx.fillStyle='rgba(255,210,61,0.9)'; ctx.beginPath(); ctx.arc(x, wy, 2.5, 0, 6.28); ctx.fill(); }
+    }
+    // bússola abaixo do fio
+    const bx = W/2, by = H*0.78;
+    ctx.beginPath(); ctx.arc(bx, by, 24, 0, 6.28); ctx.fillStyle='rgba(13,15,36,0.95)'; ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.35)'; ctx.lineWidth=2; ctx.stroke();
+    ctx.fillStyle='rgba(132,146,180,0.7)'; ctx.font="600 8px Orbitron"; ctx.textAlign='center'; ctx.fillText('N', bx, by-16);
+    // agulha: sem corrente aponta p/ cima; com corrente deflete
+    const defl = Math.atan(i*2.2);   // ângulo a partir da vertical
+    const ax = Math.sin(defl), ay = -Math.cos(defl);
+    ctx.strokeStyle='rgba(255,90,110,0.95)'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx+ax*17, by+ay*17); ctx.stroke();
+    ctx.strokeStyle='rgba(180,190,220,0.9)';
+    ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx-ax*17, by-ay*17); ctx.stroke();
+    ctx.fillStyle='rgba(255,90,110,0.95)'; ctx.beginPath(); ctx.arc(bx+ax*17, by+ay*17, 3, 0, 6.28); ctx.fill();
+    document.getElementById('oeVal').textContent = Math.abs(i)<0.02 ? 'sem corrente' : (i>0?'\u2192 forte':'\u2190 forte').replace('forte', (Math.abs(i)>0.6?'forte':'fraca'));
+    t += 0.03;
+    requestAnimationFrame(frame);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* SIM 3 — indução de Faraday */
+(function(){
+  const cv = document.getElementById('faradayCanvas');
+  const sM = document.getElementById('fdMag');
+  if(!cv) return;
+  let ctx, W, H, lastVal = 10, vel = 0;
+  function build(){ const r = fitCanvas(cv, 210); ctx = r.ctx; W = r.w; H = r.h; lastVal = parseFloat(sM.value); }
+  function frame(){
+    const val = parseFloat(sM.value);
+    const raw = val - lastVal; lastVal = val;
+    vel = vel*0.7 + raw*0.3;          // suaviza e decai
+    const cur = Math.max(-1, Math.min(1, vel*0.35));   // corrente induzida
+    ctx.clearRect(0,0,W,H);
+    const midY = H*0.42;
+    // bobina (à direita)
+    const coilX = W*0.62, coilW = W*0.22;
+    ctx.strokeStyle='rgba(0,229,255,0.8)'; ctx.lineWidth=3;
+    for(let k=0;k<6;k++){ const x = coilX + k*(coilW/5); ctx.beginPath(); ctx.ellipse(x, midY, 8, 40, 0, 0, 6.28); ctx.stroke(); }
+    // fios para o galvanômetro
+    ctx.strokeStyle='rgba(150,160,190,0.7)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(coilX+coilW, midY+40); ctx.lineTo(W*0.86, midY+40); ctx.lineTo(W*0.86, H*0.8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(coilX, midY+40); ctx.lineTo(W*0.5, midY+40); ctx.lineTo(W*0.5, H*0.8); ctx.stroke();
+    // ímã (posição pelo slider): 0 = longe à esquerda, 100 = dentro da bobina
+    const magX = W*0.06 + (val/100)*(coilX - W*0.06);
+    const magW = 54, magH = 26;
+    ctx.fillStyle='rgba(255,90,110,0.9)'; ctx.fillRect(magX, midY-magH/2, magW/2, magH);
+    ctx.fillStyle='rgba(0,229,255,0.85)'; ctx.fillRect(magX+magW/2, midY-magH/2, magW/2, magH);
+    ctx.fillStyle='#fff'; ctx.font="700 12px Orbitron"; ctx.textAlign='center';
+    ctx.fillText('N', magX+magW/4, midY+4); ctx.fillText('S', magX+3*magW/4, midY+4);
+    // galvanômetro (mostrador)
+    const gx = W*0.5 + (W*0.86-W*0.5)/2, gy = H*0.86, gr = 26;
+    ctx.beginPath(); ctx.arc(gx, gy, gr, Math.PI, 0); ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=2; ctx.stroke();
+    ctx.strokeStyle='rgba(132,146,180,0.5)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx, gy-gr); ctx.stroke();
+    const na = -Math.PI/2 + cur*1.3;
+    ctx.strokeStyle = Math.abs(cur)>0.05?'rgba(39,232,138,0.95)':'rgba(180,190,220,0.8)'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx+Math.cos(na)*(gr-4), gy+Math.sin(na)*(gr-4)); ctx.stroke();
+    ctx.fillStyle='rgba(132,146,180,0.8)'; ctx.font="600 8px Orbitron"; ctx.fillText('GALVANÔMETRO', gx, gy+14);
+    // lâmpada (brilho ~ |cur|)
+    const bright = Math.abs(cur);
+    if(bright>0.05){
+      const grd = ctx.createRadialGradient(coilX+coilW*0.5, midY-60, 2, coilX+coilW*0.5, midY-60, 30);
+      grd.addColorStop(0, `rgba(255,210,61,${0.3+bright*0.7})`); grd.addColorStop(1, 'rgba(255,210,61,0)');
+      ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(coilX+coilW*0.5, midY-60, 30, 0, 6.28); ctx.fill();
+    }
+    ctx.fillStyle = bright>0.05?'rgba(255,230,120,0.95)':'rgba(90,100,130,0.6)';
+    ctx.beginPath(); ctx.arc(coilX+coilW*0.5, midY-60, 9, 0, 6.28); ctx.fill();
+    // readouts
+    document.getElementById('fdPos').textContent = val>80?'dentro da bobina':(val>40?'perto':'longe');
+    const mag = Math.abs(cur);
+    document.getElementById('fdCur').textContent = mag<0.05?'0 (parado)':(cur>0?'+ '+Math.round(mag*100):'- '+Math.round(mag*100));
+    document.getElementById('fdLamp').textContent = bright>0.4?'acesa!':(bright>0.05?'fraca':'apagada');
+    requestAnimationFrame(frame);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+
+/* SIM 4 — gerador CA */
+(function(){
+  const cv = document.getElementById('genCanvas');
+  const sS = document.getElementById('genSpeed');
+  if(!cv) return;
+  let ctx, W, H, theta = 0, wave = [];
+  function build(){ const r = fitCanvas(cv, 220); ctx = r.ctx; W = r.w; H = r.h; wave = []; }
+  function frame(){
+    const spd = parseFloat(sS.value)/1000;
+    theta += spd;
+    const emf = Math.sin(theta);
+    wave.push(emf); if(wave.length > 200) wave.shift();
+    ctx.clearRect(0,0,W,H);
+    // ---- lado esquerdo: campo + espira girando ----
+    const lx = W*0.26, ly = H*0.42, R = Math.min(W*0.16, 60);
+    // linhas de campo verticais
+    ctx.strokeStyle='rgba(139,92,255,0.2)'; ctx.lineWidth=1.2;
+    for(let x=lx-R-20; x<=lx+R+20; x+=18){ ctx.beginPath(); ctx.moveTo(x, ly-R-16); ctx.lineTo(x, ly+R+16); ctx.stroke(); }
+    ctx.fillStyle='rgba(255,90,110,0.8)'; ctx.font="700 11px Orbitron"; ctx.textAlign='center'; ctx.fillText('N', lx-R-30, ly+4);
+    ctx.fillStyle='rgba(0,229,255,0.8)'; ctx.fillText('S', lx+R+30, ly+4);
+    // espira (elipse que "gira": largura = |cos|)
+    const w = Math.abs(Math.cos(theta))*R + 6;
+    ctx.strokeStyle='rgba(255,210,61,0.95)'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.ellipse(lx, ly, w, R, 0, 0, 6.28); ctx.stroke();
+    // pontos indicando os lados da espira
+    ctx.fillStyle='rgba(255,210,61,0.95)';
+    ctx.beginPath(); ctx.arc(lx - Math.cos(theta)*R, ly, 4, 0, 6.28); ctx.fill();
+    ctx.beginPath(); ctx.arc(lx + Math.cos(theta)*R, ly, 4, 0, 6.28); ctx.fill();
+    // ---- lado direito: onda CA ----
+    const gx = W*0.5, gw = W*0.46, gy = H*0.42, gh = R;
+    ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx+gw, gy); ctx.stroke();
+    ctx.beginPath();
+    wave.forEach((v,i)=>{ const x = gx + (i/200)*gw; const y = gy - v*gh; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+    ctx.strokeStyle='rgba(39,232,138,0.95)'; ctx.lineWidth=2.5; ctx.stroke();
+    // ponto atual
+    const cyv = gy - emf*gh;
+    ctx.fillStyle = emf>=0?'rgba(39,232,138,0.95)':'rgba(255,90,110,0.95)';
+    ctx.beginPath(); ctx.arc(gx+gw, cyv, 4, 0, 6.28); ctx.fill();
+    ctx.fillStyle='rgba(132,146,180,0.8)'; ctx.font="600 9px Orbitron"; ctx.textAlign='left';
+    ctx.fillText('tensão gerada (+/-)', gx+4, gy - gh - 6);
+    document.getElementById('genVval').textContent = spd<0.04?'lenta':(spd<0.075?'média':'rápida');
+    requestAnimationFrame(frame);
+  }
+  build(); frame();
+  window.addEventListener('resize', build);
+})();
+</script>
+</body>
+</html>
