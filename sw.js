@@ -1,7 +1,7 @@
 // sw.js  —  Service Worker da Plataforma da Física
 // Troque a versão (v1 -> v2 -> v3...) sempre que quiser forçar
 // uma atualização geral nos aparelhos dos alunos.
-const CACHE = 'plataphysica-v7';
+const CACHE = 'plataphysica-v9';
 
 // Páginas essenciais pré-carregadas já na instalação.
 // O RESTANTE (cada aula, jogo, planetário) é guardado em cache
@@ -21,8 +21,7 @@ const PRECACHE = [
   './eletromagnetismo-enem.html',
   './optica-enem.html',
   './hidrostatica-enem.html',
-  './modo-calmo.js',
-  './voltar.js'
+  './acessibilidade.js'
 ];
 
 // Instalação: pré-carrega o "esqueleto" do app
