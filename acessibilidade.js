@@ -97,16 +97,29 @@
   }
   if (TEM_VOZ) { carregarVoz(); try { speechSynthesis.onvoiceschanged = carregarVoz; } catch (e) {} }
   function textoDaPagina() {
-    var raizT = document.querySelector('main') || document.body;
-    var els = raizT.querySelectorAll('h1,h2,h3,h4,p,li');
+    // Lê TODO o texto visível do conteúdo (inclui alternativas em <span>,
+    // caixas .note, mapas etc.). innerText já ignora o que está escondido
+    // (ex.: resoluções fechadas) e respeita a ordem de leitura.
+    var main = document.querySelector('main');
+    var alvos = [];
+    if (main) {
+      alvos.push(main);
+    } else {
+      var kids = document.body.children;
+      for (var i = 0; i < kids.length; i++) {
+        var k = kids[i];
+        if (k.id === 'axRoot') continue;
+        if (k.tagName === 'SCRIPT' || k.tagName === 'STYLE' || k.tagName === 'NOSCRIPT') continue;
+        if (k.classList && (k.classList.contains('topbar') || k.classList.contains('toc'))) continue;
+        alvos.push(k);
+      }
+    }
     var partes = [];
-    for (var i = 0; i < els.length; i++) {
-      var el = els[i];
-      if (el.closest('#axRoot') || el.closest('.topbar')) continue;
-      var t = (el.innerText || '').replace(/\s+/g, ' ').trim();
+    for (var j = 0; j < alvos.length; j++) {
+      var t = (alvos[j].innerText || '').trim();
       if (t) partes.push(t);
     }
-    return partes.join('.\n');
+    return partes.join('\n');
   }
   function falarProxima() {
     if (!lendo || idxFala >= filaFala.length) { lendo = false; pintar(); return; }
