@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Queda Livre e Lançamentos do Zero — Aula | Plataforma da Física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a1a; --bg-2:#0d0f24; --panel:rgba(18,22,48,0.72); --panel-solid:#12162f;
+    --orange:#ff9d3d; --orange-dim:#b06a1e; --cyan:#00e5ff; --violet:#8b5cff; --green:#27e88a;
+    --yellow:#ffd23d; --blue:#4aa3ff; --magenta:#ff3df0; --red:#ff5a6e;
+    --txt:#dbe6f5; --txt-dim:#8492b4; --line:rgba(255,157,61,0.24); --line-soft:rgba(255,255,255,0.07);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body::before{content:'';position:fixed;inset:0;z-index:-2;background:
+    radial-gradient(1100px 620px at 80% -8%, rgba(255,157,61,0.10), transparent 60%),
+    radial-gradient(900px 520px at 5% 15%, rgba(0,229,255,0.08), transparent 60%),
+    radial-gradient(800px 800px at 50% 120%, rgba(139,92,255,0.05), transparent 60%), var(--bg);}
+  body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(255,157,61,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,157,61,0.03) 1px,transparent 1px);
+    background-size:46px 46px;mask-image:radial-gradient(ellipse 100% 70% at 50% 0%,#000 30%,transparent 80%);}
+  ::selection{background:rgba(255,157,61,0.3);color:#fff}
+
+  .topbar{position:sticky;top:0;z-index:60;backdrop-filter:blur(12px);background:rgba(8,9,22,0.8);border-bottom:1px solid var(--line)}
+  .topbar-row{max-width:980px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:14px}
+  .tb-logo{font-family:'Orbitron';font-weight:700;font-size:14px;color:#eafcff;letter-spacing:.5px;display:flex;align-items:center;gap:9px;white-space:nowrap}
+  .tb-logo .spark{color:var(--orange);filter:drop-shadow(0 0 6px var(--orange))}
+  .tb-spacer{flex:1}
+  .tb-pct{font-family:'Orbitron';font-weight:700;font-size:13px;color:var(--green);min-width:42px;text-align:right}
+  .tb-toc-btn{font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:.4px;color:var(--orange);background:rgba(255,157,61,0.09);border:1px solid var(--line);padding:8px 13px;border-radius:9px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .tb-toc-btn:hover{background:rgba(255,157,61,0.18)}
+  .progress-strip{height:3px;background:rgba(255,255,255,0.06)}
+  .progress-strip > div{height:100%;width:0;background:linear-gradient(90deg,var(--orange),var(--yellow));box-shadow:0 0 10px rgba(255,157,61,.6);transition:width .4s ease}
+
+  .toc{position:fixed;inset:0;z-index:70;display:none;background:rgba(4,5,14,0.72);backdrop-filter:blur(4px)}
+  .toc.open{display:block}
+  .toc-panel{position:absolute;right:0;top:0;height:100%;width:min(340px,86vw);background:var(--panel-solid);border-left:1px solid var(--line);padding:24px 20px;overflow-y:auto;transform:translateX(100%);transition:transform .3s ease}
+  .toc.open .toc-panel{transform:translateX(0)}
+  .toc-panel h3{font-family:'Orbitron';font-weight:700;font-size:14px;color:var(--orange);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+  .toc-x{cursor:pointer;color:var(--txt-dim);font-size:22px;line-height:1}
+  .toc a{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--txt);padding:11px 12px;border-radius:9px;margin-bottom:4px;font-size:16px;font-weight:500;transition:.18s;border:1px solid transparent}
+  .toc a:hover{background:rgba(255,157,61,0.06);border-color:var(--line)}
+  .toc a .n{font-family:'Orbitron';font-size:11px;color:var(--orange);min-width:22px}
+  .toc a .dot{margin-left:auto;width:16px;height:16px;border-radius:50%;border:2px solid var(--orange-dim);display:grid;place-items:center;font-size:10px;color:#04121a}
+  .toc a.done .dot{background:var(--green);border-color:var(--green)}
+
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  section.lesson{padding:58px 0;border-bottom:1px solid var(--line-soft)}
+  section.lesson:last-of-type{border-bottom:none}
+
+  .hero{position:relative;overflow:hidden;padding:0;border-bottom:1px solid var(--line)}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+  .hero-inner{position:relative;max-width:980px;margin:0 auto;padding:72px 20px 66px;text-align:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:2px;color:var(--orange);border:1px solid var(--line);background:rgba(255,157,61,0.05);padding:7px 15px;border-radius:30px;text-transform:uppercase;margin-bottom:24px}
+  .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px var(--orange);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .hero h1{font-family:'Orbitron';font-weight:900;font-size:clamp(28px,6.4vw,50px);line-height:1.05;letter-spacing:-1px;color:#eafcff;text-shadow:0 0 34px rgba(255,157,61,0.35)}
+  .hero h1 .glow{color:var(--orange);text-shadow:0 0 30px rgba(255,157,61,0.7)}
+  .hero .sub{font-size:clamp(17px,2.6vw,21px);color:var(--txt);max-width:680px;margin:22px auto 0;font-weight:500}
+  .hero .sub b{color:#eafcff;font-weight:700}
+  .hero-meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+  .chip{font-family:'Orbitron';font-size:11px;font-weight:500;color:var(--txt-dim);border:1px solid var(--line-soft);background:rgba(255,255,255,0.02);padding:8px 13px;border-radius:8px}
+  .chip b{color:var(--orange);font-weight:700}
+  .scroll-cue{margin-top:40px;font-family:'Orbitron';font-size:11px;letter-spacing:1.5px;color:var(--txt-dim);animation:bob 2s infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
+
+  .kicker{font-family:'Orbitron';font-weight:500;font-size:12px;letter-spacing:1.6px;color:var(--orange);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .kicker .num{font-weight:900;font-size:13px;color:#04121a;background:var(--orange);width:30px;height:30px;display:grid;place-items:center;border-radius:9px;box-shadow:0 0 14px rgba(255,157,61,.5)}
+  h2.sec-title{font-family:'Orbitron';font-weight:700;font-size:clamp(23px,4.4vw,33px);color:#eafcff;line-height:1.12;letter-spacing:-.3px;margin-bottom:20px}
+  .lead{font-size:19px;color:var(--txt);font-weight:500;line-height:1.65;margin-bottom:18px}
+  p.body{font-size:17px;line-height:1.72;color:var(--txt);font-weight:400;margin-bottom:16px}
+  p.body b,li b{color:#eafcff;font-weight:700}
+  p.body .hl{color:var(--orange);font-weight:600}
+  .up{color:var(--cyan);font-weight:700}.down{color:var(--orange);font-weight:700}
+  .unit{color:var(--cyan);font-weight:700}
+  sub{font-size:.72em}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin:22px 0;backdrop-filter:blur(6px)}
+  .card h3{font-family:'Orbitron';font-weight:700;font-size:14px;letter-spacing:.4px;color:#eafcff;margin-bottom:12px}
+  .card p{font-size:16.5px;line-height:1.62;margin-bottom:10px}
+  .card p:last-child{margin-bottom:0}
+  .note{border-left:3px solid var(--orange);background:rgba(255,157,61,0.05);padding:15px 18px;border-radius:0 11px 11px 0;margin:20px 0;font-size:16.5px;line-height:1.6}
+  .note.tip{border-left-color:var(--green);background:rgba(39,232,138,0.06)}
+  .note.warn{border-left-color:var(--red);background:rgba(255,90,110,0.06)}
+  .note .tag{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.6px;display:block;margin-bottom:6px;color:var(--orange)}
+  .note.tip .tag{color:var(--green)}
+  .note.warn .tag{color:var(--red)}
+  .note b{color:#eafcff}
+
+  .formula{text-align:center;font-family:'Orbitron';font-weight:700;font-size:clamp(17px,3.8vw,25px);color:#eafcff;background:rgba(0,0,0,0.32);border:1px solid var(--line);border-radius:12px;padding:22px 16px;margin:22px 0;letter-spacing:.5px;overflow-x:auto;word-break:break-word}
+  .formula .o{color:var(--orange)}.formula .c{color:var(--cyan)}.formula .v{color:var(--violet)}.formula .y{color:var(--yellow)}
+  .formula small{display:block;font-family:'Rajdhani';font-weight:500;font-size:14px;letter-spacing:0;color:var(--txt-dim);margin-top:12px}
+  .law{font-family:'Orbitron';font-weight:500;font-size:14px;line-height:1.9;color:var(--orange);background:rgba(0,0,0,0.28);border:1px solid var(--line-soft);border-radius:10px;padding:13px 15px;margin-top:12px;overflow-x:auto}
+  .law.c{color:var(--cyan)}.law.v{color:var(--violet)}.law.y{color:var(--yellow)}
+
+  .map{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden;margin:22px 0}
+  .map.two{grid-template-columns:repeat(2,1fr)}
+  .map .m{background:var(--panel-solid);padding:18px 16px;text-align:center}
+  .map .m .ic{font-size:26px;display:block;margin-bottom:8px}
+  .map .m .t{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;display:block;margin-bottom:6px}
+  .map .m .d{color:var(--txt-dim);font-size:14px;line-height:1.4}
+
+  .sim{background:linear-gradient(180deg,rgba(13,15,36,0.9),rgba(10,10,26,0.9));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:24px 0;box-shadow:0 8px 40px rgba(0,0,0,0.35)}
+  .sim-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(255,157,61,0.06);border-bottom:1px solid var(--line)}
+  .sim-head .ic{font-size:16px}
+  .sim-head .ttl{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;letter-spacing:.4px}
+  .sim-head .lbl{margin-left:auto;font-family:'Orbitron';font-size:10px;color:var(--orange);border:1px solid var(--line);padding:4px 9px;border-radius:20px}
+  .sim-canvas-wrap{position:relative;width:100%;background:radial-gradient(circle at 50% 45%,rgba(255,157,61,0.04),transparent 70%)}
+  .sim canvas{display:block;width:100%;touch-action:manipulation}
+  .sim-controls{padding:18px}
+  .ctrl{margin-bottom:16px}
+  .ctrl:last-child{margin-bottom:0}
+  .ctrl-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .ctrl-label .nm{font-family:'Orbitron';font-weight:500;font-size:12.5px;color:var(--txt);letter-spacing:.3px}
+  .ctrl-label .vl{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--orange)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--orange),rgba(255,255,255,0.08));outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--orange);box-shadow:0 0 12px rgba(255,157,61,0.7);border:2px solid #04121a;cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--orange);box-shadow:0 0 12px rgba(255,157,61,0.7);border:2px solid #04121a;cursor:pointer}
+  .simbtn{font-family:'Orbitron';font-weight:700;font-size:12.5px;letter-spacing:.4px;color:#04121a;background:linear-gradient(120deg,var(--orange),#ffc182);border:none;padding:12px 16px;border-radius:10px;cursor:pointer;transition:.2s;width:100%}
+  .simbtn:hover{filter:brightness(1.08)}
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .readout .ro{flex:1;min-width:70px;background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:10px;padding:10px 11px;text-align:center}
+  .readout .ro .k{font-family:'Orbitron';font-size:9.5px;letter-spacing:.4px;color:var(--txt-dim);display:block;margin-bottom:4px}
+  .readout .ro .v{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--orange)}
+  .readout .ro.c .v{color:var(--cyan)}.readout .ro.y .v{color:var(--yellow)}.readout .ro.v2 .v{color:var(--violet)}
+  .hint{font-size:13.5px;color:var(--txt-dim);text-align:center;margin:10px 0 0;line-height:1.5}
+
+  .enem-q{border:1px solid var(--violet);border-radius:var(--radius);overflow:hidden;margin:24px 0;background:linear-gradient(180deg,rgba(139,92,255,0.06),rgba(10,10,26,0.4))}
+  .eq-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(139,92,255,0.1);border-bottom:1px solid rgba(139,92,255,0.25);flex-wrap:wrap}
+  .eq-badge{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.4px;color:var(--violet);border:1px solid rgba(139,92,255,0.4);background:rgba(139,92,255,0.08);padding:5px 11px;border-radius:20px}
+  .eq-tag{font-family:'Orbitron';font-size:11px;color:var(--txt-dim);letter-spacing:.5px}
+  .eq-tag.real{margin-left:auto;color:var(--green)}
+  .eq-body{padding:20px 18px}
+  .eq-enun{font-size:16.5px;line-height:1.62;color:var(--txt);margin-bottom:16px}
+  .eq-alts{display:flex;flex-direction:column;gap:8px}
+  .eq-alt{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;font-size:15.5px;transition:.25s}
+  .eq-alt .let{font-family:'Orbitron';font-weight:700;font-size:13px;width:26px;height:26px;flex-shrink:0;display:grid;place-items:center;border-radius:7px;border:1px solid var(--orange-dim);color:var(--orange)}
+  .eq-alt.correct{border-color:var(--green);background:rgba(39,232,138,0.1)}
+  .eq-alt.correct .let{background:var(--green);color:#04121a;border-color:var(--green)}
+  .reveal-btn{margin-top:16px;width:100%;font-family:'Orbitron';font-weight:700;font-size:13px;letter-spacing:.5px;background:linear-gradient(120deg,var(--violet),#6f4ad6);color:#fff;border:none;padding:13px;border-radius:11px;cursor:pointer;transition:.2s}
+  .reveal-btn:hover{filter:brightness(1.12);box-shadow:0 0 20px rgba(139,92,255,0.4)}
+  .eq-sol{margin-top:18px;border-top:1px dashed rgba(139,92,255,0.3);padding-top:16px;display:none}
+  .eq-sol.show{display:block;animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .eq-sol p{font-size:16px;line-height:1.62;color:var(--txt);margin-bottom:6px}
+  .eq-answer{margin-top:14px;font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--green);background:rgba(39,232,138,0.1);border:1px solid rgba(39,232,138,0.3);border-radius:10px;padding:13px 16px;text-align:center}
+  .eq-sol .lb{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.5px;color:var(--orange);display:block;margin-bottom:6px}
+
+  .sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin:22px 0}
+  .sheet .f{background:var(--panel-solid);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .sheet .f .eq{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--orange);margin-bottom:7px;word-break:break-word}
+  .sheet .f .ds{font-size:13.5px;color:var(--txt-dim);line-height:1.4}
+  .takeaways{list-style:none;margin:18px 0}
+  .takeaways li{position:relative;padding:9px 0 9px 30px;font-size:16.5px;line-height:1.55;border-bottom:1px solid var(--line-soft)}
+  .takeaways li:last-child{border-bottom:none}
+  .takeaways li::before{content:'\2193';position:absolute;left:0;top:7px;font-size:17px;color:var(--orange)}
+
+  .finish-card{text-align:center;background:linear-gradient(135deg,rgba(255,157,61,0.08),rgba(255,210,61,0.06));border:1px solid var(--line)}
+  .btn{font-family:'Orbitron';font-weight:700;font-size:14px;letter-spacing:.5px;background:linear-gradient(120deg,var(--orange),#ffc182);color:#04121a;border:none;padding:15px 30px;border-radius:12px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:9px}
+  .btn:hover{filter:brightness(1.08);box-shadow:0 0 26px rgba(255,157,61,0.45);transform:translateY(-1px)}
+  .btn.done-state{background:linear-gradient(120deg,var(--green),#1fd07e);color:#04121a}
+  footer{padding:34px 20px 50px;text-align:center;color:var(--txt-dim);font-size:13.5px}
+  footer .ft-logo{font-family:'Orbitron';font-weight:700;color:var(--orange);font-size:14px}
+
+  @media(max-width:680px){
+    section.lesson{padding:44px 0}
+    .map,.map.two{grid-template-columns:1fr}
+    .hero-inner{padding:56px 20px 50px}
+    p.body,.lead{font-size:16.5px}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <span class="tb-logo"><span class="spark">&#9660;</span> Queda e Lançamentos</span>
+    <span class="tb-spacer"></span>
+    <span class="tb-pct" id="tbPct">0%</span>
+    <button class="tb-toc-btn" id="tocBtn">&#9776; Conteúdo</button>
+  </div>
+  <div class="progress-strip"><div id="progBar"></div></div>
+</div>
+
+<div class="toc" id="toc">
+  <div class="toc-panel">
+    <h3>Conteúdo da aula <span class="toc-x" id="tocX">&times;</span></h3>
+    <nav id="tocNav"></nav>
+  </div>
+</div>
+
+<header class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="pulse"></span> Plataforma da Física · aula completa</span>
+    <h1>Queda Livre e<br><span class="glow">Lançamentos</span></h1>
+    <p class="sub">Tudo que a gravidade comanda: <b>queda livre, lançamento vertical, horizontal e oblíquo</b>. Entenda a parábola dos projéteis com cinco simulações que você controla e questões reais do ENEM.</p>
+    <div class="hero-meta">
+      <span class="chip"><b>5</b> simulações interativas</span>
+      <span class="chip"><b>5</b> questões do ENEM</span>
+      <span class="chip"><b>9</b> seções do zero</span>
+    </div>
+    <div class="scroll-cue">&#9660; ROLE PARA COMEÇAR</div>
+  </div>
+</header>
+
+<main>
+
+<!-- 1. INTRO -->
+<section class="lesson" id="s1" data-title="A grande ideia">
+  <div class="wrap">
+    <div class="kicker"><span class="num">1</span> A grande ideia</div>
+    <h2 class="sec-title">Queda e lançamentos: a física da gravidade</h2>
+    <p class="lead">Solte uma pedra, chute uma bola, atire uma flecha: em todos os casos, depois que o objeto sai da mão, <b>uma única força comanda o movimento</b> — a gravidade.</p>
+    <p class="body">Este é um dos temas mais bonitos da mecânica porque um só ingrediente (a aceleração da gravidade, <span class="hl">g</span>) explica quatro situações que parecem diferentes. Vamos tratar as quatro, sempre <b>desprezando a resistência do ar</b>:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#11015;</span><span class="t">QUEDA LIVRE</span><span class="d">o objeto é solto e cai só pela gravidade.</span></div>
+      <div class="m"><span class="ic">&#8597;</span><span class="t">LANÇ. VERTICAL</span><span class="d">jogado para cima (ou para baixo), na mesma linha.</span></div>
+      <div class="m"><span class="ic">&#10142;</span><span class="t">LANÇ. HORIZONTAL</span><span class="d">jogado na horizontal, de certa altura.</span></div>
+      <div class="m"><span class="ic">&#8599;</span><span class="t">LANÇ. OBLÍQUO</span><span class="d">jogado inclinado — a parábola clássica.</span></div>
+    </div>
+    <div class="note tip"><span class="tag">O SEGREDO QUE LIGA TUDO</span> Nos lançamentos, o movimento <b>horizontal</b> e o <b>vertical</b> acontecem ao mesmo tempo, mas são <b>independentes</b> um do outro. Guardar isso resolve metade das questões.</div>
+  </div>
+</section>
+
+<!-- 2. GRAVIDADE -->
+<section class="lesson" id="s2" data-title="A gravidade (g)">
+  <div class="wrap">
+    <div class="kicker"><span class="num">2</span> O motor de tudo</div>
+    <h2 class="sec-title">A aceleração da gravidade</h2>
+    <p class="body">Perto da superfície da Terra, todo corpo abandonado cai com uma aceleração constante, a <span class="hl">aceleração da gravidade g</span>. Seu valor é cerca de 9,8 m/s² — mas nas contas costumamos usar <b>g &asymp; 10 m/s²</b>.</p>
+    <p class="body">A grande descoberta de <b>Galileu</b> foi perceber que, sem o ar atrapalhando, <span class="hl">todos os corpos caem com a mesma aceleração</span> — não importa se são leves ou pesados. Uma pena e um martelo, no vácuo, chegam juntos ao chão. Foi exatamente o que o astronauta David Scott mostrou na Lua, em 1971.</p>
+    <div class="note warn"><span class="tag">CUIDADO</span> "Cair com a mesma aceleração" não é "sofrer a mesma força". O martelo tem <b>peso maior</b>, mas também <b>mais massa</b> para acelerar — e os dois efeitos se cancelam, deixando a mesma aceleração g para todos.</div>
+
+    <div class="enem-q" data-correct="3">
+      <div class="eq-head"><span class="eq-badge">ENEM 2018</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Ao soltar um martelo e uma pena na Lua em 1971, o astronauta David Scott confirmou que ambos atingiram juntos a superfície — como Galileu previra, ao minimizar a resistência do ar. Na demonstração, ele largou, no mesmo instante e da mesma altura, um martelo de 1,32 kg e uma pena de 30 g. Durante a queda no vácuo, esses objetos apresentam iguais:</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>inércias.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>impulsos.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>trabalhos.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>acelerações.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>energias potenciais.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução &#9660;</button>
+        <div class="eq-sol">
+          <p>No vácuo, sem resistência do ar, a única aceleração é a da gravidade, <b>igual para todos os corpos</b> (g). Massas, pesos, impulsos e energias são diferentes; a aceleração é a mesma.</p>
+          <div class="eq-answer">Resposta: alternativa D</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. QUEDA LIVRE -->
+<section class="lesson" id="s3" data-title="Queda livre">
+  <div class="wrap">
+    <div class="kicker"><span class="num">3</span> Só a gravidade</div>
+    <h2 class="sec-title">Queda livre</h2>
+    <p class="body">Na <span class="hl">queda livre</span>, o objeto é <b>abandonado do repouso</b> (velocidade inicial zero) e cai apenas sob a ação da gravidade. É um MRUV (movimento acelerado) com aceleração g apontando para baixo. As três equações que resolvem tudo:</p>
+    <div class="formula"><span class="c">v</span> = g&middot;t &nbsp;|&nbsp; <span class="o">h</span> = &frac12;g&middot;t² &nbsp;|&nbsp; <span class="c">v²</span> = 2g&middot;<span class="o">h</span> <small>v = velocidade (m/s); h = altura de queda (m); t = tempo (s); g &asymp; 10 m/s²</small></div>
+    <p class="body">Repare: a <b>massa não aparece</b> em nenhuma equação — por isso todos caem juntos. E como a velocidade cresce com o tempo, o objeto percorre distâncias cada vez maiores a cada segundo. Solte de alturas diferentes e veja o cronômetro:</p>
+
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#11015;</span><span class="ttl">Simulação · Queda livre (leve e pesado juntos)</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="quedaCanvas" height="300"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl"><div class="ctrl-label"><span class="nm">Altura de queda h (m)</span><span class="vl" id="qHV">45 m</span></div><input type="range" id="qH" min="5" max="125" value="45"></div>
+        <div class="readout">
+          <div class="ro"><span class="k">TEMPO DE QUEDA</span><span class="v" id="qT">&mdash;</span></div>
+          <div class="ro c"><span class="k">VELOC. NO SOLO</span><span class="v" id="qV">&mdash;</span></div>
+        </div>
+        <p class="hint">As duas bolas (uma "leve" e uma "pesada") são soltas juntas e <b>chegam juntas</b> — a massa não altera a queda.</p>
+      </div>
+    </div>
+
+    <div class="enem-q" data-correct="3">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Cinco esferas foram presas em um barbante, com a distância entre esferas consecutivas aumentando em progressão aritmética. O barbante foi suspenso, com a primeira esfera tocando o chão, e depois solto. O som das colisões de cada esfera com o solo ocorreu em intervalos de tempo exatamente iguais. Isso acontece porque a:</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>velocidade de cada esfera é constante.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>aceleração de cada esfera aumenta com o tempo.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>tensão aplicada em cada esfera aumenta com o tempo.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>força resultante em cada esfera é constante.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>energia mecânica de cada esfera aumenta com o tempo.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução &#9660;</button>
+        <div class="eq-sol">
+          <p>Como h = &frac12;g&middot;t², em tempos iguais os espaços de queda crescem em <b>progressão aritmética</b> (1, 3, 5, 7...). Por isso as esferas foram espaçadas em PA: para que os choques com o solo ocorram em intervalos iguais. Isso só funciona porque a queda é livre, com <b>força resultante constante</b> (o peso) e aceleração g constante.</p>
+          <div class="eq-answer">Resposta: alternativa D</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. LANÇAMENTO VERTICAL -->
+<section class="lesson" id="s4" data-title="Lançamento vertical">
+  <div class="wrap">
+    <div class="kicker"><span class="num">4</span> Subir e voltar</div>
+    <h2 class="sec-title">Lançamento vertical</h2>
+    <p class="body">No <span class="hl">lançamento vertical para cima</span>, o objeto sai com uma velocidade inicial v<sub>0</sub> e a gravidade age <b>contra</b> o movimento: ele desacelera na subida, <b>para por um instante no ponto mais alto</b> (v = 0) e depois desce, acelerando. As equações são as do MRUV:</p>
+    <div class="formula"><span class="c">v</span> = v<sub>0</sub> &minus; g&middot;t &nbsp;|&nbsp; <span class="o">h</span> = v<sub>0</sub>&middot;t &minus; &frac12;g&middot;t² &nbsp;|&nbsp; <span class="c">v²</span> = v<sub>0</sub>² &minus; 2g&middot;<span class="o">h</span></div>
+    <p class="body">Duas consequências lindas e muito cobradas:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#127925;</span><span class="t">SIMETRIA</span><span class="d">o tempo de subida é igual ao de descida; a velocidade de volta a cada altura tem o mesmo módulo da de ida.</span></div>
+      <div class="m"><span class="ic">&#127937;</span><span class="t">PONTO MAIS ALTO</span><span class="d">lá em cima v = 0 (mas a aceleração continua sendo g, para baixo!).</span></div>
+    </div>
+    <p class="body">A altura máxima e o tempo de subida saem direto: t<sub>subida</sub> = v<sub>0</sub>/g e h<sub>máx</sub> = v<sub>0</sub>²/(2g). Ajuste a velocidade inicial:</p>
+
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#8593;</span><span class="ttl">Simulação · Lançamento vertical</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="vertCanvas" height="300"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl"><div class="ctrl-label"><span class="nm">Velocidade inicial v<sub>0</sub> (m/s)</span><span class="vl" id="vVV">30 m/s</span></div><input type="range" id="vV0" min="10" max="50" value="30"></div>
+        <div class="readout">
+          <div class="ro"><span class="k">ALTURA MÁX.</span><span class="v" id="vHmax">&mdash;</span></div>
+          <div class="ro c"><span class="k">T. SUBIDA</span><span class="v" id="vTsub">&mdash;</span></div>
+          <div class="ro y"><span class="k">T. TOTAL</span><span class="v" id="vTtot">&mdash;</span></div>
+        </div>
+        <p class="hint">Note o objeto <b>parar</b> no topo (v = 0) e a subida ser o espelho da descida.</p>
+      </div>
+    </div>
+
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2009</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Ao pensar na física dos super-heróis, imagine o Super-homem dando um forte salto para chegar ao topo de um prédio de altura H. Sua velocidade no ponto mais alto deve ser zero. Sendo g a gravidade, vale v<sub>0</sub>² = 2gH. A altura alcançada depende do quadrado da velocidade inicial porque:</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>a altura é proporcional à velocidade média vezes o tempo no ar ao quadrado.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>o tempo no ar é proporcional a g, e g é proporcional à velocidade.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>o tempo no ar é inversamente proporcional a g, e g é inversamente proporcional à velocidade média.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>a aceleração deve ser elevada ao quadrado, pois há duas acelerações envolvidas.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>a altura é proporcional à velocidade média vezes o tempo no ar, e esse tempo também depende da velocidade inicial.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução &#9660;</button>
+        <div class="eq-sol">
+          <p>A altura é (velocidade média) &times; (tempo). Mas a velocidade média cresce com v<sub>0</sub> <b>e</b> o tempo de subida também (t = v<sub>0</sub>/g). Como os dois fatores crescem com v<sub>0</sub>, a altura acaba dependendo de v<sub>0</sub>&middot;v<sub>0</sub> = v<sub>0</sub>².</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. INDEPENDÊNCIA -->
+<section class="lesson" id="s5" data-title="Independência dos movimentos">
+  <div class="wrap">
+    <div class="kicker"><span class="num">5</span> O princípio-chave</div>
+    <h2 class="sec-title">A independência dos movimentos</h2>
+    <p class="body">Aqui está a ideia que destrava os lançamentos horizontal e oblíquo — o <span class="hl">princípio da independência</span> (ou princípio de Galileu):</p>
+    <div class="note"><span class="tag">PRINCÍPIO DA INDEPENDÊNCIA</span> Quando um corpo tem movimento na horizontal <b>e</b> na vertical ao mesmo tempo, <b>um não interfere no outro</b>. Cada direção pode ser analisada separadamente, como se a outra não existisse.</div>
+    <p class="body">Na prática, todo lançamento vira <b>a soma de dois movimentos simples</b>:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#10142;</span><span class="t">HORIZONTAL</span><span class="d">MRU — velocidade constante (não há força horizontal, ignorando o ar).</span></div>
+      <div class="m"><span class="ic">&#11015;</span><span class="t">VERTICAL</span><span class="d">MRUV — queda livre / lançamento vertical, governado por g.</span></div>
+    </div>
+    <p class="body">A prova visual mais famosa: solte uma bola e, ao mesmo tempo, lance outra na horizontal, da mesma altura. Por mais rápido que a segunda seja lançada, <b>as duas tocam o chão ao mesmo tempo</b> — porque a queda vertical é idêntica nas duas. Veja:</p>
+
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#9878;</span><span class="ttl">Simulação · Cair vs. lançar na horizontal</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="indepCanvas" height="300"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl"><div class="ctrl-label"><span class="nm">Velocidade horizontal da bola lançada (m/s)</span><span class="vl" id="iVV">18 m/s</span></div><input type="range" id="iV0" min="4" max="40" value="18"></div>
+        <p class="hint">As linhas tracejadas mostram que, <b>a cada instante</b>, as duas bolas estão na mesma altura — e chegam juntas ao solo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. LANÇAMENTO HORIZONTAL -->
+<section class="lesson" id="s6" data-title="Lançamento horizontal">
+  <div class="wrap">
+    <div class="kicker"><span class="num">6</span> Meia parábola</div>
+    <h2 class="sec-title">Lançamento horizontal</h2>
+    <p class="body">É o que acontece quando algo é lançado <b>na horizontal a partir de uma altura</b> — uma bolinha que rola da mesa, um objeto largado de um avião. Aplicando a independência:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#10142;</span><span class="t">NA HORIZONTAL</span><span class="d">MRU: x = v<sub>0</sub>&middot;t (velocidade constante v<sub>0</sub>).</span></div>
+      <div class="m"><span class="ic">&#11015;</span><span class="t">NA VERTICAL</span><span class="d">queda livre: y = &frac12;g&middot;t² (parte do repouso vertical).</span></div>
+    </div>
+    <p class="body">A combinação dos dois gera uma <span class="hl">trajetória parabólica</span>. O ponto genial para o ENEM: o <b>tempo de queda só depende da altura</b>, não da velocidade horizontal. Depois é só multiplicar pela velocidade para achar o alcance:</p>
+    <div class="formula"><span class="c">t<sub>queda</sub></span> = &radic;(2h / g) &nbsp;|&nbsp; <span class="o">alcance</span> = v<sub>0</sub> &middot; t<sub>queda</sub> <small>h = altura de lançamento; v<sub>0</sub> = velocidade horizontal; g &asymp; 10 m/s²</small></div>
+
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#10142;</span><span class="ttl">Simulação · Lançamento horizontal</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="horizCanvas" height="300"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl"><div class="ctrl-label"><span class="nm">Velocidade horizontal v<sub>0</sub> (m/s)</span><span class="vl" id="hV0V">20 m/s</span></div><input type="range" id="hV0" min="5" max="45" value="20"></div>
+        <div class="ctrl"><div class="ctrl-label"><span class="nm">Altura h (m)</span><span class="vl" id="hHV">45 m</span></div><input type="range" id="hH" min="10" max="120" value="45"></div>
+        <div class="readout">
+          <div class="ro c"><span class="k">T. DE QUEDA</span><span class="v" id="hT">&mdash;</span></div>
+          <div class="ro"><span class="k">ALCANCE</span><span class="v" id="hA">&mdash;</span></div>
+        </div>
+        <p class="hint">Aumente só a altura e veja: o tempo de queda muda. Aumente só a velocidade e o tempo de queda <b>não muda</b> — só o alcance.</p>
+      </div>
+    </div>
+
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Conta-se que, na Primeira Guerra, um piloto francês, voando a 2000 m, viu o que parecia uma mosca parada perto do rosto; ao apanhá-la, era um projétil alemão. O piloto conseguiu apanhar o projétil porque:</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>ele foi disparado contra o avião, freado pelo ar, e parou na frente do piloto.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>o avião se movia no mesmo sentido que o dele, com velocidade bem maior.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>ele foi disparado para cima com velocidade constante quando o avião passou.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>o avião se movia em sentido oposto, com velocidade de mesmo valor.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>o avião se movia no mesmo sentido que o dele, com velocidade de mesmo valor.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução &#9660;</button>
+        <div class="eq-sol">
+          <p>Se avião e projétil se movem <b>no mesmo sentido e com a mesma velocidade horizontal</b>, a velocidade de um <b>em relação ao outro</b> é praticamente nula — o projétil parece "parado" ao lado do piloto. É a independência do movimento horizontal em ação.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. LANÇAMENTO OBLÍQUO -->
+<section class="lesson" id="s7" data-title="Lançamento oblíquo">
+  <div class="wrap">
+    <div class="kicker"><span class="num">7</span> A parábola completa</div>
+    <h2 class="sec-title">Lançamento oblíquo</h2>
+    <p class="body">É o lançamento inclinado — a bola chutada, a bala de canhão, o arremesso de peso. A velocidade inicial faz um ângulo &theta; com o chão, então o primeiro passo é <span class="hl">decompor v<sub>0</sub></span> em duas partes:</p>
+    <div class="formula"><span class="c">v<sub>0x</sub></span> = v<sub>0</sub>&middot;cos&theta; &nbsp;|&nbsp; <span class="o">v<sub>0y</sub></span> = v<sub>0</sub>&middot;sen&theta; <small>a horizontal (x) é MRU; a vertical (y) é lançamento vertical</small></div>
+    <p class="body">A partir daí é só juntar o que já sabemos: na horizontal, MRU com v<sub>0x</sub>; na vertical, um lançamento vertical com v<sub>0y</sub>. Os resultados clássicos:</p>
+    <div class="map">
+      <div class="m"><span class="ic">&#127956;</span><span class="t">ALTURA MÁX.</span><span class="d">H = v<sub>0y</sub>² / (2g)</span></div>
+      <div class="m"><span class="ic">&#9201;</span><span class="t">TEMPO DE VOO</span><span class="d">t = 2&middot;v<sub>0y</sub> / g</span></div>
+      <div class="m"><span class="ic">&#128207;</span><span class="t">ALCANCE</span><span class="d">A = v<sub>0</sub>²&middot;sen(2&theta;) / g</span></div>
+    </div>
+    <div class="note tip"><span class="tag">O ÂNGULO MÁGICO</span> Como o alcance depende de sen(2&theta;), ele é <b>máximo em &theta; = 45&deg;</b> (onde sen 90&deg; = 1). E ângulos complementares (ex.: 30&deg; e 60&deg;) dão o <b>mesmo alcance</b>. Teste no simulador!</div>
+
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#8599;</span><span class="ttl">Simulação · Lançamento oblíquo</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="obliqCanvas" height="300"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl"><div class="ctrl-label"><span class="nm">Velocidade inicial v<sub>0</sub> (m/s)</span><span class="vl" id="oV0V">28 m/s</span></div><input type="range" id="oV0" min="12" max="45" value="28"></div>
+        <div class="ctrl"><div class="ctrl-label"><span class="nm">Ângulo de lançamento &theta; (&deg;)</span><span class="vl" id="oAV">45&deg;</span></div><input type="range" id="oA" min="15" max="75" value="45"></div>
+        <div class="readout">
+          <div class="ro"><span class="k">ALTURA MÁX.</span><span class="v" id="oH">&mdash;</span></div>
+          <div class="ro c"><span class="k">ALCANCE</span><span class="v" id="oR">&mdash;</span></div>
+          <div class="ro y"><span class="k">T. DE VOO</span><span class="v" id="oTv">&mdash;</span></div>
+        </div>
+        <p class="hint">As setas mostram a decomposição v<sub>0x</sub> / v<sub>0y</sub>. Coloque 45&deg; para o alcance máximo.</p>
+      </div>
+    </div>
+
+    <div class="enem-q" data-correct="1">
+      <div class="eq-head"><span class="eq-badge">ENEM 2014</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Antigamente, acreditava-se que, no lançamento oblíquo, a resultante das forças sobre o objeto tinha o mesmo sentido da velocidade em todos os instantes — o que a ciência atual refuta. Desprezando a resistência do ar, qual a direção e o sentido da força resultante sobre o objeto no ponto mais alto da trajetória?</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>Indefinido, pois é nula, assim como a velocidade vertical nesse ponto.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Vertical para baixo, pois só o peso atua durante o movimento.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>Horizontal, no sentido do movimento, pois a inércia mantém o objeto.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>Inclinada na direção do lançamento, pois a força inicial é constante.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>Inclinada para baixo, no sentido do movimento, apontando para onde vai cair.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução &#9660;</button>
+        <div class="eq-sol">
+          <p>Ignorando o ar, a <b>única</b> força sobre o objeto em todo o trajeto é o <b>peso</b> — sempre vertical e para baixo. No ponto mais alto a velocidade vertical é zero, mas a força resultante (o peso) continua vertical, para baixo. É ela que faz o objeto começar a descer.</p>
+          <div class="eq-answer">Resposta: alternativa B</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. APLICAÇÕES -->
+<section class="lesson" id="s8" data-title="No mundo real">
+  <div class="wrap">
+    <div class="kicker"><span class="num">8</span> Onde isso aparece</div>
+    <h2 class="sec-title">No mundo real e no ENEM</h2>
+    <p class="body">Esse conteúdo está por toda parte — e o ENEM adora contextualizar:</p>
+    <div class="map">
+      <div class="m"><span class="ic">&#9917;</span><span class="t">ESPORTES</span><span class="d">o chute a gol, o arremesso no basquete e o salto em distância são lançamentos oblíquos.</span></div>
+      <div class="m"><span class="ic">&#128748;</span><span class="t">SOCORRO AÉREO</span><span class="d">soltar mantimentos de um avião é lançamento horizontal: solta-se antes de estar sobre o alvo.</span></div>
+      <div class="m"><span class="ic">&#127983;</span><span class="t">FOGOS E JATOS</span><span class="d">a água de uma mangueira e os fogos de artifício descrevem parábolas.</span></div>
+    </div>
+    <div class="note"><span class="tag">ESTRATÉGIA DE PROVA</span> Diante de qualquer lançamento: (1) separe em horizontal (MRU) e vertical (queda/lançamento vertical); (2) lembre que o <b>tempo</b> é o elo entre as duas direções — ele é o mesmo para x e y; (3) no oblíquo, comece decompondo v<sub>0</sub>.</div>
+  </div>
+</section>
+
+<!-- 9. RESUMO -->
+<section class="lesson" id="s9" data-title="Resumo e fórmulas">
+  <div class="wrap">
+    <div class="kicker"><span class="num">9</span> Leve no bolso</div>
+    <h2 class="sec-title">Resumo e fórmulas essenciais</h2>
+    <div class="sheet">
+      <div class="f"><div class="eq">v = g&middot;t</div><div class="ds">queda livre</div></div>
+      <div class="f"><div class="eq">h = &frac12;g&middot;t²</div><div class="ds">altura na queda</div></div>
+      <div class="f"><div class="eq">v² = 2g&middot;h</div><div class="ds">sem o tempo</div></div>
+      <div class="f"><div class="eq">v = v<sub>0</sub> &minus; g&middot;t</div><div class="ds">lançamento vertical</div></div>
+      <div class="f"><div class="eq">t<sub>q</sub> = &radic;(2h/g)</div><div class="ds">tempo de queda (horizontal)</div></div>
+      <div class="f"><div class="eq">A = v<sub>0</sub>&middot;t<sub>q</sub></div><div class="ds">alcance (horizontal)</div></div>
+      <div class="f"><div class="eq">v<sub>0x</sub> = v<sub>0</sub>cos&theta;</div><div class="ds">decomposição (x)</div></div>
+      <div class="f"><div class="eq">v<sub>0y</sub> = v<sub>0</sub>sen&theta;</div><div class="ds">decomposição (y)</div></div>
+      <div class="f"><div class="eq">A = v<sub>0</sub>²sen(2&theta;)/g</div><div class="ds">alcance (oblíquo)</div></div>
+    </div>
+    <ul class="takeaways">
+      <li>Sem o ar, <b>todos os corpos caem com a mesma aceleração g</b> — a massa não importa.</li>
+      <li><b>Queda livre:</b> parte do repouso; v = g&middot;t e h = &frac12;g&middot;t².</li>
+      <li><b>Lançamento vertical:</b> sobe, para no topo (v = 0) e desce — subida e descida são <b>simétricas</b>.</li>
+      <li><b>Independência:</b> horizontal (MRU) e vertical (queda) não interferem entre si; o <b>tempo</b> é o elo.</li>
+      <li><b>Horizontal:</b> o tempo de queda só depende da altura. <b>Oblíquo:</b> decomponha v<sub>0</sub>; alcance máximo em <b>45&deg;</b>.</li>
+    </ul>
+
+    <div class="card finish-card">
+      <p class="body" style="margin-bottom:18px">Você percorreu queda livre e os três lançamentos, com cinco simulações e cinco questões reais do ENEM. Marque a aula como concluída:</p>
+      <button class="btn" id="finishBtn">&#10003; Concluir aula</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p><span class="ft-logo">&#9660; Plataforma da Física</span></p>
+  <p style="margin-top:8px">Queda Livre e Lançamentos — queda livre, lançamento vertical, horizontal e oblíquo.</p>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+  var KEY='plataphysica_queda_lancamentos_aula';
+  var ORG='#ff9d3d',CY='#00e5ff',VIO='#8b5cff',YEL='#ffd23d',GRN='#27e88a',DIM='#8492b4',WHT='#cfe0f2';
+  var g=10;
+
+  function fitCanvas(cv,cssH){
+    var dpr=window.devicePixelRatio||1;
+    var w=cv.clientWidth||(cv.parentElement?cv.parentElement.clientWidth:300);
+    cv.width=Math.round(w*dpr);cv.height=Math.round(cssH*dpr);cv.style.height=cssH+'px';
+    var ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return {ctx:ctx,w:w,h:cssH};
+  }
+  function pad2(n){n=''+n;return n.length<2?('0'+n):n;}
+  function arrow(ctx,x1,y1,x2,y2,color,wd){
+    ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=wd||2.5;
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    var a=Math.atan2(y2-y1,x2-x1),hl=8;
+    ctx.beginPath();ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-hl*Math.cos(a-0.4),y2-hl*Math.sin(a-0.4));
+    ctx.lineTo(x2-hl*Math.cos(a+0.4),y2-hl*Math.sin(a+0.4));
+    ctx.closePath();ctx.fill();
+  }
+  function ball(ctx,x,y,r,color){ctx.beginPath();ctx.arc(x,y,r,0,2*Math.PI);ctx.fillStyle=color;ctx.shadowColor=color;ctx.shadowBlur=12;ctx.fill();ctx.shadowBlur=0;}
+  function ground(ctx,w,gy){ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(w,gy);ctx.stroke();}
+
+  /* índice + progresso */
+  var secs=[].slice.call(document.querySelectorAll('section.lesson'));
+  var tocNav=document.getElementById('tocNav');
+  secs.forEach(function(s,i){
+    var a=document.createElement('a');a.href='#'+s.id;
+    a.innerHTML='<span class="n">'+pad2(i+1)+'</span><span>'+s.getAttribute('data-title')+'</span><span class="dot">&#10003;</span>';
+    a.addEventListener('click',closeToc);tocNav.appendChild(a);
+  });
+  var tocLinks=[].slice.call(tocNav.children);
+  var toc=document.getElementById('toc');
+  function openToc(){toc.classList.add('open');}function closeToc(){toc.classList.remove('open');}
+  document.getElementById('tocBtn').addEventListener('click',openToc);
+  document.getElementById('tocX').addEventListener('click',closeToc);
+  toc.addEventListener('click',function(e){if(e.target===toc)closeToc();});
+  var seen={};try{seen=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){seen={};}
+  var progBar=document.getElementById('progBar'),tbPct=document.getElementById('tbPct');
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(seen));}catch(e){}}
+  function updateProgress(){var done=0;secs.forEach(function(s,i){if(seen[s.id]){done++;tocLinks[i].classList.add('done');}});var pct=Math.round(done/secs.length*100);progBar.style.width=pct+'%';tbPct.textContent=pct+'%';}
+  if('IntersectionObserver' in window){var io=new IntersectionObserver(function(en){en.forEach(function(e){if(e.isIntersecting){seen[e.target.id]=true;save();updateProgress();}});},{threshold:.4});secs.forEach(function(s){io.observe(s);});}
+  updateProgress();
+
+  /* questões (revelar) */
+  document.querySelectorAll('.enem-q').forEach(function(q){
+    var ci=parseInt(q.getAttribute('data-correct'),10);
+    var btn=q.querySelector('.reveal-btn'),sol=q.querySelector('.eq-sol'),alts=q.querySelectorAll('.eq-alt');
+    if(!btn)return;
+    btn.addEventListener('click',function(){sol.classList.add('show');if(alts[ci])alts[ci].classList.add('correct');btn.style.display='none';});
+  });
+
+  /* concluir */
+  var fb=document.getElementById('finishBtn');
+  if(fb){if(seen.__finish){fb.classList.add('done-state');fb.innerHTML='&#10003; Aula concluída';}
+    fb.addEventListener('click',function(){seen.__finish=true;save();fb.classList.add('done-state');fb.innerHTML='&#10003; Aula concluída';});}
+
+  /* HERO — trajetórias parabólicas */
+  (function(){
+    var cv=document.getElementById('heroCanvas');if(!cv)return;
+    var D;function resize(){D=fitCanvas(cv,(cv.parentElement?cv.parentElement.clientHeight:360)||360);}
+    resize();window.addEventListener('resize',resize);
+    var shots=[];for(var i=0;i<5;i++)shots.push({x0:Math.random()*0.3,v:0.5+Math.random()*0.6,a:0.5+Math.random()*0.5,t:Math.random()*3,col:[ORG,CY,YEL,VIO,GRN][i]});
+    var last=performance.now();
+    function draw(now){var ctx=D.ctx,w=D.w,h=D.h,dt=(now-last)/1000;last=now;ctx.clearRect(0,0,w,h);
+      shots.forEach(function(s){s.t+=dt;if(s.t>3.2)s.t=0;
+        var tt=s.t,x=(s.x0+s.v*tt*0.28)*w,y=h-(s.a*tt- .16*tt*tt)*h*0.5-8;
+        if(y<h){ctx.beginPath();ctx.arc(x,y,3,0,2*Math.PI);ctx.fillStyle=s.col;ctx.globalAlpha=.55;ctx.shadowColor=s.col;ctx.shadowBlur=9;ctx.fill();ctx.shadowBlur=0;ctx.globalAlpha=1;}
+      });
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+
+  /* SIM 1 — queda livre */
+  (function(){
+    var cv=document.getElementById('quedaCanvas');if(!cv)return;
+    var D;function resize(){D=fitCanvas(cv,300);}
+    var H=document.getElementById('qH');var t=0,last=performance.now(),TS=1.4;
+    H.addEventListener('input',function(){document.getElementById('qHV').textContent=H.value+' m';t=0;});
+    function draw(now){
+      if(!D){requestAnimationFrame(draw);return;}
+      var dt=Math.min(0.032,(now-last)/1000)*TS;last=now;
+      var ctx=D.ctx,w=D.w,h=D.h,gy=h-24,top=22;
+      var hm=+H.value,tF=Math.sqrt(2*hm/g);
+      t+=dt;if(t>tF+0.5)t=0;var tt=Math.min(t,tF);
+      var ym=0.5*g*tt*tt,py=top+(gy-top)*(ym/hm);
+      ctx.clearRect(0,0,w,h);ground(ctx,w,gy);
+      ctx.setLineDash([4,5]);ctx.strokeStyle='rgba(255,157,61,0.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(w*0.72,top);ctx.lineTo(w*0.72,gy);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle=ORG;ctx.font='11px Orbitron,sans-serif';ctx.textAlign='left';ctx.fillText('h = '+hm+' m',w*0.72+8,top+14);
+      ball(ctx,w*0.40,py,8,DIM);ball(ctx,w*0.53,py,13,ORG);
+      ctx.fillStyle=DIM;ctx.font='10px Rajdhani,sans-serif';ctx.textAlign='center';ctx.fillText('leve',w*0.40,py-14);ctx.fillText('pesado',w*0.53,py-20);
+      document.getElementById('qT').textContent=tF.toFixed(1).replace('.',',')+' s';
+      document.getElementById('qV').textContent=Math.round(g*tF)+' m/s';
+      requestAnimationFrame(draw);
+    }
+    resize();window.addEventListener('resize',resize);requestAnimationFrame(draw);
+  })();
+
+  /* SIM 2 — lançamento vertical */
+  (function(){
+    var cv=document.getElementById('vertCanvas');if(!cv)return;
+    var D;function resize(){D=fitCanvas(cv,300);}
+    var V=document.getElementById('vV0');var t=0,last=performance.now(),TS=1.3;
+    V.addEventListener('input',function(){document.getElementById('vVV').textContent=V.value+' m/s';t=0;});
+    function draw(now){
+      if(!D){requestAnimationFrame(draw);return;}
+      var dt=Math.min(0.032,(now-last)/1000)*TS;last=now;
+      var ctx=D.ctx,w=D.w,h=D.h,gy=h-24,top=22;
+      var v0=+V.value,tUp=v0/g,tTot=2*tUp,hmax=v0*v0/(2*g);
+      t+=dt;if(t>tTot+0.4)t=0;var tt=Math.min(t,tTot);
+      var ym=v0*tt-0.5*g*tt*tt;if(ym<0)ym=0;
+      var py=gy-(gy-top)*(ym/hmax);
+      ctx.clearRect(0,0,w,h);ground(ctx,w,gy);
+      // marcador de altura máxima
+      ctx.setLineDash([5,5]);ctx.strokeStyle='rgba(0,229,255,0.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(w*0.2,top);ctx.lineTo(w*0.8,top);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle=CY;ctx.font='11px Orbitron,sans-serif';ctx.textAlign='center';ctx.fillText('h máx',w*0.5,top-6);
+      // seta de velocidade
+      var vy=v0-g*tt;var vlen=Math.max(-46,Math.min(46,vy*1.4));
+      if(Math.abs(vy)>0.5)arrow(ctx,w*0.5,py,w*0.5,py-vlen,YEL,2.5);
+      ball(ctx,w*0.5,py,13,ORG);
+      document.getElementById('vHmax').textContent=Math.round(hmax)+' m';
+      document.getElementById('vTsub').textContent=tUp.toFixed(1).replace('.',',')+' s';
+      document.getElementById('vTtot').textContent=tTot.toFixed(1).replace('.',',')+' s';
+      requestAnimationFrame(draw);
+    }
+    resize();window.addEventListener('resize',resize);requestAnimationFrame(draw);
+  })();
+
+  /* SIM 3 — independência dos movimentos */
+  (function(){
+    var cv=document.getElementById('indepCanvas');if(!cv)return;
+    var D;function resize(){D=fitCanvas(cv,300);}
+    var V=document.getElementById('iV0');var t=0,last=performance.now(),TS=1.3,Hm=40;
+    V.addEventListener('input',function(){document.getElementById('iVV').textContent=V.value+' m/s';t=0;});
+    function draw(now){
+      if(!D){requestAnimationFrame(draw);return;}
+      var dt=Math.min(0.032,(now-last)/1000)*TS;last=now;
+      var ctx=D.ctx,w=D.w,h=D.h,gy=h-24,top=26;
+      var v0=+V.value,tF=Math.sqrt(2*Hm/g),maxX=v0*tF;
+      var startX=w*0.12,scaleX=(w*0.80)/maxX;
+      t+=dt;if(t>tF+0.6)t=0;var tt=Math.min(t,tF);
+      var ym=0.5*g*tt*tt,py=top+(gy-top)*(ym/Hm),xB=startX+v0*tt*scaleX;
+      ctx.clearRect(0,0,w,h);ground(ctx,w,gy);
+      // trajetória tracejada da bola lançada
+      ctx.setLineDash([3,4]);ctx.strokeStyle='rgba(0,229,255,0.3)';ctx.lineWidth=1;ctx.beginPath();
+      for(var k=0;k<=1;k+=0.04){var yk=0.5*g*(k*tF)*(k*tF);ctx.lineTo(startX+v0*(k*tF)*scaleX,top+(gy-top)*(yk/Hm));}ctx.stroke();ctx.setLineDash([]);
+      // linha de mesma altura
+      ctx.strokeStyle='rgba(255,255,255,0.25)';ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(startX,py);ctx.lineTo(xB,py);ctx.stroke();ctx.setLineDash([]);
+      ball(ctx,startX,py,11,ORG);ball(ctx,xB,py,11,CY);
+      ctx.fillStyle=DIM;ctx.font='10px Rajdhani,sans-serif';ctx.textAlign='center';
+      ctx.fillText('solta',startX,top-8);ctx.fillText('lançada',startX+40,top-8);
+      requestAnimationFrame(draw);
+    }
+    resize();window.addEventListener('resize',resize);requestAnimationFrame(draw);
+  })();
+
+  /* SIM 4 — lançamento horizontal */
+  (function(){
+    var cv=document.getElementById('horizCanvas');if(!cv)return;
+    var D;function resize(){D=fitCanvas(cv,300);}
+    var V=document.getElementById('hV0'),H=document.getElementById('hH');var t=0,last=performance.now(),TS=1.4;
+    V.addEventListener('input',function(){document.getElementById('hV0V').textContent=V.value+' m/s';t=0;});
+    H.addEventListener('input',function(){document.getElementById('hHV').textContent=H.value+' m';t=0;});
+    function draw(now){
+      if(!D){requestAnimationFrame(draw);return;}
+      var dt=Math.min(0.032,(now-last)/1000)*TS;last=now;
+      var ctx=D.ctx,w=D.w,h=D.h,gy=h-24,top=24;
+      var v0=+V.value,hm=+H.value,tF=Math.sqrt(2*hm/g),alc=v0*tF;
+      var startX=w*0.10,sc=Math.min((w*0.82)/alc,(gy-top)/hm);
+      t+=dt;if(t>tF+0.5)t=0;var tt=Math.min(t,tF);
+      var x=v0*tt,y=0.5*g*tt*tt,px=startX+x*sc,py=top+y*sc;
+      ctx.clearRect(0,0,w,h);ground(ctx,w,gy);
+      // plataforma
+      ctx.fillStyle='rgba(255,157,61,0.18)';ctx.fillRect(0,top,startX,8);
+      ctx.strokeStyle=ORG;ctx.lineWidth=2;ctx.strokeRect(0,top,startX,8);
+      // trajetória
+      ctx.setLineDash([3,4]);ctx.strokeStyle='rgba(255,157,61,0.35)';ctx.lineWidth=1.4;ctx.beginPath();
+      for(var k=0;k<=1;k+=0.03){var yk=0.5*g*(k*tF)*(k*tF);ctx.lineTo(startX+v0*(k*tF)*sc,top+yk*sc);}ctx.stroke();ctx.setLineDash([]);
+      ball(ctx,px,py,11,ORG);
+      document.getElementById('hT').textContent=tF.toFixed(1).replace('.',',')+' s';
+      document.getElementById('hA').textContent=Math.round(alc)+' m';
+      requestAnimationFrame(draw);
+    }
+    resize();window.addEventListener('resize',resize);requestAnimationFrame(draw);
+  })();
+
+  /* SIM 5 — lançamento oblíquo */
+  (function(){
+    var cv=document.getElementById('obliqCanvas');if(!cv)return;
+    var D;function resize(){D=fitCanvas(cv,300);}
+    var V=document.getElementById('oV0'),A=document.getElementById('oA');var t=0,last=performance.now(),TS=1.3;
+    V.addEventListener('input',function(){document.getElementById('oV0V').textContent=V.value+' m/s';t=0;});
+    A.addEventListener('input',function(){document.getElementById('oAV').textContent=A.value+'\u00B0';t=0;});
+    function draw(now){
+      if(!D){requestAnimationFrame(draw);return;}
+      var dt=Math.min(0.032,(now-last)/1000)*TS;last=now;
+      var ctx=D.ctx,w=D.w,h=D.h,gy=h-24,top=20;
+      var v0=+V.value,th=(+A.value)*Math.PI/180,v0x=v0*Math.cos(th),v0y=v0*Math.sin(th);
+      var tV=2*v0y/g,hmax=v0y*v0y/(2*g),alc=v0x*tV;
+      var startX=w*0.10,sc=Math.min((w*0.82)/alc,(gy-top)/hmax);
+      t+=dt;if(t>tV+0.4)t=0;var tt=Math.min(t,tV);
+      var x=v0x*tt,y=v0y*tt-0.5*g*tt*tt;if(y<0)y=0;
+      var px=startX+x*sc,py=gy-y*sc;
+      ctx.clearRect(0,0,w,h);ground(ctx,w,gy);
+      // trajetória
+      ctx.setLineDash([3,4]);ctx.strokeStyle='rgba(255,157,61,0.35)';ctx.lineWidth=1.4;ctx.beginPath();
+      for(var k=0;k<=1;k+=0.025){var tk=k*tV,yk=v0y*tk-0.5*g*tk*tk;ctx.lineTo(startX+v0x*tk*sc,gy-yk*sc);}ctx.stroke();ctx.setLineDash([]);
+      // decomposição no lançamento
+      arrow(ctx,startX,gy,startX+Math.min(60,v0x*1.4),gy,CY,2.5);
+      arrow(ctx,startX,gy,startX,gy-Math.min(60,v0y*1.4),YEL,2.5);
+      ctx.fillStyle=CY;ctx.font='10px Orbitron,sans-serif';ctx.textAlign='left';ctx.fillText('v0x',startX+Math.min(60,v0x*1.4)+3,gy-3);
+      ctx.fillStyle=YEL;ctx.fillText('v0y',startX+3,gy-Math.min(60,v0y*1.4)-4);
+      ball(ctx,px,py,11,ORG);
+      document.getElementById('oH').textContent=Math.round(hmax)+' m';
+      document.getElementById('oR').textContent=Math.round(alc)+' m';
+      document.getElementById('oTv').textContent=tV.toFixed(1).replace('.',',')+' s';
+      requestAnimationFrame(draw);
+    }
+    resize();window.addEventListener('resize',resize);requestAnimationFrame(draw);
+  })();
+
+})();
+</script>
+  <script src="/Plataforma-da-Fisica/acessibilidade.js"></script>
+  <script src="/Plataforma-da-Fisica/vlibras.js"></script>
+</body>
+</html>
