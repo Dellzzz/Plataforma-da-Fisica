@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Movimento Circular do Zero — Aula | Plataforma da Física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a1a; --bg-2:#0d0f24; --panel:rgba(18,22,48,0.72); --panel-solid:#12162f;
+    --cyan:#00e5ff; --magenta:#ff3df0; --magenta-dim:#b02aa0; --violet:#8b5cff;
+    --green:#27e88a; --yellow:#ffd23d; --orange:#ff9d3d; --red:#ff5a6e;
+    --txt:#dbe6f5; --txt-dim:#8492b4; --line:rgba(255,61,240,0.24); --line-soft:rgba(255,255,255,0.07);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body::before{content:'';position:fixed;inset:0;z-index:-2;background:
+    radial-gradient(1100px 620px at 80% -8%, rgba(255,61,240,0.10), transparent 60%),
+    radial-gradient(900px 520px at 5% 15%, rgba(0,229,255,0.09), transparent 60%),
+    radial-gradient(800px 800px at 50% 120%, rgba(139,92,255,0.06), transparent 60%), var(--bg);}
+  body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(255,61,240,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,61,240,0.03) 1px,transparent 1px);
+    background-size:46px 46px;mask-image:radial-gradient(ellipse 100% 70% at 50% 0%,#000 30%,transparent 80%);}
+  ::selection{background:rgba(255,61,240,0.3);color:#fff}
+
+  .topbar{position:sticky;top:0;z-index:60;backdrop-filter:blur(12px);background:rgba(8,9,22,0.8);border-bottom:1px solid var(--line)}
+  .topbar-row{max-width:980px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:14px}
+  .tb-logo{font-family:'Orbitron';font-weight:700;font-size:14px;color:#eafcff;letter-spacing:.5px;display:flex;align-items:center;gap:9px;white-space:nowrap}
+  .tb-logo .spark{color:var(--magenta);filter:drop-shadow(0 0 6px var(--magenta))}
+  .tb-spacer{flex:1}
+  .tb-pct{font-family:'Orbitron';font-weight:700;font-size:13px;color:var(--green);min-width:42px;text-align:right}
+  .tb-toc-btn{font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:.4px;color:var(--magenta);background:rgba(255,61,240,0.09);border:1px solid var(--line);padding:8px 13px;border-radius:9px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .tb-toc-btn:hover{background:rgba(255,61,240,0.18)}
+  .progress-strip{height:3px;background:rgba(255,255,255,0.06)}
+  .progress-strip > div{height:100%;width:0;background:linear-gradient(90deg,var(--magenta),var(--violet));box-shadow:0 0 10px rgba(255,61,240,.6);transition:width .4s ease}
+
+  .toc{position:fixed;inset:0;z-index:70;display:none;background:rgba(4,5,14,0.72);backdrop-filter:blur(4px)}
+  .toc.open{display:block}
+  .toc-panel{position:absolute;right:0;top:0;height:100%;width:min(340px,86vw);background:var(--panel-solid);border-left:1px solid var(--line);padding:24px 20px;overflow-y:auto;transform:translateX(100%);transition:transform .3s ease}
+  .toc.open .toc-panel{transform:translateX(0)}
+  .toc-panel h3{font-family:'Orbitron';font-weight:700;font-size:14px;color:var(--magenta);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+  .toc-x{cursor:pointer;color:var(--txt-dim);font-size:22px;line-height:1}
+  .toc a{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--txt);padding:11px 12px;border-radius:9px;margin-bottom:4px;font-size:16px;font-weight:500;transition:.18s;border:1px solid transparent}
+  .toc a:hover{background:rgba(255,61,240,0.06);border-color:var(--line)}
+  .toc a .n{font-family:'Orbitron';font-size:11px;color:var(--magenta);min-width:22px}
+  .toc a .dot{margin-left:auto;width:16px;height:16px;border-radius:50%;border:2px solid var(--magenta-dim);display:grid;place-items:center;font-size:10px;color:#04121a}
+  .toc a.done .dot{background:var(--green);border-color:var(--green)}
+
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  section.lesson{padding:58px 0;border-bottom:1px solid var(--line-soft)}
+  section.lesson:last-of-type{border-bottom:none}
+
+  .hero{position:relative;overflow:hidden;padding:0;border-bottom:1px solid var(--line)}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.6}
+  .hero-inner{position:relative;max-width:980px;margin:0 auto;padding:72px 20px 66px;text-align:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:2px;color:var(--magenta);border:1px solid var(--line);background:rgba(255,61,240,0.05);padding:7px 15px;border-radius:30px;text-transform:uppercase;margin-bottom:24px}
+  .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--magenta);box-shadow:0 0 8px var(--magenta);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .hero h1{font-family:'Orbitron';font-weight:900;font-size:clamp(32px,7.4vw,58px);line-height:1.03;letter-spacing:-1px;color:#eafcff;text-shadow:0 0 34px rgba(255,61,240,0.35)}
+  .hero h1 .glow{color:var(--magenta);text-shadow:0 0 30px rgba(255,61,240,0.7)}
+  .hero .sub{font-size:clamp(17px,2.6vw,21px);color:var(--txt);max-width:660px;margin:22px auto 0;font-weight:500}
+  .hero .sub b{color:#eafcff;font-weight:700}
+  .hero-meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+  .chip{font-family:'Orbitron';font-size:11px;font-weight:500;color:var(--txt-dim);border:1px solid var(--line-soft);background:rgba(255,255,255,0.02);padding:8px 13px;border-radius:8px}
+  .chip b{color:var(--magenta);font-weight:700}
+  .scroll-cue{margin-top:40px;font-family:'Orbitron';font-size:11px;letter-spacing:1.5px;color:var(--txt-dim);animation:bob 2s infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
+
+  .kicker{font-family:'Orbitron';font-weight:500;font-size:12px;letter-spacing:1.6px;color:var(--magenta);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .kicker .num{font-weight:900;font-size:13px;color:#180417;background:var(--magenta);width:30px;height:30px;display:grid;place-items:center;border-radius:9px;box-shadow:0 0 14px rgba(255,61,240,.5)}
+  h2.sec-title{font-family:'Orbitron';font-weight:700;font-size:clamp(23px,4.4vw,33px);color:#eafcff;line-height:1.12;letter-spacing:-.3px;margin-bottom:20px}
+  .lead{font-size:19px;color:var(--txt);font-weight:500;line-height:1.65;margin-bottom:18px}
+  p.body{font-size:17px;line-height:1.72;color:var(--txt);font-weight:400;margin-bottom:16px}
+  p.body b{color:#eafcff;font-weight:700}
+  p.body .hl{color:var(--magenta);font-weight:600}
+  .unit{color:var(--cyan);font-weight:700}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin:22px 0;backdrop-filter:blur(6px)}
+  .note{border-left:3px solid var(--magenta);background:rgba(255,61,240,0.05);padding:15px 18px;border-radius:0 11px 11px 0;margin:20px 0;font-size:16.5px;line-height:1.6}
+  .note.tip{border-left-color:var(--green);background:rgba(39,232,138,0.06)}
+  .note.warn{border-left-color:var(--orange);background:rgba(255,157,61,0.06)}
+  .note .tag{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.6px;display:block;margin-bottom:6px;color:var(--magenta)}
+  .note.tip .tag{color:var(--green)}
+  .note.warn .tag{color:var(--orange)}
+  .note b{color:#eafcff}
+
+  .formula{text-align:center;font-family:'Orbitron';font-weight:700;font-size:clamp(19px,4.4vw,27px);color:#eafcff;background:rgba(0,0,0,0.32);border:1px solid var(--line);border-radius:12px;padding:22px;margin:22px 0;letter-spacing:1px}
+  .formula .m{color:var(--magenta)}
+  .formula .c{color:var(--cyan)}
+  .formula .g{color:var(--green)}
+  .formula .y{color:var(--yellow)}
+  .formula small{display:block;font-family:'Rajdhani';font-weight:500;font-size:14px;letter-spacing:0;color:var(--txt-dim);margin-top:12px}
+
+  .map{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden;margin:22px 0}
+  .map.two{grid-template-columns:repeat(2,1fr)}
+  .map .m{background:var(--panel-solid);padding:18px 16px;text-align:center}
+  .map .m .ic{font-size:26px;display:block;margin-bottom:8px}
+  .map .m .t{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;display:block;margin-bottom:6px}
+  .map .m .d{color:var(--txt-dim);font-size:14px;line-height:1.4}
+
+  .sim{background:linear-gradient(180deg,rgba(13,15,36,0.9),rgba(10,10,26,0.9));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:24px 0;box-shadow:0 8px 40px rgba(0,0,0,0.35)}
+  .sim-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(255,61,240,0.06);border-bottom:1px solid var(--line)}
+  .sim-head .ic{font-size:16px}
+  .sim-head .ttl{font-family:'Orbitron';font-weight:700;font-size:13px;color:#eafcff;letter-spacing:.4px}
+  .sim-head .lbl{margin-left:auto;font-family:'Orbitron';font-size:10px;color:var(--magenta);border:1px solid var(--line);padding:4px 9px;border-radius:20px}
+  .sim-canvas-wrap{position:relative;width:100%;background:radial-gradient(circle at 50% 45%,rgba(255,61,240,0.04),transparent 70%)}
+  .sim canvas{display:block;width:100%}
+  .sim-controls{padding:18px}
+  .ctrl{margin-bottom:16px}
+  .ctrl:last-child{margin-bottom:0}
+  .ctrl-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .ctrl-label .nm{font-family:'Orbitron';font-weight:500;font-size:12.5px;color:var(--txt);letter-spacing:.3px}
+  .ctrl-label .vl{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--magenta)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--magenta),rgba(255,255,255,0.08));outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--magenta);box-shadow:0 0 12px rgba(255,61,240,0.7);border:2px solid #180417;cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--magenta);box-shadow:0 0 12px rgba(255,61,240,0.7);border:2px solid #180417;cursor:pointer}
+  .seg{display:flex;gap:6px;margin-bottom:14px}
+  .seg button{flex:1;font-family:'Orbitron';font-weight:600;font-size:12px;color:var(--txt-dim);background:rgba(255,255,255,0.03);border:1px solid var(--line-soft);border-radius:9px;padding:10px;cursor:pointer;transition:.18s}
+  .seg button.on{color:#180417;background:var(--magenta);border-color:var(--magenta)}
+  .simbtn{font-family:'Orbitron';font-weight:700;font-size:12.5px;letter-spacing:.4px;color:#180417;background:linear-gradient(120deg,var(--magenta),#ff8af5);border:none;padding:12px 16px;border-radius:10px;cursor:pointer;transition:.2s}
+  .simbtn:hover{filter:brightness(1.08)}
+  .simbtn.ghost{background:transparent;color:var(--magenta);border:1px solid var(--line)}
+  .readout{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .readout .ro{flex:1;min-width:74px;background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:10px;padding:10px 11px;text-align:center}
+  .readout .ro .k{font-family:'Orbitron';font-size:9.5px;letter-spacing:.4px;color:var(--txt-dim);display:block;margin-bottom:4px}
+  .readout .ro .v{font-family:'Orbitron';font-weight:700;font-size:16px;color:var(--magenta)}
+  .readout .ro.c .v{color:var(--cyan)}
+  .readout .ro.g .v{color:var(--green)}
+  .readout .ro.y .v{color:var(--yellow)}
+
+  .enem-q{border:1px solid var(--violet);border-radius:var(--radius);overflow:hidden;margin:26px 0;background:linear-gradient(180deg,rgba(139,92,255,0.06),rgba(10,10,26,0.4))}
+  .eq-head{display:flex;align-items:center;gap:10px;padding:13px 18px;background:rgba(139,92,255,0.1);border-bottom:1px solid rgba(139,92,255,0.25);flex-wrap:wrap}
+  .eq-badge{font-family:'Orbitron';font-weight:700;font-size:11px;letter-spacing:.4px;color:var(--violet);border:1px solid rgba(139,92,255,0.4);background:rgba(139,92,255,0.08);padding:5px 11px;border-radius:20px}
+  .eq-tag{font-family:'Orbitron';font-size:11px;color:var(--txt-dim);letter-spacing:.5px}
+  .eq-tag.real{margin-left:auto;color:var(--green)}
+  .eq-body{padding:20px 18px}
+  .eq-enun{font-size:16.5px;line-height:1.62;color:var(--txt);margin-bottom:16px}
+  .eq-alts{display:flex;flex-direction:column;gap:8px}
+  .eq-alt{display:flex;gap:11px;align-items:flex-start;border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;font-size:15.5px;transition:.25s}
+  .eq-alt .let{font-family:'Orbitron';font-weight:700;font-size:13px;width:26px;height:26px;flex-shrink:0;display:grid;place-items:center;border-radius:7px;border:1px solid var(--magenta-dim);color:var(--magenta)}
+  .eq-alt.correct{border-color:var(--green);background:rgba(39,232,138,0.1)}
+  .eq-alt.correct .let{background:var(--green);color:#04121a;border-color:var(--green)}
+  .reveal-btn{margin-top:16px;width:100%;font-family:'Orbitron';font-weight:700;font-size:13px;letter-spacing:.5px;background:linear-gradient(120deg,var(--violet),#6f4ad6);color:#fff;border:none;padding:13px;border-radius:11px;cursor:pointer;transition:.2s}
+  .reveal-btn:hover{filter:brightness(1.12);box-shadow:0 0 20px rgba(139,92,255,0.4)}
+  .eq-sol{margin-top:18px;border-top:1px dashed rgba(139,92,255,0.3);padding-top:18px;display:none}
+  .eq-sol.show{display:block;animation:fade .4s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .eq-sol h4{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;color:var(--magenta);margin:16px 0 8px;text-transform:uppercase}
+  .eq-sol h4:first-child{margin-top:0}
+  .eq-sol p{font-size:16px;line-height:1.62;color:var(--txt);margin-bottom:6px}
+  .eq-sol .calc-step{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--yellow);background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:9px;padding:11px 14px;margin:10px 0;letter-spacing:.5px}
+  .eq-answer{margin-top:16px;font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--green);background:rgba(39,232,138,0.1);border:1px solid rgba(39,232,138,0.3);border-radius:10px;padding:13px 16px;text-align:center}
+
+  .ex{background:var(--panel-solid);border:1px solid var(--cyan);border-radius:var(--radius);margin:24px 0;overflow:hidden}
+  .ex-h{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.5px;color:#04121a;background:var(--cyan);padding:9px 16px}
+  .ex-b{padding:16px 18px;font-size:16px;line-height:1.62}
+  .ex-b .calc-step{font-family:'Orbitron';font-weight:700;font-size:15px;color:var(--cyan);background:rgba(0,0,0,0.3);border:1px solid var(--line-soft);border-radius:9px;padding:11px 14px;margin:10px 0}
+
+  .sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:22px 0}
+  .sheet .f{background:var(--panel-solid);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .sheet .f .eq{font-family:'Orbitron';font-weight:700;font-size:16px;color:var(--magenta);margin-bottom:7px}
+  .sheet .f .ds{font-size:13.5px;color:var(--txt-dim);line-height:1.4}
+  .takeaways{list-style:none;margin:18px 0}
+  .takeaways li{position:relative;padding:9px 0 9px 32px;font-size:16.5px;line-height:1.55;border-bottom:1px solid var(--line-soft)}
+  .takeaways li:last-child{border-bottom:none}
+  .takeaways li::before{content:'\21BB';position:absolute;left:0;top:7px;font-size:17px;color:var(--magenta)}
+  .takeaways li b{color:#eafcff}
+
+  .finish-card{text-align:center;background:linear-gradient(135deg,rgba(255,61,240,0.08),rgba(139,92,255,0.06));border:1px solid var(--line)}
+  .btn{font-family:'Orbitron';font-weight:700;font-size:14px;letter-spacing:.5px;background:linear-gradient(120deg,var(--magenta),#ff8af5);color:#180417;border:none;padding:15px 30px;border-radius:12px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:9px}
+  .btn:hover{filter:brightness(1.08);box-shadow:0 0 26px rgba(255,61,240,0.45);transform:translateY(-1px)}
+  .btn.done-state{background:linear-gradient(120deg,var(--green),#1fd07e);color:#04121a}
+  footer{padding:34px 20px 50px;text-align:center;color:var(--txt-dim);font-size:13.5px}
+  footer .ft-logo{font-family:'Orbitron';font-weight:700;color:var(--magenta);font-size:14px}
+
+  @media(max-width:680px){
+    section.lesson{padding:44px 0}
+    .map,.map.two{grid-template-columns:1fr}
+    .hero-inner{padding:56px 20px 50px}
+    p.body,.lead{font-size:16.5px}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <span class="tb-logo"><span class="spark">&#8635;</span> Movimento Circular</span>
+    <span class="tb-spacer"></span>
+    <span class="tb-pct" id="tbPct">0%</span>
+    <button class="tb-toc-btn" id="tocBtn">&#9776; Conteúdo</button>
+  </div>
+  <div class="progress-strip"><div id="progBar"></div></div>
+</div>
+
+<div class="toc" id="toc">
+  <div class="toc-panel">
+    <h3>Conteúdo da aula <span class="toc-x" id="tocX">&times;</span></h3>
+    <nav id="tocNav"></nav>
+  </div>
+</div>
+
+<header class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="pulse"></span> Plataforma da Física · aula completa</span>
+    <h1>Movimento<br><span class="glow">Circular</span></h1>
+    <p class="sub">Tudo o que gira: da roda-gigante ao satélite. Entenda <b>período, velocidade angular, aceleração e força centrípeta</b> e a transmissão por polias — com simulações que você controla e questões reais do ENEM.</p>
+    <div class="hero-meta">
+      <span class="chip"><b>5</b> simulações interativas</span>
+      <span class="chip"><b>4</b> questões do ENEM</span>
+      <span class="chip"><b>12</b> seções do zero</span>
+    </div>
+    <div class="scroll-cue">&#9660; ROLE PARA COMEÇAR</div>
+  </div>
+</header>
+
+<main>
+
+<!-- 1. INTRO -->
+<section class="lesson" id="s1" data-title="O que é movimento circular">
+  <div class="wrap">
+    <div class="kicker"><span class="num">1</span> A grande ideia</div>
+    <h2 class="sec-title">O que é movimento circular?</h2>
+    <p class="lead">Movimento circular é todo movimento cuja trajetória é uma <b>circunferência</b> — o corpo se mantém sempre à mesma distância de um ponto central.</p>
+    <p class="body">Ele está por toda parte: a <span class="hl">roda</span> de um carro, as pás de um <span class="hl">ventilador</span>, o ponteiro do relógio, a Lua em torno da Terra, um carrossel, o tambor da máquina de lavar. Sempre que algo <b>gira</b>, estamos falando de movimento circular.</p>
+    <div class="map">
+      <div class="m"><span class="ic">&#127905;</span><span class="t">RODA-GIGANTE</span><span class="d">cada cabine descreve um círculo</span></div>
+      <div class="m"><span class="ic">&#128760;</span><span class="t">SATÉLITE</span><span class="d">órbita quase circular ao redor da Terra</span></div>
+      <div class="m"><span class="ic">&#128260;</span><span class="t">ENGRENAGENS</span><span class="d">giram e transmitem movimento entre si</span></div>
+    </div>
+    <p class="body">Nesta aula vamos do básico (o que é um ângulo em radianos) até a <b>força centrípeta</b> e a <b>transmissão por polias</b>, um dos assuntos preferidos do ENEM. Há uma diferença importante logo de início:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#128259;</span><span class="t">MCU (uniforme)</span><span class="d">gira com rapidez <b>constante</b> — o foco desta aula</span></div>
+      <div class="m"><span class="ic">&#9201;</span><span class="t">MCUV (variado)</span><span class="d">a rapidez de giro <b>aumenta ou diminui</b></span></div>
+    </div>
+    <p class="body">Vamos começar entendendo como se mede uma "quantidade de giro": o ângulo.</p>
+  </div>
+</section>
+
+<!-- 2. RADIANO -->
+<section class="lesson" id="s2" data-title="Ângulo e o radiano">
+  <div class="wrap">
+    <div class="kicker"><span class="num">2</span> Medindo o giro</div>
+    <h2 class="sec-title">O ângulo e o radiano</h2>
+    <p class="body">Para medir "quanto" um corpo girou, usamos o <b>ângulo</b>. Na física do movimento circular, a unidade mais conveniente não é o grau, e sim o <span class="hl">radiano (rad)</span>.</p>
+    <p class="body">O radiano liga o ângulo diretamente ao <b>comprimento do arco</b> percorrido: um ângulo de 1 radiano corresponde a um arco de comprimento igual ao raio. De modo geral:</p>
+    <div class="formula"><span class="c">&theta;</span> = <span class="g">s</span> / <span class="m">R</span> <small>ângulo (rad) = comprimento do arco &divide; raio</small></div>
+    <p class="body">Como o comprimento de uma circunferência inteira é 2&pi;R, uma <b>volta completa</b> corresponde a um ângulo de <span class="hl">2&pi; radianos</span>. Guarde estas equivalências:</p>
+    <div class="map">
+      <div class="m"><span class="ic">&#128260;</span><span class="t">1 VOLTA</span><span class="d">360&deg; = <b>2&pi; rad</b> &asymp; 6,28 rad</span></div>
+      <div class="m"><span class="ic">&#9203;</span><span class="t">MEIA VOLTA</span><span class="d">180&deg; = <b>&pi; rad</b></span></div>
+      <div class="m"><span class="ic">&#128736;</span><span class="t">1/4 DE VOLTA</span><span class="d">90&deg; = <b>&pi;/2 rad</b></span></div>
+    </div>
+    <div class="note tip">
+      <span class="tag">POR QUE RADIANO?</span>
+      Porque ele transforma a relação entre o giro e a distância percorrida numa conta simples: <b>s = &theta;·R</b>. É o que vai nos permitir ligar as grandezas <b>angulares</b> (do giro) às grandezas <b>lineares</b> (da trajetória) mais à frente.
+    </div>
+  </div>
+</section>
+
+<!-- 3. PERÍODO E FREQUÊNCIA -->
+<section class="lesson" id="s3" data-title="Período e frequência">
+  <div class="wrap">
+    <div class="kicker"><span class="num">3</span> O ritmo do giro</div>
+    <h2 class="sec-title">Período e frequência</h2>
+    <p class="body">Duas grandezas descrevem o <b>ritmo</b> de qualquer movimento que se repete:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#9201;</span><span class="t">PERÍODO (T)</span><span class="d">o tempo de <b>uma volta completa</b>. Unidade: segundo (s)</span></div>
+      <div class="m"><span class="ic">&#128259;</span><span class="t">FREQUÊNCIA (f)</span><span class="d"><b>quantas voltas por segundo</b>. Unidade: hertz (Hz)</span></div>
+    </div>
+    <p class="body">Elas são uma o inverso da outra — essa é uma das relações mais úteis da física:</p>
+    <div class="formula"><span class="c">f</span> = 1 / <span class="m">T</span> <small>frequência = 1 &divide; período &nbsp;|&nbsp; também: T = 1/f</small></div>
+    <p class="body">Se uma roda dá 2 voltas por segundo, sua frequência é f = 2 Hz e cada volta leva T = 1/2 = 0,5 s. Em máquinas, a frequência costuma vir em <b>rotações por minuto (rpm)</b>: para virar hertz, divida por 60 (pois 1 minuto = 60 s).</p>
+    <div class="ex">
+      <div class="ex-h">EXEMPLO RESOLVIDO · de rpm para Hz</div>
+      <div class="ex-b">
+        <p>Um motor gira a 1 800 rpm. Qual a frequência em hertz e o período?</p>
+        <div class="calc-step">f = 1800 &divide; 60 = 30 Hz</div>
+        <div class="calc-step">T = 1/f = 1/30 &asymp; 0,033 s</div>
+        <p>Ou seja, 30 voltas por segundo, cada uma durando cerca de 33 milésimos de segundo.</p>
+      </div>
+    </div>
+
+    <!-- ENEM c263 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2016</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">A corrida dos 100 m rasos qualifica o homem mais rápido do mundo. Um corredor de elite percorreu essa distância em 10 s, com 41 passadas, iniciando com o pé direito. O período de oscilação do pé direito desse corredor foi mais próximo de:</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>1/10 s.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>1/4 s.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>1/2 s.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>2 s.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>4 s.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>O período é o tempo de <b>um ciclo completo</b> do pé direito (de um toque no chão até o próximo). Das 41 passadas, cerca de metade são do pé direito &mdash; aproximadamente 20 toques.</p>
+          <div class="calc-step">T = tempo &divide; nº de ciclos = 10 &divide; 20 = 1/2 s</div>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. VELOCIDADE ANGULAR -->
+<section class="lesson" id="s4" data-title="Velocidade angular">
+  <div class="wrap">
+    <div class="kicker"><span class="num">4</span> A rapidez do giro</div>
+    <h2 class="sec-title">Velocidade angular (&omega;)</h2>
+    <p class="body">A <span class="hl">velocidade angular</span> (letra grega ômega, &omega;) mede <b>quão rápido o ângulo varia</b> — ou seja, quanto o corpo gira por segundo. Sua unidade é o radiano por segundo (rad/s).</p>
+    <p class="body">Como uma volta completa é 2&pi; radianos e leva um período T, a velocidade angular é:</p>
+    <div class="formula"><span class="c">&omega;</span> = 2&pi; / <span class="m">T</span> = 2&pi;<span class="g">f</span> <small>velocidade angular = um giro completo (2&pi;) por período</small></div>
+    <p class="body">Repare: quanto <b>menor o período</b> (giro mais rápido), <b>maior o &omega;</b>. E &omega; depende só do <b>ritmo do giro</b> — não importa o tamanho do círculo. Isso terá uma consequência importante daqui a pouco.</p>
+    <div class="note">
+      <span class="tag">TODOS OS PONTOS TÊM O MESMO &omega;</span>
+      Num corpo rígido girando (um disco, uma roda), <b>todos os pontos completam a volta ao mesmo tempo</b>. Logo, todos têm a <b>mesma velocidade angular &omega;</b> e a mesma frequência &mdash; do centro até a borda.
+    </div>
+  </div>
+</section>
+
+<!-- 5. VELOCIDADE LINEAR -->
+<section class="lesson" id="s5" data-title="Velocidade linear (v = ωR)">
+  <div class="wrap">
+    <div class="kicker"><span class="num">5</span> Do giro à trajetória</div>
+    <h2 class="sec-title">Velocidade linear e a ponte v = &omega;R</h2>
+    <p class="body">A <span class="hl">velocidade linear</span> (ou escalar) é a rapidez com que o corpo percorre a <b>trajetória</b>, em metros por segundo. Ela é sempre <b>tangente</b> ao círculo &mdash; aponta na direção do movimento, "de lado".</p>
+    <p class="body">Numa volta, o corpo percorre a circunferência (2&pi;R) no tempo de um período (T). Então:</p>
+    <div class="formula"><span class="c">v</span> = 2&pi;<span class="m">R</span> / <span class="y">T</span> = <span class="g">&omega;</span> &middot; <span class="m">R</span> <small>velocidade linear = velocidade angular &times; raio</small></div>
+    <p class="body">Esta é a <b>ponte</b> entre o mundo angular e o linear: <span class="hl">v = &omega;R</span>. Ela revela algo curioso: como todos os pontos de um disco têm o mesmo &omega;, os que estão <b>mais longe do centro</b> (R maior) têm <b>velocidade linear maior</b>. A borda "corre" mais que o miolo. Arraste e compare:</p>
+
+    <!-- SIM 1 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#128260;</span><span class="ttl">Simulação · Mesmo &omega;, velocidades diferentes</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="radiusCanvas" height="240"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Velocidade angular &omega; (rad/s)</span><span class="vl" id="raWval">3,0</span></div>
+          <input type="range" id="raW" min="5" max="60" value="30">
+        </div>
+        <div class="readout">
+          <div class="ro c"><span class="k">v BORDA (R maior)</span><span class="v" id="raVout">&mdash;</span></div>
+          <div class="ro g"><span class="k">v MEIO (R menor)</span><span class="v" id="raVin">&mdash;</span></div>
+          <div class="ro"><span class="k">&omega; (IGUAL)</span><span class="v" id="raW2">&mdash;</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENEM c310 -->
+    <div class="enem-q" data-correct="0">
+      <div class="eq-head"><span class="eq-badge">ENEM 2018</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Um vendedor sugere trocar as rodas de um automóvel de aro 15 para aro 17 polegadas, o que aumenta o diâmetro do conjunto roda e pneu. Duas consequências dessa troca são:</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>Elevar o centro de massa (mais instável) e aumentar a velocidade real em relação à indicada no velocímetro.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>Abaixar o centro de massa (mais instável) e diminuir a velocidade real em relação à indicada.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>Elevar o centro de massa (mais estável) e aumentar a velocidade real em relação à indicada.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>Abaixar o centro de massa (mais estável) e diminuir a velocidade real em relação à indicada.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>Elevar o centro de massa (mais estável) e diminuir a velocidade real em relação à indicada.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Centro de massa</h4>
+          <p>Rodas maiores <b>elevam</b> o carro, subindo o centro de massa &mdash; o que o deixa <b>menos estável</b> em curvas.</p>
+          <h4>O velocímetro (aqui entra v = &omega;R)</h4>
+          <p>O velocímetro conta as <b>rotações da roda</b> (&omega;) e supõe o raio antigo. Com um pneu de <b>raio maior</b>, cada rotação avança mais (v = &omega;R), então o carro anda <b>mais rápido</b> do que o velocímetro indica.</p>
+          <div class="eq-answer">Resposta: alternativa A</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. MCU E PROJEÇÃO -->
+<section class="lesson" id="s6" data-title="MCU e a projeção (MHS)">
+  <div class="wrap">
+    <div class="kicker"><span class="num">6</span> O movimento por inteiro</div>
+    <h2 class="sec-title">Movimento Circular Uniforme (MCU)</h2>
+    <p class="body">No <span class="hl">Movimento Circular Uniforme</span>, o corpo gira com velocidade angular <b>constante</b> &mdash; dá voltas em intervalos de tempo sempre iguais. O <b>módulo</b> da velocidade linear não muda... mas atenção: a <b>direção</b> dela muda o tempo todo, porque ela é sempre tangente ao círculo.</p>
+    <p class="body">Na simulação abaixo, o vetor <span style="color:var(--cyan);font-weight:700">azul</span> é a velocidade (tangente) e o vetor <span style="color:var(--magenta);font-weight:700">rosa</span> é a aceleração centrípeta (que sempre aponta para o centro &mdash; já já a estudamos). Mude o raio e o período e veja os valores:</p>
+
+    <!-- SIM 2 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#128259;</span><span class="ttl">Simulação · MCU com vetores</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="circleCanvas" height="260"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Raio R (m)</span><span class="vl" id="ccRval">1,5 m</span></div>
+          <input type="range" id="ccR" min="6" max="30" value="15">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Período T (s)</span><span class="vl" id="ccTval">3,0 s</span></div>
+          <input type="range" id="ccT" min="10" max="60" value="30">
+        </div>
+        <div class="readout">
+          <div class="ro"><span class="k">FREQU. f</span><span class="v" id="ccF">&mdash;</span></div>
+          <div class="ro"><span class="k">&omega; (rad/s)</span><span class="v" id="ccW">&mdash;</span></div>
+          <div class="ro c"><span class="k">v (m/s)</span><span class="v" id="ccV">&mdash;</span></div>
+          <div class="ro"><span class="k">a&#8347; (m/s²)</span><span class="v" id="ccA">&mdash;</span></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="body"><b>Um truque bonito:</b> se você olhar um MCU "de lado" (a sombra do corpo numa parede), verá a sombra indo e voltando, acelerando no meio e parando nas pontas. Essa sombra descreve um <span class="hl">Movimento Harmônico Simples (MHS)</span> &mdash; o mesmo de um pêndulo ou de uma mola. Veja:</p>
+
+    <!-- SIM 3 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#127761;</span><span class="ttl">Simulação · A sombra do MCU é um MHS</span><span class="lbl">observe</span></div>
+      <div class="sim-canvas-wrap"><canvas id="projCanvas" height="220"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Período T (s)</span><span class="vl" id="pjTval">3,0 s</span></div>
+          <input type="range" id="pjT" min="10" max="60" value="30">
+        </div>
+        <p style="font-size:14px;color:var(--txt-dim);text-align:center;margin:0">O ponto rosa gira em MCU; sua <b>projeção</b> (a bolinha azul, na régua à direita) sobe e desce em MHS &mdash; rápida no centro, parada nos extremos.</p>
+      </div>
+    </div>
+
+    <!-- ENEM p58 -->
+    <div class="enem-q" data-correct="2">
+      <div class="eq-head"><span class="eq-badge">ENEM 2013</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Um enfeite de berço é um aro metálico com um ursinho pendurado, que gira com velocidade angular constante, na horizontal. O movimento do ursinho é projetado numa parede pela sua sombra. Enquanto o ursinho gira, sua sombra descreve um movimento:</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>circular uniforme.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>retilíneo uniforme.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>retilíneo harmônico simples.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>circular uniformemente variado.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>retilíneo uniformemente variado.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>A sombra se move numa <b>linha reta</b> (elimina A e D, que são circulares). E não é uniforme: ela é rápida no meio e para nas pontas, exatamente como vimos na simulação.</p>
+          <p>Esse vai e vem, projeção de um MCU, é justamente o <b>Movimento Harmônico Simples</b>.</p>
+          <div class="eq-answer">Resposta: alternativa C</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. ACELERAÇÃO CENTRÍPETA -->
+<section class="lesson" id="s7" data-title="Aceleração centrípeta">
+  <div class="wrap">
+    <div class="kicker"><span class="num">7</span> Acelerar sem ficar mais rápido</div>
+    <h2 class="sec-title">Aceleração centrípeta</h2>
+    <p class="body">Aqui mora a ideia mais sutil da aula. No MCU a velocidade tem <b>módulo constante</b>, mas está sempre <b>mudando de direção</b>. E mudar a velocidade &mdash; mesmo só a direção &mdash; já é <span class="hl">acelerar</span>.</p>
+    <p class="body">Essa aceleração aponta sempre para o <b>centro</b> da curva (por isso "centrípeta", que busca o centro). Ela não muda a rapidez; ela apenas <b>curva</b> a trajetória, puxando o movimento para dentro o tempo todo. Seu módulo é:</p>
+    <div class="formula"><span class="c">a&#8347;</span> = <span class="m">v²</span> / R = <span class="g">&omega;²</span> &middot; R <small>aceleração centrípeta &mdash; aponta para o centro</small></div>
+    <p class="body">Repare nas duas formas: com v² e R, ou com &omega;² e R. Elas mostram que a aceleração cresce <b>muito</b> com a velocidade (ao quadrado!) e também aumenta com o raio quando &omega; é fixo. Volte à <b>simulação do MCU</b> (seção 6) e veja o valor de a&#8347; disparar ao diminuir o período.</p>
+    <div class="note warn">
+      <span class="tag">CUIDADO COM A INTUIÇÃO</span>
+      É comum pensar "se a rapidez não muda, não há aceleração". Errado! No MCU <b>sempre há aceleração</b> (a centrípeta), porque a <b>direção</b> da velocidade muda continuamente. Aceleração não é só "ficar mais rápido".
+    </div>
+  </div>
+</section>
+
+<!-- 8. FORÇA CENTRÍPETA -->
+<section class="lesson" id="s8" data-title="Força centrípeta">
+  <div class="wrap">
+    <div class="kicker"><span class="num">8</span> Quem faz a curva acontecer</div>
+    <h2 class="sec-title">Força centrípeta (e o mito da "centrífuga")</h2>
+    <p class="body">Pela 2ª Lei de Newton, se há aceleração, há uma <b>força resultante</b> na mesma direção. Como a aceleração centrípeta aponta para o centro, a força resultante também aponta para o centro: é a <span class="hl">força centrípeta</span>.</p>
+    <div class="formula"><span class="c">F&#8347;</span> = m &middot; <span class="m">a&#8347;</span> = m<span class="m">v²</span>/R <small>força resultante que mantém o corpo na curva</small></div>
+    <div class="note">
+      <span class="tag">ELA NÃO É UMA FORÇA "NOVA"</span>
+      Força centrípeta é um <b>papel</b>, não um tipo de força. Quem faz esse papel muda em cada caso: a <b>tração</b> do barbante numa pedra girada; o <b>atrito</b> dos pneus numa curva; a <b>gravidade</b> que segura a Lua; a <b>normal</b> no globo da morte. É sempre a resultante apontando para o centro.
+    </div>
+    <p class="body">E a famosa <b>"força centrífuga"</b>, que jogaria você para fora? <span class="hl">Ela não existe como força real.</span> O que você sente numa curva é a sua <b>inércia</b>: seu corpo tende a seguir em linha reta, e é o carro (pela porta, pelo cinto) que te empurra para dentro. Se a força que segura a curva sumir, o corpo não voa "para fora" &mdash; ele sai pela <b>tangente</b>, em linha reta. Teste você mesmo: gire e depois corte a corda.</p>
+
+    <!-- SIM 4 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#10024;</span><span class="ttl">Simulação · Cortar a corda (inércia)</span><span class="lbl">clique</span></div>
+      <div class="sim-canvas-wrap"><canvas id="releaseCanvas" height="250"></canvas></div>
+      <div class="sim-controls">
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Velocidade de giro</span><span class="vl" id="rlVval">média</span></div>
+          <input type="range" id="rlV" min="8" max="40" value="20">
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="simbtn" id="rlCut" style="flex:1">&#9986; Cortar a corda</button>
+          <button class="simbtn ghost" id="rlReset" style="flex:1">&#8635; Reiniciar</button>
+        </div>
+        <p style="font-size:14px;color:var(--txt-dim);text-align:center;margin:12px 0 0">Enquanto a corda puxa (seta rosa, para o centro), a pedra faz a curva. Ao cortar, ela segue reto <b>pela tangente</b> &mdash; nunca radialmente para fora.</p>
+      </div>
+    </div>
+
+    <!-- ENEM c199 -->
+    <div class="enem-q" data-correct="4">
+      <div class="eq-head"><span class="eq-badge">ENEM 2014</span><span class="eq-tag">Questão resolvida</span><span class="eq-tag real">prova real</span></div>
+      <div class="eq-body">
+        <p class="eq-enun">Uma criança está em um carrossel em um parque de diversões. Esse brinquedo descreve um movimento circular com intervalo de tempo regular. A força resultante que atua sobre a criança:</p>
+        <div class="eq-alts">
+          <div class="eq-alt"><span class="let">A</span><span>é nula.</span></div>
+          <div class="eq-alt"><span class="let">B</span><span>é oblíqua à velocidade do carrossel.</span></div>
+          <div class="eq-alt"><span class="let">C</span><span>é paralela à velocidade do carrossel.</span></div>
+          <div class="eq-alt"><span class="let">D</span><span>está direcionada para fora do brinquedo.</span></div>
+          <div class="eq-alt"><span class="let">E</span><span>está direcionada para o centro do brinquedo.</span></div>
+        </div>
+        <button class="reveal-btn">Ver resolução passo a passo &#9660;</button>
+        <div class="eq-sol">
+          <h4>Raciocínio</h4>
+          <p>Intervalos de tempo regulares indicam um <b>MCU</b>. Como a direção da velocidade muda, há aceleração centrípeta e, portanto, uma força resultante &mdash; ela não é nula (elimina A).</p>
+          <p>Essa força resultante é a <b>centrípeta</b>: aponta para o <b>centro</b> do brinquedo. "Para fora" (D) seria a inexistente força centrífuga.</p>
+          <div class="eq-answer">Resposta: alternativa E</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. TRANSMISSÃO -->
+<section class="lesson" id="s9" data-title="Transmissão (polias e engrenagens)">
+  <div class="wrap">
+    <div class="kicker"><span class="num">9</span> O queridinho do ENEM</div>
+    <h2 class="sec-title">Transmissão de movimento</h2>
+    <p class="body">Bicicletas, relógios, motores e esteiras ligam rodas que giram juntas. Há <b>dois jeitos</b> de acoplar duas rodas, e cada um conserva uma grandeza diferente. Saber distinguir os dois resolve quase toda questão do tema:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#128273;</span><span class="t">MESMO EIXO</span><span class="d">giram juntas no mesmo centro &rarr; <b>mesma &omega;</b> (mesma frequência). A de maior raio tem <b>maior v</b>.</span></div>
+      <div class="m"><span class="ic">&#128260;</span><span class="t">CORREIA / CONTATO</span><span class="d">ligadas por correia ou encostadas &rarr; <b>mesma v</b> na borda. A de maior raio tem <b>menor &omega;</b>.</span></div>
+    </div>
+    <p class="body">A regra sai direto de <b>v = &omega;R</b>. Escolha o tipo de acoplamento, mude os raios e confira o que se conserva:</p>
+
+    <!-- SIM 5 -->
+    <div class="sim">
+      <div class="sim-head"><span class="ic">&#9881;</span><span class="ttl">Simulação · Polias: eixo x correia</span><span class="lbl">arraste</span></div>
+      <div class="sim-canvas-wrap"><canvas id="transCanvas" height="230"></canvas></div>
+      <div class="sim-controls">
+        <div class="seg">
+          <button id="tgEixo" class="on">Mesmo eixo (mesma &omega;)</button>
+          <button id="tgCorreia">Correia (mesma v)</button>
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Raio da roda A</span><span class="vl" id="trA">1,0</span></div>
+          <input type="range" id="trRa" min="6" max="20" value="10">
+        </div>
+        <div class="ctrl">
+          <div class="ctrl-label"><span class="nm">Raio da roda B</span><span class="vl" id="trB">2,0</span></div>
+          <input type="range" id="trRb" min="6" max="30" value="20">
+        </div>
+        <div class="readout">
+          <div class="ro"><span class="k">&omega;A : &omega;B</span><span class="v" id="trW">&mdash;</span></div>
+          <div class="ro c"><span class="k">vA : vB (borda)</span><span class="v" id="trV">&mdash;</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ex">
+      <div class="ex-h">EXEMPLO RESOLVIDO · bicicleta (correia/corrente)</div>
+      <div class="ex-b">
+        <p>Numa bicicleta, a coroa (dianteira) tem raio 3 vezes maior que a catraca (traseira), ligadas pela corrente. Se você pedala a coroa a 1 volta por segundo (f = 1 Hz), qual a frequência da catraca (e da roda)?</p>
+        <p>Corrente &rarr; <b>mesma v</b> na borda das duas. Como v = &omega;R = 2&pi;f·R:</p>
+        <div class="calc-step">f<sub>coroa</sub>·R<sub>coroa</sub> = f<sub>catraca</sub>·R<sub>catraca</sub></div>
+        <div class="calc-step">1 &middot; 3 = f<sub>catraca</sub> &middot; 1 &rarr; f<sub>catraca</sub> = 3 Hz</div>
+        <p>A roda gira 3 vezes mais rápido que a pedalada &mdash; é assim que a bike ganha velocidade. Raio maior "puxando", raio menor "puxado": o pequeno gira mais rápido.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. MCUV -->
+<section class="lesson" id="s10" data-title="MCUV — quando o giro acelera">
+  <div class="wrap">
+    <div class="kicker"><span class="num">10</span> Um passo além</div>
+    <h2 class="sec-title">Quando o giro acelera (MCUV)</h2>
+    <p class="body">Até aqui o giro foi uniforme. Mas e quando a roda <b>arranca</b> ou <b>freia</b>? Aí a velocidade angular muda, e temos o <span class="hl">Movimento Circular Uniformemente Variado (MCUV)</span>. Surge uma nova grandeza, a <b>aceleração angular</b> (&alpha;), que mede quão rápido o &omega; varia (em rad/s²).</p>
+    <p class="body">Nesse caso o corpo passa a ter <b>duas</b> acelerações ao mesmo tempo, perpendiculares entre si:</p>
+    <div class="map two">
+      <div class="m"><span class="ic">&#8635;</span><span class="t">CENTRÍPETA (a&#8347;)</span><span class="d">aponta para o centro; muda a <b>direção</b> da velocidade. a&#8347; = &omega;²R</span></div>
+      <div class="m"><span class="ic">&#10230;</span><span class="t">TANGENCIAL (a&#8348;)</span><span class="d">na direção do movimento; muda o <b>módulo</b> da velocidade. a&#8348; = &alpha;R</span></div>
+    </div>
+    <p class="body">A aceleração total é a combinação (soma vetorial) das duas. No MCU comum, a tangencial é zero &mdash; sobra só a centrípeta. É por isso que, no dia a dia do ENEM, quase tudo se resolve com o que você já viu nas seções anteriores.</p>
+    <div class="note tip">
+      <span class="tag">RESUMO RÁPIDO</span>
+      <b>MCU:</b> só aceleração centrípeta (muda a direção). <b>MCUV:</b> centrípeta <b>+</b> tangencial (muda direção <b>e</b> módulo). A palavra "uniforme" no nome sempre se refere ao <b>módulo</b> da velocidade.
+    </div>
+  </div>
+</section>
+
+<!-- 11. APLICAÇÕES -->
+<section class="lesson" id="s11" data-title="Aplicações no cotidiano">
+  <div class="wrap">
+    <div class="kicker"><span class="num">11</span> Física no mundo real</div>
+    <h2 class="sec-title">Onde tudo isso aparece</h2>
+    <p class="body">O movimento circular explica situações que o ENEM adora contextualizar. Em todas, procure <b>qual força faz o papel de centrípeta</b>:</p>
+    <div class="map">
+      <div class="m"><span class="ic">&#128663;</span><span class="t">CURVA DE CARRO</span><span class="d">o <b>atrito</b> dos pneus é a força centrípeta. Sem atrito (gelo), o carro sai pela tangente.</span></div>
+      <div class="m"><span class="ic">&#128760;</span><span class="t">SATÉLITES</span><span class="d">a <b>gravidade</b> faz o papel de centrípeta e mantém a órbita.</span></div>
+      <div class="m"><span class="ic">&#127904;</span><span class="t">GLOBO DA MORTE</span><span class="d">no topo, <b>peso + normal</b> apontam para o centro e seguram a moto.</span></div>
+    </div>
+    <div class="map">
+      <div class="m"><span class="ic">&#128700;</span><span class="t">CENTRÍFUGA</span><span class="d">separa substâncias: as mais densas exigem mais força para curvar e vão para a borda.</span></div>
+      <div class="m"><span class="ic">&#128692;</span><span class="t">CURVA INCLINADA</span><span class="d">a <b>sobrelevação</b> da pista usa a normal para ajudar a fazer a curva.</span></div>
+      <div class="m"><span class="ic">&#127765;</span><span class="t">LUA E PLANETAS</span><span class="d">órbitas quase circulares governadas pela gravitação.</span></div>
+    </div>
+    <div class="note">
+      <span class="tag">A PERGUNTA-CHAVE DO ENEM</span>
+      Diante de qualquer situação de giro, pergunte-se: <b>"quem está empurrando ou puxando o corpo para o centro?"</b> A resposta é a força centrípeta daquele caso &mdash; e daí sai quase toda a solução.
+    </div>
+  </div>
+</section>
+
+<!-- 12. RESUMO -->
+<section class="lesson" id="s12" data-title="Resumo e fórmulas">
+  <div class="wrap">
+    <div class="kicker"><span class="num">12</span> Leve no bolso</div>
+    <h2 class="sec-title">Resumo e fórmulas essenciais</h2>
+    <div class="sheet">
+      <div class="f"><div class="eq">f = 1/T</div><div class="ds">frequência e período são inversos</div></div>
+      <div class="f"><div class="eq">&omega; = 2&pi;/T = 2&pi;f</div><div class="ds">velocidade angular (rad/s)</div></div>
+      <div class="f"><div class="eq">v = &omega;R</div><div class="ds">a ponte angular &rarr; linear</div></div>
+      <div class="f"><div class="eq">a&#8347; = v²/R = &omega;²R</div><div class="ds">aceleração centrípeta</div></div>
+      <div class="f"><div class="eq">F&#8347; = mv²/R</div><div class="ds">força centrípeta (resultante)</div></div>
+      <div class="f"><div class="eq">1 volta = 2&pi; rad</div><div class="ds">360&deg; em radianos</div></div>
+    </div>
+    <ul class="takeaways">
+      <li>Movimento circular é toda trajetória em <b>circunferência</b>; no <b>MCU</b> o giro é uniforme.</li>
+      <li>Num corpo rígido, todos os pontos têm a <b>mesma &omega;</b>; a <b>velocidade linear</b> cresce com o raio (v = &omega;R).</li>
+      <li>No MCU há <b>aceleração centrípeta</b>, apontando para o centro, mesmo com a rapidez constante &mdash; ela muda a <b>direção</b> da velocidade.</li>
+      <li>A <b>força centrípeta</b> é a resultante para o centro; a "centrífuga" <b>não é força real</b>: é inércia (saída pela tangente).</li>
+      <li><b>Transmissão:</b> mesmo eixo &rarr; mesma &omega;; correia/contato &rarr; mesma v.</li>
+      <li>A projeção (sombra) de um MCU é um <b>MHS</b>.</li>
+    </ul>
+
+    <div class="card finish-card">
+      <p class="body" style="margin-bottom:18px">Você percorreu o movimento circular do zero &mdash; do radiano à transmissão por polias, passando pelas cinco simulações. Marque a aula como concluída:</p>
+      <button class="btn" id="finishBtn">&#10003; Concluir aula</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p><span class="ft-logo">&#8635; Plataforma da Física</span></p>
+  <p style="margin-top:8px">Movimento Circular &mdash; aula interativa com simulações e questões reais do ENEM.</p>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+  var KEY='plataphysica_circular_aula';
+
+  function fitCanvas(cv, cssH){
+    var dpr=window.devicePixelRatio||1;
+    var w=cv.clientWidth || (cv.parentElement?cv.parentElement.clientWidth:300);
+    cv.width=Math.round(w*dpr); cv.height=Math.round(cssH*dpr); cv.style.height=cssH+'px';
+    var ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+    return {ctx:ctx,w:w,h:cssH};
+  }
+  function pad2(n){ n=''+n; return n.length<2?('0'+n):n; }
+  function arrow(ctx,x1,y1,x2,y2,color,wd){
+    ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=wd||2.5;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    var a=Math.atan2(y2-y1,x2-x1), hl=8;
+    ctx.beginPath(); ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-hl*Math.cos(a-0.4), y2-hl*Math.sin(a-0.4));
+    ctx.lineTo(x2-hl*Math.cos(a+0.4), y2-hl*Math.sin(a+0.4));
+    ctx.closePath(); ctx.fill();
+  }
+
+  /* ---- índice + progresso ---- */
+  var secs=[].slice.call(document.querySelectorAll('section.lesson'));
+  var tocNav=document.getElementById('tocNav');
+  secs.forEach(function(s,i){
+    var a=document.createElement('a'); a.href='#'+s.id;
+    a.innerHTML='<span class="n">'+pad2(i+1)+'</span><span>'+s.getAttribute('data-title')+'</span><span class="dot">&#10003;</span>';
+    a.addEventListener('click',closeToc); tocNav.appendChild(a);
+  });
+  var tocLinks=[].slice.call(tocNav.children);
+  var toc=document.getElementById('toc');
+  function openToc(){toc.classList.add('open');}
+  function closeToc(){toc.classList.remove('open');}
+  document.getElementById('tocBtn').addEventListener('click',openToc);
+  document.getElementById('tocX').addEventListener('click',closeToc);
+  toc.addEventListener('click',function(e){ if(e.target===toc) closeToc(); });
+
+  var seen={}; try{ seen=JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){ seen={}; }
+  var progBar=document.getElementById('progBar'), tbPct=document.getElementById('tbPct');
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(seen)); }catch(e){} }
+  function updateProgress(){
+    var done=0;
+    secs.forEach(function(s,i){ if(seen[s.id]){ done++; tocLinks[i].classList.add('done'); } });
+    var pct=Math.round(done/secs.length*100);
+    progBar.style.width=pct+'%'; tbPct.textContent=pct+'%';
+  }
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(en){
+      en.forEach(function(e){ if(e.isIntersecting){ seen[e.target.id]=true; save(); updateProgress(); } });
+    },{threshold:.4});
+    secs.forEach(function(s){ io.observe(s); });
+  }
+  updateProgress();
+
+  /* ---- questões: revelar ---- */
+  [].slice.call(document.querySelectorAll('.enem-q')).forEach(function(q){
+    var btn=q.querySelector('.reveal-btn'), sol=q.querySelector('.eq-sol');
+    var ci=parseInt(q.getAttribute('data-correct'),10);
+    var alts=q.querySelectorAll('.eq-alt');
+    if(!btn) return;
+    btn.addEventListener('click',function(){
+      sol.classList.add('show');
+      if(alts[ci]) alts[ci].classList.add('correct');
+      btn.style.display='none';
+    });
+  });
+
+  /* ---- concluir ---- */
+  var fb=document.getElementById('finishBtn');
+  if(fb){
+    if(seen.__finish){ fb.classList.add('done-state'); fb.innerHTML='&#10003; Aula concluída'; }
+    fb.addEventListener('click',function(){ seen.__finish=true; save(); fb.classList.add('done-state'); fb.innerHTML='&#10003; Aula concluída'; });
+  }
+
+  /* ---- HERO ---- */
+  (function(){
+    var cv=document.getElementById('heroCanvas'); if(!cv) return;
+    var D; function resize(){ D=fitCanvas(cv, (cv.parentElement?cv.parentElement.clientHeight:360)||360); }
+    resize(); window.addEventListener('resize',resize);
+    var t0=performance.now();
+    var rings=[{r:.16,n:1,s:1.0},{r:.28,n:2,s:-0.7},{r:.42,n:3,s:0.5}];
+    function draw(now){
+      var t=(now-t0)/1000, ctx=D.ctx,w=D.w,h=D.h,cx=w/2,cy=h/2,base=Math.min(w,h);
+      ctx.clearRect(0,0,w,h);
+      rings.forEach(function(rg){
+        var R=rg.r*base;
+        ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI); ctx.strokeStyle='rgba(255,61,240,0.12)'; ctx.lineWidth=1; ctx.stroke();
+        for(var k=0;k<rg.n;k++){
+          var ang=t*rg.s + k*2*Math.PI/rg.n, x=cx+R*Math.cos(ang), y=cy+R*Math.sin(ang);
+          ctx.beginPath(); ctx.arc(x,y,4,0,2*Math.PI);
+          ctx.fillStyle= k%2?'#00e5ff':'#ff3df0'; ctx.shadowColor=ctx.fillStyle; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
+        }
+      });
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+
+  /* ---- SIM 1: radiusCanvas ---- */
+  (function(){
+    var cv=document.getElementById('radiusCanvas'); if(!cv) return;
+    var D; function resize(){D=fitCanvas(cv,240);} resize(); window.addEventListener('resize',resize);
+    var sW=document.getElementById('raW');
+    var raWval=document.getElementById('raWval'),raVout=document.getElementById('raVout'),raVin=document.getElementById('raVin'),raW2=document.getElementById('raW2');
+    var ang=0,last=performance.now();
+    function draw(now){
+      var dt=(now-last)/1000; last=now;
+      var w=D.w,h=D.h,ctx=D.ctx,cx=w/2,cy=h/2;
+      var omega=parseInt(sW.value,10)/10;
+      ang+=omega*dt;
+      var Rout=Math.min(w,h)*0.4, Rin=Rout*0.5, rin=1.0, rout=2.0, vin=omega*rin, vout=omega*rout;
+      ctx.clearRect(0,0,w,h);
+      [Rout,Rin].forEach(function(R){ ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI); ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1; ctx.stroke(); });
+      ctx.strokeStyle='rgba(255,61,240,0.35)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Rout*Math.cos(ang),cy+Rout*Math.sin(ang)); ctx.stroke();
+      function pt(R,vmag,color){
+        var x=cx+R*Math.cos(ang), y=cy+R*Math.sin(ang), tx=-Math.sin(ang), ty=Math.cos(ang), L=vmag*18;
+        arrow(ctx,x,y,x+tx*L,y+ty*L,color,2.5);
+        ctx.beginPath(); ctx.arc(x,y,6,0,2*Math.PI); ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0;
+      }
+      pt(Rin,vin,'#27e88a'); pt(Rout,vout,'#00e5ff');
+      ctx.beginPath(); ctx.arc(cx,cy,3,0,2*Math.PI); ctx.fillStyle='#8492b4'; ctx.fill();
+      raWval.textContent=omega.toFixed(1).replace('.',','); raW2.textContent=omega.toFixed(1).replace('.',',');
+      raVout.textContent=vout.toFixed(1).replace('.',',')+' m/s'; raVin.textContent=vin.toFixed(1).replace('.',',')+' m/s';
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+
+  /* ---- SIM 2: circleCanvas (MCU) ---- */
+  (function(){
+    var cv=document.getElementById('circleCanvas'); if(!cv) return;
+    var D; function resize(){D=fitCanvas(cv,260);} resize(); window.addEventListener('resize',resize);
+    var sR=document.getElementById('ccR'), sT=document.getElementById('ccT');
+    var ccRval=document.getElementById('ccRval'),ccTval=document.getElementById('ccTval'),ccF=document.getElementById('ccF'),ccW=document.getElementById('ccW'),ccV=document.getElementById('ccV'),ccA=document.getElementById('ccA');
+    var ang=0,last=performance.now();
+    function draw(now){
+      var dt=(now-last)/1000; last=now;
+      var w=D.w,h=D.h,ctx=D.ctx,cx=w/2,cy=h/2;
+      var R_m=parseInt(sR.value,10)/10, T_s=parseInt(sT.value,10)/10;
+      var omega=2*Math.PI/T_s, v=omega*R_m, acp=omega*omega*R_m, f=1/T_s;
+      ang+=omega*dt;
+      var Rpx=Math.min(w,h)*0.34;
+      ctx.clearRect(0,0,w,h);
+      ctx.beginPath(); ctx.arc(cx,cy,Rpx,0,2*Math.PI); ctx.strokeStyle='rgba(255,255,255,0.14)'; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx,cy,3,0,2*Math.PI); ctx.fillStyle='#8492b4'; ctx.fill();
+      var x=cx+Rpx*Math.cos(ang), y=cy+Rpx*Math.sin(ang);
+      ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
+      var tx=-Math.sin(ang), ty=Math.cos(ang), Lv=Math.min(62,14+v*10);
+      arrow(ctx,x,y,x+tx*Lv,y+ty*Lv,'#00e5ff',3);
+      var ux=cx-x,uy=cy-y,un=Math.hypot(ux,uy); ux/=un;uy/=un; var La=Math.min(54,12+acp*3);
+      arrow(ctx,x,y,x+ux*La,y+uy*La,'#ff3df0',3);
+      ctx.beginPath(); ctx.arc(x,y,7,0,2*Math.PI); ctx.fillStyle='#eafcff'; ctx.shadowColor='#ff3df0'; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
+      ccRval.textContent=R_m.toFixed(1).replace('.',',')+' m'; ccTval.textContent=T_s.toFixed(1).replace('.',',')+' s';
+      ccF.textContent=f.toFixed(2).replace('.',',')+' Hz'; ccW.textContent=omega.toFixed(1).replace('.',',');
+      ccV.textContent=v.toFixed(1).replace('.',','); ccA.textContent=acp.toFixed(1).replace('.',',');
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+
+  /* ---- SIM 3: projCanvas (MCU -> MHS) ---- */
+  (function(){
+    var cv=document.getElementById('projCanvas'); if(!cv) return;
+    var D; function resize(){D=fitCanvas(cv,220);} resize(); window.addEventListener('resize',resize);
+    var sT=document.getElementById('pjT'), pjTval=document.getElementById('pjTval');
+    var ang=0,last=performance.now(),trail=[];
+    function draw(now){
+      var dt=(now-last)/1000; last=now;
+      var w=D.w,h=D.h,ctx=D.ctx;
+      var T_s=parseInt(sT.value,10)/10, omega=2*Math.PI/T_s;
+      ang+=omega*dt;
+      ctx.clearRect(0,0,w,h);
+      var cx=w*0.26, cy=h/2, R=Math.min(w,h)*0.33;
+      ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI); ctx.strokeStyle='rgba(255,255,255,0.13)'; ctx.lineWidth=1.5; ctx.stroke();
+      var x=cx+R*Math.cos(ang), y=cy+R*Math.sin(ang);
+      var wallX=w*0.60;
+      ctx.strokeStyle='rgba(255,255,255,0.18)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(wallX,cy-R); ctx.lineTo(wallX,cy+R); ctx.stroke();
+      ctx.setLineDash([4,4]); ctx.strokeStyle='rgba(0,229,255,0.4)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(wallX,y); ctx.stroke(); ctx.setLineDash([]);
+      trail.push(y); var maxT=Math.max(10,(w-wallX-8)); if(trail.length>maxT) trail.shift();
+      ctx.strokeStyle='rgba(0,229,255,0.55)'; ctx.lineWidth=1.5; ctx.beginPath();
+      for(var i=0;i<trail.length;i++){ var px=wallX+(trail.length-i), py=trail[i]; if(i===0)ctx.moveTo(px,py); else ctx.lineTo(px,py); }
+      ctx.stroke();
+      ctx.beginPath(); ctx.arc(wallX,y,6,0,2*Math.PI); ctx.fillStyle='#00e5ff'; ctx.shadowColor='#00e5ff'; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0;
+      ctx.beginPath(); ctx.arc(x,y,7,0,2*Math.PI); ctx.fillStyle='#ff3df0'; ctx.shadowColor='#ff3df0'; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0;
+      pjTval.textContent=T_s.toFixed(1).replace('.',',')+' s';
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+
+  /* ---- SIM 4: releaseCanvas (cortar corda) ---- */
+  (function(){
+    var cv=document.getElementById('releaseCanvas'); if(!cv) return;
+    var D; function resize(){D=fitCanvas(cv,250);} resize(); window.addEventListener('resize',resize);
+    var sV=document.getElementById('rlV'), rlVval=document.getElementById('rlVval');
+    var cut=false,bx=0,by=0,vx=0,vy=0,ang=0,last=performance.now();
+    function reset(){ cut=false; ang=0; }
+    document.getElementById('rlCut').addEventListener('click',function(){
+      if(cut) return;
+      var w=D.w,h=D.h,cx=w/2,cy=h/2,R=Math.min(w,h)*0.32;
+      bx=cx+R*Math.cos(ang); by=cy+R*Math.sin(ang);
+      var omega=parseInt(sV.value,10)/10, speed=omega*R;
+      vx=-Math.sin(ang)*speed; vy=Math.cos(ang)*speed; cut=true;
+    });
+    document.getElementById('rlReset').addEventListener('click',reset);
+    function draw(now){
+      var dt=(now-last)/1000; last=now;
+      var w=D.w,h=D.h,ctx=D.ctx,cx=w/2,cy=h/2,R=Math.min(w,h)*0.32;
+      var omega=parseInt(sV.value,10)/10;
+      rlVval.textContent= omega<1.5?'baixa':(omega<3?'média':'alta');
+      ctx.clearRect(0,0,w,h);
+      ctx.setLineDash([5,5]); ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=1; ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI); ctx.stroke(); ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(cx,cy,4,0,2*Math.PI); ctx.fillStyle='#8492b4'; ctx.fill();
+      if(!cut){
+        ang+=omega*dt;
+        var x=cx+R*Math.cos(ang), y=cy+R*Math.sin(ang);
+        ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
+        var ux=cx-x,uy=cy-y,un=Math.hypot(ux,uy); ux/=un;uy/=un;
+        arrow(ctx,x,y,x+ux*34,y+uy*34,'#ff3df0',3);
+        ctx.beginPath(); ctx.arc(x,y,9,0,2*Math.PI); ctx.fillStyle='#eafcff'; ctx.shadowColor='#ff3df0'; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
+      } else {
+        bx+=vx*dt; by+=vy*dt;
+        ctx.setLineDash([3,4]); ctx.strokeStyle='rgba(0,229,255,0.4)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(bx-vx*0.3,by-vy*0.3); ctx.lineTo(bx,by); ctx.stroke(); ctx.setLineDash([]);
+        arrow(ctx,bx,by,bx+vx*0.15,by+vy*0.15,'#00e5ff',3);
+        ctx.beginPath(); ctx.arc(bx,by,9,0,2*Math.PI); ctx.fillStyle='#eafcff'; ctx.shadowColor='#00e5ff'; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
+        if(bx<-30||bx>w+30||by<-30||by>h+30) reset();
+      }
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+
+  /* ---- SIM 5: transCanvas (polias) ---- */
+  (function(){
+    var cv=document.getElementById('transCanvas'); if(!cv) return;
+    var D; function resize(){D=fitCanvas(cv,230);} resize(); window.addEventListener('resize',resize);
+    var mode='eixo';
+    var tgE=document.getElementById('tgEixo'), tgC=document.getElementById('tgCorreia');
+    var sRa=document.getElementById('trRa'), sRb=document.getElementById('trRb');
+    var trA=document.getElementById('trA'),trB=document.getElementById('trB'),trW=document.getElementById('trW'),trV=document.getElementById('trV');
+    tgE.addEventListener('click',function(){mode='eixo';tgE.classList.add('on');tgC.classList.remove('on');});
+    tgC.addEventListener('click',function(){mode='correia';tgC.classList.add('on');tgE.classList.remove('on');});
+    var angA=0,angB=0,last=performance.now();
+    function draw(now){
+      var dt=(now-last)/1000; last=now;
+      var w=D.w,h=D.h,ctx=D.ctx,cy=h/2;
+      var ra=parseInt(sRa.value,10), rb=parseInt(sRb.value,10);
+      var Ra=ra*2.0, Rb=rb*2.0, cxA=w*0.30, cxB=w*0.70;
+      var omegaA=2.2, omegaB=(mode==='eixo')?omegaA:omegaA*(ra/rb);
+      angA+=omegaA*dt; angB+=omegaB*dt;
+      ctx.clearRect(0,0,w,h);
+      if(mode==='correia'){
+        ctx.strokeStyle='rgba(0,229,255,0.5)'; ctx.lineWidth=3; ctx.beginPath();
+        ctx.moveTo(cxA,cy-Ra); ctx.lineTo(cxB,cy-Rb); ctx.moveTo(cxA,cy+Ra); ctx.lineTo(cxB,cy+Rb); ctx.stroke();
+      } else {
+        ctx.strokeStyle='rgba(255,61,240,0.4)'; ctx.lineWidth=2; ctx.setLineDash([5,4]); ctx.beginPath(); ctx.moveTo(cxA,cy); ctx.lineTo(cxB,cy); ctx.stroke(); ctx.setLineDash([]);
+      }
+      function wheel(cx,R,ang,color){
+        ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI); ctx.fillStyle='rgba(18,22,48,0.9)'; ctx.fill();
+        ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.stroke();
+        for(var k=0;k<6;k++){ var a=ang+k*Math.PI/3; ctx.strokeStyle='rgba(255,255,255,0.22)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+R*Math.cos(a),cy+R*Math.sin(a)); ctx.stroke(); }
+        ctx.beginPath(); ctx.arc(cx+R*Math.cos(ang),cy+R*Math.sin(ang),4,0,2*Math.PI); ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.arc(cx,cy,3,0,2*Math.PI); ctx.fillStyle='#8492b4'; ctx.fill();
+      }
+      wheel(cxA,Ra,angA,'#ff3df0'); wheel(cxB,Rb,angB,'#8b5cff');
+      ctx.fillStyle='#8492b4'; ctx.font='11px Orbitron, sans-serif'; ctx.textAlign='center';
+      ctx.fillText('A',cxA,cy+Ra+18); ctx.fillText('B',cxB,cy+Rb+18);
+      var ram=(ra/10), rbm=(rb/10);
+      trA.textContent=ram.toFixed(1).replace('.',','); trB.textContent=rbm.toFixed(1).replace('.',',');
+      if(mode==='eixo'){ trW.textContent='1 : 1'; trV.textContent=ram.toFixed(1).replace('.',',')+' : '+rbm.toFixed(1).replace('.',','); }
+      else { trV.textContent='1 : 1'; trW.textContent=rbm.toFixed(1).replace('.',',')+' : '+ram.toFixed(1).replace('.',','); }
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  })();
+
+})();
+</script>
+</body>
+</html>
