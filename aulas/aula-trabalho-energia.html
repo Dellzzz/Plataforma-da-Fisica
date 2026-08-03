@@ -918,7 +918,7 @@
     function bar(id,lbl,frac){document.getElementById(id).style.width=Math.max(0,Math.min(100,frac*100))+'%';document.getElementById(lbl).textContent=Math.round(Math.max(0,frac*100))+'%';}
     function draw(now){
       if(!D){requestAnimationFrame(draw);return;}
-      var dt=Math.min(0.03,(now-last)/1000);last=now;
+      var dt=Math.min(0.032,(now-last)/1000)*2.4;last=now;
       var ctx=D.ctx,w=D.w,h=D.h,ground=h-22;
       var mu=fric?(+Mu.value)/100:0,Lr=Lramp(),H_m=hm(),Em0=g*H_m;
       if(running){
@@ -931,16 +931,19 @@
           s+=v*dt;
         }
       }
-      // geometria da rampa
-      var topX=w*0.12,topY=ground-(ground-24),botX=w*0.55,botY=ground;
-      // desenha rampa
-      ctx.fillStyle='rgba(39,232,138,0.06)';ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=2;
-      ctx.beginPath();ctx.moveTo(topX,botY);ctx.lineTo(botX,botY);ctx.lineTo(botX,topY);ctx.closePath();ctx.fill();ctx.stroke();
-      ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.beginPath();ctx.moveTo(botX,botY);ctx.lineTo(w-10,botY);ctx.stroke();
+      ctx.clearRect(0,0,w,h);
+      // geometria: rampa no alto à esquerda, desce para a direita; plano segue à direita
+      var rampTopX=w*0.10, rampBotX=w*0.50;
+      var rampH=(ground-20)*Math.min(1,H_m/80), rampTopY=ground-rampH;
+      // chão
+      ctx.strokeStyle='rgba(255,255,255,0.45)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,ground);ctx.lineTo(w,ground);ctx.stroke();
+      // rampa
+      ctx.fillStyle='rgba(39,232,138,0.10)';ctx.strokeStyle=GRN;ctx.lineWidth=2.5;
+      ctx.beginPath();ctx.moveTo(rampTopX,ground);ctx.lineTo(rampBotX,ground);ctx.lineTo(rampTopX,rampTopY);ctx.closePath();ctx.fill();ctx.stroke();
       // posição do bloco
-      var prog=Math.min(1,s/Lr),bxp,byp,heightNow;
-      if(phase==='ramp'){bxp=botX+(topX-botX)*prog;byp=topY+(botY-topY)*prog;heightNow=H_m*(1-prog);}
-      else{var flat=Math.min(w-30,botX+ (s-Lr)*(w*0.03));bxp=flat;byp=botY;heightNow=0;}
+      var prog=Lr>0?Math.min(1,s/Lr):0,bxp,byp,heightNow;
+      if(phase==='ramp'){bxp=rampTopX+(rampBotX-rampTopX)*prog;byp=rampTopY+(ground-rampTopY)*prog;heightNow=H_m*(1-prog);}
+      else{bxp=Math.min(w-16,rampBotX+(s-Lr)*(w*0.02));byp=ground;heightNow=0;}
       ctx.fillStyle='#1b2450';ctx.strokeStyle=GRN;ctx.lineWidth=2;ctx.fillRect(bxp-11,byp-22,22,22);ctx.strokeRect(bxp-11,byp-22,22,22);
       // energias
       var Ec=0.5*v*v,Ep=g*heightNow,Q=Math.max(0,Em0-Ec-Ep);
