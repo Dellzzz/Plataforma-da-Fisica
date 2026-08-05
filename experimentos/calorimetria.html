@@ -1,0 +1,3193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratório de Calorimetria | Plataforma da Física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ========================================
+   VARIÁVEIS E RESET
+======================================== */
+:root{
+  --bg:#0a0805;
+  --bg-2:#150c08;
+  --bg-3:#2a160d;
+  --accent:#ff5a3d;
+  --accent-2:#ffb020;
+  --accent-soft:rgba(255,90,61,.15);
+  --accent-soft-2:rgba(255,176,32,.1);
+  --text:#ffe8d6;
+  --text-muted:#c2a897;
+  --glass-bg:rgba(255,90,61,.04);
+  --glass-bg-strong:rgba(255,90,61,.1);
+  --glass-border:rgba(255,90,61,.25);
+  --glass-border-strong:rgba(255,90,61,.5);
+  --success:#00ffaa;
+  --warning:#ffaa00;
+  --danger:#ff3366;
+  --font-display:'Orbitron',sans-serif;
+  --font-body:'Rajdhani',sans-serif;
+  --base-font:16px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:var(--base-font)}
+
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
+  line-height:1.5;
+}
+
+/* Background grid */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(255,90,61,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,90,61,.04) 1px,transparent 1px);
+  background-size:50px 50px;
+  pointer-events:none;
+  z-index:0;
+  mask-image:radial-gradient(circle at 50% 50%,black 30%,transparent 85%);
+  -webkit-mask-image:radial-gradient(circle at 50% 50%,black 30%,transparent 85%);
+}
+
+/* Background glow */
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(255,90,61,.2),transparent 40%),
+    radial-gradient(circle at 80% 70%,rgba(255,176,32,.15),transparent 40%),
+    radial-gradient(circle at 50% 100%,rgba(255,90,61,.1),transparent 50%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* Partículas flutuantes */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:1}
+.particle{
+  position:absolute;
+  width:2px;height:2px;
+  background:var(--accent);
+  border-radius:50%;
+  box-shadow:0 0 10px var(--accent),0 0 20px var(--accent);
+  animation:float 15s infinite linear;
+  opacity:0;
+}
+@keyframes float{
+  0%{transform:translateY(100vh) translateX(0);opacity:0}
+  10%{opacity:.8}
+  90%{opacity:.8}
+  100%{transform:translateY(-100px) translateX(50px);opacity:0}
+}
+
+/* Skip link */
+.skip-link{
+  position:absolute;
+  top:-100px;
+  left:10px;
+  background:var(--accent);
+  color:white;
+  padding:12px 24px;
+  border-radius:8px;
+  z-index:9999;
+  text-decoration:none;
+  font-weight:600;
+  transition:top .3s;
+}
+.skip-link:focus{top:10px}
+
+/* Foco visível */
+*:focus{outline:none}
+*:focus-visible{
+  outline:2px solid var(--accent-2);
+  outline-offset:3px;
+  border-radius:4px;
+  box-shadow:0 0 20px var(--accent-soft);
+}
+
+/* Ícones inline (substituem o Font Awesome — sem dependência externa) */
+.ico{
+  display:inline-block;
+  line-height:1;
+  font-style:normal;
+  vertical-align:-2px;
+}
+.spin{animation:icoSpin 1s linear infinite}
+@keyframes icoSpin{to{transform:rotate(360deg)}}
+
+/* ========================================
+   HEADER
+======================================== */
+header{
+  position:relative;
+  z-index:10;
+  padding:18px 30px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--glass-border);
+  backdrop-filter:blur(15px);
+  -webkit-backdrop-filter:blur(15px);
+  background:rgba(10,8,5,.7);
+}
+
+.logo{display:flex;align-items:center;gap:15px}
+
+.logo-icon{
+  width:52px;height:52px;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;
+  color:white;
+  box-shadow:0 0 25px var(--accent),inset 0 0 15px rgba(255,255,255,.2);
+  animation:pulse 3s ease-in-out infinite;
+  position:relative;
+}
+.logo-icon::after{
+  content:'';
+  position:absolute;
+  inset:-3px;
+  border-radius:16px;
+  border:1px solid var(--accent);
+  opacity:.5;
+  animation:ring 3s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 25px var(--accent),inset 0 0 15px rgba(255,255,255,.2)}
+  50%{box-shadow:0 0 40px var(--accent-2),inset 0 0 20px rgba(255,255,255,.3)}
+}
+@keyframes ring{
+  0%,100%{transform:scale(1);opacity:.5}
+  50%{transform:scale(1.1);opacity:0}
+}
+
+.logo-text h1{
+  font-family:var(--font-display);
+  font-size:1.4rem;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  letter-spacing:2px;
+  line-height:1.1;
+}
+.logo-text .subtitle{
+  font-size:.65rem;
+  color:var(--text-muted);
+  letter-spacing:4px;
+  text-transform:uppercase;
+  font-weight:500;
+}
+
+.header-actions{display:flex;gap:10px;align-items:center}
+
+.icon-btn{
+  width:48px;height:48px;
+  border-radius:12px;
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  color:var(--text);
+  cursor:pointer;
+  font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .3s ease;
+  backdrop-filter:blur(10px);
+  position:relative;
+}
+.icon-btn:hover,.icon-btn:focus-visible{
+  background:var(--glass-bg-strong);
+  border-color:var(--accent);
+  box-shadow:0 0 25px var(--accent-soft),inset 0 0 10px var(--accent-soft);
+  transform:translateY(-2px);
+}
+.icon-btn.active{
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:white;
+  border-color:transparent;
+  box-shadow:0 0 25px var(--accent);
+}
+.unit-btn{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.5px;width:auto;min-width:48px;padding:0 10px}
+
+.status-indicator{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 14px;
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-radius:20px;
+  font-size:.75rem;
+  color:var(--text-muted);
+  font-family:var(--font-display);
+  letter-spacing:1px;
+}
+.status-dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--success);
+  box-shadow:0 0 10px var(--success);
+  animation:blink 2s infinite;
+}
+@keyframes blink{50%{opacity:.5}}
+
+/* ========================================
+   LAYOUT PRINCIPAL
+======================================== */
+main{
+  position:relative;
+  z-index:5;
+  padding:24px 30px 60px;
+  max-width:1600px;
+  margin:0 auto;
+}
+
+.grid-layout{
+  display:grid;
+  grid-template-columns:340px 1fr 310px;
+  gap:20px;
+  align-items:start;
+}
+
+.tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:.8rem;
+  letter-spacing:.8px;
+  color:var(--text-muted);
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-radius:12px;
+  padding:12px 20px;
+  cursor:pointer;
+  transition:all .25s ease;
+  display:flex;align-items:center;gap:9px;
+}
+.tab-btn:hover{border-color:var(--accent);color:var(--text)}
+.tab-btn.active{
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 0 20px var(--accent-soft);
+}
+
+@media (max-width:1280px){
+  .grid-layout{grid-template-columns:1fr 1fr}
+  .visualization{grid-column:1/-1}
+}
+@media (max-width:768px){
+  .grid-layout{grid-template-columns:1fr}
+  header{padding:15px 20px}
+  main{padding:20px 15px 60px}
+  .logo-text h1{font-size:1.1rem}
+  .logo-text .subtitle{font-size:.55rem;letter-spacing:2px}
+}
+
+/* ========================================
+   PAINÉIS (Glassmorphism)
+======================================== */
+.glass-panel{
+  background:var(--glass-bg);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);
+  border-radius:18px;
+  padding:24px;
+  position:relative;
+  overflow:hidden;
+}
+.glass-panel::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),var(--accent-2),transparent);
+}
+.glass-panel::after{
+  content:'';
+  position:absolute;
+  top:0;right:0;
+  width:80px;height:80px;
+  background:radial-gradient(circle,var(--accent-soft),transparent 70%);
+  pointer-events:none;
+}
+
+.panel-title{
+  font-family:var(--font-display);
+  font-size:.95rem;
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:22px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  position:relative;
+}
+.panel-title::before{
+  content:'';
+  width:4px;height:22px;
+  background:linear-gradient(180deg,var(--accent),var(--accent-2));
+  border-radius:2px;
+  box-shadow:0 0 12px var(--accent);
+}
+
+/* ========================================
+   CONTROLES
+======================================== */
+.control-group{margin-bottom:22px}
+.control-group:last-child{margin-bottom:0}
+
+.control-label{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+  font-size:.82rem;
+  color:var(--text-muted);
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+.control-value{
+  font-family:var(--font-display);
+  color:var(--accent);
+  font-weight:700;
+  font-size:.9rem;
+  text-shadow:0 0 10px var(--accent-soft);
+}
+
+.custom-select{
+  width:100%;
+  padding:13px 16px;
+  background:rgba(10,8,5,.7);
+  border:1px solid var(--glass-border);
+  border-radius:10px;
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:.92rem;
+  cursor:pointer;
+  transition:all .3s ease;
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff5a3d' stroke-width='2.5' stroke-linecap='round'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  background-size:16px;
+  padding-right:42px;
+}
+.custom-select:hover{border-color:var(--accent)}
+.custom-select:focus-visible{
+  border-color:var(--accent);
+  box-shadow:0 0 15px var(--accent-soft);
+}
+.custom-select option{background:var(--bg-2);color:var(--text);padding:8px}
+
+input[type="range"]{
+  width:100%;
+  height:6px;
+  -webkit-appearance:none;
+  appearance:none;
+  background:rgba(255,90,61,.15);
+  border-radius:3px;
+  outline:none;
+  cursor:pointer;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:22px;height:22px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  border-radius:50%;
+  cursor:pointer;
+  box-shadow:0 0 20px var(--accent);
+  transition:all .2s ease;
+  border:2px solid var(--bg);
+}
+input[type="range"]::-webkit-slider-thumb:hover{
+  transform:scale(1.15);
+  box-shadow:0 0 30px var(--accent-2);
+}
+input[type="range"]::-moz-range-thumb{
+  width:22px;height:22px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  border-radius:50%;
+  cursor:pointer;
+  border:2px solid var(--bg);
+  box-shadow:0 0 20px var(--accent);
+}
+
+/* Material preview */
+.material-preview{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:14px;
+  background:rgba(10,8,5,.5);
+  border-radius:12px;
+  border:1px solid var(--glass-border);
+  margin-top:6px;
+  transition:all .3s ease;
+}
+.material-preview:hover{
+  border-color:var(--accent);
+  background:rgba(10,8,5,.7);
+}
+.material-icon{
+  width:50px;height:50px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  background:linear-gradient(135deg,var(--accent-soft),transparent);
+  border:1px solid var(--glass-border);
+  flex-shrink:0;
+}
+.material-info{flex:1;min-width:0}
+.material-info h4{
+  font-family:var(--font-display);
+  font-size:.85rem;
+  color:var(--text);
+  margin-bottom:4px;
+  letter-spacing:1px;
+}
+.material-info p{
+  font-size:.72rem;
+  color:var(--text-muted);
+  line-height:1.3;
+}
+
+/* ========================================
+   BOTÕES
+======================================== */
+.btn{
+  width:100%;
+  padding:14px 20px;
+  border-radius:12px;
+  border:none;
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:.85rem;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all .3s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  position:relative;
+  overflow:hidden;
+  margin-bottom:10px;
+}
+.btn:last-child{margin-bottom:0}
+.btn:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+  filter:grayscale(.5);
+}
+.btn:disabled:hover{transform:none;box-shadow:none}
+
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:white;
+  box-shadow:0 4px 20px rgba(255,90,61,.3);
+}
+.btn-primary:hover:not(:disabled){
+  box-shadow:0 8px 30px var(--accent),0 0 40px var(--accent-soft);
+  transform:translateY(-2px);
+}
+.btn-primary::before{
+  content:'';
+  position:absolute;
+  top:0;left:-100%;
+  width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);
+  transition:left .6s ease;
+}
+.btn-primary:hover::before{left:100%}
+
+.btn-secondary{
+  background:transparent;
+  color:var(--text);
+  border:1px solid var(--glass-border);
+}
+.btn-secondary:hover:not(:disabled){
+  border-color:var(--accent);
+  background:var(--accent-soft);
+  box-shadow:0 0 20px var(--accent-soft);
+}
+
+.btn-ghost{
+  background:rgba(255,51,102,.1);
+  color:var(--danger);
+  border:1px solid rgba(255,51,102,.3);
+}
+.btn-ghost:hover:not(:disabled){
+  background:rgba(255,51,102,.2);
+  box-shadow:0 0 20px rgba(255,51,102,.3);
+}
+
+/* ========================================
+   VISUALIZAÇÃO (Calorímetro)
+======================================== */
+.visualization{display:flex;flex-direction:column;gap:20px}
+
+.calorimeter-container{
+  position:relative;
+  min-height:340px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:30px;
+}
+
+#calorimeterCanvas{
+  max-width:100%;
+  height:auto;
+  filter:drop-shadow(0 10px 30px var(--accent-soft));
+}
+
+.calorimeter-status{
+  position:absolute;
+  top:20px;
+  right:20px;
+  padding:8px 16px;
+  background:rgba(10,8,5,.8);
+  border:1px solid var(--glass-border);
+  border-radius:20px;
+  font-family:var(--font-display);
+  font-size:.75rem;
+  color:var(--text-muted);
+  letter-spacing:1px;
+  backdrop-filter:blur(10px);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.calorimeter-status.active{color:var(--accent);border-color:var(--accent)}
+
+/* ========================================
+   GRÁFICO
+======================================== */
+.chart-wrapper{
+  position:relative;
+  height:280px;
+  margin-top:10px;
+}
+.chart-wrapper canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* ========================================
+   RESULTADO (Display Digital)
+======================================== */
+.result-display{
+  background:linear-gradient(135deg,rgba(255,90,61,.1),rgba(255,176,32,.05));
+  border:1px solid var(--glass-border-strong);
+  border-radius:14px;
+  padding:24px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.result-display::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at 50% 50%,var(--accent-soft),transparent 70%);
+  pointer-events:none;
+}
+.result-display::after{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent-2),transparent);
+  animation:scan 3s linear infinite;
+}
+@keyframes scan{
+  0%{transform:translateX(-100%)}
+  100%{transform:translateX(100%)}
+}
+
+.result-label{
+  font-family:var(--font-display);
+  font-size:.7rem;
+  color:var(--text-muted);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+.result-value{
+  font-family:var(--font-display);
+  font-size:3.2rem;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-shadow:0 0 40px var(--accent);
+  line-height:1;
+  letter-spacing:-1px;
+  filter:drop-shadow(0 0 20px var(--accent-soft));
+}
+.result-unit{
+  font-family:var(--font-display);
+  font-size:1.2rem;
+  color:var(--accent);
+  margin-top:4px;
+  font-weight:500;
+}
+.result-meta{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid var(--glass-border);
+  font-size:.75rem;
+  color:var(--text-muted);
+  display:flex;
+  justify-content:space-around;
+}
+.result-meta div{display:flex;flex-direction:column;gap:2px}
+.result-meta strong{
+  color:var(--accent);
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:.85rem;
+}
+
+/* ========================================
+   LISTA DE ELEMENTOS
+======================================== */
+.elements-list{
+  max-height:400px;
+  overflow-y:auto;
+  padding-right:6px;
+}
+.elements-list::-webkit-scrollbar{width:6px}
+.elements-list::-webkit-scrollbar-track{background:rgba(255,90,61,.05);border-radius:3px}
+.elements-list::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
+
+.element-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  background:rgba(10,8,5,.5);
+  border:1px solid var(--glass-border);
+  border-radius:10px;
+  margin-bottom:10px;
+  transition:all .3s ease;
+  position:relative;
+}
+.element-item:hover{
+  border-color:var(--accent);
+  transform:translateX(-3px);
+}
+.element-color{
+  width:4px;
+  height:36px;
+  border-radius:2px;
+  flex-shrink:0;
+  box-shadow:0 0 10px currentColor;
+}
+.element-details{flex:1;min-width:0}
+.element-name{
+  font-family:var(--font-display);
+  font-size:.78rem;
+  color:var(--text);
+  letter-spacing:1px;
+  margin-bottom:3px;
+}
+.element-specs{
+  font-size:.7rem;
+  color:var(--text-muted);
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.element-specs span{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+}
+.element-temp{
+  font-family:var(--font-display);
+  font-size:.85rem;
+  color:var(--accent);
+  font-weight:700;
+}
+.element-remove{
+  width:28px;height:28px;
+  border-radius:6px;
+  background:rgba(255,51,102,.1);
+  border:1px solid rgba(255,51,102,.3);
+  color:var(--danger);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  transition:all .2s;
+}
+.element-remove:hover{
+  background:rgba(255,51,102,.3);
+  box-shadow:0 0 10px rgba(255,51,102,.4);
+}
+
+.empty-state{
+  text-align:center;
+  padding:30px 15px;
+  color:var(--text-muted);
+  font-size:.85rem;
+}
+.empty-state .ico{
+  font-size:32px;
+  color:var(--accent);
+  opacity:.4;
+  margin-bottom:10px;
+  display:block;
+}
+
+/* ========================================
+   DRAWER GUIA LATERAL
+======================================== */
+.side-guide{
+  position:fixed;
+  top:0;
+  right:-450px;
+  width:450px;
+  max-width:100vw;
+  height:100vh;
+  background:rgba(21,12,8,.95);
+  backdrop-filter:blur(25px);
+  -webkit-backdrop-filter:blur(25px);
+  border-left:2px solid var(--accent);
+  box-shadow:-10px 0 50px var(--accent-soft);
+  z-index:1000;
+  transition:right .4s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;
+}
+.side-guide.open{right:0}
+
+.side-guide::-webkit-scrollbar{width:6px}
+.side-guide::-webkit-scrollbar-track{background:rgba(255,90,61,.05)}
+.side-guide::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
+
+.guide-tab{
+  position:absolute;
+  left:-50px;
+  top:50%;
+  transform:translateY(-50%);
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:white;
+  padding:20px 12px;
+  border-radius:10px 0 0 10px;
+  cursor:pointer;
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+  font-family:var(--font-display);
+  font-weight:700;
+  letter-spacing:4px;
+  font-size:.85rem;
+  box-shadow:-5px 0 20px var(--accent-soft);
+  transition:all .3s;
+  border:2px solid var(--accent);
+  border-right:none;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.guide-tab:hover{
+  box-shadow:-5px 0 30px var(--accent);
+  padding-right:16px;
+}
+.guide-tab .ico{transform:rotate(180deg);font-size:.8rem}
+
+.guide-content{padding:30px}
+.guide-content h2{
+  font-family:var(--font-display);
+  font-size:1.5rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  margin-bottom:8px;
+  letter-spacing:2px;
+}
+.guide-content .guide-subtitle{
+  color:var(--text-muted);
+  font-size:.85rem;
+  margin-bottom:30px;
+  letter-spacing:1px;
+}
+
+.guide-section{margin-bottom:28px}
+.guide-section h3{
+  font-family:var(--font-display);
+  font-size:.95rem;
+  color:var(--accent);
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  letter-spacing:1px;
+}
+.guide-section h3 .step-num{
+  width:28px;height:28px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.8rem;
+  font-weight:700;
+  color:white;
+  box-shadow:0 0 15px var(--accent);
+  flex-shrink:0;
+}
+.guide-section p{
+  color:var(--text);
+  font-size:.88rem;
+  line-height:1.6;
+  margin-bottom:8px;
+}
+.guide-section ul{
+  list-style:none;
+  padding-left:0;
+}
+.guide-section ul li{
+  font-size:.82rem;
+  color:var(--text-muted);
+  padding:6px 0 6px 18px;
+  position:relative;
+}
+.guide-section ul li::before{
+  content:'';
+  position:absolute;
+  left:0;top:13px;
+  width:6px;height:6px;
+  background:var(--accent);
+  border-radius:50%;
+  box-shadow:0 0 8px var(--accent);
+}
+
+.formula-box{
+  background:rgba(10,8,5,.7);
+  border:1px solid var(--glass-border);
+  border-radius:10px;
+  padding:14px;
+  margin:12px 0;
+  font-family:var(--font-display);
+  color:var(--accent);
+  text-align:center;
+  font-size:.95rem;
+  letter-spacing:1px;
+  position:relative;
+}
+.formula-box::before{
+  content:'FÓRMULA';
+  position:absolute;
+  top:-8px;left:14px;
+  background:var(--bg-2);
+  padding:0 8px;
+  font-size:.65rem;
+  color:var(--text-muted);
+  letter-spacing:2px;
+}
+
+.constants-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+  font-size:.78rem;
+}
+.constants-table th,.constants-table td{
+  padding:8px 10px;
+  text-align:left;
+  border-bottom:1px solid var(--glass-border);
+}
+.constants-table th{
+  color:var(--accent);
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:.7rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+.constants-table td{color:var(--text)}
+.constants-table td:last-child{color:var(--accent);font-family:var(--font-display)}
+
+.close-guide{
+  position:absolute;
+  top:20px;right:20px;
+  width:36px;height:36px;
+  border-radius:8px;
+  background:rgba(255,51,102,.1);
+  border:1px solid rgba(255,51,102,.3);
+  color:var(--danger);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all .2s;
+}
+.close-guide:hover{background:rgba(255,51,102,.3)}
+
+/* ========================================
+   TOAST
+======================================== */
+.toast-container{
+  position:fixed;
+  bottom:30px;
+  right:30px;
+  z-index:9999;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  pointer-events:none;
+}
+.toast{
+  background:rgba(21,12,8,.95);
+  backdrop-filter:blur(15px);
+  border:1px solid var(--glass-border);
+  border-left:4px solid var(--accent);
+  border-radius:10px;
+  padding:14px 20px;
+  color:var(--text);
+  font-size:.85rem;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-width:280px;
+  max-width:400px;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+  animation:toastIn .3s ease;
+  pointer-events:auto;
+}
+.toast.success{border-left-color:var(--success)}
+.toast.success .ico{color:var(--success)}
+.toast.warning{border-left-color:var(--warning)}
+.toast.warning .ico{color:var(--warning)}
+.toast.error{border-left-color:var(--danger)}
+.toast.error .ico{color:var(--danger)}
+.toast.info .ico{color:var(--accent)}
+.toast.hide{animation:toastOut .3s ease forwards}
+@keyframes toastIn{
+  from{transform:translateX(120%);opacity:0}
+  to{transform:translateX(0);opacity:1}
+}
+@keyframes toastOut{
+  to{transform:translateX(120%);opacity:0}
+}
+
+/* ========================================
+   MODOS DE ACESSIBILIDADE
+======================================== */
+body.high-contrast{
+  --text:#ffffff;
+  --text-muted:#cccccc;
+  --bg:#000000;
+  --bg-2:#0d0704;
+  --glass-bg:rgba(255,255,255,.08);
+  --glass-border:rgba(255,255,255,.4);
+  --glass-border-strong:rgba(255,255,255,.6);
+}
+body.high-contrast::after{
+  background:
+    radial-gradient(circle at 20% 20%,rgba(255,90,61,.4),transparent 40%),
+    radial-gradient(circle at 80% 70%,rgba(255,176,32,.3),transparent 40%);
+}
+
+body.reduce-motion *,
+body.reduce-motion *::before,
+body.reduce-motion *::after{
+  animation-duration:.01s !important;
+  transition-duration:.01s !important;
+}
+body.reduce-motion .particle{display:none}
+
+body.large-font{--base-font:18px}
+body.xlarge-font{--base-font:20px}
+
+/* Screen reader only */
+.sr-only{
+  position:absolute;
+  width:1px;height:1px;
+  padding:0;margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+
+/* Anúncio aria-live */
+.live-region{
+  position:absolute;
+  width:1px;height:1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+}
+
+/* Responsividade final */
+@media (max-width:768px){
+  .side-guide{width:100vw;right:-100vw}
+  .side-guide.open{right:0}
+  .guide-tab{left:-44px;padding:16px 10px}
+  .toast-container{right:15px;bottom:15px;left:15px}
+  .toast{min-width:auto}
+  .result-value{font-size:2.5rem}
+  .chart-wrapper{height:240px}
+}
+
+/* Animação de pulso para o calorímetro ativo */
+@keyframes calorimeterPulse{
+  0%,100%{filter:drop-shadow(0 10px 30px var(--accent-soft))}
+  50%{filter:drop-shadow(0 10px 50px var(--accent-2))}
+}
+.calorimeter-container.active #calorimeterCanvas{
+  animation:calorimeterPulse 2s ease-in-out infinite;
+}
+</style>
+</head>
+<body>
+
+<!-- Skip link -->
+<a href="#main" class="skip-link">Pular para o conteúdo principal</a>
+
+<!-- Partículas de fundo -->
+<div class="particles" id="particles" aria-hidden="true"></div>
+
+<!-- Header -->
+<header role="banner">
+  <div class="logo">
+    <div class="logo-icon" aria-hidden="true">
+      <span class="ico">🧪</span>
+    </div>
+    <div class="logo-text">
+      <h1>CALORIMETRIA LAB</h1>
+      <div class="subtitle">Prof. Jardel A. Leite.</div>
+    </div>
+  </div>
+  
+  <div class="header-actions">
+    <div class="status-indicator" aria-live="polite">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">PRONTO</span>
+    </div>
+    
+    <button class="icon-btn unit-btn" id="unitBtn" aria-label="Alternar unidade de energia entre Joule e caloria" title="Unidade de energia" aria-pressed="false">J</button>
+
+    <button class="icon-btn" id="resetBtn" aria-label="Reiniciar laboratório" title="Reiniciar">
+      <span class="ico" aria-hidden="true">↻</span>
+    </button>
+  </div>
+</header>
+
+
+
+<!-- Conteúdo principal -->
+<main id="main" role="main">
+
+  <div class="tabs" role="tablist" aria-label="Modo do laboratório">
+    <button class="tab-btn active" id="tabBtnMistura" role="tab" aria-selected="true" aria-controls="tabMistura">
+      <span class="ico" aria-hidden="true">🧪</span> Mistura (Calorímetro)
+    </button>
+    <button class="tab-btn" id="tabBtnAquecimento" role="tab" aria-selected="false" aria-controls="tabAquecimento">
+      <span class="ico" aria-hidden="true">📈</span> Curva de Aquecimento
+    </button>
+  </div>
+
+  <div class="grid-layout" id="tabMistura" role="tabpanel" aria-labelledby="tabBtnMistura">
+    
+    <!-- ==================== PAINEL DE CONTROLE ==================== -->
+    <section class="glass-panel" aria-labelledby="control-title">
+      <h2 class="panel-title" id="control-title">Painel de Controle</h2>
+      
+      <div class="control-group">
+        <div class="control-label">
+          <span>Material</span>
+        </div>
+        <select class="custom-select" id="materialSelect" aria-label="Selecionar material">
+          <option value="agua">Água (líquido)</option>
+          <option value="gelo">Gelo (sólido)</option>
+          <option value="cobre">Cobre</option>
+          <option value="ferro">Ferro</option>
+          <option value="aluminio">Alumínio</option>
+        </select>
+      </div>
+      
+      <div class="control-group">
+        <div class="control-label">
+          <span>Massa</span>
+          <span class="control-value"><span id="massValue">100</span> g</span>
+        </div>
+        <input type="range" id="massSlider" min="10" max="500" value="100" step="10" 
+               aria-label="Massa do material em gramas" aria-valuemin="10" aria-valuemax="500" aria-valuenow="100">
+      </div>
+      
+      <div class="control-group">
+        <div class="control-label">
+          <span>Temperatura Inicial</span>
+          <span class="control-value"><span id="tempValue">25</span> °C</span>
+        </div>
+        <input type="range" id="tempSlider" min="-20" max="150" value="25" step="1"
+               aria-label="Temperatura inicial em graus Celsius" aria-valuemin="-20" aria-valuemax="150" aria-valuenow="25">
+      </div>
+      
+      <div class="material-preview" id="materialPreview">
+        <div class="material-icon" id="materialIcon">
+          <span class="ico">💧</span>
+        </div>
+        <div class="material-info">
+          <h4 id="materialName">Água</h4>
+          <p id="materialSpec">c = 4,186 J/(g·°C) | Líquido</p>
+        </div>
+      </div>
+      
+      <div style="margin-top:20px">
+        <button class="btn btn-primary" id="addBtn">
+          <span class="ico" aria-hidden="true">+</span>
+          Adicionar ao Calorímetro
+        </button>
+        <button class="btn btn-secondary" id="startBtn" disabled>
+          <span class="ico" aria-hidden="true">▶</span>
+          Iniciar Troca de Calor
+        </button>
+        <button class="btn btn-ghost" id="clearBtn" disabled>
+          <span class="ico" aria-hidden="true">🗑</span>
+          Limpar Sistema
+        </button>
+      </div>
+    </section>
+    
+    <!-- ==================== VISUALIZAÇÃO ==================== -->
+    <section class="visualization" aria-labelledby="viz-title">
+      <h2 id="viz-title" class="sr-only">Visualização do Calorímetro</h2>
+      
+      <div class="glass-panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <h3 class="panel-title" style="margin-bottom:0">Calorímetro Ideal</h3>
+          <div class="calorimeter-status" id="calorimeterStatus">
+            <span class="ico" aria-hidden="true">⏸</span>
+            <span>EM ESPERA</span>
+          </div>
+        </div>
+        
+        <div class="calorimeter-container" id="calorimeterContainer">
+          <canvas id="calorimeterCanvas" width="600" height="320" aria-label="Visualização animada do calorímetro com os materiais adicionados"></canvas>
+        </div>
+      </div>
+      
+      <div class="glass-panel">
+        <h3 class="panel-title">Gráfico de Temperatura × Tempo</h3>
+        <div class="chart-wrapper">
+          <canvas id="chartCanvas" aria-label="Gráfico de temperatura ao longo do tempo" role="img"></canvas>
+        </div>
+      </div>
+      
+      <div class="result-display">
+        <div class="result-label">Temperatura de Equilíbrio Térmico</div>
+        <div class="result-value" id="resultValue">--</div>
+        <div class="result-unit">°C</div>
+        <div class="result-meta">
+          <div>
+            <span style="font-size:.65rem;color:var(--text-muted);letter-spacing:1px">ELEMENTOS</span>
+            <strong id="metaCount">0</strong>
+          </div>
+          <div>
+            <span style="font-size:.65rem;color:var(--text-muted);letter-spacing:1px">MASSA TOTAL</span>
+            <strong id="metaMass">0 g</strong>
+          </div>
+          <div>
+            <span style="font-size:.65rem;color:var(--text-muted);letter-spacing:1px">ΔT MÉDIO</span>
+            <strong id="metaDelta">--</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- ==================== LISTA DE ELEMENTOS ==================== -->
+    <aside class="glass-panel" aria-labelledby="elements-title">
+      <h2 class="panel-title" id="elements-title">Elementos no Sistema</h2>
+      <div class="elements-list" id="elementsList">
+        <div class="empty-state">
+          <span class="ico" aria-hidden="true">🧪</span>
+          <div>Nenhum elemento adicionado</div>
+          <div style="font-size:.7rem;margin-top:5px;opacity:.7">Use o painel de controle</div>
+        </div>
+      </div>
+      
+      <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--glass-border)">
+        <h3 style="font-family:var(--font-display);font-size:.75rem;color:var(--text-muted);letter-spacing:2px;margin-bottom:10px">PRINCÍPIO FÍSICO</h3>
+        <div class="formula-box">ΣQ = 0</div>
+        <p style="font-size:.75rem;color:var(--text-muted);line-height:1.5;margin-top:8px">
+          Em um sistema isolado, a soma de todos os fluxos de calor é zero. O calor cedido por uns é absorvido por outros até o equilíbrio.
+        </p>
+      </div>
+    </aside>
+    
+  </div>
+
+  <div class="grid-layout" id="tabAquecimento" role="tabpanel" aria-labelledby="tabBtnAquecimento" hidden>
+
+    <!-- ==================== PAINEL DE CONTROLE (AQUECIMENTO) ==================== -->
+    <section class="glass-panel" aria-labelledby="aq-control-title">
+      <h2 class="panel-title" id="aq-control-title">Painel de Controle</h2>
+
+      <div class="control-group">
+        <div class="control-label">
+          <span>Material</span>
+        </div>
+        <select class="custom-select" id="aqMaterial" aria-label="Selecionar material">
+          <option value="agua">Água</option>
+          <option value="gelo">Gelo (mesma substância — H₂O)</option>
+          <option value="cobre">Cobre</option>
+          <option value="ferro">Ferro</option>
+          <option value="aluminio">Alumínio</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">
+          <span>Massa</span>
+          <span class="control-value"><span id="aqMassaValue">100</span> g</span>
+        </div>
+        <input type="range" id="aqMassa" min="10" max="500" value="100" step="10"
+               aria-label="Massa do material em gramas">
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">
+          <span>Temperatura inicial</span>
+          <span class="control-value"><span id="aqTiValue">-20</span> °C</span>
+        </div>
+        <input type="range" id="aqTi" min="-20" max="150" value="-20" step="1"
+               aria-label="Temperatura inicial em graus Celsius">
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">
+          <span>Temperatura final</span>
+          <span class="control-value"><span id="aqTfValue">120</span> °C</span>
+        </div>
+        <input type="range" id="aqTf" min="-20" max="150" value="120" step="1"
+               aria-label="Temperatura final desejada em graus Celsius">
+      </div>
+
+      <div class="control-group">
+        <div class="control-label">
+          <span>Potência do aquecedor</span>
+          <span class="control-value"><span id="aqPotValue">200</span> W</span>
+        </div>
+        <input type="range" id="aqPot" min="50" max="1000" value="200" step="10"
+               aria-label="Potência do aquecedor em watts">
+      </div>
+
+      <div style="margin-top:20px">
+        <button class="btn btn-primary" id="aqPlayBtn">
+          <span class="ico" aria-hidden="true">▶</span>
+          Aquecer
+        </button>
+        <button class="btn btn-ghost" id="aqResetBtn">
+          <span class="ico" aria-hidden="true">↻</span>
+          Reiniciar
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== VISUALIZAÇÃO (AQUECIMENTO) ==================== -->
+    <section class="visualization" aria-labelledby="aq-viz-title">
+      <h2 id="aq-viz-title" class="sr-only">Curva de Aquecimento</h2>
+
+      <div class="glass-panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <h3 class="panel-title" style="margin-bottom:0">Curva de Aquecimento (T × Q)</h3>
+          <div class="calorimeter-status" id="aqStatusBadge">
+            <span class="ico" aria-hidden="true">⏸</span>
+            <span id="aqStatusTxt">PRONTO</span>
+          </div>
+        </div>
+        <div class="chart-wrapper" style="height:320px">
+          <canvas id="heatChartCanvas" aria-label="Gráfico de temperatura em função do calor fornecido" role="img"></canvas>
+        </div>
+      </div>
+
+      <div class="result-display">
+        <div class="result-label">Calor total necessário</div>
+        <div class="result-value" id="aqQTotal">--</div>
+        <div class="result-unit" id="aqQTotalUnidade">kJ</div>
+        <div class="result-meta">
+          <div>
+            <span style="font-size:.65rem;color:var(--text-muted);letter-spacing:1px">TEMPO ESTIMADO</span>
+            <strong id="aqTempoTotal">--</strong>
+          </div>
+          <div>
+            <span style="font-size:.65rem;color:var(--text-muted);letter-spacing:1px">FASE ATUAL</span>
+            <strong id="aqFaseAtual">--</strong>
+          </div>
+          <div>
+            <span style="font-size:.65rem;color:var(--text-muted);letter-spacing:1px">T ATUAL</span>
+            <strong id="aqTAtual">--</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== INFO (AQUECIMENTO) ==================== -->
+    <aside class="glass-panel" aria-labelledby="aq-info-title">
+      <h2 class="panel-title" id="aq-info-title">Fases do Aquecimento</h2>
+      <div class="table-wrap">
+        <table class="constants-table">
+          <thead><tr><th>Trecho</th><th>O que ocorre</th></tr></thead>
+          <tbody>
+            <tr><td>Rampa</td><td>T varia — calor sensível (Q=m·c·ΔT)</td></tr>
+            <tr><td>Patamar</td><td>T constante — mudança de fase (Q=m·L)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:.78rem;color:var(--text-muted);line-height:1.5;margin-top:10px">
+        Só a água (e o gelo, que é a mesma substância) muda de fase nesta faixa de temperatura — por isso metais mostram uma reta contínua, sem patamares.
+      </p>
+
+      <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--glass-border)">
+        <h3 style="font-family:var(--font-display);font-size:.75rem;color:var(--text-muted);letter-spacing:2px;margin-bottom:10px">PRINCÍPIO FÍSICO</h3>
+        <div class="formula-box">Q = m·c·ΔT<br>Q = m·L</div>
+        <p style="font-size:.75rem;color:var(--text-muted);line-height:1.5;margin-top:8px">
+          Durante uma mudança de fase, toda a energia fornecida vira calor latente — a temperatura fica constante até a transição terminar.
+        </p>
+      </div>
+    </aside>
+
+  </div>
+</main>
+
+<!-- ==================== DRAWER GUIA ==================== -->
+<aside class="side-guide" id="sideGuide" role="complementary" aria-labelledby="guideTitle">
+  <div class="guide-tab" id="guideTab" role="button" tabindex="0" aria-label="Abrir guia do experimento" aria-controls="sideGuide">
+    <span class="ico" aria-hidden="true">📖</span>
+    <span>GUIA</span>
+  </div>
+  
+  <div class="guide-content">
+    <button class="close-guide" id="closeGuide" aria-label="Fechar guia">
+      <span class="ico" aria-hidden="true">✕</span>
+    </button>
+    
+    <h2 id="guideTitle">Guia do Experimento</h2>
+    <div class="guide-subtitle">Calorimetria e Equilíbrio Térmico</div>
+    
+    <div class="guide-section">
+      <h3><span class="step-num">1</span> Objetivo</h3>
+      <p>Determinar a temperatura de equilíbrio térmico de um sistema composto por diferentes materiais, aplicando o princípio da conservação de energia.</p>
+    </div>
+    
+    <div class="guide-section">
+      <h3><span class="step-num">2</span> Como Usar</h3>
+      <ul>
+        <li>Selecione um material no painel de controle</li>
+        <li>Ajuste a massa entre 10g e 500g</li>
+        <li>Defina a temperatura inicial (-20°C a 150°C)</li>
+        <li>Clique em "Adicionar ao Calorímetro"</li>
+        <li>Repita para outros materiais (mínimo 2)</li>
+        <li>Clique em "Iniciar Troca de Calor"</li>
+        <li>Observe a convergência no gráfico</li>
+      </ul>
+    </div>
+    
+    <div class="guide-section">
+      <h3><span class="step-num">3</span> Calor Sensível</h3>
+      <p>Quando um corpo sofre variação de temperatura sem mudança de fase:</p>
+      <div class="formula-box">Q = m · c · ΔT</div>
+      <p style="font-size:.78rem;color:var(--text-muted)">
+        Onde Q é o calor, m é a massa, c é o calor específico e ΔT é a variação de temperatura.
+      </p>
+    </div>
+    
+    <div class="guide-section">
+      <h3><span class="step-num">4</span> Calor Latente</h3>
+      <p>Quando há mudança de fase (sólido ↔ líquido ↔ gasoso), a temperatura permanece constante durante a transição:</p>
+      <div class="formula-box">Q = m · L</div>
+      <p style="font-size:.78rem;color:var(--text-muted)">
+        Onde L é o calor latente da mudança de fase. Para a água: L<sub>fusão</sub> = <span class="cval" data-cval="334" data-casas="0">334</span> <span class="unitlabel" data-unitlabel="massa">J/g</span> e L<sub>vaporização</sub> = <span class="cval" data-cval="2260" data-casas="0">2260</span> <span class="unitlabel" data-unitlabel="massa">J/g</span>.
+      </p>
+    </div>
+    
+    <div class="guide-section">
+      <h3><span class="step-num">5</span> Equilíbrio Térmico</h3>
+      <p>Em um sistema isolado, a soma dos calores trocados entre os corpos é nula:</p>
+      <div class="formula-box">Q₁ + Q₂ + Q₃ + ... = 0</div>
+      <p style="font-size:.78rem;color:var(--text-muted)">
+        O calor cedido pelos corpos mais quentes é igual ao calor absorvido pelos mais frios, em valor absoluto.
+      </p>
+    </div>
+    
+    <div class="guide-section">
+      <h3><span class="step-num">6</span> Constantes Utilizadas</h3>
+      <table class="constants-table">
+        <thead>
+          <tr>
+            <th>Material</th>
+            <th id="cUnitHeader">c (J/g·°C)</th>
+            <th>Fase</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Água (líquido)</td><td><span class="cval" data-cval="4.186" data-casas="3">4,186</span></td><td>Líquido</td></tr>
+          <tr><td>Gelo</td><td><span class="cval" data-cval="2.092" data-casas="3">2,092</span></td><td>Sólido</td></tr>
+          <tr><td>Cobre</td><td><span class="cval" data-cval="0.386" data-casas="3">0,386</span></td><td>Sólido</td></tr>
+          <tr><td>Ferro</td><td><span class="cval" data-cval="0.450" data-casas="3">0,450</span></td><td>Sólido</td></tr>
+          <tr><td>Alumínio</td><td><span class="cval" data-cval="0.900" data-casas="3">0,900</span></td><td>Sólido</td></tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="guide-section">
+      <h3><span class="step-num">7</span> Hipóteses do Modelo</h3>
+      <ul>
+        <li>Calorímetro ideal (capacidade térmica nula)</li>
+        <li>Sistema isolado (sem troca com o ambiente)</li>
+        <li>Distribuição uniforme de temperatura</li>
+        <li>Pressão atmosférica constante (1 atm)</li>
+        <li>Calores específicos constantes</li>
+      </ul>
+    </div>
+  </div>
+</aside>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Região aria-live para leitores de tela -->
+<div class="live-region" id="liveRegion" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+/* ============================================================
+   LABORATÓRIO DE CALORIMETRIA - LÓGICA PRINCIPAL
+   ============================================================ */
+
+// Polyfill para roundRect (compatibilidade) - definido antes de qualquer uso
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+    if (w < 2 * r) r = w / 2;
+    if (h < 2 * r) r = h / 2;
+    this.beginPath();
+    this.moveTo(x + r, y);
+    this.arcTo(x + w, y, x + w, y + h, r);
+    this.arcTo(x + w, y + h, x, y + h, r);
+    this.arcTo(x, y + h, x, y, r);
+    this.arcTo(x, y, x + w, y, r);
+    this.closePath();
+    return this;
+  };
+}
+
+// ===== ESTADO GLOBAL =====
+const state = {
+  elementos: [],
+  simulando: false,
+  Tf: null,
+  tempo: 0,
+  animFrame: null,
+  historico: [],
+  unidade: 'J'
+};
+
+// ===== CONSTANTES FÍSICAS =====
+const FISICA = {
+  agua:      { c: 4.186, nome: 'Água',   fase: 'líquido', Pf: 0,   Pe: 100, Lf: 334, Lv: 2260, cor: '#3ac6ff', dens: 1.00, icon: '💧' },
+  gelo:      { c: 2.092, nome: 'Gelo',   fase: 'sólido',  Pf: 0,   Pe: 100, Lf: 334, Lv: 2260, cor: '#bdeeff', dens: 0.92, icon: '❄' },
+  cobre:     { c: 0.386, nome: 'Cobre',  fase: 'sólido',  cor: '#ff8c42', dens: 8.96, icon: '●' },
+  ferro:     { c: 0.450, nome: 'Ferro',  fase: 'sólido',  cor: '#adb3bb', dens: 7.87, icon: '■' },
+  aluminio:  { c: 0.900, nome: 'Alumínio',fase: 'sólido',  cor: '#d8dde2', dens: 2.70, icon: '◆' }
+};
+
+const VAPOR = { c: 2.010, nome: 'Vapor', fase: 'gasoso' };
+
+/* ============================================================
+   UNIDADES DE ENERGIA (J ⇄ cal)
+   ============================================================ */
+const J_POR_CAL = 4.186;
+
+function paraUnidadeAtual(valorEmJ) {
+  return state.unidade === 'J' ? valorEmJ : valorEmJ / J_POR_CAL;
+}
+
+function fmtNum(v, casas) {
+  return v.toFixed(casas).replace('.', ',');
+}
+
+// Formata um valor "por grama" (c, em J/(g·°C) ou J/g) na unidade atual
+function fmtPorMassa(jValorPorG, porGrauC, casas) {
+  const conv = paraUnidadeAtual(jValorPorG);
+  const unidadeTxt = state.unidade === 'J'
+    ? (porGrauC ? 'J/(g·°C)' : 'J/g')
+    : (porGrauC ? 'cal/(g·°C)' : 'cal/g');
+  return `${fmtNum(conv, casas)} ${unidadeTxt}`;
+}
+
+// Formata uma quantidade de calor total (Q, em joules), escolhendo J/kJ ou cal/kcal
+function fmtEnergiaTotal(joules) {
+  const abs = Math.abs(joules);
+  if (state.unidade === 'J') {
+    if (abs >= 1000) return `${fmtNum(joules / 1000, 2)} kJ`;
+    return `${fmtNum(joules, 0)} J`;
+  }
+  const cal = joules / J_POR_CAL;
+  if (Math.abs(cal) >= 1000) return `${fmtNum(cal / 1000, 2)} kcal`;
+  return `${fmtNum(cal, 0)} cal`;
+}
+
+// Atualiza todos os elementos da página marcados com data-cval / data-unitlabel
+// para refletirem a unidade de energia atualmente selecionada (J ou cal)
+function atualizarUnidadesDOM() {
+  document.querySelectorAll('.cval').forEach(el => {
+    const base = parseFloat(el.dataset.cval);
+    const casas = parseInt(el.dataset.casas, 10) || 0;
+    el.textContent = fmtNum(paraUnidadeAtual(base), casas);
+  });
+  document.querySelectorAll('.unitlabel').forEach(el => {
+    const massaSo = el.dataset.unitlabel === 'massa';
+    el.textContent = state.unidade === 'J' ? (massaSo ? 'J/g' : 'J/(g·°C)') : (massaSo ? 'cal/g' : 'cal/(g·°C)');
+  });
+  const header = document.getElementById('cUnitHeader');
+  if (header) header.textContent = state.unidade === 'J' ? 'c (J/g·°C)' : 'c (cal/g·°C)';
+  const btn = document.getElementById('unitBtn');
+  if (btn) {
+    btn.textContent = state.unidade;
+    btn.setAttribute('aria-pressed', state.unidade === 'cal' ? 'true' : 'false');
+  }
+  atualizarPreview();
+  if (typeof atualizarAquecimentoUI === 'function') atualizarAquecimentoUI();
+}
+
+function alternarUnidade() {
+  state.unidade = state.unidade === 'J' ? 'cal' : 'J';
+  atualizarUnidadesDOM();
+  showToast(`Unidade de energia: ${state.unidade === 'J' ? 'Joule' : 'caloria'}`, 'info');
+}
+
+/* ============================================================
+   FUNÇÕES DE CÁLCULO FÍSICO
+   ============================================================ */
+
+function calorNecessario(elem, Tf) {
+  const { tipo, massa, Ti } = elem;
+  const prop = FISICA[tipo];
+  let Q = 0;
+  
+  if (tipo === 'agua') {
+    const c_liq = 4.186;
+    if (Tf < 0) {
+      Q = massa * c_liq * (0 - Ti);
+      Q += -massa * 334;
+      Q += massa * 2.092 * (Tf - 0);
+    } else if (Tf <= 100) {
+      Q = massa * c_liq * (Tf - Ti);
+    } else {
+      Q = massa * c_liq * (100 - Ti);
+      Q += massa * 2260;
+      Q += massa * 2.010 * (Tf - 100);
+    }
+  } else if (tipo === 'gelo') {
+    const c_sol = 2.092;
+    if (Tf < 0) {
+      Q = massa * c_sol * (Tf - Ti);
+    } else if (Tf <= 100) {
+      Q = massa * c_sol * (0 - Ti);
+      Q += massa * 334;
+      Q += massa * 4.186 * (Tf - 0);
+    } else {
+      Q = massa * c_sol * (0 - Ti);
+      Q += massa * 334;
+      Q += massa * 4.186 * 100;
+      Q += massa * 2260;
+      Q += massa * 2.010 * (Tf - 100);
+    }
+  } else {
+    Q = massa * prop.c * (Tf - Ti);
+  }
+  
+  return Q;
+}
+
+function calcularEquilibrio(elementos) {
+  if (elementos.length === 0) return null;
+  if (elementos.length === 1) return elementos[0].Ti;
+  
+  let Tmin = Math.min(...elementos.map(e => e.Ti));
+  let Tmax = Math.max(...elementos.map(e => e.Ti));
+  
+  if (Math.abs(Tmin - Tmax) < 0.001) return Tmin;
+  
+  let lo = Tmin, hi = Tmax;
+  for (let i = 0; i < 200; i++) {
+    const mid = (lo + hi) / 2;
+    const Qtotal = elementos.reduce((acc, e) => acc + calorNecessario(e, mid), 0);
+    if (Math.abs(Qtotal) < 1e-6) return mid;
+    const Qlo = elementos.reduce((acc, e) => acc + calorNecessario(e, lo), 0);
+    if (Qtotal * Qlo > 0) lo = mid;
+    else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+/* ============================================================
+   FÍSICA DA CURVA DE AQUECIMENTO (aba 2)
+   ------------------------------------------------------------
+   Diferente da mistura (calorNecessario, acima, que assume a fase
+   inicial pelo "tipo" selecionado), aqui a fase de cada trecho é
+   determinada pelas temperaturas Ti/Tf reais — por isso funciona
+   corretamente mesmo atravessando 0°C e 100°C num único aquecimento.
+   ============================================================ */
+
+// Monta os "degraus" (sensível e latente) entre Ti e Tf para a água/gelo (H2O)
+function calorAcumuladoH2O(massa, Ti, Tf) {
+  const C_GELO = 2.092, C_AGUA = 4.186, C_VAPOR = 2.010, LF = 334, LV = 2260;
+  function cSensivel(T) { return T < 0 ? C_GELO : (T <= 100 ? C_AGUA : C_VAPOR); }
+  function faseSensivel(T) { return T < 0 ? 'Sólido' : (T <= 100 ? 'Líquido' : 'Vapor'); }
+
+  const segmentos = [];
+  const limites = [0, 100].filter(L => L > Ti && L < Tf).sort((a, b) => a - b);
+  let Tprev = Ti, Qprev = 0;
+
+  limites.forEach(lim => {
+    const c = cSensivel((Tprev + lim) / 2);
+    const Q1 = Qprev + massa * c * (lim - Tprev);
+    segmentos.push({ T0: Tprev, T1: lim, Q0: Qprev, Q1, fase: faseSensivel((Tprev + lim) / 2) });
+    Qprev = Q1; Tprev = lim;
+
+    const L = lim === 0 ? LF : LV;
+    const Q2 = Qprev + massa * L;
+    const faseLatente = lim === 0 ? 'Fusão (sólido → líquido)' : 'Vaporização (líquido → vapor)';
+    segmentos.push({ T0: lim, T1: lim, Q0: Qprev, Q1: Q2, fase: faseLatente });
+    Qprev = Q2;
+  });
+
+  const c = cSensivel((Tprev + Tf) / 2);
+  const Qf = Qprev + massa * c * (Tf - Tprev);
+  segmentos.push({ T0: Tprev, T1: Tf, Q0: Qprev, Q1: Qf, fase: faseSensivel((Tprev + Tf) / 2) });
+
+  return segmentos;
+}
+
+// Metais: sem dado de fusão nesta faixa — só calor sensível (reta única)
+function calorAcumuladoMetal(c, massa, Ti, Tf) {
+  return [{ T0: Ti, T1: Tf, Q0: 0, Q1: massa * c * (Tf - Ti), fase: 'Sólido (sem mudança de fase nesta faixa)' }];
+}
+
+// Dado um Q já fornecido, acha em qual trecho o sistema está e interpola T
+function aqEstadoEmQ(segmentos, Qalvo) {
+  for (const s of segmentos) {
+    if (Qalvo >= s.Q0 - 1e-6 && Qalvo <= s.Q1 + 1e-6) {
+      const T = Math.abs(s.Q1 - s.Q0) < 1e-9 ? s.T0 : s.T0 + (s.T1 - s.T0) * (Qalvo - s.Q0) / (s.Q1 - s.Q0);
+      return { T, fase: s.fase };
+    }
+  }
+  const last = segmentos[segmentos.length - 1];
+  return { T: last.T1, fase: last.fase };
+}
+
+// Achata os segmentos numa polilinha (T,Q) para desenhar a curva inteira
+function pontosDeSegmentos(segmentos) {
+  const pts = [{ x: segmentos[0].Q0, y: segmentos[0].T0 }];
+  segmentos.forEach(s => pts.push({ x: s.Q1, y: s.T1 }));
+  return pts;
+}
+
+function fmtTempo(segundos) {
+  if (segundos < 60) return `${fmtNum(segundos, 1)} s`;
+  if (segundos < 3600) return `${fmtNum(segundos / 60, 1)} min`;
+  return `${fmtNum(segundos / 3600, 2)} h`;
+}
+
+// Como fmtEnergiaTotal, mas devolve valor e unidade separados (dois <span> no HTML)
+function fmtEnergiaTotalPartes(joules) {
+  if (state.unidade === 'J') {
+    if (Math.abs(joules) >= 1000) return { valor: fmtNum(joules / 1000, 2), unidade: 'kJ' };
+    return { valor: fmtNum(joules, 0), unidade: 'J' };
+  }
+  const cal = joules / J_POR_CAL;
+  if (Math.abs(cal) >= 1000) return { valor: fmtNum(cal / 1000, 2), unidade: 'kcal' };
+  return { valor: fmtNum(cal, 0), unidade: 'cal' };
+}
+
+/* ============================================================
+   GESTÃO DE ELEMENTOS
+   ============================================================ */
+
+let nextId = 1;
+
+function adicionarElemento() {
+  if (state.simulando) {
+    showToast('Pare a simulação antes de adicionar novos elementos', 'warning');
+    return;
+  }
+  if (state.elementos.length >= 6) {
+    showToast('Máximo de 6 elementos no calorímetro', 'warning');
+    return;
+  }
+  
+  const tipo = document.getElementById('materialSelect').value;
+  const massa = parseInt(document.getElementById('massSlider').value);
+  const Ti = parseInt(document.getElementById('tempSlider').value);
+  
+  const elem = {
+    id: nextId++,
+    tipo,
+    massa,
+    Ti,
+    T_atual: Ti
+  };
+  
+  state.elementos.push(elem);
+  renderElementos();
+  desenharCalorimetro();
+  
+  document.getElementById('startBtn').disabled = state.elementos.length < 2;
+  document.getElementById('clearBtn').disabled = false;
+  
+  const prop = FISICA[tipo];
+  showToast(`${prop.nome} adicionado: ${massa}g a ${Ti}°C`, 'success');
+  anunciar(`${prop.nome} adicionado ao calorímetro, massa ${massa} gramas, temperatura inicial ${Ti} graus Celsius`);
+  
+  atualizarMeta();
+}
+
+function removerElemento(id) {
+  if (state.simulando) {
+    showToast('Pare a simulação antes de remover elementos', 'warning');
+    return;
+  }
+  state.elementos = state.elementos.filter(e => e.id !== id);
+  renderElementos();
+  desenharCalorimetro();
+  
+  document.getElementById('startBtn').disabled = state.elementos.length < 2;
+  if (state.elementos.length === 0) {
+    document.getElementById('clearBtn').disabled = true;
+  }
+  
+  atualizarMeta();
+}
+
+function limparSistema() {
+  if (state.simulando) pararSimulacao();
+  state.elementos = [];
+  state.Tf = null;
+  state.historico = [];
+  state.tempo = 0;
+  renderElementos();
+  desenharCalorimetro();
+  resetarGrafico();
+  document.getElementById('resultValue').textContent = '--';
+  document.getElementById('metaDelta').textContent = '--';
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('clearBtn').disabled = true;
+  setStatus('PRONTO', false);
+  atualizarMeta();
+  showToast('Sistema limpo', 'info');
+}
+
+/* ============================================================
+   RENDERIZAÇÃO DA LISTA DE ELEMENTOS
+   ============================================================ */
+function renderElementos() {
+  const list = document.getElementById('elementsList');
+  if (state.elementos.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <span class="ico" aria-hidden="true">🧪</span>
+        <div>Nenhum elemento adicionado</div>
+        <div style="font-size:.7rem;margin-top:5px;opacity:.7">Use o painel de controle</div>
+      </div>`;
+    return;
+  }
+  
+  list.innerHTML = state.elementos.map(e => {
+    const prop = FISICA[e.tipo];
+    return `
+      <div class="element-item" role="listitem">
+        <div class="element-color" style="background:${prop.cor};color:${prop.cor}"></div>
+        <div class="element-details">
+          <div class="element-name">${prop.nome}</div>
+          <div class="element-specs">
+            <span><span class="ico" aria-hidden="true">⚖</span> ${e.massa}g</span>
+            <span><span class="ico" aria-hidden="true">🌡</span> <span class="element-temp">${e.T_atual.toFixed(1)}°C</span></span>
+          </div>
+        </div>
+        <button class="element-remove" data-id="${e.id}" aria-label="Remover ${prop.nome}">
+          <span class="ico" aria-hidden="true">✕</span>
+        </button>
+      </div>`;
+  }).join('');
+  
+  list.querySelectorAll('.element-remove').forEach(btn => {
+    btn.addEventListener('click', () => removerElemento(parseInt(btn.dataset.id)));
+  });
+}
+
+function atualizarTemperaturasLista() {
+  const items = document.querySelectorAll('.element-item .element-temp');
+  state.elementos.forEach((e, i) => {
+    if (items[i]) items[i].textContent = `${e.T_atual.toFixed(1)}°C`;
+  });
+}
+
+function atualizarMeta() {
+  document.getElementById('metaCount').textContent = state.elementos.length;
+  const massaTotal = state.elementos.reduce((s, e) => s + e.massa, 0);
+  document.getElementById('metaMass').textContent = `${massaTotal} g`;
+  
+  if (state.Tf !== null && state.elementos.length > 0) {
+    const deltaMedio = state.elementos.reduce((s, e) => s + Math.abs(e.T_atual - e.Ti), 0) / state.elementos.length;
+    document.getElementById('metaDelta').textContent = `${deltaMedio.toFixed(1)}°C`;
+  }
+}
+
+/* ============================================================
+   CANVAS: DESENHO DO CALORÍMETRO E ELEMENTOS REALISTAS
+   ============================================================ */
+const canvas = document.getElementById('calorimeterCanvas');
+const ctx = canvas.getContext('2d');
+
+// Converte temperatura em cor (azul frio → roxo → magenta → vermelho quente)
+function tempToColor(temp) {
+  const t = Math.max(0, Math.min(1, (temp + 20) / 170));
+  const stops = [
+    { t: 0,    r: 70,  g: 170, b: 255 },
+    { t: 0.3,  r: 120, g: 215, b: 255 },
+    { t: 0.5,  r: 255, g: 225, b: 150 },
+    { t: 0.75, r: 255, g: 140, b: 40  },
+    { t: 1,    r: 255, g: 60,  b: 40  }
+  ];
+  for (let i = 0; i < stops.length - 1; i++) {
+    if (t >= stops[i].t && t <= stops[i+1].t) {
+      const localT = (t - stops[i].t) / (stops[i+1].t - stops[i].t);
+      const r = Math.round(stops[i].r + (stops[i+1].r - stops[i].r) * localT);
+      const g = Math.round(stops[i].g + (stops[i+1].g - stops[i].g) * localT);
+      const b = Math.round(stops[i].b + (stops[i+1].b - stops[i].b) * localT);
+      return { r, g, b, str: `rgb(${r},${g},${b})` };
+    }
+  }
+  return { r: 255, g: 0, b: 255, str: 'rgb(255,176,32)' };
+}
+
+// Converte componente RGB para string rgba com alpha
+function rgba(c, a) {
+  return `rgba(${c.r},${c.g},${c.b},${a})`;
+}
+
+// Determina o estado visual (fase) de um elemento com base na temperatura atual
+function getEstadoVisual(elem) {
+  if (elem.tipo === 'agua') {
+    if (elem.T_atual < 0) return 'gelo';
+    if (elem.T_atual > 100) return 'vapor';
+    return 'liquido';
+  } else if (elem.tipo === 'gelo') {
+    if (elem.T_atual >= 0) return 'liquido';
+    return 'gelo';
+  }
+  return 'solido';
+}
+
+/* --- Desenha LÍQUIDO (água no estado líquido) --- */
+// Forma de poça com superfície ondulada animada, bolhas subindo, brilho na superfície
+function desenharLiquido(ctx, x, y, r, cor, tempo) {
+  ctx.save();
+  
+  // Sombra no chão (elipse achatada abaixo)
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.beginPath();
+  ctx.ellipse(x, y + r * 0.75, r * 0.85, r * 0.15, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Glow externo difuso
+  const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, r * 1.8);
+  glowGrad.addColorStop(0, rgba(cor, 0.3));
+  glowGrad.addColorStop(1, rgba(cor, 0));
+  ctx.fillStyle = glowGrad;
+  ctx.beginPath();
+  ctx.arc(x, y, r * 1.8, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Corpo do líquido: metade inferior é semicírculo, topo é onda senoidal animada
+  const waveAmp = r * 0.1;
+  const waveFreq = 2.5;
+  const wavePhase = tempo * 1.8;
+  
+  ctx.beginPath();
+  // Começa no canto esquerdo do topo
+  ctx.moveTo(x - r, y);
+  // Desenha a superfície ondulada da esquerda para a direita
+  for (let i = 0; i <= 30; i++) {
+    const t = i / 30;
+    const px = x - r + 2 * r * t;
+    const py = y + Math.sin(t * Math.PI * waveFreq + wavePhase) * waveAmp
+                 + Math.sin(t * Math.PI * waveFreq * 2.3 + wavePhase * 1.5) * waveAmp * 0.3;
+    ctx.lineTo(px, py);
+  }
+  // Continha descendo pelo lado direito e fecha o semicírculo inferior
+  ctx.arc(x, y, r, 0, Math.PI, false);
+  ctx.closePath();
+  
+  // Gradiente de preenchimento: mais claro no topo, mais escuro no fundo
+  const liqGrad = ctx.createLinearGradient(x, y - r, x, y + r);
+  liqGrad.addColorStop(0, rgba(cor, 0.85));
+  liqGrad.addColorStop(0.4, rgba(cor, 0.6));
+  liqGrad.addColorStop(1, rgba(cor, 0.8));
+  ctx.fillStyle = liqGrad;
+  ctx.fill();
+  
+  // Borda do líquido
+  ctx.strokeStyle = rgba(cor, 0.9);
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  
+  // Bolhas subindo dentro do líquido
+  for (let i = 0; i < 4; i++) {
+    const bubblePhase = (tempo * 0.4 + i * 0.6) % 1;
+    const bx = x + Math.sin(i * 2.1 + tempo * 0.7) * r * 0.45;
+    const by = y + r * 0.3 - bubblePhase * r * 0.9;
+    const br = 1.5 + Math.sin(tempo * 2 + i) * 0.8;
+    ctx.fillStyle = `rgba(255,255,255,${0.35 * (1 - bubblePhase)})`;
+    ctx.beginPath();
+    ctx.arc(bx, by, Math.max(0.5, br), 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  // Brilho na superfície (highlight elíptico)
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ctx.beginPath();
+  ctx.ellipse(x - r * 0.25, y - r * 0.15, r * 0.35, r * 0.07, -0.2, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Reflexo menor à direita
+  ctx.fillStyle = 'rgba(255,255,255,0.1)';
+  ctx.beginPath();
+  ctx.ellipse(x + r * 0.4, y - r * 0.05, r * 0.15, r * 0.04, 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Símbolo H₂O
+  ctx.fillStyle = 'rgba(255,255,255,0.92)';
+  ctx.font = `bold ${Math.max(9, r * 0.38)}px Orbitron, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('H₂O', x, y + r * 0.2);
+  
+  ctx.restore();
+}
+
+/* --- Desenha GELO (cristal hexagonal angular) --- */
+function desenharGelo(ctx, x, y, r, cor, tempo) {
+  ctx.save();
+  
+  // Sombra no chão
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.beginPath();
+  ctx.ellipse(x, y + r * 0.8, r * 0.7, r * 0.13, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Glow externo
+  const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, r * 1.6);
+  glowGrad.addColorStop(0, rgba(cor, 0.25));
+  glowGrad.addColorStop(1, rgba(cor, 0));
+  ctx.fillStyle = glowGrad;
+  ctx.beginPath();
+  ctx.arc(x, y, r * 1.6, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Forma cristalina hexagonal com vértices irregulares (aparência de gelo natural)
+  const sides = 6;
+  const points = [];
+  for (let i = 0; i < sides; i++) {
+    const angle = (Math.PI * 2 * i) / sides - Math.PI / 2;
+    const variance = 0.82 + Math.sin(i * 1.7) * 0.18;
+    const radius = r * variance;
+    points.push({
+      x: x + Math.cos(angle) * radius,
+      y: y + Math.sin(angle) * radius
+    });
+  }
+  
+  // Corpo principal do cristal
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  for (let i = 1; i < sides; i++) {
+    ctx.lineTo(points[i].x, points[i].y);
+  }
+  ctx.closePath();
+  
+  // Gradiente: claro no canto superior esquerdo, escuro no inferior direito
+  const iceGrad = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
+  iceGrad.addColorStop(0, rgba(cor, 0.95));
+  iceGrad.addColorStop(0.35, rgba(cor, 0.7));
+  iceGrad.addColorStop(0.7, rgba(cor, 0.55));
+  iceGrad.addColorStop(1, rgba({r: Math.max(0,cor.r-40), g: Math.max(0,cor.g-40), b: Math.max(0,cor.b-40)}, 0.85));
+  ctx.fillStyle = iceGrad;
+  ctx.fill();
+  
+  // Borda nítida
+  ctx.strokeStyle = rgba(cor, 1);
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Linhas internas das facetas (do centro para cada vértice)
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < sides; i++) {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(points[i].x, points[i].y);
+    ctx.stroke();
+  }
+  
+  // Facetas internas (triângulos alternados mais escuros para dar volume)
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  for (let i = 0; i < sides; i += 2) {
+    const p1 = points[i];
+    const p2 = points[(i + 1) % sides];
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.closePath();
+    ctx.fill();
+  }
+  
+  // Sparkle principal (brilho no canto superior esquerdo)
+  const sparkX = x - r * 0.3;
+  const sparkY = y - r * 0.35;
+  const sparkR = r * 0.13 * (1 + Math.sin(tempo * 3) * 0.15);
+  ctx.fillStyle = 'rgba(255,255,255,0.7)';
+  ctx.beginPath();
+  ctx.arc(sparkX, sparkY, sparkR, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Cruz do sparkle
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(sparkX - sparkR * 2, sparkY);
+  ctx.lineTo(sparkX + sparkR * 2, sparkY);
+  ctx.moveTo(sparkX, sparkY - sparkR * 2);
+  ctx.lineTo(sparkX, sparkY + sparkR * 2);
+  ctx.stroke();
+  
+  // Sparkle secundário menor
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.beginPath();
+  ctx.arc(x + r * 0.25, y + r * 0.1, r * 0.07, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Símbolo H₂O
+  ctx.fillStyle = 'rgba(255,255,255,0.88)';
+  ctx.font = `bold ${Math.max(9, r * 0.38)}px Orbitron, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('H₂O', x, y + r * 0.05);
+  
+  ctx.restore();
+}
+
+/* --- Desenha VAPOR (partículas gasosas subindo e dissipando) --- */
+function desenharVapor(ctx, x, y, r, cor, tempo) {
+  ctx.save();
+  
+  // Glow difuso muito amplo
+  const glowGrad = ctx.createRadialGradient(x, y - r * 0.3, 0, x, y - r * 0.3, r * 2.5);
+  glowGrad.addColorStop(0, rgba(cor, 0.15));
+  glowGrad.addColorStop(1, rgba(cor, 0));
+  ctx.fillStyle = glowGrad;
+  ctx.beginPath();
+  ctx.arc(x, y - r * 0.3, r * 2.5, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Múltiplas partículas de vapor subindo
+  for (let i = 0; i < 8; i++) {
+    const phase = (tempo * 0.35 + i * 0.35) % 1;
+    const px = x + Math.sin(i * 1.3 + tempo * 0.8) * r * 0.7 * (0.5 + phase * 0.5);
+    const py = y + r * 0.5 - phase * r * 2;
+    const pr = r * (0.12 + 0.08 * Math.sin(i + tempo)) * (1 - phase * 0.6);
+    const alpha = 0.45 * (1 - phase) * (phase < 0.1 ? phase / 0.1 : 1);
+    
+    // Partícula com gradiente radial
+    const pGrad = ctx.createRadialGradient(px, py, 0, px, py, pr);
+    pGrad.addColorStop(0, rgba(cor, alpha));
+    pGrad.addColorStop(1, rgba(cor, 0));
+    ctx.fillStyle = pGrad;
+    ctx.beginPath();
+    ctx.arc(px, py, pr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  // Forma base muito translúcida (vestígio do líquido)
+  ctx.fillStyle = rgba(cor, 0.12);
+  ctx.beginPath();
+  ctx.ellipse(x, y + r * 0.3, r * 0.5, r * 0.2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Símbolo H₂O bem tên
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = `bold ${Math.max(8, r * 0.33)}px Orbitron, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('H₂O', x, y);
+  
+  ctx.restore();
+}
+
+/* --- Desenha SÓLIDO METÁLICO (bloco tipo lingote com gradiente metálico) --- */
+function desenharSolido(ctx, x, y, r, cor, elem, prop, tempo) {
+  ctx.save();
+  
+  // Sombra no chão
+  ctx.fillStyle = 'rgba(0,0,0,0.35)';
+  ctx.beginPath();
+  ctx.ellipse(x, y + r * 0.7, r * 0.75, r * 0.13, 0, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Glow externo
+  const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, r * 1.5);
+  glowGrad.addColorStop(0, rgba(cor, 0.2));
+  glowGrad.addColorStop(1, rgba(cor, 0));
+  ctx.fillStyle = glowGrad;
+  ctx.beginPath();
+  ctx.arc(x, y, r * 1.5, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Dimensões do bloco (formato de lingote: ligeiramente trapezoidal)
+  const w = r * 1.5;
+  const h = r * 1.3;
+  const bx = x - w / 2;
+  const by = y - h / 2;
+  const taper = r * 0.12; // quanto a base é mais larga que o topo
+  
+  // Trapezóide (mais largo embaixo, como um lingote)
+  ctx.beginPath();
+  ctx.moveTo(bx + taper, by);                    // topo esquerdo
+  ctx.lineTo(bx + w - taper, by);                 // topo direito
+  ctx.lineTo(bx + w, by + h);                     // base direita
+  ctx.lineTo(bx, by + h);                         // base esquerda
+  ctx.closePath();
+  
+  // Gradiente metálico: brilhante no topo-esquerda, escuro no fundo-direita
+  const darkCor = { r: Math.max(0, cor.r - 60), g: Math.max(0, cor.g - 60), b: Math.max(0, cor.b - 60) };
+  const lightCor = { r: Math.min(255, cor.r + 70), g: Math.min(255, cor.g + 70), b: Math.min(255, cor.b + 70) };
+  
+  const metalGrad = ctx.createLinearGradient(bx, by, bx + w, by + h);
+  metalGrad.addColorStop(0, rgba(lightCor, 0.95));
+  metalGrad.addColorStop(0.25, rgba(cor, 0.88));
+  metalGrad.addColorStop(0.6, rgba(cor, 0.75));
+  metalGrad.addColorStop(1, rgba(darkCor, 0.85));
+  ctx.fillStyle = metalGrad;
+  ctx.fill();
+  
+  // Borda
+  ctx.strokeStyle = rgba(cor, 1);
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  
+  // Faixa de brilho superior (highlight horizontal)
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.beginPath();
+  ctx.moveTo(bx + taper + 3, by + 3);
+  ctx.lineTo(bx + w - taper - 3, by + 3);
+  ctx.lineTo(bx + w - taper - 6, by + h * 0.18);
+  ctx.lineTo(bx + taper + 6, by + h * 0.18);
+  ctx.closePath();
+  ctx.fill();
+  
+  // Brilho na borda esquerda (reflexo de luz)
+  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(bx + taper + 1, by + 2);
+  ctx.lineTo(bx + 1, by + h - 2);
+  ctx.stroke();
+  
+  // Sombra na borda direita
+  ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(bx + w - 1, by + h - 2);
+  ctx.lineTo(bx + w - taper - 1, by + 2);
+  ctx.stroke();
+  
+  // Pequena vibração/tremor se a temperatura for alta (agitação térmica)
+  let offsetX = 0, offsetY = 0;
+  if (elem.T_atual > 50) {
+    const intensity = Math.min(1, (elem.T_atual - 50) / 100);
+    offsetX = Math.sin(tempo * 15 + elem.id * 2) * intensity * 1.5;
+    offsetY = Math.cos(tempo * 12 + elem.id * 3) * intensity * 1.5;
+  }
+  
+  // Símbolo do elemento químico
+  const simbolo = elem.tipo === 'cobre' ? 'Cu' : elem.tipo === 'ferro' ? 'Fe' : 'Al';
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.font = `bold ${Math.max(10, r * 0.42)}px Orbitron, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(simbolo, x + offsetX, y + offsetY);
+  
+  ctx.restore();
+}
+
+/* ============================================================
+   FUNÇÃO PRINCIPAL DE DESENHO DO CALORÍMETRO
+   ============================================================ */
+// Gravidade visual (px/s²) usada só para a animação de queda dos materiais —
+// não é o valor físico real, é calibrada para o tamanho do béquer na tela.
+const GRAVIDADE_QUEDA = 2200;
+let ultimoFrameFisica = null;
+
+// Calcula onde cada elemento deve REPOUSAR: metais (sempre sólidos, mais densos
+// que a água) afundam até o fundo; gelo (menos denso) flutua na superfície da
+// poça; água/gelo derretido viram uma poça única no fundo do béquer; vapor sobe.
+function calcularLayoutFisico(geo) {
+  const porId = {};
+  const metais = [], gelos = [], liquidos = [], vapores = [];
+
+  state.elementos.forEach(e => {
+    if (e.tipo === 'cobre' || e.tipo === 'ferro' || e.tipo === 'aluminio') { metais.push(e); return; }
+    const estado = getEstadoVisual(e);
+    if (estado === 'gelo') gelos.push(e);
+    else if (estado === 'vapor') vapores.push(e);
+    else liquidos.push(e);
+  });
+
+  // Poça compartilhada: soma as massas líquidas e mistura as cores por média ponderada
+  let poolMassa = 0, rS = 0, gS = 0, bS = 0, tS = 0;
+  liquidos.forEach(e => {
+    poolMassa += e.massa;
+    const c = tempToColor(e.T_atual);
+    rS += c.r * e.massa; gS += c.g * e.massa; bS += c.b * e.massa; tS += e.T_atual * e.massa;
+  });
+  const temPool = poolMassa > 0;
+  const corPool = temPool ? { r: rS / poolMassa, g: gS / poolMassa, b: bS / poolMassa } : null;
+  const tempMediaPool = temPool ? tS / poolMassa : 0;
+  const alturaPool = temPool ? Math.min(geo.innerH * 0.82, 10 + poolMassa * 0.36) : 0;
+  const floorY = geo.innerY + geo.innerH;
+  const superficieY = floorY - alturaPool;
+
+  function raioDe(massa) {
+    const t = Math.max(0, Math.min(1, (massa - 10) / (500 - 10)));
+    return 14 + 28 * t;
+  }
+  function distribuiX(lista) {
+    const n = lista.length;
+    lista.forEach((e, i) => {
+      porId[e.id] = { targetX: geo.innerX + (geo.innerW / n) * (i + 0.5), radius: raioDe(e.massa) };
+    });
+  }
+  distribuiX(metais);
+  distribuiX(gelos);
+  distribuiX(vapores);
+  distribuiX(liquidos);
+
+  // Metais: sempre afundam até o fundo do béquer (mais densos que a água)
+  metais.forEach(e => { porId[e.id].targetY = floorY - porId[e.id].radius * 0.62; });
+  // Gelo: flutua na superfície da poça (menos denso); sem poça, repousa no fundo
+  gelos.forEach(e => {
+    const r = porId[e.id].radius;
+    porId[e.id].targetY = temPool ? (superficieY - r * 0.25) : (floorY - r * 0.82);
+  });
+  // Vapor: sobe e paira perto do topo
+  vapores.forEach(e => { porId[e.id].targetY = geo.innerY + 28; });
+  // Líquidos não são desenhados individualmente (viram a poça), mas guardam alvo por segurança
+  liquidos.forEach(e => { porId[e.id].targetY = superficieY - 6; });
+
+  return {
+    porId,
+    grupos: { metais, gelos, liquidos, vapores },
+    pool: { existe: temPool, altura: alturaPool, superficieY, floorY, cor: corPool, tempMedia: tempMediaPool }
+  };
+}
+
+// Anima a queda física: cada elemento novo cai do alto com gravidade, quica
+// levemente ao pousar, e reacomoda-se (sem novo "salto") se o alvo mudar
+// (ex.: a poça sobe quando mais água é adicionada).
+function atualizarFisicaQueda(dt, geo) {
+  const layout = calcularLayoutFisico(geo);
+
+  state.elementos.forEach(elem => {
+    const L = layout.porId[elem.id];
+    if (!L) return;
+    elem.radius = L.radius;
+
+    if (elem.x === undefined || elem.x === null) elem.x = L.targetX;
+    else elem.x += (L.targetX - elem.x) * Math.min(1, dt * 6);
+
+    if (elem.quedaY === undefined || elem.quedaY === null) {
+      elem.quedaY = L.targetY - 230;
+      elem.quedaVy = 0;
+      elem.pousado = false;
+      elem.quicos = 0;
+    }
+
+    if (!elem.pousado) {
+      elem.quedaVy += GRAVIDADE_QUEDA * dt;
+      elem.quedaY += elem.quedaVy * dt;
+      if (elem.quedaY >= L.targetY) {
+        elem.quedaY = L.targetY;
+        if (elem.quicos < 2 && elem.quedaVy > 60) {
+          elem.quedaVy *= -0.26;
+          elem.quicos++;
+        } else {
+          elem.quedaVy = 0;
+          elem.pousado = true;
+        }
+      }
+    } else if (Math.abs(elem.quedaY - L.targetY) > 1) {
+      elem.quedaY += (L.targetY - elem.quedaY) * Math.min(1, dt * 6);
+    }
+
+    elem.y = elem.quedaY;
+  });
+
+  return layout;
+}
+
+// Desenha a poça de líquido única (água/gelo derretido, todos misturados),
+// com superfície ondulada, bolhas quando quente, e translúcida o bastante
+// para deixar ver os metais afundados por baixo dela.
+function desenharPoca(ctx, innerX, innerW, pool, tempo) {
+  const cor = pool.cor;
+  const x0 = innerX + 4, x1 = innerX + innerW - 4;
+  const yTop = pool.superficieY, yBot = pool.floorY;
+  const waveAmp = 4, waveFreq = 3.2, wavePhase = tempo * 1.6;
+
+  ctx.save();
+
+  ctx.beginPath();
+  ctx.moveTo(x0, yBot);
+  ctx.lineTo(x0, yTop);
+  const steps = 36;
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const px = x0 + (x1 - x0) * t;
+    const py = yTop + Math.sin(t * Math.PI * waveFreq + wavePhase) * waveAmp
+                     + Math.sin(t * Math.PI * waveFreq * 2.1 + wavePhase * 1.4) * waveAmp * 0.35;
+    ctx.lineTo(px, py);
+  }
+  ctx.lineTo(x1, yBot);
+  ctx.closePath();
+
+  const grad = ctx.createLinearGradient(0, yTop, 0, yBot);
+  grad.addColorStop(0, rgba(cor, 0.78));
+  grad.addColorStop(0.55, rgba(cor, 0.56));
+  grad.addColorStop(1, rgba(cor, 0.74));
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  ctx.strokeStyle = rgba(cor, 0.9);
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Bolhas subindo quando a poça está quente
+  if (pool.tempMedia > 45) {
+    const nBolhas = pool.tempMedia > 90 ? 8 : 4;
+    for (let i = 0; i < nBolhas; i++) {
+      const bubblePhase = (tempo * 0.5 + i * 0.47) % 1;
+      const bx = x0 + (x1 - x0) * ((i + 0.5) / nBolhas) + Math.sin(i * 2 + tempo) * 8;
+      const by = yBot - bubblePhase * (yBot - yTop) * 0.9;
+      const br = 1.4 + Math.sin(tempo * 2 + i) * 0.7;
+      ctx.fillStyle = `rgba(255,255,255,${0.4 * (1 - bubblePhase)})`;
+      ctx.beginPath();
+      ctx.arc(bx, by, Math.max(0.5, br), 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // Brilho na superfície
+  ctx.fillStyle = 'rgba(255,255,255,0.16)';
+  ctx.beginPath();
+  ctx.ellipse((x0 + x1) / 2 - (x1 - x0) * 0.18, yTop + 3, (x1 - x0) * 0.2, 3, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  if (yBot - yTop > 24) {
+    const meioY = yTop + (yBot - yTop) * 0.5;
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.font = 'bold 13px Orbitron, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('H₂O', (x0 + x1) / 2, meioY - 7);
+    ctx.font = 'bold 11px Orbitron, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.fillText(`${pool.tempMedia.toFixed(0)}°C`, (x0 + x1) / 2, meioY + 10);
+  }
+
+  ctx.restore();
+}
+
+function desenharCalorimetro() {
+  const W = canvas.width;
+  const H = canvas.height;
+  
+  ctx.clearRect(0, 0, W, H);
+  
+  const cx = W / 2;
+  const cy = H / 2;
+  const beakerW = 360;
+  const beakerH = 220;
+  const beakerX = cx - beakerW / 2;
+  const beakerY = cy - beakerH / 2;
+  const innerX = beakerX + 15;
+  const innerY = beakerY + 30;
+  const innerW = beakerW - 30;
+  const innerH = beakerH - 50;
+  
+  // Tempo para animações (superfície ondulada, bolhas, sparkles)
+  const tempo = performance.now() / 1000;
+  
+  // ===== Recipiente (béquer de vidro) =====
+  ctx.save();
+  
+  ctx.shadowColor = 'rgba(255,90,61,0.4)';
+  ctx.shadowBlur = 30;
+  
+  ctx.beginPath();
+  ctx.moveTo(beakerX - 10, beakerY);
+  ctx.lineTo(beakerX, beakerY + 20);
+  ctx.lineTo(beakerX, beakerY + beakerH - 20);
+  ctx.lineTo(beakerX - 10, beakerY + beakerH);
+  ctx.lineTo(beakerX + beakerW + 10, beakerY + beakerH);
+  ctx.lineTo(beakerX + beakerW, beakerY + beakerH - 20);
+  ctx.lineTo(beakerX + beakerW, beakerY + 20);
+  ctx.lineTo(beakerX + beakerW + 10, beakerY);
+  ctx.closePath();
+  
+  const glassGrad = ctx.createLinearGradient(beakerX, beakerY, beakerX + beakerW, beakerY + beakerH);
+  glassGrad.addColorStop(0, 'rgba(255,90,61,0.05)');
+  glassGrad.addColorStop(0.5, 'rgba(255,176,32,0.03)');
+  glassGrad.addColorStop(1, 'rgba(255,90,61,0.08)');
+  ctx.fillStyle = glassGrad;
+  ctx.fill();
+  
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = 'rgba(255,90,61,0.6)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Bordas superiores (bico do béquer)
+  ctx.beginPath();
+  ctx.moveTo(beakerX - 10, beakerY);
+  ctx.lineTo(beakerX - 25, beakerY - 5);
+  ctx.moveTo(beakerX + beakerW + 10, beakerY);
+  ctx.lineTo(beakerX + beakerW + 25, beakerY - 5);
+  ctx.strokeStyle = 'rgba(255,90,61,0.8)';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  
+  // Graduações
+  ctx.strokeStyle = 'rgba(255,90,61,0.3)';
+  ctx.lineWidth = 1;
+  ctx.font = '10px Orbitron, sans-serif';
+  ctx.fillStyle = 'rgba(255,232,214,0.5)';
+  for (let i = 1; i <= 4; i++) {
+    const y = beakerY + (beakerH * i / 5);
+    ctx.beginPath();
+    ctx.moveTo(beakerX + 5, y);
+    ctx.lineTo(beakerX + 20, y);
+    ctx.stroke();
+    ctx.fillText(`${500 - i*100}ml`, beakerX + 25, y + 4);
+  }
+  
+  ctx.restore();
+  
+  // ===== Estado vazio =====
+  if (state.elementos.length === 0) {
+    ultimoFrameFisica = null;
+    ctx.fillStyle = 'rgba(255,232,214,0.3)';
+    ctx.font = '14px Rajdhani, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Calorímetro vazio', cx, cy);
+    ctx.font = '11px Rajdhani, sans-serif';
+    ctx.fillStyle = 'rgba(194,168,151,0.5)';
+    ctx.fillText('Adicione materiais pelo painel de controle', cx, cy + 20);
+    return;
+  }
+  
+  // ===== Física da queda + layout (poça, afundar/flutuar) =====
+  const agora = performance.now();
+  const dt = ultimoFrameFisica === null ? 0 : Math.min(0.05, (agora - ultimoFrameFisica) / 1000);
+  ultimoFrameFisica = agora;
+  const layout = atualizarFisicaQueda(dt, { innerX, innerY, innerW, innerH });
+  
+  // ===== 1) Metais no fundo (afundam por serem mais densos que a água) =====
+  layout.grupos.metais.forEach(elem => {
+    const prop = FISICA[elem.tipo];
+    const cor = tempToColor(elem.T_atual);
+    desenharSolido(ctx, elem.x, elem.y, elem.radius, cor, elem, prop, tempo);
+  });
+  
+  // ===== 2) Poça de líquido única (água + gelo derretido) =====
+  if (layout.pool.existe) {
+    desenharPoca(ctx, innerX, innerW, layout.pool, tempo);
+  }
+  
+  // ===== 3) Gelo flutuando na superfície =====
+  layout.grupos.gelos.forEach(elem => {
+    const cor = tempToColor(elem.T_atual);
+    desenharGelo(ctx, elem.x, elem.y, elem.radius, cor, tempo);
+  });
+  
+  // ===== 4) Vapor subindo =====
+  layout.grupos.vapores.forEach(elem => {
+    const cor = tempToColor(elem.T_atual);
+    desenharVapor(ctx, elem.x, elem.y, elem.radius, cor, tempo);
+  });
+  
+  // Obs.: a temperatura exata de cada elemento já aparece ao vivo na lista
+  // "Elementos no Sistema" ao lado — no canvas, mostramos só a da poça
+  // (abaixo), para não sobrepor textos quando o béquer fica cheio.
+  
+  // ===== Caixa de temperatura de equilíbrio =====
+  if (state.Tf !== null) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(10,8,5,0.8)';
+    ctx.strokeStyle = 'rgba(255,90,61,0.8)';
+    ctx.lineWidth = 1;
+    const boxW = 180, boxH = 40;
+    const boxX = cx - boxW/2;
+    const boxY = beakerY + beakerH + 20;
+    
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxW, boxH, 8);
+    ctx.fill();
+    ctx.stroke();
+    
+    ctx.fillStyle = 'rgba(194,168,151,0.8)';
+    ctx.font = '9px Orbitron, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('EQUILÍBRIO', boxX + 12, boxY + 15);
+    
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 18px Orbitron, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(`${state.Tf.toFixed(1)}°C`, boxX + boxW - 12, boxY + 28);
+    ctx.restore();
+  }
+}
+
+/* ============================================================
+   SIMULAÇÃO DE TROCA DE CALOR (ANIMAÇÃO)
+   ============================================================ */
+
+function passoSimulacao(dt) {
+  state.tempo += dt;
+  
+  let todosConvergiram = true;
+  state.elementos.forEach(elem => {
+    const prop = FISICA[elem.tipo];
+    const tau = Math.max(0.5, (elem.massa * prop.c) / 200);
+    
+    const T_novo = state.Tf + (elem.Ti - state.Tf) * Math.exp(-state.tempo / tau);
+    
+    if (Math.abs(T_novo - elem.T_atual) > 0.05) {
+      todosConvergiram = false;
+    }
+    
+    elem.T_atual = T_novo;
+  });
+  
+  state.historico.push({
+    t: state.tempo,
+    temps: state.elementos.map(e => e.T_atual)
+  });
+  if (state.historico.length > 200) state.historico.shift();
+  
+  atualizarGrafico();
+  atualizarTemperaturasLista();
+  atualizarMeta();
+  desenharCalorimetro();
+  
+  if (state.tempo > 12 || (todosConvergiram && state.tempo > 5)) {
+    pararSimulacao(true);
+  }
+}
+
+function iniciarSimulacao() {
+  if (state.elementos.length < 2) {
+    showToast('Adicione pelo menos 2 elementos', 'warning');
+    return;
+  }
+  
+  state.Tf = calcularEquilibrio(state.elementos);
+  state.tempo = 0;
+  state.historico = [];
+  state.simulando = true;
+  
+  state.elementos.forEach(e => e.T_atual = e.Ti);
+  
+  document.getElementById('resultValue').textContent = state.Tf.toFixed(1);
+  document.getElementById('calorimeterContainer').classList.add('active');
+  setStatus('SIMULANDO', true);
+  
+  document.getElementById('addBtn').disabled = true;
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('startBtn').innerHTML = '<span class="ico spin" aria-hidden="true">⏳</span> Simulando...';
+  
+  showToast(`Simulação iniciada. Tf = ${state.Tf.toFixed(2)}°C`, 'info');
+  anunciar(`Simulação iniciada. Temperatura de equilíbrio calculada: ${state.Tf.toFixed(1)} graus Celsius`);
+
+  
+  let ultimoT = performance.now();
+  function loop(t) {
+    const dt = Math.min(0.1, (t - ultimoT) / 1000);
+    ultimoT = t;
+    passoSimulacao(dt);
+    if (state.simulando) {
+      state.animFrame = requestAnimationFrame(loop);
+    }
+  }
+  state.animFrame = requestAnimationFrame(loop);
+}
+
+function pararSimulacao(completo = false) {
+  state.simulando = false;
+  if (state.animFrame) {
+    cancelAnimationFrame(state.animFrame);
+    state.animFrame = null;
+  }
+  
+  if (state.Tf !== null) {
+    state.elementos.forEach(e => e.T_atual = state.Tf);
+    desenharCalorimetro();
+    atualizarTemperaturasLista();
+    atualizarMeta();
+  }
+  
+  document.getElementById('calorimeterContainer').classList.remove('active');
+  setStatus('CONCLUÍDO', false);
+  
+  document.getElementById('addBtn').disabled = false;
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('startBtn').innerHTML = '<span class="ico" aria-hidden="true">▶</span> Iniciar Troca de Calor';
+  
+  if (completo) {
+    showToast(`Equilíbrio térmico atingido: ${state.Tf.toFixed(2)}°C`, 'success');
+    anunciar(`Equilíbrio térmico atingido. Todos os materiais alcançaram ${state.Tf.toFixed(1)} graus Celsius`);
+
+  }
+}
+
+/* ============================================================
+   GRÁFICO (canvas puro — sem dependências externas)
+   ============================================================ */
+
+// Motor de gráfico de linhas leve e autônomo, reaproveitado pelas duas abas
+// (Mistura, no chartCanvas, e Curva de Aquecimento, no heatChartCanvas).
+function criarGraficoLinha(canvasEl) {
+  const cfg = { series: [], xLabel: '', yLabel: '', xFmt: v => v.toFixed(1), yFmt: v => v.toFixed(0), legend: true };
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    const w = canvasEl.clientWidth || (canvasEl.parentElement ? canvasEl.parentElement.clientWidth : 300);
+    const h = canvasEl.clientHeight || 240;
+    canvasEl.width = Math.round(w * dpr);
+    canvasEl.height = Math.round(h * dpr);
+    const ctx = canvasEl.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function draw() {
+    const ctx = canvasEl.getContext('2d');
+    const w = canvasEl.clientWidth || (canvasEl.parentElement ? canvasEl.parentElement.clientWidth : 300);
+    const h = canvasEl.clientHeight || 240;
+    ctx.clearRect(0, 0, w, h);
+
+    const pts = [];
+    cfg.series.forEach(s => s.data.forEach(p => pts.push(p)));
+    if (pts.length < 2) {
+      ctx.fillStyle = 'rgba(255,232,214,0.35)';
+      ctx.font = '13px Rajdhani, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Sem dados suficientes ainda', w / 2, h / 2);
+      return;
+    }
+
+    let xMin = Infinity, xMax = -Infinity, yMin = Infinity, yMax = -Infinity;
+    pts.forEach(p => { if (p.x < xMin) xMin = p.x; if (p.x > xMax) xMax = p.x; if (p.y < yMin) yMin = p.y; if (p.y > yMax) yMax = p.y; });
+    if (xMax - xMin < 1e-9) xMax = xMin + 1;
+    if (yMax - yMin < 1e-9) { yMin -= 1; yMax += 1; }
+    const padY = (yMax - yMin) * 0.15;
+    yMin -= padY; yMax += padY;
+
+    const padL = 46, padR = 14, padT = cfg.legend ? 32 : 12, padB = 28;
+    const plotW = Math.max(10, w - padL - padR), plotH = Math.max(10, h - padT - padB);
+    const px = x => padL + (x - xMin) / (xMax - xMin) * plotW;
+    const py = y => padT + (1 - (y - yMin) / (yMax - yMin)) * plotH;
+
+    // grade + eixo Y
+    ctx.strokeStyle = 'rgba(255,90,61,0.12)';
+    ctx.lineWidth = 1;
+    ctx.font = '10px Rajdhani, sans-serif';
+    ctx.fillStyle = '#c2a897';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    const yTicks = 4;
+    for (let i = 0; i <= yTicks; i++) {
+      const yy = yMin + (yMax - yMin) * i / yTicks;
+      const Y = py(yy);
+      ctx.beginPath(); ctx.moveTo(padL, Y); ctx.lineTo(w - padR, Y); ctx.stroke();
+      ctx.fillText(cfg.yFmt(yy), padL - 7, Y);
+    }
+    // eixo X
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const xTicks = Math.min(5, Math.max(2, Math.round(plotW / 90)));
+    for (let i = 0; i <= xTicks; i++) {
+      const xx = xMin + (xMax - xMin) * i / xTicks;
+      ctx.fillText(cfg.xFmt(xx), px(xx), h - padB + 6);
+    }
+    // rótulos dos eixos
+    ctx.fillStyle = '#c2a897';
+    ctx.font = '10px Orbitron, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(cfg.xLabel, padL + plotW / 2, h - 8);
+    ctx.save();
+    ctx.translate(11, padT + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText(cfg.yLabel, 0, 0);
+    ctx.restore();
+
+    // linhas de dados
+    cfg.series.forEach(s => {
+      if (s.data.length < 2) return;
+      ctx.beginPath();
+      ctx.strokeStyle = s.color;
+      ctx.lineWidth = s.width || 2.5;
+      ctx.setLineDash(s.dash || []);
+      s.data.forEach((p, i) => { const X = px(p.x), Y = py(p.y); if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y); });
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
+    // legenda
+    if (cfg.legend) {
+      let lx = padL;
+      ctx.font = '11px Rajdhani, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      cfg.series.forEach(s => {
+        if (!s.label) return;
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(lx + 5, 14, 5, 0, 2 * Math.PI); ctx.fill();
+        ctx.fillStyle = '#ffe8d6';
+        ctx.fillText(s.label, lx + 15, 14);
+        lx += 15 + ctx.measureText(s.label).width + 16;
+      });
+    }
+  }
+
+  function setSeries(series, opts) {
+    cfg.series = series;
+    Object.assign(cfg, opts || {});
+    draw();
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  return { setSeries, resize };
+}
+
+let graficoTemp = null;
+
+function initGrafico() {
+  graficoTemp = criarGraficoLinha(document.getElementById('chartCanvas'));
+  graficoTemp.setSeries([], { xLabel: 'Tempo (s)', yLabel: 'Temperatura (°C)' });
+}
+
+function resetarGrafico() {
+  if (!graficoTemp) return;
+  graficoTemp.setSeries([], { xLabel: 'Tempo (s)', yLabel: 'Temperatura (°C)' });
+}
+
+function atualizarGrafico() {
+  if (!graficoTemp) return;
+
+  const series = state.elementos.map((e, i) => ({
+    label: `${FISICA[e.tipo].nome} ${i + 1}`,
+    color: FISICA[e.tipo].cor,
+    data: state.historico.map(h => ({ x: h.t, y: h.temps[i] }))
+  }));
+
+  if (state.Tf !== null) {
+    series.push({
+      label: 'Equilíbrio',
+      color: '#ffb020',
+      dash: [8, 4],
+      width: 2,
+      data: state.historico.map(h => ({ x: h.t, y: state.Tf }))
+    });
+  }
+
+  graficoTemp.setSeries(series, { xLabel: 'Tempo (s)', yLabel: 'Temperatura (°C)' });
+}
+
+/* ============================================================
+   GRÁFICO E REPRODUÇÃO — ABA "CURVA DE AQUECIMENTO"
+   ============================================================ */
+let graficoAquecimento = null;
+let aqAnim = null; // { rodando, t, duracaoVisual, segmentos, Qtotal, ultimoTempo }
+
+function atualizarGraficoAquecimento(segmentos, Qatual, Tatual) {
+  if (!graficoAquecimento) return;
+  const full = pontosDeSegmentos(segmentos);
+  let progresso = full.filter(p => p.x <= Qatual);
+  if (progresso.length === 0 || progresso[progresso.length - 1].x < Qatual - 1e-6) {
+    progresso.push({ x: Qatual, y: Tatual });
+  }
+
+  const conv = state.unidade === 'J' ? 1 : (1 / J_POR_CAL);
+  const fullConv = full.map(p => ({ x: p.x * conv, y: p.y }));
+  const progConv = progresso.map(p => ({ x: p.x * conv, y: p.y }));
+
+  graficoAquecimento.setSeries([
+    { label: 'Curva completa', color: 'rgba(255,232,214,0.28)', width: 2, data: fullConv },
+    { label: 'Aquecendo', color: '#ff5a3d', width: 3, data: progConv }
+  ], {
+    xLabel: `Calor fornecido (${state.unidade === 'J' ? 'J' : 'cal'})`,
+    yLabel: 'Temperatura (°C)',
+    xFmt: v => (Math.abs(v) >= 1000 ? fmtNum(v / 1000, 1) + 'k' : fmtNum(v, 0)),
+    yFmt: v => fmtNum(v, 0)
+  });
+}
+
+function aqStatusBadgeDefine(icone, texto, ativo) {
+  const badge = document.getElementById('aqStatusBadge');
+  badge.innerHTML = `<span class="ico" aria-hidden="true">${icone}</span><span id="aqStatusTxt">${texto}</span>`;
+  badge.classList.toggle('active', ativo);
+}
+
+function aqIniciarNovo() {
+  const tipo = document.getElementById('aqMaterial').value;
+  const massa = parseInt(document.getElementById('aqMassa').value, 10);
+  const Ti = parseInt(document.getElementById('aqTi').value, 10);
+  const Tf = parseInt(document.getElementById('aqTf').value, 10);
+
+  if (Tf <= Ti) {
+    showToast('A temperatura final deve ser maior que a inicial', 'warning');
+    return;
+  }
+
+  const segmentos = (tipo === 'agua' || tipo === 'gelo')
+    ? calorAcumuladoH2O(massa, Ti, Tf)
+    : calorAcumuladoMetal(FISICA[tipo].c, massa, Ti, Tf);
+  const Qtotal = segmentos[segmentos.length - 1].Q1;
+  const P = parseInt(document.getElementById('aqPot').value, 10);
+
+  aqAnim = { rodando: true, t: 0, duracaoVisual: 9, segmentos, Qtotal, ultimoTempo: performance.now() };
+
+  const totalFmt = fmtEnergiaTotalPartes(Qtotal);
+  document.getElementById('aqQTotal').textContent = totalFmt.valor;
+  document.getElementById('aqQTotalUnidade').textContent = totalFmt.unidade;
+  document.getElementById('aqTempoTotal').textContent = fmtTempo(Qtotal / P);
+
+  document.getElementById('aqPlayBtn').innerHTML = '<span class="ico" aria-hidden="true">⏸</span> Pausar';
+  aqStatusBadgeDefine('▶', 'AQUECENDO', true);
+  anunciar(`Aquecimento iniciado. Calor total necessário: ${totalFmt.valor} ${totalFmt.unidade}`);
+
+  requestAnimationFrame(aqLoop);
+}
+
+function aqTogglePlay() {
+  if (!aqAnim || aqAnim.t >= aqAnim.duracaoVisual) {
+    aqIniciarNovo();
+    return;
+  }
+  if (aqAnim.rodando) {
+    aqAnim.rodando = false;
+    document.getElementById('aqPlayBtn').innerHTML = '<span class="ico" aria-hidden="true">▶</span> Continuar';
+    aqStatusBadgeDefine('⏸', 'PAUSADO', false);
+  } else {
+    aqAnim.rodando = true;
+    aqAnim.ultimoTempo = performance.now();
+    document.getElementById('aqPlayBtn').innerHTML = '<span class="ico" aria-hidden="true">⏸</span> Pausar';
+    aqStatusBadgeDefine('▶', 'AQUECENDO', true);
+    requestAnimationFrame(aqLoop);
+  }
+}
+
+function aqLoop(now) {
+  if (!aqAnim || !aqAnim.rodando) return;
+  const dt = Math.min(0.05, (now - aqAnim.ultimoTempo) / 1000);
+  aqAnim.ultimoTempo = now;
+  aqAnim.t += dt;
+
+  const frac = Math.min(1, aqAnim.t / aqAnim.duracaoVisual);
+  const Qatual = aqAnim.Qtotal * frac;
+  const { T, fase } = aqEstadoEmQ(aqAnim.segmentos, Qatual);
+
+  atualizarGraficoAquecimento(aqAnim.segmentos, Qatual, T);
+  document.getElementById('aqFaseAtual').textContent = fase;
+  document.getElementById('aqTAtual').textContent = `${fmtNum(T, 1)}°C`;
+
+  if (frac >= 1) {
+    aqAnim.rodando = false;
+    document.getElementById('aqPlayBtn').innerHTML = '<span class="ico" aria-hidden="true">▶</span> Aquecer';
+    aqStatusBadgeDefine('✓', 'CONCLUÍDO', false);
+    showToast('Aquecimento concluído', 'success');
+    anunciar(`Aquecimento concluído. Temperatura final: ${fmtNum(T, 1)} graus Celsius`);
+  } else {
+    requestAnimationFrame(aqLoop);
+  }
+}
+
+function aqReiniciar() {
+  aqAnim = null;
+  if (graficoAquecimento) {
+    graficoAquecimento.setSeries([], { xLabel: `Calor fornecido (${state.unidade === 'J' ? 'J' : 'cal'})`, yLabel: 'Temperatura (°C)' });
+  }
+  document.getElementById('aqQTotal').textContent = '--';
+  document.getElementById('aqQTotalUnidade').textContent = state.unidade === 'J' ? 'kJ' : 'kcal';
+  document.getElementById('aqTempoTotal').textContent = '--';
+  document.getElementById('aqFaseAtual').textContent = '--';
+  document.getElementById('aqTAtual').textContent = '--';
+  document.getElementById('aqPlayBtn').innerHTML = '<span class="ico" aria-hidden="true">▶</span> Aquecer';
+  aqStatusBadgeDefine('⏸', 'PRONTO', false);
+}
+
+// Reflete a unidade de energia (J/cal) atual no que já estiver na tela desta aba
+function atualizarAquecimentoUI() {
+  if (!aqAnim) {
+    const el = document.getElementById('aqQTotalUnidade');
+    if (el && document.getElementById('aqQTotal').textContent === '--') {
+      el.textContent = state.unidade === 'J' ? 'kJ' : 'kcal';
+    }
+    return;
+  }
+  const frac = Math.min(1, aqAnim.t / aqAnim.duracaoVisual);
+  const Qatual = aqAnim.Qtotal * frac;
+  const totalFmt = fmtEnergiaTotalPartes(aqAnim.Qtotal);
+  document.getElementById('aqQTotal').textContent = totalFmt.valor;
+  document.getElementById('aqQTotalUnidade').textContent = totalFmt.unidade;
+  const { T } = aqEstadoEmQ(aqAnim.segmentos, Qatual);
+  atualizarGraficoAquecimento(aqAnim.segmentos, Qatual, T);
+}
+
+/* ============================================================
+   UI: STATUS, TOAST, LEITOR DE TELA
+   ============================================================ */
+function setStatus(texto, ativo) {
+  document.getElementById('statusText').textContent = texto;
+  const dot = document.getElementById('statusDot');
+  const statusEl = document.getElementById('calorimeterStatus');
+  if (ativo) {
+    dot.style.background = 'var(--accent)';
+    dot.style.boxShadow = '0 0 10px var(--accent)';
+    statusEl.classList.add('active');
+    statusEl.innerHTML = '<span class="ico" aria-hidden="true">▶</span><span>SIMULANDO</span>';
+  } else {
+    if (texto === 'CONCLUÍDO') {
+      dot.style.background = 'var(--success)';
+      dot.style.boxShadow = '0 0 10px var(--success)';
+      statusEl.classList.remove('active');
+      statusEl.innerHTML = '<span class="ico" aria-hidden="true">✓</span><span>CONCLUÍDO</span>';
+    } else {
+      dot.style.background = 'var(--success)';
+      dot.style.boxShadow = '0 0 10px var(--success)';
+      statusEl.classList.remove('active');
+      statusEl.innerHTML = '<span class="ico" aria-hidden="true">⏸</span><span>EM ESPERA</span>';
+    }
+  }
+}
+
+function showToast(msg, tipo = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${tipo}`;
+  toast.setAttribute('role', 'alert');
+  
+  const icons = {
+    success: '✓',
+    warning: '⚠',
+    error: '✕',
+    info: 'ℹ'
+  };
+  
+  toast.innerHTML = `<span class="ico" aria-hidden="true">${icons[tipo]}</span><span>${msg}</span>`;
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('hide');
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+function anunciar(texto) {
+  document.getElementById('liveRegion').textContent = texto;
+}
+
+/* ============================================================
+   PREVIEW DO MATERIAL SELECIONADO
+   ============================================================ */
+function atualizarPreview() {
+  const tipo = document.getElementById('materialSelect').value;
+  const prop = FISICA[tipo];
+  
+  document.getElementById('materialIcon').innerHTML = `<span class="ico" aria-hidden="true">${prop.icon}</span>`;
+  document.getElementById('materialName').textContent = prop.nome;
+  
+  let spec = `c = ${fmtPorMassa(prop.c, true, 3)} | ${prop.fase}`;
+  if (prop.Lf) spec += ` | Lf=${fmtPorMassa(prop.Lf, false, 0)}`;
+  document.getElementById('materialSpec').textContent = spec;
+}
+
+/* ============================================================
+   DRAWER GUIA LATERAL
+   ============================================================ */
+function toggleGuia(abrir) {
+  const guide = document.getElementById('sideGuide');
+  const tab = document.getElementById('guideTab');
+  const isOpen = abrir !== undefined ? abrir : !guide.classList.contains('open');
+  
+  guide.classList.toggle('open', isOpen);
+  tab.setAttribute('aria-expanded', isOpen);
+  
+  if (isOpen) {
+    tab.setAttribute('aria-label', 'Fechar guia do experimento');
+  } else {
+    tab.setAttribute('aria-label', 'Abrir guia do experimento');
+  }
+}
+
+/* ============================================================
+   PARTÍCULAS DE FUNDO
+   ============================================================ */
+function criarParticulas() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDelay = Math.random() * 15 + 's';
+    p.style.animationDuration = (10 + Math.random() * 10) + 's';
+    p.style.background = Math.random() > 0.5 ? '#ff5a3d' : '#ffb020';
+    p.style.boxShadow = `0 0 10px ${p.style.background}, 0 0 20px ${p.style.background}`;
+    container.appendChild(p);
+  }
+}
+
+/* ============================================================
+   INICIALIZAÇÃO E EVENT LISTENERS
+   ============================================================ */
+function mostrarAba(nome) {
+  const mistura = document.getElementById('tabMistura');
+  const aquecimento = document.getElementById('tabAquecimento');
+  const btnM = document.getElementById('tabBtnMistura');
+  const btnA = document.getElementById('tabBtnAquecimento');
+  const ativarMistura = nome === 'mistura';
+
+  mistura.hidden = !ativarMistura;
+  aquecimento.hidden = ativarMistura;
+  btnM.classList.toggle('active', ativarMistura);
+  btnA.classList.toggle('active', !ativarMistura);
+  btnM.setAttribute('aria-selected', ativarMistura ? 'true' : 'false');
+  btnA.setAttribute('aria-selected', !ativarMistura ? 'true' : 'false');
+
+  // Canvases escondidos ficam com tamanho 0 — precisa recalcular ao reaparecer
+  if (ativarMistura && graficoTemp) graficoTemp.resize();
+  if (!ativarMistura && graficoAquecimento) graficoAquecimento.resize();
+}
+
+function init() {
+  const massSlider = document.getElementById('massSlider');
+  const tempSlider = document.getElementById('tempSlider');
+  
+  massSlider.addEventListener('input', e => {
+    document.getElementById('massValue').textContent = e.target.value;
+    e.target.setAttribute('aria-valuenow', e.target.value);
+  });
+  
+  tempSlider.addEventListener('input', e => {
+    document.getElementById('tempValue').textContent = e.target.value;
+    e.target.setAttribute('aria-valuenow', e.target.value);
+  });
+  
+  document.getElementById('materialSelect').addEventListener('change', atualizarPreview);
+  
+  document.getElementById('addBtn').addEventListener('click', adicionarElemento);
+  document.getElementById('startBtn').addEventListener('click', iniciarSimulacao);
+  document.getElementById('clearBtn').addEventListener('click', limparSistema);
+  document.getElementById('resetBtn').addEventListener('click', limparSistema);
+  document.getElementById('unitBtn').addEventListener('click', alternarUnidade);
+  
+  document.getElementById('tabBtnMistura').addEventListener('click', () => mostrarAba('mistura'));
+  document.getElementById('tabBtnAquecimento').addEventListener('click', () => mostrarAba('aquecimento'));
+  
+  ['aqMassa', 'aqTi', 'aqTf', 'aqPot'].forEach(id => {
+    document.getElementById(id).addEventListener('input', e => {
+      document.getElementById(id + 'Value').textContent = e.target.value;
+    });
+  });
+  document.getElementById('aqMaterial').addEventListener('change', e => {
+    const tipo = e.target.value;
+    const novoTi = tipo === 'gelo' ? -20 : (tipo === 'agua' ? 20 : 25);
+    document.getElementById('aqTi').value = novoTi;
+    document.getElementById('aqTiValue').textContent = novoTi;
+  });
+  document.getElementById('aqPlayBtn').addEventListener('click', aqTogglePlay);
+  document.getElementById('aqResetBtn').addEventListener('click', aqReiniciar);
+  
+  document.getElementById('guideTab').addEventListener('click', () => toggleGuia());
+  document.getElementById('guideTab').addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleGuia();
+    }
+  });
+  document.getElementById('closeGuide').addEventListener('click', () => toggleGuia(false));
+  
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (document.getElementById('sideGuide').classList.contains('open')) toggleGuia(false);
+    }
+  });
+  
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.body.classList.add('reduce-motion');
+  }
+  
+  criarParticulas();
+  initGrafico();
+  graficoAquecimento = criarGraficoLinha(document.getElementById('heatChartCanvas'));
+  graficoAquecimento.setSeries([], { xLabel: 'Calor fornecido (J)', yLabel: 'Temperatura (°C)' });
+  atualizarPreview();
+  desenharCalorimetro();
+  setStatus('PRONTO', false);
+  
+  // Loop contínuo de renderização para animar líquidos e vapores mesmo sem simulação
+  function renderLoop() {
+    if (state.elementos.length > 0 && !state.simulando) {
+      desenharCalorimetro();
+    }
+    requestAnimationFrame(renderLoop);
+  }
+  requestAnimationFrame(renderLoop);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
