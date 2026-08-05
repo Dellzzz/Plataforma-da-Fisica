@@ -34,7 +34,7 @@
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;font-size:var(--base-font)}
+html{scroll-behavior:smooth;font-size:var(--base-font);overflow-x:hidden}
 
 body{
   font-family:var(--font-body);
@@ -222,6 +222,10 @@ header{
 }
 .unit-btn{font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.5px;width:auto;min-width:48px;padding:0 10px}
 
+.panel-header-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 12px;margin-bottom:10px}
+.panel-header-row > *{flex:0 0 auto;max-width:100%}
+.panel-header-row .panel-title{margin-bottom:0}
+
 .status-indicator{
   display:flex;
   align-items:center;
@@ -261,6 +265,10 @@ main{
   gap:20px;
   align-items:start;
 }
+/* IMPORTANTE: sem isto, o atributo nativo [hidden] perde para .grid-layout{display:grid}
+   (mesma especificidade, mas CSS de autor > CSS do agente de usuário) e as duas abas
+   ficam visíveis ao mesmo tempo, empilhadas. */
+.grid-layout[hidden]{display:none}
 
 .tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
 .tab-btn{
@@ -1052,6 +1060,23 @@ body.xlarge-font{--base-font:20px}
   .result-value{font-size:2.5rem}
   .chart-wrapper{height:240px}
 }
+@media (max-width:480px){
+  header{padding:10px 12px;gap:8px}
+  .logo{gap:8px;min-width:0}
+  .logo-icon{width:36px;height:36px;font-size:16px;border-radius:9px}
+  .logo-text{min-width:0}
+  .logo-text h1{font-size:.82rem;letter-spacing:.5px;white-space:nowrap}
+  .logo-text .subtitle{font-size:.48rem;letter-spacing:1px;white-space:nowrap}
+  .header-actions{gap:6px}
+  .status-indicator{padding:6px 9px;gap:5px}
+  .status-indicator #statusText{display:none}
+  .icon-btn{width:36px;height:36px;font-size:13px;border-radius:9px}
+  .unit-btn{min-width:36px;padding:0 6px;font-size:11px}
+  .tabs{gap:6px;margin-bottom:14px}
+  .tab-btn{padding:9px 12px;font-size:.68rem;gap:5px}
+  .panel-header-row .panel-title{font-size:1rem}
+  .calorimeter-status{position:static;top:auto;right:auto;padding:6px 10px;font-size:.62rem;gap:5px}
+}
 
 /* Animação de pulso para o calorímetro ativo */
 @keyframes calorimeterPulse{
@@ -1179,7 +1204,7 @@ body.xlarge-font{--base-font:20px}
       <h2 id="viz-title" class="sr-only">Visualização do Calorímetro</h2>
       
       <div class="glass-panel">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="panel-header-row">
           <h3 class="panel-title" style="margin-bottom:0">Calorímetro Ideal</h3>
           <div class="calorimeter-status" id="calorimeterStatus">
             <span class="ico" aria-hidden="true">⏸</span>
@@ -1314,7 +1339,7 @@ body.xlarge-font{--base-font:20px}
       <h2 id="aq-viz-title" class="sr-only">Curva de Aquecimento</h2>
 
       <div class="glass-panel">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="panel-header-row">
           <h3 class="panel-title" style="margin-bottom:0">Curva de Aquecimento (T × Q)</h3>
           <div class="calorimeter-status" id="aqStatusBadge">
             <span class="ico" aria-hidden="true">⏸</span>
