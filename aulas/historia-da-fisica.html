@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Grande Jornada da Física · Plataforma da Física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05030f;
+  --panel:rgba(18,12,38,0.55);
+  --panel-solid:#0c0820;
+  --purple:#c44dff;
+  --purple-2:#bc13fe;
+  --magenta:#ff43d4;
+  --cyan:#22e8ff;
+  --gold:#ffb83d;
+  --text:#ece9fb;
+  --muted:#a39dcb;
+  --line:rgba(196,77,255,0.22);
+  --glow:0 0 22px rgba(196,77,255,0.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Poppins',sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 820px at 12% 8%, rgba(120,40,210,0.22), transparent 60%),
+    radial-gradient(1100px 760px at 88% 18%, rgba(0,170,255,0.14), transparent 60%),
+    radial-gradient(1000px 1000px at 72% 96%, rgba(220,40,180,0.14), transparent 62%),
+    radial-gradient(900px 700px at 30% 70%, rgba(90,40,200,0.12), transparent 60%),
+    var(--bg);
+  background-attachment:fixed;
+  line-height:1.7;
+  overflow-x:hidden;
+}
+#starfield{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:0 22px 120px}
+
+/* ---------- NAV ---------- */
+nav{
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(14px);
+  background:linear-gradient(180deg, rgba(8,5,20,0.92), rgba(8,5,20,0.55));
+  border-bottom:1px solid var(--line);
+}
+.nav-in{max-width:1040px;margin:0 auto;display:flex;align-items:center;gap:18px;padding:12px 22px}
+.brand{font-family:'Orbitron',sans-serif;font-weight:900;letter-spacing:2px;font-size:1.05rem;
+  background:linear-gradient(90deg,var(--cyan),var(--purple),var(--magenta));
+  -webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap;
+  text-shadow:0 0 18px rgba(196,77,255,0.25)}
+.brand small{display:block;font-family:'Poppins';font-weight:300;font-size:.58rem;letter-spacing:3px;color:var(--muted);-webkit-text-fill-color:var(--muted)}
+.nav-links{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-left:auto}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{font-size:.78rem;color:var(--muted);text-decoration:none;padding:6px 11px;border-radius:20px;white-space:nowrap;transition:.25s;border:1px solid transparent}
+.nav-links a:hover{color:var(--text);border-color:var(--line);background:rgba(196,77,255,0.08);box-shadow:var(--glow)}
+
+/* ---------- HERO ---------- */
+header.hero{position:relative;z-index:1;text-align:center;padding:120px 22px 70px}
+.kicker{font-family:'Orbitron';letter-spacing:6px;font-size:.72rem;color:var(--cyan);text-shadow:0 0 14px rgba(34,232,255,.5);margin-bottom:22px}
+h1.title{
+  font-family:'Orbitron',sans-serif;font-weight:900;line-height:1.05;
+  font-size:clamp(2.3rem,7vw,4.4rem);letter-spacing:1px;
+  background:linear-gradient(120deg,#fff 5%,var(--cyan) 35%,var(--purple) 65%,var(--magenta) 95%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 26px rgba(196,77,255,0.45));
+}
+.hero p.sub{max-width:680px;margin:26px auto 0;color:var(--muted);font-weight:300;font-size:1.05rem}
+.hero-line{width:120px;height:2px;margin:34px auto 0;background:linear-gradient(90deg,transparent,var(--purple),transparent);box-shadow:var(--glow)}
+.scroll-hint{margin-top:40px;font-size:.7rem;letter-spacing:3px;color:var(--muted);animation:bob 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(8px);opacity:1}}
+
+/* ---------- INTRO ---------- */
+.intro{font-size:1.08rem;font-weight:300;color:#d6d2f0;text-align:center;max-width:820px;margin:0 auto 70px;padding:0 6px}
+.intro b{color:var(--purple);font-weight:600}
+
+/* ---------- CARD / SECTION ---------- */
+.card{
+  position:relative;background:var(--panel);backdrop-filter:blur(10px);
+  border:1px solid var(--line);border-radius:20px;padding:38px 34px;margin-bottom:48px;
+  box-shadow:0 18px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
+  scroll-margin-top:80px;
+}
+.card::before{content:"";position:absolute;inset:0;border-radius:20px;padding:1px;
+  background:linear-gradient(135deg,rgba(196,77,255,.5),transparent 40%,transparent 60%,rgba(34,232,255,.4));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:.6}
+.sec-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+.sec-head .num{font-family:'Orbitron';font-weight:900;font-size:1.1rem;color:var(--purple-2);
+  border:1px solid var(--line);border-radius:10px;padding:3px 10px;text-shadow:0 0 12px rgba(188,19,254,.6);background:rgba(188,19,254,.08)}
+.sec-head h2{font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(1.5rem,4vw,2.1rem);
+  background:linear-gradient(90deg,#fff,var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sec-head .years{margin-left:auto;font-family:'Orbitron';font-size:.8rem;letter-spacing:2px;color:var(--cyan);opacity:.85;white-space:nowrap}
+.tag{display:inline-block;font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+  border:1px solid rgba(255,184,61,.35);border-radius:14px;padding:3px 12px;margin:10px 0 22px;background:rgba(255,184,61,.07)}
+.card p{margin-bottom:16px;color:#ddd9f2;font-weight:300}
+.card p strong, .card li strong{color:#fff;font-weight:600}
+.card .lead{font-size:1.12rem;color:#efedfb;font-weight:400}
+
+/* lists / laws */
+.laws{list-style:none;margin:6px 0 18px;display:grid;gap:12px}
+.laws li{position:relative;padding:14px 16px 14px 54px;background:rgba(34,232,255,0.05);border:1px solid rgba(34,232,255,0.18);border-radius:12px;font-weight:300}
+.laws li .lw{position:absolute;left:14px;top:13px;font-family:'Orbitron';font-weight:700;color:var(--cyan);font-size:.95rem}
+.formula{display:block;font-family:'Orbitron';text-align:center;font-size:1.35rem;letter-spacing:1px;color:#fff;
+  margin:8px auto 22px;padding:16px;border-radius:14px;background:linear-gradient(180deg,rgba(196,77,255,.12),rgba(34,232,255,.06));
+  border:1px solid var(--line);box-shadow:inset 0 0 30px rgba(196,77,255,.12);text-shadow:0 0 18px rgba(196,77,255,.5)}
+
+/* ---------- FIGURE ---------- */
+figure.fig{margin:6px auto 26px;max-width:430px;text-align:center}
+figure.fig .frame{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);
+  box-shadow:0 12px 40px rgba(0,0,0,.55),0 0 28px rgba(196,77,255,.18);background:#0a0718}
+figure.fig img{display:block;width:100%;height:auto;filter:saturate(1.05) contrast(1.02)}
+figure.fig .frame::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(5,3,15,.45));pointer-events:none}
+figcaption{margin-top:10px;font-size:.74rem;color:var(--muted);font-weight:300;word-break:break-word}
+figcaption b{color:var(--purple);font-weight:600;letter-spacing:1px}
+figcaption a{color:var(--cyan);text-decoration:none}
+figcaption a:hover{text-decoration:underline}
+.img-fail{min-height:280px;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;
+  background:repeating-linear-gradient(45deg,#120a28,#120a28 12px,#170d33 12px,#170d33 24px);color:var(--muted);font-size:.85rem}
+
+/* ---------- SIMULATION ---------- */
+.sim{margin:30px 0 6px;background:linear-gradient(180deg,rgba(8,5,22,.85),rgba(12,8,32,.7));
+  border:1px solid var(--line);border-radius:18px;padding:18px 18px 20px;box-shadow:inset 0 0 40px rgba(34,232,255,.06)}
+.sim-title{display:flex;align-items:center;gap:10px;font-family:'Orbitron';font-weight:700;font-size:1rem;color:var(--cyan);
+  text-shadow:0 0 14px rgba(34,232,255,.5);margin-bottom:4px}
+.sim-title .dot{width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.sim-sub{font-size:.82rem;color:var(--muted);font-weight:300;margin-bottom:14px}
+.sim canvas{display:block;width:100%;border-radius:12px;background:radial-gradient(circle at 50% 45%,#0a0820,#04020c);border:1px solid rgba(255,255,255,.05);touch-action:pan-y}
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:14px}
+.ctrl{display:flex;align-items:center;gap:9px;font-size:.8rem;color:var(--muted)}
+.ctrl label{white-space:nowrap;letter-spacing:.4px}
+.btn{font-family:'Poppins';font-size:.78rem;font-weight:500;color:var(--text);cursor:pointer;
+  background:rgba(196,77,255,.08);border:1px solid var(--line);border-radius:10px;padding:7px 13px;transition:.2s;letter-spacing:.3px}
+.btn:hover{background:rgba(196,77,255,.2);box-shadow:var(--glow)}
+.btn.on{background:linear-gradient(90deg,var(--purple-2),var(--magenta));border-color:transparent;color:#fff;box-shadow:0 0 18px rgba(255,67,212,.5)}
+.btn.cyan.on{background:linear-gradient(90deg,#0bbbd6,var(--cyan));box-shadow:0 0 18px rgba(34,232,255,.5)}
+.grp{display:flex;gap:6px;flex-wrap:wrap}
+input[type=range]{-webkit-appearance:none;appearance:none;width:130px;height:5px;border-radius:5px;
+  background:linear-gradient(90deg,var(--purple),var(--cyan));outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;
+  box-shadow:0 0 12px var(--cyan);border:2px solid var(--purple)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:#fff;border:2px solid var(--purple);box-shadow:0 0 12px var(--cyan)}
+.toggle{display:inline-flex;align-items:center;gap:7px;cursor:pointer;user-select:none}
+.toggle input{display:none}
+.toggle .sw{width:38px;height:20px;border-radius:20px;background:#2a1f4d;position:relative;transition:.25s;border:1px solid var(--line)}
+.toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#9b8fd6;transition:.25s}
+.toggle input:checked + .sw{background:linear-gradient(90deg,var(--purple),var(--cyan))}
+.toggle input:checked + .sw::after{left:20px;background:#fff;box-shadow:0 0 10px var(--cyan)}
+.sim-note{margin-top:14px;font-size:.82rem;color:var(--muted);font-weight:300;background:rgba(196,77,255,.06);
+  border-left:3px solid var(--purple);border-radius:0 10px 10px 0;padding:11px 14px;min-height:0;transition:.3s}
+.sim-note b{color:var(--cyan);font-weight:600}
+
+/* ---------- REFERENCES ---------- */
+.refs h2{font-family:'Orbitron';font-weight:700;font-size:1.5rem;color:var(--purple);margin-bottom:18px;text-shadow:0 0 16px rgba(196,77,255,.35)}
+.refs ol{list-style:none;counter-reset:r}
+.refs li{counter-increment:r;position:relative;padding:11px 12px 11px 46px;border-bottom:1px solid rgba(196,77,255,.12);font-size:.82rem;color:var(--muted);font-weight:300;word-break:break-word}
+.refs li::before{content:counter(r,decimal-leading-zero);position:absolute;left:10px;top:11px;font-family:'Orbitron';color:var(--cyan);font-size:.8rem;opacity:.8}
+.refs li b{color:var(--text)}
+.refs a{color:var(--cyan);text-decoration:none}
+.refs a:hover{text-decoration:underline}
+
+footer{text-align:center;color:var(--muted);font-size:.78rem;font-weight:300;margin-top:60px;padding-top:30px;border-top:1px solid var(--line)}
+footer .fbrand{font-family:'Orbitron';color:var(--purple);letter-spacing:2px}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(34px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.7,.2,1)}
+.reveal.show{opacity:1;transform:none}
+
+@media(max-width:640px){
+  .card{padding:26px 18px}
+  .sec-head .years{margin-left:0;width:100%}
+  header.hero{padding:90px 18px 50px}
+  input[type=range]{width:108px}
+}
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+
+<nav>
+  <div class="nav-in">
+    <div class="brand">PHYSICA<small>PLATAFORMA DA FÍSICA</small></div>
+    <div class="nav-links">
+      <a href="#inicio">Início</a>
+      <a href="#copernico">Copérnico</a>
+      <a href="#galileu">Galileu</a>
+      <a href="#kepler">Kepler</a>
+      <a href="#newton">Newton</a>
+      <a href="#faraday">Faraday</a>
+      <a href="#einstein">Einstein</a>
+      <a href="#quantica">Quântica</a>
+      <a href="#cosmos">Cosmos</a>
+      <a href="#referencias">Refs</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="inicio">
+  <div class="kicker">HISTÓRIA DA FÍSICA</div>
+  <h1 class="title">A Grande Jornada<br>do Cosmos ao Átomo</h1>
+  <p class="sub">Dos céus girando ao redor do Sol até as nuvens de probabilidade do átomo e os buracos negros que dobram a luz: a história de como a humanidade aprendeu a ler as leis do Universo.</p>
+  <div class="hero-line"></div>
+  <div class="scroll-hint">▼ ROLE PARA EXPLORAR</div>
+</header>
+
+<div class="wrap">
+
+  <p class="intro reveal">Durante séculos, observar o céu era um exercício de fé e de mistério. A grande virada começou quando alguns pensadores decidiram <b>medir, calcular e testar</b> em vez de apenas contemplar. Cada cientista desta jornada herdou as perguntas do anterior e devolveu ao mundo respostas mais profundas — até descobrirmos que as mesmas leis que regem a queda de uma maçã governam as galáxias, e que a realidade, no fundo, é regida pelo acaso quântico.</p>
+
+  <!-- ====================== COPÉRNICO ====================== -->
+  <section class="card reveal" id="copernico">
+    <div class="sec-head"><span class="num">01</span><h2>Nicolau Copérnico</h2><span class="years">1473 — 1543</span></div>
+    <span class="tag">A Revolução Heliocêntrica</span>
+    <figure class="fig">
+      <div class="frame"><img src="https://content.nationalgeographic.pt/medio/import/attachment/edicoesespeciais/HistoriaNG/6/Copernico/c1.jpg" alt="Nicolau Copérnico"></div>
+      <figcaption><b>Fonte:</b> <a href="https://content.nationalgeographic.pt/medio/import/attachment/edicoesespeciais/HistoriaNG/6/Copernico/c1.jpg" target="_blank" rel="noopener">content.nationalgeographic.pt</a></figcaption>
+    </figure>
+    <p class="lead">No início do século XVI, a visão dominante do cosmos era <strong>geocêntrica</strong>: herdada de Aristóteles e sistematizada por Ptolomeu, colocava a Terra imóvel no centro de tudo, com o Sol, a Lua, os planetas e as estrelas girando ao seu redor.</p>
+    <p>O astrônomo polonês Nicolau Copérnico ousou inverter essa ordem. Em sua obra <strong>De revolutionibus orbium coelestium</strong> (<em>Sobre as Revoluções das Esferas Celestes</em>), publicada em 1543 — no ano de sua morte —, propôs o <strong>modelo heliocêntrico</strong>: o Sol ocupa o centro, e a Terra passa a ser apenas mais um planeta, girando em torno do próprio eixo a cada dia e completando uma volta ao redor do Sol a cada ano.</p>
+    <p>Esse reposicionamento explicava de forma muito mais simples fenômenos que o modelo antigo só resolvia com artifícios complicados, como o <strong>movimento retrógrado aparente</strong> dos planetas (quando parecem "voltar para trás" no céu). Embora Copérnico ainda usasse <strong>órbitas circulares</strong> e mantivesse alguns epiciclos, sua ideia foi a faísca que iniciou a <strong>Revolução Científica</strong> e abriu caminho para Galileu, Kepler e Newton.</p>
+
+    <div class="sim">
+      <div class="sim-title"><span class="dot"></span>Simulação · Modelo Heliocêntrico</div>
+      <div class="sim-sub">O Sol no centro e os planetas em suas órbitas. Ative a <em>Lei das Áreas</em> para visualizar também a 2ª Lei de Kepler. Toque/arraste não é necessário — use os controles abaixo.</div>
+      <canvas id="helioCanvas"></canvas>
+      <div class="controls">
+        <div class="ctrl"><label>Velocidade</label><input type="range" id="helioSpeed" min="0" max="3" step="0.05" value="1"></div>
+        <label class="toggle"><input type="checkbox" id="helioOrbits" checked><span class="sw"></span><span>Órbitas</span></label>
+        <label class="toggle"><input type="checkbox" id="helioNames" checked><span class="sw"></span><span>Nomes</span></label>
+        <label class="toggle"><input type="checkbox" id="helioAreas"><span class="sw"></span><span>Lei das Áreas (Kepler)</span></label>
+      </div>
+      <div class="sim-note" id="helioNote">O Sol concentra mais de <b>99,8%</b> da massa do Sistema Solar — por isso domina gravitacionalmente todas as órbitas. Repare que os planetas mais distantes orbitam <b>mais devagar</b>.</div>
+    </div>
+  </section>
+
+  <!-- ====================== GALILEU ====================== -->
+  <section class="card reveal" id="galileu">
+    <div class="sec-head"><span class="num">02</span><h2>Galileu Galilei</h2><span class="years">1564 — 1642</span></div>
+    <span class="tag">O Olhar Telescópico e a Mecânica</span>
+    <figure class="fig">
+      <div class="frame"><img src="https://files.meiobit.com/wp-content/uploads/2013/08/20130806galileo-galileo-galileo-galileo-galileo-figaro.jpg" alt="Galileu Galilei"></div>
+      <figcaption><b>Fonte:</b> <a href="https://files.meiobit.com/wp-content/uploads/2013/08/20130806galileo-galileo-galileo-galileo-galileo-figaro.jpg" target="_blank" rel="noopener">files.meiobit.com</a></figcaption>
+    </figure>
+    <p class="lead">Chamado de "pai da ciência moderna", Galileu uniu duas armas poderosas: a <strong>observação instrumental</strong> e a <strong>linguagem matemática</strong>.</p>
+    <p>Aperfeiçoando a luneta, apontou-a para o céu e fez descobertas que abalaram a astronomia: observou as <strong>quatro maiores luas de Júpiter</strong> (hoje chamadas satélites galileanos), provando que nem tudo orbita a Terra; viu as <strong>fases de Vênus</strong>, fortes evidências a favor do heliocentrismo; mapeou <strong>crateras e montanhas na Lua</strong>; identificou <strong>manchas solares</strong>; e revelou que a Via Láctea é formada por incontáveis estrelas.</p>
+    <p>Na mecânica, foi igualmente revolucionário. Demonstrou que <strong>corpos de massas diferentes caem com a mesma aceleração</strong> quando se despreza a resistência do ar, derrubando Aristóteles. Formulou o <strong>princípio da inércia</strong> (um corpo tende a manter seu movimento) e descreveu o lançamento de projéteis como a combinação de um movimento horizontal uniforme com uma queda vertical acelerada, resultando em uma <strong>trajetória parabólica</strong>. Para ele, "a natureza está escrita em linguagem matemática" — e o conhecimento deve ser submetido ao teste do experimento. Por defender o heliocentrismo, entrou em conflito com a Inquisição e passou seus últimos anos em prisão domiciliar.</p>
+  </section>
+
+  <!-- ====================== KEPLER ====================== -->
+  <section class="card reveal" id="kepler">
+    <div class="sec-head"><span class="num">03</span><h2>Johannes Kepler</h2><span class="years">1571 — 1630</span></div>
+    <span class="tag">As Leis do Movimento Planetário</span>
+    <figure class="fig">
+      <div class="frame"><img src="https://gertitashkomd.com/wp-content/uploads/2025/06/Tashko-Johannes-Kepler-Planetary-Laws-1571-1630.jpg" alt="Johannes Kepler"></div>
+      <figcaption><b>Fonte:</b> <a href="https://gertitashkomd.com/wp-content/uploads/2025/06/Tashko-Johannes-Kepler-Planetary-Laws-1571-1630.jpg" target="_blank" rel="noopener">gertitashkomd.com</a></figcaption>
+    </figure>
+    <p class="lead">Usando os dados astronômicos extremamente precisos coletados por <strong>Tycho Brahe</strong> — em especial as observações do planeta Marte —, Kepler descobriu que as órbitas não eram círculos perfeitos, como todos acreditavam desde a Antiguidade.</p>
+    <p>Ele condensou décadas de cálculos em três leis que descrevem com perfeição o movimento dos planetas:</p>
+    <ul class="laws">
+      <li><span class="lw">1ª</span><strong>Lei das Órbitas:</strong> a órbita de cada planeta é uma <strong>elipse</strong>, com o Sol ocupando um dos focos (e não o centro).</li>
+      <li><span class="lw">2ª</span><strong>Lei das Áreas:</strong> a linha que une o planeta ao Sol varre <strong>áreas iguais em tempos iguais</strong>. Por isso o planeta é mais veloz no periélio (perto do Sol) e mais lento no afélio (longe do Sol).</li>
+      <li><span class="lw">3ª</span><strong>Lei Harmônica:</strong> o quadrado do período orbital é proporcional ao cubo do semieixo maior da órbita.</li>
+    </ul>
+    <span class="formula">T² = k · a³</span>
+    <p>As leis de Kepler transformaram o heliocentrismo de uma boa ideia em uma teoria <strong>quantitativa e preditiva</strong>. Pela primeira vez, era possível calcular exatamente onde um planeta estaria. Faltava apenas explicar <em>por que</em> os planetas se moviam assim — e essa resposta viria com Newton. <em>(Dica: na simulação acima, ative "Lei das Áreas" para ver a 2ª Lei em ação no planeta Marte.)</em></p>
+  </section>
+
+  <!-- ====================== NEWTON ====================== -->
+  <section class="card reveal" id="newton">
+    <div class="sec-head"><span class="num">04</span><h2>Isaac Newton</h2><span class="years">1643 — 1727</span></div>
+    <span class="tag">A Mecânica e a Gravitação Universal</span>
+    <figure class="fig">
+      <div class="frame"><img src="https://realizeeducacao.com.br/wp-content/uploads/2021/04/biografia-isaac-newton-848x480.png" alt="Isaac Newton"></div>
+      <figcaption><b>Fonte:</b> <a href="https://realizeeducacao.com.br/wp-content/uploads/2021/04/biografia-isaac-newton-848x480.png" target="_blank" rel="noopener">realizeeducacao.com.br</a></figcaption>
+    </figure>
+    <p class="lead">Em <strong>Philosophiæ Naturalis Principia Mathematica</strong> (1687), Newton reuniu e superou o trabalho de seus antecessores, fundando a <strong>mecânica clássica</strong>.</p>
+    <p>Ele enunciou as <strong>três leis do movimento</strong>: a <strong>1ª (inércia)</strong> — todo corpo permanece em repouso ou em movimento retilíneo uniforme se nenhuma força resultante atuar sobre ele; a <strong>2ª (princípio fundamental)</strong> — a força resultante é igual ao produto da massa pela aceleração; e a <strong>3ª (ação e reação)</strong> — a toda ação corresponde uma reação de mesma intensidade e sentido oposto.</p>
+    <span class="formula">F = m · a&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;F = G · m₁ · m₂ / r²</span>
+    <p>Sua maior síntese foi a <strong>Lei da Gravitação Universal</strong>: duas massas quaisquer se atraem com uma força proporcional ao produto delas e inversamente proporcional ao quadrado da distância. Com uma única equação, Newton mostrou que <strong>a mesma força que faz uma maçã cair mantém a Lua em órbita</strong> — unificando, pela primeira vez, a física da Terra e a dos céus. A partir dela, deduziu matematicamente as três leis de Kepler. Newton ainda desenvolveu o <strong>cálculo</strong>, decompôs a luz branca em cores com um prisma e construiu o primeiro <strong>telescópio refletor</strong>.</p>
+  </section>
+
+  <!-- ====================== FARADAY ====================== -->
+  <section class="card reveal" id="faraday">
+    <div class="sec-head"><span class="num">05</span><h2>Michael Faraday</h2><span class="years">1791 — 1867</span></div>
+    <span class="tag">Eletricidade, Magnetismo e o Conceito de Campo</span>
+    <figure class="fig">
+      <div class="frame"><img src="https://cdn.britannica.com/94/144794-050-F2600575/Michael-Faraday.jpg" alt="Michael Faraday"></div>
+      <figcaption><b>Fonte:</b> <a href="https://cdn.britannica.com/94/144794-050-F2600575/Michael-Faraday.jpg" target="_blank" rel="noopener">cdn.britannica.com</a></figcaption>
+    </figure>
+    <p class="lead">Vindo de uma família humilde e praticamente <strong>autodidata</strong>, Faraday tornou-se um dos maiores experimentalistas da história e revelou a profunda ligação entre eletricidade e magnetismo.</p>
+    <p>Sua descoberta mais importante foi a <strong>indução eletromagnética</strong> (1831): um campo magnético que <em>varia</em> no tempo gera (induz) uma corrente elétrica em um condutor próximo. Esse princípio é o coração dos <strong>geradores, transformadores e motores elétricos</strong> — toda a civilização elétrica moderna depende dele.</p>
+    <p>Faraday também introduziu a ideia revolucionária de <strong>campo</strong> e de <strong>linhas de campo</strong>: o espaço ao redor de cargas e ímãs não é vazio, mas preenchido por uma influência invisível que transmite as forças. Estudou ainda as leis da <strong>eletrólise</strong>, o <strong>diamagnetismo</strong> e o efeito que leva seu nome. Décadas depois, <strong>James Clerk Maxwell</strong> traduziu suas intuições em equações matemáticas, unificando eletricidade, magnetismo e óptica e revelando que a <strong>luz é uma onda eletromagnética</strong>.</p>
+  </section>
+
+  <!-- ====================== EINSTEIN ====================== -->
+  <section class="card reveal" id="einstein">
+    <div class="sec-head"><span class="num">06</span><h2>Albert Einstein</h2><span class="years">1879 — 1955</span></div>
+    <span class="tag">Relatividade e o Novo Espaço-Tempo</span>
+    <figure class="fig">
+      <div class="frame"><img src="https://www.infoescola.com/wp-content/uploads/2008/07/albert-einstein.jpg" alt="Albert Einstein"></div>
+      <figcaption><b>Fonte:</b> <a href="https://www.infoescola.com/wp-content/uploads/2008/07/albert-einstein.jpg" target="_blank" rel="noopener">infoescola.com</a></figcaption>
+    </figure>
+    <p class="lead">Em 1905, seu <strong>"ano miraculoso"</strong>, Einstein publicou artigos que reescreveram a física.</p>
+    <p>Na <strong>Relatividade Restrita</strong>, partiu de um princípio surpreendente: a <strong>velocidade da luz é a mesma para todos os observadores</strong>, independentemente de seu movimento. A consequência é que <strong>espaço e tempo deixam de ser absolutos</strong> — surgem a dilatação do tempo e a contração do comprimento — e que massa e energia são equivalentes, expressas na mais famosa equação da ciência.</p>
+    <span class="formula">E = m · c²</span>
+    <p>No mesmo ano, explicou o <strong>efeito fotoelétrico</strong> propondo que a luz se comporta como pacotes de energia, os <strong>fótons</strong> — uma das bases da futura física quântica, e o trabalho que lhe rendeu o <strong>Nobel de 1921</strong>. Em 1915 veio sua obra-prima, a <strong>Relatividade Geral</strong>: a gravidade não é uma força misteriosa à distância, mas a <strong>curvatura do espaço-tempo</strong> provocada pela massa e pela energia. Essa teoria previu o <strong>desvio da luz</strong> por corpos massivos, as <strong>lentes gravitacionais</strong>, as <strong>ondas gravitacionais</strong>, os <strong>buracos negros</strong> e a própria expansão do Universo.</p>
+  </section>
+
+  <!-- ====================== MECÂNICA QUÂNTICA ====================== -->
+  <section class="card reveal" id="quantica">
+    <div class="sec-head"><span class="num">07</span><h2>Mecânica Quântica</h2><span class="years">SÉC. XX</span></div>
+    <span class="tag">As Leis do Mundo Microscópico</span>
+    <figure class="fig">
+      <div class="frame"><img src="https://s5.static.brasilescola.uol.com.br/be/2025/09/1-ilustracao-representando-o-uso-da-matematica-para-descrever-algo-simples-uma-situacao-caracteristica-da-mecanica-quantica.jpg" alt="Mecânica Quântica"></div>
+      <figcaption><b>Fonte:</b> <a href="https://s5.static.brasilescola.uol.com.br/be/2025/09/1-ilustracao-representando-o-uso-da-matematica-para-descrever-algo-simples-uma-situacao-caracteristica-da-mecanica-quantica.jpg" target="_blank" rel="noopener">brasilescola.uol.com.br</a></figcaption>
+    </figure>
+    <p class="lead">No início do século XX, descobriu-se que as leis de Newton e de Maxwell <strong>não funcionavam para átomos e partículas</strong>. Nascia a física quântica, talvez a teoria mais bem-sucedida e mais estranha já criada.</p>
+    <p><strong>Max Planck</strong> (1900) percebeu que a energia não é trocada de forma contínua, mas em <strong>pacotes discretos</strong> chamados quanta. <strong>Einstein</strong> aplicou a ideia à luz (fótons). <strong>Niels Bohr</strong> (1913) propôs que os elétrons só podem ocupar <strong>órbitas e energias permitidas</strong>: ao saltar de um nível para outro, o elétron emite ou absorve um fóton de cor específica — explicando as <strong>raias espectrais</strong> dos elementos.</p>
+    <p>Em seguida, <strong>Louis de Broglie</strong> mostrou que partículas também se comportam como ondas; <strong>Werner Heisenberg</strong> enunciou o <strong>princípio da incerteza</strong> (não é possível conhecer ao mesmo tempo, com precisão arbitrária, a posição e a velocidade de uma partícula); e <strong>Erwin Schrödinger</strong> (1926) escreveu a equação cuja solução, a <strong>função de onda ψ</strong>, descreve o estado do sistema. Pela interpretação de <strong>Max Born</strong>, o quadrado dela, <strong>|ψ|²</strong>, fornece a <strong>probabilidade</strong> de encontrar a partícula em cada região.</p>
+    <p>Assim o átomo deixou de ter elétrons em órbitas bem definidas e passou a ter <strong>orbitais</strong> — verdadeiras <strong>nuvens de probabilidade</strong>. Conceitos como <strong>superposição</strong>, <strong>emaranhamento</strong> e <strong>tunelamento</strong> sustentam tecnologias do dia a dia: lasers, transistores, células solares, ressonância magnética e a emergente computação quântica.</p>
+
+    <div class="sim">
+      <div class="sim-title"><span class="dot"></span>Simulação · Evolução dos Modelos Atômicos</div>
+      <div class="sim-sub">Da esfera maciça de Dalton ao átomo de Bohr com níveis quantizados. Toque nos botões para comparar cada modelo histórico.</div>
+      <canvas id="atomCanvas"></canvas>
+      <div class="controls">
+        <div class="grp">
+          <button class="btn" data-atom="dalton">Dalton</button>
+          <button class="btn" data-atom="thomson">Thomson</button>
+          <button class="btn" data-atom="rutherford">Rutherford</button>
+          <button class="btn on" data-atom="bohr">Bohr</button>
+        </div>
+      </div>
+      <div class="sim-note" id="atomNote"></div>
+    </div>
+
+    <div class="sim">
+      <div class="sim-title"><span class="dot"></span>Simulação · Modelo Atômico Quântico</div>
+      <div class="sim-sub">O modelo atual (Schrödinger): o elétron não tem trajetória definida. Cada ponto luminoso representa um local provável de encontrá-lo — a nuvem é o <em>orbital</em>, e sua densidade é proporcional a |ψ|².</div>
+      <canvas id="quantumCanvas"></canvas>
+      <div class="controls">
+        <div class="grp">
+          <button class="btn cyan on" data-orb="1s">Orbital 1s</button>
+          <button class="btn cyan" data-orb="2s">Orbital 2s</button>
+          <button class="btn cyan" data-orb="2p">Orbital 2p</button>
+          <button class="btn cyan" data-orb="3d">Orbital 3d</button>
+        </div>
+      </div>
+      <div class="sim-note" id="quantumNote"></div>
+    </div>
+  </section>
+
+  <!-- ====================== COSMOLOGIA ====================== -->
+  <section class="card reveal" id="cosmos">
+    <div class="sec-head"><span class="num">08</span><h2>Cosmologia Moderna</h2><span class="years">HOJE</span></div>
+    <span class="tag">A Origem e o Destino do Universo</span>
+    <figure class="fig">
+      <div class="frame"><img src="https://news.cnrs.fr/sites/default/files/styles/visuel_principal/public/assets/images/1_stsci-jameswebb_deep_vp.jpg" alt="Campo profundo do James Webb"></div>
+      <figcaption><b>Fonte:</b> <a href="https://news.cnrs.fr/sites/default/files/styles/visuel_principal/public/assets/images/1_stsci-jameswebb_deep_vp.jpg" target="_blank" rel="noopener">news.cnrs.fr (NASA/ESA/CSA · James Webb)</a></figcaption>
+    </figure>
+    <p class="lead">Unindo a Relatividade Geral às observações de telescópios cada vez mais poderosos, a cosmologia descreve o Universo em sua maior escala — e sua história desde o começo.</p>
+    <p>Segundo a teoria do <strong>Big Bang</strong>, o Universo surgiu há cerca de <strong>13,8 bilhões de anos</strong> a partir de um estado extremamente quente e denso, e <strong>está em expansão</strong> desde então. Essa expansão foi descoberta por <strong>Edwin Hubble</strong>, que notou que as galáxias se afastam de nós (desvio para o vermelho). A <strong>radiação cósmica de fundo</strong> — uma fraca luz que permeia todo o céu — é o "eco" daquele início quente.</p>
+    <p>Entre os objetos mais extremos estão os <strong>buracos negros</strong>: regiões onde a gravidade é tão intensa que <strong>nem a luz consegue escapar</strong>. O limite sem retorno é o <strong>horizonte de eventos</strong>. Eles se formam no colapso de estrelas muito massivas, e versões <strong>supermassivas</strong> (com milhões a bilhões de massas solares) habitam o centro das galáxias. Em <strong>2019</strong>, o <strong>Event Horizon Telescope</strong> obteve a primeira imagem real de um buraco negro (M87*), e em <strong>2022</strong> registrou o do centro da nossa galáxia, <strong>Sagitário A*</strong>. À sua volta, a matéria forma <strong>discos de acreção</strong> incandescentes, e a luz das estrelas atrás dele é curvada por <strong>lentes gravitacionais</strong>.</p>
+    <p>Ainda há muito a descobrir: a <strong>matéria escura</strong> e a <strong>energia escura</strong> compõem cerca de <strong>95%</strong> de todo o conteúdo do Universo e permanecem misteriosas. As <strong>ondas gravitacionais</strong> previstas por Einstein foram detectadas em 2015 (LIGO), e o <strong>Telescópio Espacial James Webb</strong> hoje observa as galáxias mais antigas e distantes já registradas.</p>
+
+    <div class="sim">
+      <div class="sim-title"><span class="dot"></span>Simulação · Buraco Negro Realista</div>
+      <div class="sim-sub">Inspirado em <em>Interstellar</em>: o disco se curva por cima do horizonte (lente gravitacional), com anel de fótons, campo de estrelas deformado e um <em>planeta espiralando até cair no horizonte de eventos</em>. Aumente a massa e desligue a lente para comparar.</div>
+      <canvas id="bhCanvas"></canvas>
+      <div class="controls">
+        <div class="ctrl"><label>Massa</label><input type="range" id="bhMass" min="0.6" max="1.7" step="0.02" value="1"></div>
+        <label class="toggle"><input type="checkbox" id="bhLens" checked><span class="sw"></span><span>Lente gravitacional</span></label>
+        <label class="toggle"><input type="checkbox" id="bhDisk" checked><span class="sw"></span><span>Disco de acreção</span></label>
+      </div>
+      <div class="sim-note" id="bhNote">A luz que passa perto do buraco negro é <b>encurvada</b>: as estrelas ao fundo aparecem deslocadas e formam um <b>anel de Einstein</b>. O ponto central escuro é a <b>sombra</b> do horizonte de eventos.</div>
+    </div>
+  </section>
+
+  <!-- ====================== REFERÊNCIAS ====================== -->
+  <section class="card refs reveal" id="referencias">
+    <h2>Referências das Imagens</h2>
+    <ol>
+      <li><b>Nicolau Copérnico</b> — National Geographic Portugal. <a href="https://content.nationalgeographic.pt/medio/import/attachment/edicoesespeciais/HistoriaNG/6/Copernico/c1.jpg" target="_blank" rel="noopener">content.nationalgeographic.pt/medio/import/attachment/edicoesespeciais/HistoriaNG/6/Copernico/c1.jpg</a></li>
+      <li><b>Galileu Galilei</b> — Meio Bit. <a href="https://files.meiobit.com/wp-content/uploads/2013/08/20130806galileo-galileo-galileo-galileo-galileo-figaro.jpg" target="_blank" rel="noopener">files.meiobit.com/wp-content/uploads/2013/08/20130806galileo-galileo-galileo-galileo-galileo-figaro.jpg</a></li>
+      <li><b>Johannes Kepler</b> — Gerti Tashko MD. <a href="https://gertitashkomd.com/wp-content/uploads/2025/06/Tashko-Johannes-Kepler-Planetary-Laws-1571-1630.jpg" target="_blank" rel="noopener">gertitashkomd.com/wp-content/uploads/2025/06/Tashko-Johannes-Kepler-Planetary-Laws-1571-1630.jpg</a></li>
+      <li><b>Isaac Newton</b> — Realize Educação. <a href="https://realizeeducacao.com.br/wp-content/uploads/2021/04/biografia-isaac-newton-848x480.png" target="_blank" rel="noopener">realizeeducacao.com.br/wp-content/uploads/2021/04/biografia-isaac-newton-848x480.png</a></li>
+      <li><b>Michael Faraday</b> — Encyclopædia Britannica. <a href="https://cdn.britannica.com/94/144794-050-F2600575/Michael-Faraday.jpg" target="_blank" rel="noopener">cdn.britannica.com/94/144794-050-F2600575/Michael-Faraday.jpg</a></li>
+      <li><b>Albert Einstein</b> — InfoEscola. <a href="https://www.infoescola.com/wp-content/uploads/2008/07/albert-einstein.jpg" target="_blank" rel="noopener">infoescola.com/wp-content/uploads/2008/07/albert-einstein.jpg</a></li>
+      <li><b>Mecânica Quântica</b> — Brasil Escola (UOL). <a href="https://s5.static.brasilescola.uol.com.br/be/2025/09/1-ilustracao-representando-o-uso-da-matematica-para-descrever-algo-simples-uma-situacao-caracteristica-da-mecanica-quantica.jpg" target="_blank" rel="noopener">s5.static.brasilescola.uol.com.br/be/2025/09/1-ilustracao-representando-...mecanica-quantica.jpg</a></li>
+      <li><b>Cosmologia Moderna</b> — CNRS News / NASA, ESA, CSA (James Webb). <a href="https://news.cnrs.fr/sites/default/files/styles/visuel_principal/public/assets/images/1_stsci-jameswebb_deep_vp.jpg" target="_blank" rel="noopener">news.cnrs.fr/sites/default/files/.../1_stsci-jameswebb_deep_vp.jpg</a></li>
+    </ol>
+  </section>
+
+  <footer>
+    <p><span class="fbrand">PHYSICA — PLATAFORMA DA FÍSICA</span></p>
+    <p>Material didático interativo · História da Física · As simulações são reconstruções educacionais e não representam escalas reais.</p>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   NÚCLEO: céu estrelado, animador por visibilidade,
+   reveal no scroll e fallback de imagens
+   ============================================================ */
+
+/* ---- fundo: céu noturno estrelado ---- */
+(function(){
+  const cv=document.getElementById('starfield');
+  const ctx=cv.getContext('2d');
+  let W=0,H=0,DPR=1,stars=[],shooters=[],lastShoot=0;
+  function resize(){
+    DPR=Math.min(2,window.devicePixelRatio||1);
+    W=window.innerWidth;H=window.innerHeight;
+    cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
+    const n=Math.floor(W*H/2600);
+    stars=[];
+    for(let i=0;i<n;i++){
+      stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+0.2,
+        a:Math.random()*0.6+0.3,tw:Math.random()*2+0.6,ph:Math.random()*6.28,
+        hue:Math.random()<0.15?(Math.random()<0.5?'c':'p'):'w'});
+    }
+  }
+  function spawnShooter(){
+    const fromLeft=Math.random()<0.5;
+    shooters.push({x:fromLeft?-40:W+40,y:Math.random()*H*0.5,
+      vx:(fromLeft?1:-1)*(5+Math.random()*4),vy:2+Math.random()*2,life:1});
+  }
+  function loop(t){
+    ctx.clearRect(0,0,W,H);
+    for(const s of stars){
+      const tw=0.5+0.5*Math.sin(t/600*s.tw+s.ph);
+      const al=s.a*tw;
+      let col;
+      if(s.hue==='c')col='rgba(120,235,255,'+al+')';
+      else if(s.hue==='p')col='rgba(206,120,255,'+al+')';
+      else col='rgba(255,255,255,'+al+')';
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.2832);ctx.fillStyle=col;ctx.fill();
+      if(s.r>1.05){ctx.beginPath();ctx.arc(s.x,s.y,s.r*2.6,0,6.2832);ctx.fillStyle='rgba(180,160,255,'+(al*0.12)+')';ctx.fill();}
+    }
+    if(t-lastShoot>2600 && Math.random()<0.04){spawnShooter();lastShoot=t;}
+    for(let i=shooters.length-1;i>=0;i--){
+      const sh=shooters[i];sh.x+=sh.vx;sh.y+=sh.vy;sh.life-=0.012;
+      const len=14;
+      const g=ctx.createLinearGradient(sh.x,sh.y,sh.x-sh.vx*len,sh.y-sh.vy*len);
+      g.addColorStop(0,'rgba(255,255,255,'+Math.max(0,sh.life)+')');
+      g.addColorStop(1,'rgba(120,235,255,0)');
+      ctx.strokeStyle=g;ctx.lineWidth=2;ctx.beginPath();
+      ctx.moveTo(sh.x,sh.y);ctx.lineTo(sh.x-sh.vx*len,sh.y-sh.vy*len);ctx.stroke();
+      if(sh.life<=0||sh.x<-60||sh.x>W+60)shooters.splice(i,1);
+    }
+    requestAnimationFrame(loop);
+  }
+  window.addEventListener('resize',resize);
+  resize();requestAnimationFrame(loop);
+})();
+
+/* ---- ajuste de canvas com DPR + retorno de dimensões lógicas ---- */
+function fitCanvas(canvas,aspect,maxH){
+  function fit(){
+    const dpr=Math.min(2,window.devicePixelRatio||1);
+    const w=canvas.clientWidth||canvas.parentElement.clientWidth;
+    let h=Math.round(w*aspect);
+    if(maxH&&h>maxH)h=maxH;
+    canvas.style.height=h+'px';
+    canvas.width=Math.round(w*dpr);
+    canvas.height=Math.round(h*dpr);
+    const ctx=canvas.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    canvas._w=w;canvas._h=h;
+  }
+  fit();
+  window.addEventListener('resize',fit);
+  return fit;
+}
+
+/* ---- animador: só roda quando o canvas está visível ---- */
+function makeAnimator(canvas,draw){
+  let running=false,raf=0,last=0;
+  function frame(t){
+    if(!running)return;
+    let dt=(t-last)/1000;last=t;
+    if(!isFinite(dt)||dt<0)dt=0;
+    if(dt>0.05)dt=0.05;
+    draw(dt,t/1000);
+    raf=requestAnimationFrame(frame);
+  }
+  const io=new IntersectionObserver(function(e){
+    if(e[0].isIntersecting){
+      if(!running){running=true;last=performance.now();raf=requestAnimationFrame(frame);}
+    }else{running=false;if(raf)cancelAnimationFrame(raf);}
+  },{threshold:0.02});
+  io.observe(canvas);
+}
+
+/* ---- reveal no scroll ---- */
+(function(){
+  const io=new IntersectionObserver(function(es){
+    es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('show');io.unobserve(en.target);}});
+  },{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+})();
+
+/* ---- fallback caso uma imagem externa não carregue ---- */
+(function(){
+  document.querySelectorAll('figure.fig img').forEach(function(img){
+    img.addEventListener('error',function(){
+      const frame=img.parentElement;
+      const name=img.getAttribute('alt')||'Imagem';
+      frame.innerHTML='<div class="img-fail">Não foi possível carregar a imagem de<br><b style="color:#c44dff">'+name+'</b><br><span style="font-size:.72rem;opacity:.7">(verifique sua conexão — a fonte está citada abaixo)</span></div>';
+    });
+  });
+})();
+
+/* ============================================================
+   SIMULAÇÃO 1 · MODELO HELIOCÊNTRICO (+ 2a Lei de Kepler)
+   ============================================================ */
+function initHeliocentric(){
+  const canvas=document.getElementById('helioCanvas');
+  if(!canvas)return;
+  fitCanvas(canvas,0.62,560);
+  const ctx=canvas.getContext('2d');
+  const speedEl=document.getElementById('helioSpeed');
+  const orbitsEl=document.getElementById('helioOrbits');
+  const namesEl=document.getElementById('helioNames');
+  const areasEl=document.getElementById('helioAreas');
+
+  const planets=[
+    {name:'Mercurio', a:0.16, e:0.20, om:0.4, color:'#b9a48c', size:2.6},
+    {name:'Venus',    a:0.24, e:0.10, om:2.1, color:'#e8c07a', size:4.2},
+    {name:'Terra',    a:0.33, e:0.08, om:3.4, color:'#5fa8ff', size:4.6},
+    {name:'Marte',    a:0.43, e:0.20, om:1.2, color:'#ff6a4d', size:3.6, mark:true},
+    {name:'Jupiter',  a:0.62, e:0.09, om:5.0, color:'#d9a86c', size:9},
+    {name:'Saturno',  a:0.80, e:0.10, om:0.9, color:'#e6d39a', size:7.4, ring:true}
+  ];
+  planets.forEach(function(p){p.theta=Math.random()*6.2832;});
+
+  function equalTimeThetas(p,N){
+    const steps=3000, dth=2*Math.PI/steps;
+    const h=Math.sqrt(p.a*(1-p.e*p.e));
+    const ths=[], Ts=[]; let acc=0;
+    for(let i=0;i<=steps;i++){
+      const th=i*dth; ths.push(th);
+      if(i>0){ const r=p.a*(1-p.e*p.e)/(1+p.e*Math.cos(th-dth/2)); acc+=(r*r/h)*dth; }
+      Ts.push(acc);
+    }
+    const T=acc, out=[];
+    for(let k=0;k<N;k++){
+      const target=T*k/N; let idx=0;
+      for(let i=1;i<Ts.length;i++){ if(Ts[i]>=target){idx=i;break;} }
+      out.push(ths[idx]);
+    }
+    return out;
+  }
+  const mars=planets.find(function(p){return p.mark;});
+  const marsSpokes=equalTimeThetas(mars,18);
+
+  function toXY(p,theta,cx,cy,scale){
+    const r=p.a*scale*(1-p.e*p.e)/(1+p.e*Math.cos(theta));
+    const xx=r*Math.cos(theta), yy=r*Math.sin(theta);
+    return {x:cx+xx*Math.cos(p.om)-yy*Math.sin(p.om), y:cy+xx*Math.sin(p.om)+yy*Math.cos(p.om)};
+  }
+
+  makeAnimator(canvas,function(dt,t){
+    const w=canvas._w,h=canvas._h,cx=w/2,cy=h/2;
+    const minWH=Math.min(w,h), scale=minWH*0.50, sunR=minWH*0.08;
+    ctx.clearRect(0,0,w,h);
+    const spd=parseFloat(speedEl.value);
+    const showOrbits=orbitsEl.checked, showNames=namesEl.checked, showAreas=areasEl.checked;
+
+    if(showOrbits){
+      planets.forEach(function(p){
+        const aa=p.a*scale, b=aa*Math.sqrt(1-p.e*p.e);
+        const ccx=cx-aa*p.e*Math.cos(p.om), ccy=cy-aa*p.e*Math.sin(p.om);
+        ctx.save();ctx.translate(ccx,ccy);ctx.rotate(p.om);
+        ctx.beginPath();ctx.ellipse(0,0,aa,b,0,0,6.2832);
+        ctx.strokeStyle=(p.mark&&showAreas)?'rgba(255,106,77,0.55)':'rgba(150,130,220,0.22)';
+        ctx.lineWidth=1;ctx.stroke();ctx.restore();
+      });
+    }
+
+    if(showAreas){
+      marsSpokes.forEach(function(th){
+        const pt=toXY(mars,th,cx,cy,scale);
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(pt.x,pt.y);
+        ctx.strokeStyle='rgba(255,140,90,0.3)';ctx.lineWidth=1;ctx.stroke();
+      });
+      function wedge(i,col){
+        const a0=marsSpokes[i%marsSpokes.length];
+        let a1=marsSpokes[(i+1)%marsSpokes.length];
+        const p0=toXY(mars,a0,cx,cy,scale);
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(p0.x,p0.y);
+        let s=a0,e=a1; if(e<s)e+=2*Math.PI;
+        for(let a=s;a<=e;a+=0.05){const pp=toXY(mars,a,cx,cy,scale);ctx.lineTo(pp.x,pp.y);}
+        ctx.lineTo(cx,cy);ctx.closePath();ctx.fillStyle=col;ctx.fill();
+      }
+      wedge(0,'rgba(255,180,61,0.40)');
+      wedge(9,'rgba(34,232,255,0.34)');
+    }
+
+    const sg=ctx.createRadialGradient(cx,cy,0,cx,cy,sunR);
+    sg.addColorStop(0,'rgba(255,255,235,1)');
+    sg.addColorStop(0.28,'rgba(255,215,110,0.92)');
+    sg.addColorStop(1,'rgba(255,130,40,0)');
+    ctx.fillStyle=sg;ctx.beginPath();ctx.arc(cx,cy,sunR,0,6.2832);ctx.fill();
+    ctx.fillStyle='#fff7d6';ctx.beginPath();ctx.arc(cx,cy,minWH*0.018,0,6.2832);ctx.fill();
+
+    planets.forEach(function(p){
+      const h2=Math.sqrt(p.a*(1-p.e*p.e));
+      const r=p.a*(1-p.e*p.e)/(1+p.e*Math.cos(p.theta));
+      p.theta += (h2/(r*r))*dt*spd*0.55;
+      const pt=toXY(p,p.theta,cx,cy,scale);
+      ctx.beginPath();ctx.arc(pt.x,pt.y,p.size+3,0,6.2832);ctx.fillStyle='rgba(150,150,255,0.10)';ctx.fill();
+      if(p.ring){
+        ctx.save();ctx.translate(pt.x,pt.y);ctx.rotate(-0.5);
+        ctx.beginPath();ctx.ellipse(0,0,p.size*2,p.size*0.7,0,0,6.2832);
+        ctx.strokeStyle='rgba(230,211,154,0.75)';ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+      }
+      ctx.beginPath();ctx.arc(pt.x,pt.y,p.size,0,6.2832);ctx.fillStyle=p.color;ctx.fill();
+      if(showNames){
+        ctx.fillStyle='rgba(220,215,245,0.82)';ctx.font='10px Poppins, sans-serif';ctx.textAlign='center';
+        ctx.fillText(p.name,pt.x,pt.y-p.size-6);
+      }
+    });
+  });
+
+  function note(){
+    const el=document.getElementById('helioNote');
+    if(areasEl.checked){
+      el.innerHTML='<b>2a Lei de Kepler:</b> cada fatia colorida foi varrida no <b>mesmo intervalo de tempo</b>. Perto do Sol (laranja) Marte percorre um arco mais longo e baixo; longe (ciano), um arco curto e alto. As duas areas sao iguais!';
+    }else{
+      el.innerHTML='O Sol concentra mais de <b>99,8%</b> da massa do Sistema Solar, por isso domina gravitacionalmente todas as orbitas. Repare que os planetas mais distantes orbitam <b>mais devagar</b> (3a Lei de Kepler).';
+    }
+  }
+  areasEl.addEventListener('change',note); note();
+}
+
+/* ============================================================
+   SIMULAÇÃO 2 · EVOLUÇÃO DOS MODELOS ATÔMICOS
+   ============================================================ */
+function initAtomic(){
+  const canvas=document.getElementById('atomCanvas');
+  if(!canvas)return;
+  fitCanvas(canvas,0.6,520);
+  const ctx=canvas.getContext('2d');
+  const noteEl=document.getElementById('atomNote');
+  const btns=document.querySelectorAll('[data-atom]');
+  let model='bohr';
+  const info={
+    dalton:'<b>Modelo de Dalton (1808):</b> o atomo e uma esfera macica, indivisivel e indestrutivel, como uma minuscula bola de bilhar. Os atomos de um mesmo elemento sao identicos.',
+    thomson:'<b>Modelo de Thomson (1897), o "pudim de passas":</b> uma esfera de carga positiva na qual os eletrons (negativos) estao incrustados, tornando o atomo neutro. Surge apos a descoberta do eletron.',
+    rutherford:'<b>Modelo de Rutherford (1911):</b> o atomo e quase todo vazio. Quase toda a massa e a carga positiva concentram-se em um <b>nucleo</b> minusculo, com os eletrons girando a grande distancia.',
+    bohr:'<b>Modelo de Bohr (1913):</b> os eletrons so ocupam <b>orbitas de energia bem definidas</b>. Ao saltar de um nivel para outro, emitem ou absorvem um <b>foton</b> de energia (e cor) especifica, explicando as raias espectrais.'
+  };
+  function setModel(m){
+    model=m;
+    btns.forEach(function(b){b.classList.toggle('on',b.dataset.atom===m);});
+    noteEl.innerHTML=info[m];
+  }
+  btns.forEach(function(b){b.addEventListener('click',function(){setModel(b.dataset.atom);});});
+  setModel('bohr');
+
+  let jp={phase:'wait',timer:0,ang:0,prog:0};
+
+  function label(txt,x,y){
+    ctx.fillStyle='rgba(220,215,245,0.65)';ctx.font='11px Poppins, sans-serif';ctx.textAlign='center';
+    ctx.fillText(txt,x,y);
+  }
+  function electron(x,y){
+    ctx.beginPath();ctx.arc(x,y,7,0,6.2832);ctx.fillStyle='rgba(34,232,255,0.18)';ctx.fill();
+    ctx.beginPath();ctx.arc(x,y,3,0,6.2832);ctx.fillStyle='#39e6ff';ctx.fill();
+  }
+  function nucleus(x,y,r,t){
+    const g=ctx.createRadialGradient(x,y,0,x,y,r*1.7);
+    g.addColorStop(0,'#fff');g.addColorStop(0.4,'#ff8a3d');g.addColorStop(1,'rgba(255,60,40,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r*1.7,0,6.2832);ctx.fill();
+    for(let i=0;i<6;i++){
+      const a=i*1.05+t*0.6, rr=r*0.5;
+      ctx.beginPath();ctx.arc(x+Math.cos(a)*rr,y+Math.sin(a)*rr,r*0.45,0,6.2832);
+      ctx.fillStyle=i%2?'#ff5a3c':'#ffd0a0';ctx.fill();
+    }
+  }
+
+  makeAnimator(canvas,function(dt,t){
+    const w=canvas._w,h=canvas._h,cx=w/2,cy=h/2;
+    const R=Math.min(w,h)*0.40;
+    ctx.clearRect(0,0,w,h);
+
+    if(model==='dalton'){
+      const g=ctx.createRadialGradient(cx-R*0.3,cy-R*0.3,R*0.1,cx,cy,R);
+      g.addColorStop(0,'#9b7bd6');g.addColorStop(1,'#4b2b86');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,R,0,6.2832);ctx.fill();
+      ctx.strokeStyle='rgba(196,77,255,0.6)';ctx.lineWidth=2;ctx.stroke();
+      label('esfera macica e indivisivel',cx,cy+R+18);
+    }
+    else if(model==='thomson'){
+      const g=ctx.createRadialGradient(cx,cy,R*0.1,cx,cy,R);
+      g.addColorStop(0,'rgba(255,80,160,0.5)');g.addColorStop(1,'rgba(150,20,90,0.32)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,R,0,6.2832);ctx.fill();
+      ctx.strokeStyle='rgba(255,80,160,0.5)';ctx.lineWidth=2;ctx.stroke();
+      for(let i=0;i<10;i++){
+        const a=i*2.4+t*0.2, rr=R*(0.3+0.55*(((i*37)%10)/10));
+        electron(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr);
+      }
+      label('eletrons incrustados (pudim de passas)',cx,cy+R+18);
+    }
+    else if(model==='rutherford'){
+      nucleus(cx,cy,Math.min(w,h)*0.05,t);
+      const orbits=[R*0.55,R*0.78,R];
+      orbits.forEach(function(rr,i){
+        ctx.beginPath();ctx.arc(cx,cy,rr,0,6.2832);
+        ctx.strokeStyle='rgba(120,130,220,0.16)';ctx.lineWidth=1;ctx.stroke();
+        const ne=[2,3,3][i];
+        for(let k=0;k<ne;k++){
+          const a=t*(1.2-i*0.3)+k*6.2832/ne;
+          electron(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr);
+        }
+      });
+      label('nucleo denso + grande regiao vazia',cx,cy+R+18);
+    }
+    else {
+      nucleus(cx,cy,Math.min(w,h)*0.045,t);
+      const levels=[R*0.42,R*0.66,R*0.92];
+      levels.forEach(function(rr,i){
+        ctx.beginPath();ctx.arc(cx,cy,rr,0,6.2832);
+        ctx.strokeStyle='rgba(34,232,255,0.22)';ctx.setLineDash([4,5]);ctx.lineWidth=1;ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle='rgba(34,232,255,0.55)';ctx.font='9px Orbitron, sans-serif';ctx.textAlign='left';
+        ctx.fillText('n='+(i+1),cx+rr+4,cy-2);
+      });
+      const ne=[2,4,3];
+      levels.forEach(function(rr,i){
+        for(let k=0;k<ne[i];k++){
+          const a=t*(1.0-i*0.22)+k*6.2832/ne[i];
+          electron(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr);
+        }
+      });
+      jp.timer+=dt;
+      if(jp.phase==='wait'&&jp.timer>2.4){jp.phase='fall';jp.prog=0;jp.ang=Math.random()*6.2832;}
+      if(jp.phase==='fall'){
+        jp.prog+=dt*1.3;
+        const rr=levels[2]+(levels[0]-levels[2])*Math.min(1,jp.prog);
+        const ex=cx+Math.cos(jp.ang)*rr, ey=cy+Math.sin(jp.ang)*rr;
+        ctx.beginPath();ctx.arc(ex,ey,9,0,6.2832);ctx.fillStyle='rgba(255,255,255,0.3)';ctx.fill();
+        ctx.beginPath();ctx.arc(ex,ey,4,0,6.2832);ctx.fillStyle='#fff';ctx.fill();
+        if(jp.prog>=1){jp.phase='emit';jp.prog=0;}
+      }
+      if(jp.phase==='emit'){
+        jp.prog+=dt;
+        const startR=levels[0], dist=startR+jp.prog*240;
+        const ex=cx+Math.cos(jp.ang)*dist, ey=cy+Math.sin(jp.ang)*dist;
+        ctx.beginPath();ctx.arc(ex,ey,3.5,0,6.2832);ctx.fillStyle='#aef3ff';ctx.fill();
+        ctx.beginPath();ctx.arc(ex,ey,7,0,6.2832);ctx.fillStyle='rgba(120,235,255,0.3)';ctx.fill();
+        const ring=jp.prog*200;
+        ctx.beginPath();ctx.arc(cx+Math.cos(jp.ang)*startR,cy+Math.sin(jp.ang)*startR,ring,0,6.2832);
+        ctx.strokeStyle='rgba(120,235,255,'+Math.max(0,0.4-jp.prog*0.4)+')';ctx.lineWidth=1.5;ctx.stroke();
+        if(dist>Math.min(w,h)*0.55){jp.phase='wait';jp.timer=0;}
+      }
+      label('orbitas e niveis de energia quantizados',cx,cy+R+18);
+    }
+  });
+}
+
+/* ============================================================
+   SIMULAÇÃO 3 · MODELO ATÔMICO QUÂNTICO (orbitais |psi|^2)
+   ============================================================ */
+function initQuantum(){
+  const canvas=document.getElementById('quantumCanvas');
+  if(!canvas)return;
+  fitCanvas(canvas,0.6,520);
+  const ctx=canvas.getContext('2d');
+  const noteEl=document.getElementById('quantumNote');
+  const btns=document.querySelectorAll('[data-orb]');
+  let orb='1s', pts=[], rot=0, rmaxCloud=1;
+  const info={
+    '1s':'<b>Orbital 1s:</b> esferico e sem nos. Regiao onde o eletron do hidrogenio tem maior probabilidade de estar, mais densa perto do nucleo.',
+    '2s':'<b>Orbital 2s:</b> tambem esferico, porem maior e com um <b>no radial</b> (uma camada interna de probabilidade nula), visivel como um vao entre duas cascas.',
+    '2p':'<b>Orbital 2p:</b> formato de <b>halteres</b> (dois lobulos) ao longo de um eixo, com um no passando pelo nucleo. Existem tres deles: px, py e pz.',
+    '3d':'<b>Orbital 3d:</b> geometria mais complexa (aqui o d z^2), com dois lobulos e um anel. Mostra como os orbitais ficam elaborados em niveis maiores.'
+  };
+  function genCloud(type){
+    const N=2200, arr=[];
+    function build(radial,rmax,angular){
+      let mx=0; for(let i=0;i<=120;i++){const r=i/120*rmax;const v=radial(r);if(v>mx)mx=v;}
+      let count=0,guard=0;
+      while(count<N && guard<N*80){
+        guard++;
+        const r=Math.random()*rmax;
+        if(Math.random()>radial(r)/mx) continue;
+        const u=Math.random()*2-1, phi=Math.random()*6.2832, st=Math.sqrt(1-u*u);
+        const x=st*Math.cos(phi), y=st*Math.sin(phi), z=u;
+        if(angular){ if(Math.random()>angular(x,y,z)) continue; }
+        arr.push({x:x*r,y:y*r,z:z*r});
+        count++;
+      }
+    }
+    if(type==='1s') build(function(r){return r*r*Math.exp(-2*r);},5,null);
+    else if(type==='2s') build(function(r){const tt=(1-r/2);return r*r*tt*tt*Math.exp(-r);},12,null);
+    else if(type==='2p') build(function(r){return r*r*r*r*Math.exp(-r);},14,function(x,y,z){return z*z;});
+    else build(function(r){return Math.pow(r,6)*Math.exp(-2*r/3);},22,function(x,y,z){const c=(3*z*z-1);return Math.min(1,c*c);});
+    return arr;
+  }
+  function setOrb(o){
+    orb=o; pts=genCloud(o);
+    rmaxCloud=1; for(const p of pts){const d=Math.sqrt(p.x*p.x+p.y*p.y+p.z*p.z);if(d>rmaxCloud)rmaxCloud=d;}
+    btns.forEach(function(b){b.classList.toggle('on',b.dataset.orb===o);});
+    noteEl.innerHTML=info[o];
+  }
+  btns.forEach(function(b){b.addEventListener('click',function(){setOrb(b.dataset.orb);});});
+  setOrb('1s');
+
+  makeAnimator(canvas,function(dt,t){
+    const w=canvas._w,h=canvas._h,cx=w/2,cy=h/2;
+    ctx.clearRect(0,0,w,h);
+    rot+=dt*0.4;
+    const scale=Math.min(w,h)*0.40/rmaxCloud;
+    const cosR=Math.cos(rot),sinR=Math.sin(rot);
+    const tilt=0.5,ct=Math.cos(tilt),sti=Math.sin(tilt);
+    ctx.globalCompositeOperation='lighter';
+    for(const p of pts){
+      const x=p.x*cosR+p.z*sinR;
+      const z=-p.x*sinR+p.z*cosR;
+      const y=p.y;
+      const y2=y*ct-z*sti;
+      const z2=y*sti+z*ct;
+      const depth=(z2/rmaxCloud+1)/2;
+      const sx=cx+x*scale, sy=cy+y2*scale;
+      const size=0.6+depth*1.7;
+      const al=0.14+depth*0.5;
+      const cr=Math.floor(60+depth*150), cg=Math.floor(120+depth*60);
+      ctx.fillStyle='rgba('+cr+','+cg+',255,'+al+')';
+      ctx.beginPath();ctx.arc(sx,sy,size,0,6.2832);ctx.fill();
+    }
+    ctx.globalCompositeOperation='source-over';
+    ctx.beginPath();ctx.arc(cx,cy,7,0,6.2832);ctx.fillStyle='rgba(255,160,80,0.25)';ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,3,0,6.2832);ctx.fillStyle='rgba(255,210,140,0.95)';ctx.fill();
+  });
+}
+
+/* ============================================================
+   SIMULAÇÃO 4 · BURACO NEGRO REALISTA (lente gravitacional)
+   ============================================================ */
+function initBlackHole(){
+  const canvas=document.getElementById('bhCanvas');
+  if(!canvas)return;
+  fitCanvas(canvas,0.62,560);
+  const ctx=canvas.getContext('2d');
+  const massEl=document.getElementById('bhMass');
+  const lensEl=document.getElementById('bhLens');
+  const diskEl=document.getElementById('bhDisk');
+
+  // ---- campo de estrelas: muitas e pequenas ----
+  let bg=[];
+  for(let i=0;i<900;i++){
+    bg.push({a:Math.random()*6.2832, d:0.04+Math.pow(Math.random(),0.55)*1.9,
+      b:0.32+Math.random()*0.6, s:0.25+Math.pow(Math.random(),2.3)*1.5,
+      drift:(Math.random()-0.5)*0.05,
+      col:Math.random()<0.18?(Math.random()<0.5?'c':'p'):'w'});
+  }
+
+  // ---- planeta que espirala e cai no horizonte de eventos ----
+  let planet;
+  function spawnPlanet(){ planet={ang:Math.random()*6.2832, r:6.9, state:'orbit', fall:0, trail:[]}; }
+  spawnPlanet();
+  function updatePlanet(dt){
+    if(planet.state==='orbit'){
+      planet.ang += dt*(1.5/Math.pow(Math.max(0.5,planet.r),1.35));
+      planet.r   -= dt*(0.20+0.55/Math.max(0.8,planet.r));
+      planet.trail.push({ang:planet.ang,r:planet.r});
+      if(planet.trail.length>48) planet.trail.shift();
+      if(planet.r<=1.18){ planet.state='falling'; planet.fall=0; }
+    }else{
+      planet.fall+=dt;
+      planet.ang += dt*4.2;
+      planet.r = 1.18 - planet.fall*0.9;
+      planet.trail.push({ang:planet.ang,r:planet.r});
+      if(planet.trail.length>48) planet.trail.shift();
+      if(planet.fall>0.7) spawnPlanet();
+    }
+  }
+
+  // ---- cor do disco: interna branco-quente -> externa vermelho escuro ----
+  function diskRGB(rad){
+    let r,g,b;
+    if(rad<0.18){ const f=rad/0.18; r=255; g=Math.floor(252-f*28); b=Math.floor(228-f*95); }
+    else if(rad<0.55){ const f=(rad-0.18)/0.37; r=255; g=Math.floor(224-f*72); b=Math.floor(133-f*70); }
+    else { const f=(rad-0.55)/0.45; r=Math.floor(255-f*45); g=Math.floor(152-f*120); b=Math.floor(63-f*53); }
+    return [r,Math.max(0,g),Math.max(0,b)];
+  }
+
+  makeAnimator(canvas,function(dt,t){
+    const w=canvas._w,h=canvas._h,cx=w/2,cy=h/2;
+    const minWH=Math.min(w,h);
+    const mass=parseFloat(massEl.value);
+    const lensOn=lensEl.checked, diskOn=diskEl.checked;
+    const rs=minWH*0.082*mass, thetaE=rs*1.28, spread=minWH*0.64;
+
+    ctx.fillStyle='#040209';ctx.fillRect(0,0,w,h);
+
+    // --- estrelas de fundo com lente gravitacional ---
+    for(const st of bg){
+      st.a+=st.drift*dt;
+      const dpx=st.d*spread;
+      let rApp=dpx, mag=1;
+      if(lensOn){
+        const root=Math.sqrt(dpx*dpx+4*thetaE*thetaE);
+        rApp=0.5*(dpx+root);
+        mag=0.5*(dpx/root+root/dpx);
+        if(mag>3.4)mag=3.4;
+      }
+      if(rApp<rs*1.02) continue;
+      const x=cx+Math.cos(st.a)*rApp, y=cy+Math.sin(st.a)*rApp;
+      if(x<-5||x>w+5||y<-5||y>h+5) continue;
+      const al=Math.min(1,st.b*mag);
+      let col;
+      if(st.col==='c')col='rgba(160,225,255,'+al+')';
+      else if(st.col==='p')col='rgba(212,160,255,'+al+')';
+      else col='rgba(255,255,255,'+al+')';
+      ctx.beginPath();ctx.arc(x,y,st.s*Math.min(1.9,Math.sqrt(mag)),0,6.2832);ctx.fillStyle=col;ctx.fill();
+    }
+
+    updatePlanet(dt);
+
+    // --- geometria do disco de acrecao ---
+    const ri=rs*1.12, ro=rs*4.6, segs=160, approach=-0.55;
+    const qFront=0.15;
+    const qBack = lensOn ? 0.95 : 0.15;   // a lente "dobra" a parte de tras do disco por cima
+    function dcol(rad,a){ const c=diskRGB(rad); return 'rgba('+c[0]+','+c[1]+','+c[2]+','+a+')'; }
+    function drawSeg(ang,q){
+      const ci=Math.cos(ang), si=Math.sin(ang);
+      const xi=cx+ci*ri, yi=cy+si*ri*q;
+      const xo=cx+ci*ro, yo=cy+si*ro*q;
+      const dop=1+0.5*Math.cos(ang-approach);
+      const tex=0.62+0.38*Math.sin(ang*7-t*1.6);
+      const br=dop*tex;
+      const g=ctx.createLinearGradient(xi,yi,xo,yo);
+      g.addColorStop(0.0,dcol(0.0,Math.min(1,br*0.95)));
+      g.addColorStop(0.12,dcol(0.14,Math.min(1,br*0.78)));
+      g.addColorStop(0.45,dcol(0.5,Math.min(1,br*0.34)));
+      g.addColorStop(1.0,dcol(1.0,Math.min(1,br*0.05)));
+      ctx.strokeStyle=g;ctx.lineWidth=rs*0.22;ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(xi,yi);ctx.lineTo(xo,yo);ctx.stroke();
+    }
+
+    function drawPlanet(){
+      const qp=qFront;
+      ctx.globalCompositeOperation='lighter';
+      for(let i=0;i<planet.trail.length-1;i++){
+        const a=planet.trail[i], b2=planet.trail[i+1];
+        const r1=a.r*rs, r2=b2.r*rs;
+        const x1=cx+Math.cos(a.ang)*r1, y1=cy+Math.sin(a.ang)*r1*qp;
+        const x2=cx+Math.cos(b2.ang)*r2, y2=cy+Math.sin(b2.ang)*r2*qp;
+        const al=(i/planet.trail.length)*0.45;
+        ctx.strokeStyle='rgba(255,205,160,'+al+')';
+        ctx.lineWidth=0.6+(i/planet.trail.length)*2.2;
+        ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+      }
+      ctx.globalCompositeOperation='source-over';
+      const rr=planet.r*rs;
+      const px=cx+Math.cos(planet.ang)*rr, py=cy+Math.sin(planet.ang)*rr*qp;
+      const pr=Math.max(2.5,rs*0.13);
+      let stretch=1, glow=0;
+      if(planet.state==='falling'){ stretch=1+planet.fall*5; glow=Math.min(1,planet.fall*1.7); }
+      const dir=Math.atan2(cy-py,cx-px);
+      ctx.save();ctx.translate(px,py);ctx.rotate(dir);
+      if(glow>0){
+        const gg=ctx.createRadialGradient(0,0,0,0,0,pr*4.5);
+        gg.addColorStop(0,'rgba(255,225,160,'+(glow*0.85)+')');
+        gg.addColorStop(1,'rgba(255,140,60,0)');
+        ctx.globalCompositeOperation='lighter';
+        ctx.fillStyle=gg;ctx.beginPath();ctx.ellipse(0,0,pr*4.5*stretch,pr*1.6,0,0,6.2832);ctx.fill();
+        ctx.globalCompositeOperation='source-over';
+      }
+      const bgg=ctx.createRadialGradient(pr*0.4,0,pr*0.1,0,0,pr*1.25);
+      bgg.addColorStop(0,'#caa279');bgg.addColorStop(0.5,'#4c4654');bgg.addColorStop(1,'#0f0f17');
+      ctx.fillStyle=bgg;ctx.beginPath();ctx.ellipse(0,0,pr*stretch,pr,0,0,6.2832);ctx.fill();
+      ctx.restore();
+    }
+
+    const planetBehind = Math.sin(planet.ang)<0;
+
+    // --- metade DE TRAS do disco: arco curvado por cima (lente) ---
+    if(diskOn){
+      ctx.globalCompositeOperation='lighter';
+      for(let i=0;i<segs;i++){const ang=i/segs*6.2832; if(Math.sin(ang)<0) drawSeg(ang,qBack);}
+      ctx.globalCompositeOperation='source-over';
+    }
+
+    if(planetBehind) drawPlanet();
+
+    // --- sombra do horizonte de eventos ---
+    ctx.fillStyle='#000';ctx.beginPath();ctx.arc(cx,cy,rs,0,6.2832);ctx.fill();
+
+    // --- anel de fotons ---
+    ctx.save();
+    ctx.shadowBlur=20;ctx.shadowColor='rgba(255,205,130,0.95)';
+    ctx.strokeStyle='rgba(255,243,215,0.96)';ctx.lineWidth=2.4;
+    ctx.beginPath();ctx.arc(cx,cy,rs*1.03,0,6.2832);ctx.stroke();
+    ctx.strokeStyle='rgba(255,165,85,0.5)';ctx.lineWidth=5;
+    ctx.beginPath();ctx.arc(cx,cy,rs*1.03,0,6.2832);ctx.stroke();
+    ctx.restore();
+
+    // --- metade DA FRENTE do disco: faixa horizontal brilhante ---
+    if(diskOn){
+      ctx.globalCompositeOperation='lighter';
+      for(let i=0;i<segs;i++){const ang=i/segs*6.2832; if(Math.sin(ang)>=0) drawSeg(ang,qFront);}
+      ctx.globalCompositeOperation='source-over';
+    }
+
+    if(!planetBehind) drawPlanet();
+
+    // --- brilho geral (bloom) ---
+    const bloom=ctx.createRadialGradient(cx,cy,rs,cx,cy,ro*1.25);
+    bloom.addColorStop(0,'rgba(255,175,90,0.05)');
+    bloom.addColorStop(1,'rgba(255,120,60,0)');
+    ctx.globalCompositeOperation='lighter';
+    ctx.fillStyle=bloom;ctx.beginPath();ctx.arc(cx,cy,ro*1.25,0,6.2832);ctx.fill();
+    ctx.globalCompositeOperation='source-over';
+  });
+
+  function bhNote(){
+    const el=document.getElementById('bhNote');
+    if(!lensEl.checked){
+      el.innerHTML='<b>Lente desligada:</b> o disco aparece achatado (visto de lado) e as estrelas ficam em suas posicoes reais. Reative para ver a luz se curvar e o disco se "dobrar" por cima do buraco negro.';
+    }else{
+      el.innerHTML='A gravidade <b>curva a luz</b>: a parte de tras do disco aparece dobrada <b>por cima</b> do horizonte (como em Interstellar), as estrelas do fundo se deslocam formando um <b>anel de Einstein</b>, e o planeta espirala ate cruzar o <b>horizonte de eventos</b>.';
+    }
+  }
+  lensEl.addEventListener('change',bhNote); bhNote();
+}
+
+/* ---- inicialização ---- */
+document.addEventListener('DOMContentLoaded',function(){
+  try{initHeliocentric();}catch(e){console.warn('helio',e);}
+  try{initAtomic();}catch(e){console.warn('atom',e);}
+  try{initQuantum();}catch(e){console.warn('quantum',e);}
+  try{initBlackHole();}catch(e){console.warn('bh',e);}
+});
+</script>
+</body>
+</html>

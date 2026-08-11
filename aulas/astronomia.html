@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Astronomia em 6 Encontros | Plataforma da Física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#05040e; --panel:rgba(20,17,44,0.72); --panel-solid:#100d24;
+    --accent:#8b7cff; --accent-2:#ffd76a; --accent-dim:#5a4fb0;
+    --green:#27e88a; --cyan:#5ad1ff; --red:#ff5a6e; --orange:#ff9d3d; --pink:#ff9ed6;
+    --txt:#e6e3f7; --txt-dim:#8f8ab5; --line:rgba(139,124,255,0.22); --line-soft:rgba(255,255,255,0.07);
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;overflow-x:hidden}
+  body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body::before{content:'';position:fixed;inset:0;z-index:-2;background:
+    radial-gradient(1200px 700px at 50% -10%, rgba(139,124,255,0.16), transparent 60%),
+    radial-gradient(900px 600px at 90% 100%, rgba(255,215,106,0.06), transparent 60%), var(--bg);}
+  body::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55;
+    background-image:radial-gradient(1px 1px at 15% 25%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1px 1px at 62% 12%, rgba(255,255,255,.4), transparent),
+      radial-gradient(1.4px 1.4px at 82% 58%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1px 1px at 38% 78%, rgba(255,255,255,.35), transparent),
+      radial-gradient(1px 1px at 8% 62%, rgba(255,255,255,.4), transparent),
+      radial-gradient(1.4px 1.4px at 93% 30%, rgba(255,255,255,.4), transparent);}
+  ::selection{background:rgba(139,124,255,0.3);color:#fff}
+  sub{font-size:.72em}
+
+  /* ---------- topo ---------- */
+  .topbar{position:sticky;top:0;z-index:60;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    background:rgba(5,4,14,0.85);border-bottom:1px solid var(--line)}
+  .topbar-row{max-width:1020px;margin:0 auto;padding:11px 18px;display:flex;align-items:center;gap:12px}
+  .tb-logo{font-family:'Orbitron';font-weight:700;font-size:13px;color:#f2eeff;letter-spacing:.5px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .tb-logo .spark{color:var(--accent-2);filter:drop-shadow(0 0 6px var(--accent-2))}
+  .tb-spacer{flex:1}
+  .tb-pct{font-family:'Orbitron';font-weight:700;font-size:12.5px;color:var(--green);min-width:40px;text-align:right}
+  .tb-toc-btn{font-family:'Orbitron';font-weight:500;font-size:11px;letter-spacing:.4px;color:var(--accent);
+    background:rgba(139,124,255,0.1);border:1px solid var(--line);padding:8px 12px;border-radius:9px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .tb-toc-btn:hover{background:rgba(139,124,255,0.2)}
+  .progress-strip{height:3px;background:rgba(255,255,255,0.06)}
+  .progress-strip > div{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));box-shadow:0 0 10px rgba(139,124,255,.6);transition:width .4s ease}
+
+  .toc{position:fixed;inset:0;z-index:70;display:none;background:rgba(4,3,12,0.75);backdrop-filter:blur(4px)}
+  .toc.open{display:block}
+  .toc-panel{position:absolute;right:0;top:0;height:100%;width:min(330px,88vw);background:var(--panel-solid);
+    border-left:1px solid var(--line);padding:22px 18px;overflow-y:auto}
+  .toc-panel h3{font-family:'Orbitron';font-weight:700;font-size:13px;color:var(--accent-2);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+  .toc-x{cursor:pointer;color:var(--txt-dim);font-size:22px;line-height:1}
+  .toc a{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--txt);padding:11px 11px;border-radius:9px;margin-bottom:4px;font-size:15px;font-weight:500;transition:.18s;border:1px solid transparent}
+  .toc a:hover{background:rgba(139,124,255,0.07);border-color:var(--line)}
+  .toc a .n{font-family:'Orbitron';font-size:10.5px;color:var(--accent);min-width:20px}
+  .toc a .dot{margin-left:auto;width:15px;height:15px;border-radius:50%;border:2px solid var(--accent-dim);display:grid;place-items:center;font-size:9px;color:#05040e}
+  .toc a.done .dot{background:var(--green);border-color:var(--green)}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+  #heroCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.6}
+  .hero-inner{position:relative;max-width:1020px;margin:0 auto;padding:60px 20px 50px;text-align:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron';font-weight:500;font-size:11px;letter-spacing:2px;
+    color:var(--accent-2);border:1px solid var(--line);background:rgba(139,124,255,0.06);padding:7px 14px;border-radius:30px;text-transform:uppercase;margin-bottom:20px}
+  .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 8px var(--accent-2);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .hero h1{font-family:'Orbitron';font-weight:900;font-size:clamp(27px,6.2vw,50px);line-height:1.05;letter-spacing:-.5px;color:#f4f1ff;text-shadow:0 0 34px rgba(139,124,255,0.4)}
+  .hero h1 .glow{color:var(--accent-2);text-shadow:0 0 30px rgba(255,215,106,0.6)}
+  .hero .sub{font-size:clamp(16px,2.5vw,20px);color:var(--txt);max-width:660px;margin:20px auto 0;font-weight:500}
+  .hero-meta{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:24px}
+  .chip{font-family:'Orbitron';font-size:10.5px;font-weight:500;color:var(--txt-dim);border:1px solid var(--line-soft);background:rgba(255,255,255,0.02);padding:8px 12px;border-radius:8px}
+  .chip b{color:var(--accent-2);font-weight:700}
+
+  /* ---------- abas das aulas ---------- */
+  .wrap{max-width:1020px;margin:0 auto;padding:0 18px}
+  .aula-tabs{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin:24px auto 6px;max-width:1020px;padding:0 18px}
+  .aula-tabs button{font-family:'Orbitron';font-weight:600;font-size:11px;letter-spacing:.5px;color:var(--txt-dim);
+    background:rgba(255,255,255,.03);border:1px solid var(--line-soft);border-radius:10px;padding:11px 13px;cursor:pointer;transition:.18s;position:relative}
+  .aula-tabs button:hover{color:var(--txt);border-color:var(--accent)}
+  .aula-tabs button.on{color:#05040e;background:linear-gradient(120deg,var(--accent),var(--accent-2));border-color:transparent;box-shadow:0 0 18px rgba(139,124,255,.35)}
+  .tabs-label{text-align:center;font-family:'Orbitron';font-size:10.5px;letter-spacing:2px;color:var(--accent-2);
+  margin:22px auto 0;max-width:1020px;padding:0 18px;text-transform:uppercase}
+.btn.sec{background:transparent;border:1px solid var(--accent);color:var(--accent-2);margin-left:8px}
+.btn.sec:hover{background:rgba(139,124,255,0.12)}
+.fim-card .btn{margin-top:6px}
+.aula-tabs button.feito::after{content:'\2713';position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;
+    background:var(--green);color:#05040e;font-size:9px;display:grid;place-items:center;font-weight:900}
+
+  .aula-panel{display:block;padding-bottom:40px}
+  .aula-panel[hidden]{display:none}
+
+  .aula-head{text-align:center;padding:26px 0 6px}
+  .aula-head .num{font-family:'Orbitron';font-size:11px;letter-spacing:2px;color:var(--accent);text-transform:uppercase}
+  .aula-head h2{font-family:'Orbitron';font-weight:900;font-size:clamp(21px,4.2vw,31px);color:#f4f1ff;margin:8px 0 10px;line-height:1.15}
+  .aula-head p{color:var(--txt-dim);font-size:15.5px;max-width:640px;margin:0 auto}
+
+  section.bloco{padding:34px 0;border-bottom:1px solid var(--line-soft)}
+  section.bloco:last-of-type{border-bottom:none}
+  .kicker{font-family:'Orbitron';font-weight:500;font-size:11.5px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;display:flex;align-items:center;gap:11px;margin-bottom:14px}
+  .kicker .num{font-weight:900;font-size:12px;color:#05040e;background:var(--accent);width:27px;height:27px;display:grid;place-items:center;border-radius:8px;box-shadow:0 0 12px rgba(139,124,255,.5)}
+  h3.sec-title{font-family:'Orbitron';font-weight:700;font-size:clamp(19px,3.6vw,26px);color:#f4f1ff;line-height:1.2;margin-bottom:16px}
+  p.body{font-size:16.5px;line-height:1.75;color:var(--txt);margin-bottom:14px}
+  p.body b{color:#f4f1ff;font-weight:700}
+  p.body .hl{color:var(--accent-2);font-weight:600}
+  .lead{font-size:18px;color:var(--txt);font-weight:500;line-height:1.65;margin-bottom:16px}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin:18px 0;backdrop-filter:blur(6px)}
+  .card h4{font-family:'Orbitron';font-weight:700;font-size:13px;color:#f4f1ff;margin-bottom:10px;letter-spacing:.4px}
+  .card p{font-size:16px;line-height:1.65;margin-bottom:8px}
+  .card p:last-child{margin-bottom:0}
+
+  .note{border-left:3px solid var(--accent);background:rgba(139,124,255,0.06);padding:14px 17px;border-radius:0 11px 11px 0;margin:18px 0;font-size:16px;line-height:1.65}
+  .note.conversa{border-left-color:var(--accent-2);background:rgba(255,215,106,0.07)}
+  .note.mito{border-left-color:var(--red);background:rgba(255,90,110,0.07)}
+  .note.atividade{border-left-color:var(--green);background:rgba(39,232,138,0.07)}
+  .note .tag{font-family:'Orbitron';font-weight:700;font-size:10.5px;letter-spacing:.6px;display:block;margin-bottom:6px;color:var(--accent)}
+  .note.conversa .tag{color:var(--accent-2)}
+  .note.mito .tag{color:var(--red)}
+  .note.atividade .tag{color:var(--green)}
+  .note b{color:#f4f1ff}
+
+  .map{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden;margin:18px 0}
+  .map.two{grid-template-columns:repeat(2,1fr)}
+  .map .m{background:var(--panel-solid);padding:16px 14px;text-align:center}
+  .map .m .ic{font-size:25px;display:block;margin-bottom:7px}
+  .map .m .t{font-family:'Orbitron';font-weight:700;font-size:12.5px;color:#f4f1ff;display:block;margin-bottom:5px}
+  .map .m .d{color:var(--txt-dim);font-size:13.5px;line-height:1.45}
+
+  .table-wrap{overflow-x:auto;margin:18px 0;border:1px solid var(--line-soft);border-radius:12px}
+  table{width:100%;border-collapse:collapse;min-width:520px;font-size:14px}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line-soft)}
+  th{font-family:'Orbitron';font-weight:700;font-size:10.5px;letter-spacing:.5px;color:var(--accent-2);background:rgba(139,124,255,0.07);text-transform:uppercase}
+  tr:last-child td{border-bottom:none}
+
+  /* ---------- simulações ---------- */
+  .sim{background:linear-gradient(180deg,rgba(16,13,36,0.92),rgba(8,6,20,0.92));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:20px 0;box-shadow:0 8px 40px rgba(0,0,0,0.4)}
+  .sim-head{display:flex;align-items:center;gap:9px;padding:12px 16px;background:rgba(139,124,255,0.08);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .sim-head .ttl{font-family:'Orbitron';font-weight:700;font-size:12.5px;color:#f4f1ff;letter-spacing:.3px}
+  .sim-head .lbl{margin-left:auto;font-family:'Orbitron';font-size:9.5px;color:var(--accent-2);border:1px solid var(--line);padding:4px 9px;border-radius:20px;white-space:nowrap}
+  .sim canvas{display:block;width:100%;touch-action:manipulation}
+  .sim-controls{padding:16px}
+  .ctrl{margin-bottom:14px}
+  .ctrl:last-child{margin-bottom:0}
+  .ctrl-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;gap:10px}
+  .ctrl-label .nm{font-family:'Orbitron';font-weight:500;font-size:11.5px;color:var(--txt);letter-spacing:.3px}
+  .ctrl-label .vl{font-family:'Orbitron';font-weight:700;font-size:14px;color:var(--accent-2);white-space:nowrap}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:5px;background:linear-gradient(90deg,var(--accent),rgba(255,255,255,0.08));outline:none;cursor:pointer}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:19px;height:19px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 11px var(--accent-2);border:2px solid #05040e;cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:19px;height:19px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 11px var(--accent-2);border:2px solid #05040e;cursor:pointer}
+  .seg{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .seg button{flex:1;min-width:66px;font-family:'Orbitron';font-weight:600;font-size:11px;color:var(--txt-dim);background:rgba(255,255,255,.03);border:1px solid var(--line-soft);border-radius:9px;padding:10px 6px;cursor:pointer;transition:.18s}
+  .seg button.on{color:#05040e;background:var(--accent);border-color:var(--accent)}
+  .simbtn{font-family:'Orbitron';font-weight:700;font-size:12px;letter-spacing:.4px;color:#05040e;background:linear-gradient(120deg,var(--accent),var(--accent-2));border:none;padding:12px 16px;border-radius:10px;cursor:pointer;transition:.2s;width:100%}
+  .simbtn:hover{filter:brightness(1.08)}
+  .simbtn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
+  .btn-row{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px}
+  .btn-row .simbtn{flex:1;min-width:110px}
+  .readout{display:flex;flex-wrap:wrap;gap:9px;margin-top:11px}
+  .readout .ro{flex:1;min-width:78px;background:rgba(0,0,0,0.32);border:1px solid var(--line-soft);border-radius:10px;padding:9px 10px;text-align:center}
+  .readout .ro .k{font-family:'Orbitron';font-size:9px;letter-spacing:.4px;color:var(--txt-dim);display:block;margin-bottom:4px}
+  .readout .ro .v{font-family:'Orbitron';font-weight:700;font-size:14px;color:var(--accent-2)}
+  .hint{font-size:13px;color:var(--txt-dim);text-align:center;margin:9px 0 0;line-height:1.5}
+
+  /* ---------- quiz ---------- */
+  .quiz-q{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:16px 0;background:linear-gradient(180deg,rgba(139,124,255,0.07),rgba(8,6,20,0.4))}
+  .qq-head{display:flex;align-items:center;gap:9px;padding:11px 16px;background:rgba(139,124,255,0.1);border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .qq-badge{font-family:'Orbitron';font-weight:700;font-size:10.5px;color:var(--accent);border:1px solid var(--line);background:rgba(139,124,255,0.1);padding:4px 10px;border-radius:20px}
+  .qq-body{padding:16px}
+  .qq-enun{font-size:16px;line-height:1.6;margin-bottom:13px}
+  .qq-alts{display:flex;flex-direction:column;gap:7px}
+  .qq-alt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line-soft);border-radius:10px;padding:11px 12px;font-size:15px;transition:.2s;cursor:pointer;text-align:left;background:transparent;color:var(--txt);width:100%;font-family:'Rajdhani',sans-serif}
+  .qq-alt:hover{border-color:var(--accent)}
+  .qq-alt .let{font-family:'Orbitron';font-weight:700;font-size:12px;width:24px;height:24px;flex-shrink:0;display:grid;place-items:center;border-radius:7px;border:1px solid var(--accent-dim);color:var(--accent)}
+  .qq-alt.certo{border-color:var(--green);background:rgba(39,232,138,0.12)}
+  .qq-alt.certo .let{background:var(--green);color:#05040e;border-color:var(--green)}
+  .qq-alt.errado{border-color:var(--red);background:rgba(255,90,110,0.1)}
+  .qq-alt.errado .let{background:var(--red);color:#fff;border-color:var(--red)}
+  .qq-alt.travado{cursor:default;opacity:.5}
+  .qq-alt.travado.certo,.qq-alt.travado.errado{opacity:1}
+  .qq-sol{margin-top:13px;border-top:1px dashed var(--line);padding-top:12px;display:none;font-size:15px;line-height:1.6;color:var(--txt-dim)}
+  .qq-sol.show{display:block;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+  .qq-sol b{color:var(--accent-2)}
+
+  .placar{display:none;text-align:center;background:linear-gradient(135deg,rgba(139,124,255,0.1),rgba(255,215,106,0.06));border:1px solid var(--line)}
+  .placar.show{display:block}
+  .placar .pv{font-family:'Orbitron';font-weight:900;font-size:40px;color:var(--accent-2);text-shadow:0 0 22px rgba(255,215,106,.4)}
+  .placar .pm{font-size:15.5px;color:var(--txt);margin:6px 0 14px}
+
+  /* ---------- ferramentas ---------- */
+  .tool-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:20px 0}
+  .tool-card{background:linear-gradient(155deg,rgba(139,124,255,0.14),rgba(8,6,20,0.6));border:1px solid var(--accent);
+    border-radius:16px;padding:22px 18px;text-align:center;text-decoration:none;color:var(--txt);transition:.22s;display:block}
+  .tool-card:hover{transform:translateY(-3px);box-shadow:0 10px 34px rgba(139,124,255,.3);background:linear-gradient(155deg,rgba(139,124,255,0.24),rgba(8,6,20,0.6))}
+  .tool-card .ic{font-size:36px;display:block;margin-bottom:10px}
+  .tool-card > b{font-family:'Orbitron';font-size:14px;color:var(--accent-2);display:block;margin-bottom:7px;letter-spacing:.5px}
+  .tool-card span{font-size:14px;color:var(--txt-dim);line-height:1.5;display:block}
+  .tool-card .abre{display:inline-block;margin-top:12px;font-family:'Orbitron';font-size:10.5px;letter-spacing:.6px;
+    color:#05040e;background:linear-gradient(120deg,var(--accent),var(--accent-2));padding:8px 16px;border-radius:20px}
+
+  .sheet{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:11px;margin:18px 0}
+  .sheet .f{background:var(--panel-solid);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+  .sheet .f .eq{font-family:'Orbitron';font-weight:700;font-size:14px;color:var(--accent-2);margin-bottom:6px;word-break:break-word}
+  .sheet .f .ds{font-size:13px;color:var(--txt-dim);line-height:1.4}
+  .takeaways{list-style:none;margin:16px 0}
+  .takeaways li{position:relative;padding:8px 0 8px 28px;font-size:16px;line-height:1.55;border-bottom:1px solid var(--line-soft)}
+  .takeaways li:last-child{border-bottom:none}
+  .takeaways li::before{content:'\2726';position:absolute;left:0;top:8px;font-size:14px;color:var(--accent-2)}
+
+  .fim-card{text-align:center;background:linear-gradient(135deg,rgba(139,124,255,0.1),rgba(255,215,106,0.06));border:1px solid var(--line)}
+  .btn{font-family:'Orbitron';font-weight:700;font-size:13px;letter-spacing:.5px;background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#05040e;border:none;padding:14px 26px;border-radius:12px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:8px}
+  .btn:hover{filter:brightness(1.08);box-shadow:0 0 24px rgba(139,124,255,0.45);transform:translateY(-1px)}
+  .btn.feito{background:linear-gradient(120deg,var(--green),#1fd07e)}
+
+  footer{padding:30px 18px 50px;text-align:center;color:var(--txt-dim);font-size:13px}
+  footer .ft-logo{font-family:'Orbitron';font-weight:700;color:var(--accent-2);font-size:13.5px}
+
+  @media(max-width:680px){
+    section.bloco{padding:26px 0}
+    .map,.map.two{grid-template-columns:1fr}
+    .tool-grid{grid-template-columns:1fr}
+    .hero-inner{padding:44px 18px 38px}
+    p.body,.lead{font-size:16px}
+    .aula-tabs button{font-size:10px;padding:9px 10px}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-row">
+    <span class="tb-logo"><span class="spark">&#10022;</span> Astronomia</span>
+    <span class="tb-spacer"></span>
+    <span class="tb-pct" id="tbPct">0%</span>
+    <button class="tb-toc-btn" id="tocBtn">&#9776; Encontros</button>
+  </div>
+  <div class="progress-strip"><div id="progBar"></div></div>
+</div>
+
+<div class="toc" id="toc">
+  <div class="toc-panel">
+    <h3>Os 6 encontros <span class="toc-x" id="tocX">&times;</span></h3>
+    <nav id="tocNav"></nav>
+  </div>
+</div>
+
+<header class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="pulse"></span> Plataforma da Física &middot; 6 encontros</span>
+    <h1>O Céu que <span class="glow">Todo Mundo</span> Já Olhou</h1>
+    <p class="sub">Uma viagem da roça ao infinito: como o céu virou calendário, o que são de fato as estrelas, os planetas e as luas &mdash; e como observar tudo isso da porta de casa.</p>
+    <div class="hero-meta">
+      <span class="chip"><b>6</b> encontros</span>
+      <span class="chip"><b>8</b> simulações</span>
+      <span class="chip"><b>2</b> ferramentas do céu</span>
+      <span class="chip">1&ordm; ano &middot; <b>EM</b></span>
+    </div>
+  </div>
+</header>
+
+<p class="tabs-label">&#9660; ESCOLHA O ENCONTRO &mdash; toque para trocar</p>
+<div class="aula-tabs" id="aulaTabs">
+  <button data-aula="1" class="on">1 &middot; O Céu e a História</button>
+  <button data-aula="2">2 &middot; Terra, Sol e Lua</button>
+  <button data-aula="3">3 &middot; Sistema Solar</button>
+  <button data-aula="4">4 &middot; As Estrelas</button>
+  <button data-aula="5">5 &middot; Galáxias e Universo</button>
+  <button data-aula="6">6 &middot; Observar o Céu</button>
+</div>
+
+<main>
+
+<!-- ===================== AULA 1 ===================== -->
+<div class="aula-panel" id="aula1">
+  <div class="wrap">
+    <div class="aula-head">
+      <div class="num">Encontro 1</div>
+      <h2>O Céu e a História da Humanidade</h2>
+      <p>Antes de existir relógio, calendário ou GPS, existia o céu. E ele já dizia tudo o que era preciso saber.</p>
+    </div>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">1</span> Para começar</div>
+      <h3 class="sec-title">O primeiro relógio do mundo não tinha ponteiro</h3>
+      <p class="lead">Imagine viver sem celular, sem calendário na parede, sem previsão do tempo. Como você saberia a hora de plantar? De colher? Quando viria a chuva?</p>
+      <p class="body">Foi olhando para cima que a humanidade respondeu a essas perguntas. O <span class="hl">Sol</span> marcava o dia. A <span class="hl">Lua</span> marcava os meses. As <span class="hl">estrelas</span> marcavam as estações e mostravam o caminho de volta para casa. Astronomia não nasceu na universidade &mdash; nasceu na necessidade de sobreviver.</p>
+
+      <div class="note conversa">
+        <span class="tag">RODA DE CONVERSA</span>
+        Antes de seguir, uma pergunta para a turma: <b>que histórias sobre o céu você ouviu dos mais velhos?</b> Lua boa para plantar, lua para cortar cabelo, estrela que anuncia chuva, "as Três Marias"... Anote no quadro o que a turma trouxer. Vamos voltar nessas histórias durante os seis encontros &mdash; algumas têm fundo científico, outras não, e descobrir qual é qual é parte da graça.
+      </div>
+
+      <div class="map">
+        <div class="m"><span class="ic">&#127793;</span><span class="t">PLANTAR E COLHER</span><span class="d">As estrelas que aparecem no início da noite mudam ao longo do ano e avisam a estação.</span></div>
+        <div class="m"><span class="ic">&#9973;</span><span class="t">NAVEGAR</span><span class="d">Sem bússola, os povos se guiavam pelas estrelas fixas e pelo Sol.</span></div>
+        <div class="m"><span class="ic">&#128220;</span><span class="t">CONTAR O TEMPO</span><span class="d">De lua nova a lua nova são cerca de 29,5 dias &mdash; a origem do nosso mês.</span></div>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">2</span> Os povos e o céu</div>
+      <h3 class="sec-title">Todo povo olhou para cima &mdash; inclusive aqui</h3>
+      <p class="body">Costumam contar a história da astronomia começando na Grécia. Mas ela é muito mais antiga e muito mais espalhada pelo mundo:</p>
+
+      <div class="table-wrap">
+        <table>
+          <tr><th>Povo</th><th>O que fizeram</th><th>Quando</th></tr>
+          <tr><td>Construtores de Stonehenge</td><td>Alinharam pedras enormes com o nascer do Sol no solstício</td><td>~3000 a.C.</td></tr>
+          <tr><td>Egípcios</td><td>Previam a cheia do Nilo pela estrela Sirius; alinharam pirâmides</td><td>~2500 a.C.</td></tr>
+          <tr><td>Babilônios</td><td>Registraram movimentos dos planetas por séculos e previram eclipses</td><td>~1800 a.C.</td></tr>
+          <tr><td>Maias</td><td>Calendário preciso e observação detalhada de Vênus</td><td>~300 d.C.</td></tr>
+          <tr><td>Povos indígenas do Brasil</td><td>Constelações próprias ligadas às chuvas e à caça</td><td>Há milhares de anos</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h4>&#127463;&#127479; O céu dos povos indígenas brasileiros</h4>
+        <p>Os povos Tupi-Guarani enxergavam figuras diferentes das gregas nas mesmas estrelas. A mais famosa é a <b>Ema</b>: seu bico é formado pelo Cruzeiro do Sul e o corpo se estende por uma grande mancha escura da Via Láctea. Quando a Ema aparece inteira no começo da noite, é sinal de mudança de estação.</p>
+        <p>Repare numa diferença bonita: enquanto os gregos ligavam <b>pontos brilhantes</b> para formar figuras, muitos povos indígenas também enxergavam figuras nas <b>manchas escuras</b> entre as estrelas. Duas formas igualmente válidas de ler o mesmo céu.</p>
+      </div>
+
+      <div class="note conversa">
+        <span class="tag">VALE COMENTAR</span>
+        Nenhum desses povos tinha telescópio. Tudo isso foi feito <b>a olho nu</b>, com paciência e anotação ao longo de gerações. É bom lembrar disso quando alguém disser que "não entende nada de ciência": observar com atenção e anotar já é fazer ciência.
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">3</span> A grande discussão</div>
+      <h3 class="sec-title">Quem gira em torno de quem?</h3>
+      <p class="body">Por quase 2000 anos, a explicação oficial foi a de <b>Ptolomeu</b>: a Terra parada no centro, e tudo girando em volta dela. E olha, não era burrice &mdash; é exatamente o que a gente <b>vê</b>. O Sol nasce de um lado e se põe do outro. O chão parece firme e imóvel.</p>
+      <p class="body">Só que havia um incômodo: de vez em quando, <span class="hl">Marte parecia andar para trás no céu</span>. Ele avançava por semanas, parava, voltava um pouco, e depois seguia em frente de novo. Esse "laço" é chamado de <b>movimento retrógrado</b>.</p>
+      <p class="body">Para explicar isso com a Terra no centro, era preciso inventar círculos dentro de círculos, um remendo em cima do outro. Até que <b>Copérnico</b> (1543) propôs algo mais simples: e se o <b>Sol</b> estivesse no centro? Aí o laço de Marte deixa de ser mistério &mdash; é só a Terra, mais rápida por dentro, <b>ultrapassando</b> Marte, como um carro ultrapassando outro na estrada.</p>
+
+      <div class="sim">
+        <div class="sim-head"><span class="ttl">&#128301; Por que Marte "anda para trás"</span><span class="lbl">interativo</span></div>
+        <canvas id="retroCanvas" height="330"></canvas>
+        <div class="sim-controls">
+          <div class="btn-row">
+            <button class="simbtn" id="retroPlay">&#9654; Animar</button>
+            <button class="simbtn ghost" id="retroReset">&#8635; Reiniciar</button>
+          </div>
+          <div class="seg">
+            <button id="retroVerOrb" class="on">Ver as órbitas</button>
+            <button id="retroVerCeu">Ver o céu da Terra</button>
+          </div>
+          <p class="hint">À esquerda, a Terra (azul) ultrapassa Marte (vermelho) por dentro. À direita, o que um observador na Terra vê no céu: a linha faz um <b>laço para trás</b> justamente na ultrapassagem.</p>
+        </div>
+      </div>
+
+      <div class="note mito">
+        <span class="tag">O QUE ISSO ENSINA</span>
+        A explicação mais <b>simples</b> que dá conta dos fatos costuma ser a melhor. O modelo com a Terra no centro até funcionava, mas precisava de remendos infinitos. Trocar o centro resolveu tudo de uma vez. Ciência não é decorar quem estava certo &mdash; é entender <b>por que</b> uma explicação venceu a outra.
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">4</span> A luneta muda tudo</div>
+      <h3 class="sec-title">Galileu aponta um tubo para o céu</h3>
+      <p class="body">Em 1609, <b>Galileu Galilei</b> apontou uma luneta para o céu &mdash; e em poucas noites derrubou certezas de séculos:</p>
+      <div class="map two">
+        <div class="m"><span class="ic">&#127765;</span><span class="t">A LUA TEM MONTANHAS</span><span class="d">Não era uma esfera lisa e perfeita: tinha crateras e montanhas, como a Terra.</span></div>
+        <div class="m"><span class="ic">&#128302;</span><span class="t">JÚPITER TEM LUAS</span><span class="d">Quatro pontinhos giravam em volta de Júpiter. Ou seja: nem tudo gira em volta da Terra.</span></div>
+        <div class="m"><span class="ic">&#9792;</span><span class="t">VÊNUS TEM FASES</span><span class="d">Vênus mostra fases como a Lua &mdash; só possível se ele girar em volta do Sol.</span></div>
+        <div class="m"><span class="ic">&#9728;</span><span class="t">O SOL TEM MANCHAS</span><span class="d">O Sol não era "perfeito e imutável": tinha manchas que mudavam de lugar.</span></div>
+      </div>
+      <p class="body">Depois vieram <b>Kepler</b>, mostrando que as órbitas são elipses (ovaladas) e não círculos perfeitos, e <b>Newton</b>, explicando <span class="hl">por que</span> os planetas ficam presos ao Sol: a mesma gravidade que faz a manga cair do pé segura a Terra em órbita. A física do céu e a física da Terra viraram uma coisa só.</p>
+
+      <div class="note atividade">
+        <span class="tag">ATIVIDADE EM DUPLA (10 min)</span>
+        Cada dupla escolhe <b>uma</b> das quatro descobertas de Galileu acima e explica, em duas frases e com as próprias palavras, <b>por que</b> aquilo incomodava quem acreditava que tudo girava em volta da Terra. Depois, cada dupla lê para a turma.
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">5</span> Fixando</div>
+      <h3 class="sec-title">Teste rápido do Encontro 1</h3>
+      <p class="body">Toque na alternativa que você acha certa &mdash; a resposta aparece na hora.</p>
+      <div class="quiz" data-quiz="1">
+
+        <div class="quiz-q" data-certa="2">
+          <div class="qq-head"><span class="qq-badge">Questão 01</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">Por que os povos antigos se interessaram tanto pelo céu?</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>Porque tinham telescópios muito bons.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>Por pura curiosidade, sem nenhuma utilidade prática.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>Porque o céu servia de calendário, relógio e mapa para a vida prática.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>Porque acreditavam que o céu era feito de fogo.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: C.</b> Saber a época de plantar, contar os meses e se orientar em viagens era questão de sobrevivência. A observação do céu era, antes de tudo, uma ferramenta.</div>
+          </div>
+        </div>
+
+        <div class="quiz-q" data-certa="1">
+          <div class="qq-head"><span class="qq-badge">Questão 02</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">O "movimento retrógrado" de Marte (parecer andar para trás no céu) acontece porque:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>Marte realmente para e volta em sua órbita.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>A Terra, mais rápida e por dentro, ultrapassa Marte.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>O Sol empurra Marte para trás de vez em quando.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>É uma ilusão causada pela atmosfera da Terra.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: B.</b> É um efeito de perspectiva na ultrapassagem, igual a um carro mais lento que parece "andar para trás" quando você o ultrapassa na estrada.</div>
+          </div>
+        </div>
+
+        <div class="quiz-q" data-certa="3">
+          <div class="qq-head"><span class="qq-badge">Questão 03</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">Qual descoberta de Galileu mostrou mais diretamente que <b>nem tudo</b> girava em volta da Terra?</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>As montanhas da Lua.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>As manchas do Sol.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>A Via Láctea ser feita de estrelas.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>As luas girando em volta de Júpiter.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: D.</b> Se havia corpos girando em volta de <b>Júpiter</b>, então a Terra não podia ser o centro de absolutamente tudo.</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="card placar" id="placar1">
+        <div class="pv" id="placarV1">0/3</div>
+        <div class="pm" id="placarM1"></div>
+        <button class="btn" data-refazer="1">&#8635; Refazer</button>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <h3 class="sec-title">Para levar do Encontro 1</h3>
+      <ul class="takeaways">
+        <li>A astronomia nasceu de uma <b>necessidade prática</b>: plantar, colher, navegar e contar o tempo.</li>
+        <li>Muitos povos leram o céu à sua maneira &mdash; inclusive os indígenas brasileiros, com a <b>Ema</b> e as manchas escuras.</li>
+        <li>Achar que a Terra era o centro não era bobagem: era o que os olhos mostravam.</li>
+        <li>O <b>laço de Marte</b> foi a pista de que algo estava errado; Copérnico resolveu trocando o centro.</li>
+        <li>A <b>luneta de Galileu</b> transformou opinião em observação.</li>
+      </ul>
+      <div class="card fim-card">
+        <p class="body" style="margin-bottom:14px">Terminou o primeiro encontro. Marque como concluído para acompanhar seu progresso:</p>
+        <button class="btn" data-concluir="1">&#10003; Concluir Encontro 1</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ===================== AULA 2 ===================== -->
+<div class="aula-panel" id="aula2" hidden>
+  <div class="wrap">
+    <div class="aula-head">
+      <div class="num">Encontro 2</div>
+      <h2>Terra, Sol e Lua: o trio do dia a dia</h2>
+      <p>Dia e noite, verão e inverno, fases da Lua, eclipses e marés. Tudo isso vem de três corpos se movendo.</p>
+    </div>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">1</span> Dois movimentos</div>
+      <h3 class="sec-title">A Terra roda e a Terra viaja</h3>
+      <p class="body">A Terra faz <b>dois</b> movimentos ao mesmo tempo, e cada um cria uma coisa diferente:</p>
+      <div class="map two">
+        <div class="m"><span class="ic">&#128260;</span><span class="t">ROTAÇÃO</span><span class="d">Gira em torno de si mesma em <b>24 horas</b> &rarr; cria o <b>dia e a noite</b>.</span></div>
+        <div class="m"><span class="ic">&#128257;</span><span class="t">TRANSLAÇÃO</span><span class="d">Dá uma volta em torno do Sol em <b>365 dias e 6 horas</b> &rarr; cria o <b>ano</b>.</span></div>
+      </div>
+      <p class="body">Aquelas 6 horas que sobram todo ano se acumulam: em 4 anos viram um dia inteiro. É por isso que existe o <span class="hl">ano bissexto</span>, com 29 de fevereiro. Nada de mágico &mdash; é só acerto de conta.</p>
+      <p class="body">E por que não sentimos a Terra girar, se ela roda a mais de 1600 km/h na linha do equador? Pelo mesmo motivo que você não sente a velocidade dentro de um ônibus em movimento constante: <b>tudo se move junto com você</b> &mdash; o chão, o ar, seu corpo. A gente só sente mudanças de velocidade, como uma freada.</p>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">2</span> Derrubando um mito</div>
+      <h3 class="sec-title">Por que existem as estações do ano?</h3>
+      <div class="note mito">
+        <span class="tag">O MITO MAIS COMUM DA ASTRONOMIA</span>
+        Muita gente aprendeu que é verão porque a Terra fica <b>mais perto</b> do Sol, e inverno porque fica mais longe. <b>Está errado.</b> Se fosse assim, o mundo inteiro teria verão ao mesmo tempo &mdash; e não é o que acontece: quando é verão aqui, é inverno na Europa. Curiosidade: a Terra está mais <b>perto</b> do Sol em <b>janeiro</b>, justamente o nosso verão... e o inverno deles.
+      </div>
+      <p class="body">A resposta verdadeira é a <span class="hl">inclinação do eixo da Terra</span>, de cerca de <b>23,5&deg;</b>. Como o eixo é inclinado e aponta sempre para a mesma direção, ao longo do ano cada hemisfério fica ora mais "de frente" para o Sol, ora mais "de lado".</p>
+      <p class="body">Quando os raios chegam <b>mais de frente</b>, a mesma quantidade de luz se concentra numa área menor: esquenta mais, e o dia dura mais. É verão. Quando chegam <b>inclinados</b>, a mesma luz se espalha por uma área maior: esquenta menos. É inverno. Veja acontecendo:</p>
+
+      <div class="sim">
+        <div class="sim-head"><span class="ttl">&#127777; As estações e a inclinação da Terra</span><span class="lbl">arraste</span></div>
+        <canvas id="estCanvas" height="320"></canvas>
+        <div class="sim-controls">
+          <div class="ctrl">
+            <div class="ctrl-label"><span class="nm">Mês do ano</span><span class="vl" id="estMesV">Janeiro</span></div>
+            <input type="range" id="estMes" min="0" max="11" value="0">
+          </div>
+          <div class="readout">
+            <div class="ro"><span class="k">HEMISFÉRIO SUL</span><span class="v" id="estSul">&mdash;</span></div>
+            <div class="ro"><span class="k">HEMISFÉRIO NORTE</span><span class="v" id="estNorte">&mdash;</span></div>
+          </div>
+          <p class="hint">Repare: o eixo aponta <b>sempre</b> para o mesmo lado. O que muda é a posição da Terra na órbita &mdash; e com ela, qual hemisfério recebe a luz mais de frente.</p>
+        </div>
+      </div>
+
+      <div class="note conversa">
+        <span class="tag">LIGANDO COM O SERTÃO</span>
+        Aqui no Nordeste as estações não são tão marcadas quanto no Sul do país &mdash; falamos mais em <b>tempo de chuva</b> e <b>tempo de seca</b>. Isso acontece porque estamos perto da linha do equador, onde a inclinação faz menos diferença na quantidade de luz. Mas o mecanismo é o mesmo para o planeta inteiro.
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">3</span> Nossa companheira</div>
+      <h3 class="sec-title">As fases da Lua</h3>
+      <p class="body">A Lua <b>não tem luz própria</b>: ela brilha porque reflete a luz do Sol, igual a um espelho. E metade dela está sempre iluminada &mdash; a metade virada para o Sol. O que muda é <span class="hl">quanto dessa metade iluminada nós conseguimos ver</span> daqui, conforme ela dá a volta na Terra.</p>
+      <p class="body">Essa volta leva cerca de <b>29,5 dias</b> &mdash; e é daí que veio a ideia de "mês". Mexa na simulação e veja a fase mudar:</p>
+
+      <div class="sim">
+        <div class="sim-head"><span class="ttl">&#127765; Por que a Lua muda de forma</span><span class="lbl">arraste</span></div>
+        <canvas id="luaCanvas" height="330"></canvas>
+        <div class="sim-controls">
+          <div class="ctrl">
+            <div class="ctrl-label"><span class="nm">Dias desde a Lua Nova</span><span class="vl" id="luaDiaV">0 dias</span></div>
+            <input type="range" id="luaDia" min="0" max="295" value="0">
+          </div>
+          <div class="readout">
+            <div class="ro"><span class="k">FASE</span><span class="v" id="luaFase">&mdash;</span></div>
+            <div class="ro"><span class="k">ILUMINADA</span><span class="v" id="luaIlum">&mdash;</span></div>
+            <div class="ro"><span class="k">MELHOR HORA</span><span class="v" id="luaHora">&mdash;</span></div>
+          </div>
+          <p class="hint">À esquerda, a vista de cima: metade da Lua sempre iluminada pelo Sol. À direita, o que enxergamos daqui.</p>
+        </div>
+      </div>
+
+      <div class="note conversa">
+        <span class="tag">E AS CRENÇAS SOBRE A LUA?</span>
+        <b>"Lua boa para plantar", "cortar o cabelo na lua certa", "criança nasce mais na lua cheia".</b> Vamos com honestidade: a Lua <b>de fato</b> puxa a Terra &mdash; é ela que faz as marés do mar. Mas essa força é fortíssima sobre oceanos inteiros e desprezível sobre uma plantinha, um fio de cabelo ou uma pessoa. Estudos que contaram nascimentos em hospitais durante anos não acharam relação com a lua cheia. <b>O que existe de real</b> é a <b>luz</b>: noites de lua cheia são bem mais claras, o que historicamente permitia trabalhar, colher ou viajar de madrugada. Muito saber antigo tem uma base prática real &mdash; e vale a pena separar essa parte do resto.
+      </div>
+
+      <div class="card">
+        <h4>&#128302; Uma curiosidade que impressiona</h4>
+        <p>A Lua leva o <b>mesmo tempo</b> para girar em torno de si mesma e para dar a volta na Terra. Resultado: ela mostra <b>sempre a mesma face</b> para nós. Ninguém na história da humanidade viu o outro lado da Lua a olho nu &mdash; só conhecemos esse lado desde 1959, por fotos de sondas.</p>
+        <p>E não, o outro lado não é o "lado escuro": ele também recebe sol. É o <b>lado oculto</b>, não escuro.</p>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">4</span> Quando tudo se alinha</div>
+      <h3 class="sec-title">Eclipses e marés</h3>
+      <p class="body">Um <span class="hl">eclipse</span> acontece quando Sol, Terra e Lua ficam alinhados e um projeta sombra no outro:</p>
+      <div class="map two">
+        <div class="m"><span class="ic">&#127762;</span><span class="t">ECLIPSE SOLAR</span><span class="d">A <b>Lua</b> fica na frente do Sol e tapa a luz. Acontece na <b>Lua Nova</b>, de dia, e só é visto de uma faixa estreita da Terra.</span></div>
+        <div class="m"><span class="ic">&#127761;</span><span class="t">ECLIPSE LUNAR</span><span class="d">A <b>Terra</b> fica no meio e sua sombra cobre a Lua. Acontece na <b>Lua Cheia</b>, à noite, e é visto por metade do planeta.</span></div>
+      </div>
+      <p class="body">Se é assim, por que não temos eclipse todo mês? Porque a órbita da Lua é <b>inclinada</b> cerca de 5&deg; em relação à da Terra. Quase sempre a sombra passa um pouco acima ou abaixo do alvo. Só quando o alinhamento é bem certeiro é que o eclipse acontece.</p>
+
+      <div class="sim">
+        <div class="sim-head"><span class="ttl">&#127761; Alinhamento e eclipses</span><span class="lbl">interativo</span></div>
+        <canvas id="eclCanvas" height="290"></canvas>
+        <div class="sim-controls">
+          <div class="seg">
+            <button id="eclSolar" class="on">Eclipse Solar</button>
+            <button id="eclLunar">Eclipse Lunar</button>
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-label"><span class="nm">Inclinação da órbita da Lua</span><span class="vl" id="eclIncV">0&deg; (alinhado)</span></div>
+            <input type="range" id="eclInc" min="0" max="50" value="0">
+          </div>
+          <div class="readout">
+            <div class="ro"><span class="k">SITUAÇÃO</span><span class="v" id="eclStatus">&mdash;</span></div>
+          </div>
+          <p class="hint">Aumente a inclinação e veja a sombra <b>errar o alvo</b> &mdash; é por isso que eclipse é raro.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>&#127754; As marés: a Lua puxando o mar</h4>
+        <p>A gravidade da Lua puxa a água dos oceanos. O lado da Terra virado para a Lua ganha uma "elevação" de água &mdash; e, curiosamente, o lado oposto também. Como a Terra gira, cada ponto do litoral passa por essas elevações e temos <b>duas marés altas e duas baixas por dia</b>.</p>
+        <p>Quando o Sol se alinha com a Lua (lua nova e cheia), os puxões se somam e as marés ficam mais fortes: são as <b>marés de sizígia</b>, conhecidas dos pescadores como marés de lua.</p>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">5</span> Fixando</div>
+      <h3 class="sec-title">Teste rápido do Encontro 2</h3>
+      <div class="quiz" data-quiz="2">
+
+        <div class="quiz-q" data-certa="1">
+          <div class="qq-head"><span class="qq-badge">Questão 01</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">As estações do ano existem principalmente porque:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>A Terra fica mais perto ou mais longe do Sol.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>O eixo da Terra é inclinado, mudando a inclinação dos raios em cada hemisfério.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>O Sol esquenta mais em alguns meses do ano.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>A Lua bloqueia parte do calor do Sol.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: B.</b> Prova disso: quando é verão aqui, é inverno no hemisfério norte &mdash; e a distância até o Sol é a mesma para os dois.</div>
+          </div>
+        </div>
+
+        <div class="quiz-q" data-certa="2">
+          <div class="qq-head"><span class="qq-badge">Questão 02</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">A Lua muda de forma ao longo do mês porque:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>A sombra da Terra vai cobrindo a Lua aos poucos.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>A Lua realmente muda de tamanho.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>Vemos porções diferentes da metade iluminada, conforme ela orbita a Terra.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>Nuvens altas tapam parte da Lua.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: C.</b> Cuidado com a confusão mais comum: sombra da Terra na Lua é <b>eclipse lunar</b>, que dura horas. As fases levam um mês e são só uma questão de ponto de vista.</div>
+          </div>
+        </div>
+
+        <div class="quiz-q" data-certa="0">
+          <div class="qq-head"><span class="qq-badge">Questão 03</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">Por que não acontece um eclipse todo mês?</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>Porque a órbita da Lua é inclinada e a sombra quase sempre passa acima ou abaixo.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>Porque a Lua fica longe demais em alguns meses.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>Porque a Terra para de girar durante o eclipse.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>Porque só há eclipse quando há lua crescente.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: A.</b> A inclinação de cerca de 5&deg; faz o alinhamento perfeito ser incomum &mdash; por isso eclipse vira notícia.</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="card placar" id="placar2">
+        <div class="pv" id="placarV2">0/3</div>
+        <div class="pm" id="placarM2"></div>
+        <button class="btn" data-refazer="2">&#8635; Refazer</button>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <h3 class="sec-title">Para levar do Encontro 2</h3>
+      <ul class="takeaways">
+        <li><b>Rotação</b> faz o dia; <b>translação</b> faz o ano; as 6 horas que sobram fazem o ano bissexto.</li>
+        <li>Estações vêm da <b>inclinação de 23,5&deg;</b> do eixo, não da distância até o Sol.</li>
+        <li>As <b>fases</b> são ponto de vista: vemos partes diferentes da metade sempre iluminada.</li>
+        <li>A Lua mostra <b>sempre a mesma face</b> para a Terra.</li>
+        <li>Eclipses precisam de alinhamento certeiro; a maré é a Lua puxando o mar de verdade.</li>
+      </ul>
+      <div class="card fim-card">
+        <p class="body" style="margin-bottom:14px">Encontro 2 concluído?</p>
+        <button class="btn" data-concluir="2">&#10003; Concluir Encontro 2</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ===================== AULA 3 ===================== -->
+<div class="aula-panel" id="aula3" hidden>
+  <div class="wrap">
+    <div class="aula-head">
+      <div class="num">Encontro 3</div>
+      <h2>Nossa Vizinhança: o Sistema Solar</h2>
+      <p>Oito planetas, centenas de luas, milhões de pedras e alguns visitantes de gelo &mdash; todos presos ao mesmo Sol.</p>
+    </div>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">1</span> O chefe</div>
+      <h3 class="sec-title">O Sol é quase tudo</h3>
+      <p class="lead">Se você juntar o Sol, os oito planetas, todas as luas, asteroides e cometas numa balança, o Sol sozinho é <b>99,8%</b> de toda a massa.</p>
+      <p class="body">Ou seja: o Sistema Solar é, essencialmente, <b>o Sol</b> &mdash; e um punhado de restos girando em volta. É a gravidade dele que segura todo mundo em órbita. E ele não é uma bola de fogo queimando: é uma <span class="hl">estrela</span>, uma esfera gigante de gás onde acontece fusão nuclear no centro. Voltaremos nisso no Encontro 4.</p>
+      <div class="map">
+        <div class="m"><span class="ic">&#128207;</span><span class="t">TAMANHO</span><span class="d">Caberiam cerca de <b>1,3 milhão</b> de Terras dentro do Sol.</span></div>
+        <div class="m"><span class="ic">&#127777;</span><span class="t">TEMPERATURA</span><span class="d">Cerca de <b>5.500 &deg;C</b> na superfície e <b>15 milhões de &deg;C</b> no núcleo.</span></div>
+        <div class="m"><span class="ic">&#9201;</span><span class="t">DISTÂNCIA</span><span class="d">A luz dele leva <b>8 minutos</b> para chegar aqui.</span></div>
+      </div>
+      <div class="note">
+        <span class="tag">PENSE NISSO</span>
+        Quando você olha para o Sol (nunca diretamente, por favor!), está vendo como ele era há <b>8 minutos</b>. Olhar para longe é sempre olhar para o passado &mdash; e isso vai ficar cada vez mais impressionante nos próximos encontros.
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">2</span> Os oito</div>
+      <h3 class="sec-title">Dois tipos de planeta</h3>
+      <p class="body">Os planetas se dividem em dois grupos bem diferentes, e a divisão não é por acaso: perto do Sol o calor não deixou o gelo e o gás se acumularem; longe, sim.</p>
+      <div class="map two">
+        <div class="m"><span class="ic">&#129704;</span><span class="t">ROCHOSOS (internos)</span><span class="d"><b>Mercúrio, Vênus, Terra, Marte.</b> Pequenos, com superfície sólida onde dá para pisar, poucas ou nenhuma lua.</span></div>
+        <div class="m"><span class="ic">&#127760;</span><span class="t">GASOSOS (externos)</span><span class="d"><b>Júpiter, Saturno, Urano, Netuno.</b> Enormes, sem chão firme, com anéis e dezenas de luas.</span></div>
+      </div>
+
+      <div class="sim">
+        <div class="sim-head"><span class="ttl">&#128302; O Sistema Solar em movimento</span><span class="lbl">interativo</span></div>
+        <canvas id="ssCanvas" height="340"></canvas>
+        <div class="sim-controls">
+          <div class="btn-row">
+            <button class="simbtn" id="ssPlay">&#9654; Animar</button>
+            <button class="simbtn ghost" id="ssTamanho">&#8646; Comparar tamanhos</button>
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-label"><span class="nm">Velocidade do tempo</span><span class="vl" id="ssVelV">normal</span></div>
+            <input type="range" id="ssVel" min="1" max="10" value="4">
+          </div>
+          <p class="hint">Repare que quanto <b>mais longe</b> do Sol, <b>mais devagar</b> o planeta anda &mdash; Netuno leva 165 anos para dar uma volta. Toque num planeta para ver seus dados.</p>
+          <div class="readout">
+            <div class="ro" style="min-width:100%"><span class="k">PLANETA SELECIONADO</span><span class="v" id="ssInfo">toque em um planeta</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <tr><th>Planeta</th><th>Volta no Sol</th><th>Um dia lá</th><th>Marca registrada</th></tr>
+          <tr><td>Mercúrio</td><td>88 dias</td><td>59 dias</td><td>O mais rápido; sem atmosfera, ferve e congela</td></tr>
+          <tr><td>Vênus</td><td>225 dias</td><td>243 dias</td><td>O mais quente (460 &deg;C): efeito estufa descontrolado</td></tr>
+          <tr><td>Terra</td><td>365 dias</td><td>24 horas</td><td>Água líquida e vida</td></tr>
+          <tr><td>Marte</td><td>687 dias</td><td>24h 37min</td><td>O planeta vermelho, com o maior vulcão do sistema</td></tr>
+          <tr><td>Júpiter</td><td>12 anos</td><td>10 horas</td><td>O gigante; a Grande Mancha é uma tempestade secular</td></tr>
+          <tr><td>Saturno</td><td>29 anos</td><td>10,7 horas</td><td>Anéis de gelo e pedra, finíssimos</td></tr>
+          <tr><td>Urano</td><td>84 anos</td><td>17 horas</td><td>Gira "deitado", tombado de lado</td></tr>
+          <tr><td>Netuno</td><td>165 anos</td><td>16 horas</td><td>Ventos de 2.000 km/h, os mais fortes conhecidos</td></tr>
+        </table>
+      </div>
+      <div class="note conversa">
+        <span class="tag">CURIOSIDADE QUE RENDE CONVERSA</span>
+        Em <b>Vênus</b>, o dia dura mais que o ano: ele gira tão devagar em torno de si mesmo que dá a volta no Sol antes de completar uma rotação. Já em <b>Júpiter</b>, apesar de ser gigante, o dia tem só 10 horas &mdash; ele roda rapidíssimo.
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">3</span> A polêmica</div>
+      <h3 class="sec-title">O que aconteceu com Plutão?</h3>
+      <p class="body">Muita gente na sala aprendeu que existiam <b>nove</b> planetas. Em 2006 Plutão foi "rebaixado" &mdash; e não foi birra de cientista. Foi definição.</p>
+      <p class="body">Para ser planeta, um corpo precisa cumprir <b>três</b> requisitos:</p>
+      <div class="map">
+        <div class="m"><span class="ic">&#9989;</span><span class="t">1. ORBITAR O SOL</span><span class="d">Plutão cumpre.</span></div>
+        <div class="m"><span class="ic">&#9989;</span><span class="t">2. SER REDONDO</span><span class="d">Ter gravidade suficiente para virar esfera. Plutão cumpre.</span></div>
+        <div class="m"><span class="ic">&#10060;</span><span class="t">3. LIMPAR A ÓRBITA</span><span class="d">Ser o dono do caminho. Plutão <b>não</b> cumpre: divide espaço com milhares de corpos gelados.</span></div>
+      </div>
+      <p class="body">Plutão virou <span class="hl">planeta anão</span>, junto com Ceres, Eris, Makemake e Haumea. Foi uma descoberta que forçou a mudança: encontraram tantos "Plutões" que ou virava tudo planeta, ou se criava uma categoria nova.</p>
+      <div class="note">
+        <span class="tag">LIÇÃO DE CIÊNCIA</span>
+        Ciência <b>muda de opinião quando aparecem dados novos</b> &mdash; e isso é força, não fraqueza. Se um dia descobrirmos algo que contradiga o que está nesta aula, a aula muda.
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">4</span> O resto da vizinhança</div>
+      <h3 class="sec-title">Luas, asteroides e cometas</h3>
+      <div class="card">
+        <h4>&#127765; Luas: mais de 200 no sistema solar</h4>
+        <p><b>Europa</b> (de Júpiter) tem um oceano de água líquida sob uma casca de gelo &mdash; um dos melhores lugares para procurar vida. <b>Titã</b> (de Saturno) tem rios e lagos, mas de metano líquido. <b>Io</b> (de Júpiter) é o corpo mais vulcânico conhecido. Nossa Lua é grande demais para o tamanho da Terra e ajuda a <b>estabilizar</b> a inclinação do nosso eixo &mdash; ou seja, ajuda a manter o clima previsível.</p>
+      </div>
+      <div class="card">
+        <h4>&#9732; Asteroides, cometas e estrelas cadentes</h4>
+        <p><b>Asteroides:</b> pedras e metal, a maioria num cinturão entre Marte e Júpiter.</p>
+        <p><b>Cometas:</b> "bolas de neve sujas" &mdash; gelo e poeira. Ao se aproximarem do Sol, o gelo vira gás e forma a cauda, que aponta sempre para o <b>lado contrário</b> ao Sol.</p>
+        <p><b>Meteoro</b> é o risco de luz no céu (a popular estrela cadente) &mdash; e não é estrela nenhuma: é um grão de poeira queimando na atmosfera. Se um pedaço chega ao chão, aí vira <b>meteorito</b>.</p>
+      </div>
+      <div class="note atividade">
+        <span class="tag">ATIVIDADE (15 min)</span>
+        Em grupos de 3: cada grupo "adota" um planeta e prepara um <b>cartão de visitas</b> dele com quatro informações &mdash; tamanho comparado à Terra, duração do ano, temperatura e uma curiosidade. Apresentem em 1 minuto. No fim, a turma vota no planeta onde <b>menos</b> gostaria de morar (e justifica).
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">5</span> Fixando</div>
+      <h3 class="sec-title">Teste rápido do Encontro 3</h3>
+      <div class="quiz" data-quiz="3">
+        <div class="quiz-q" data-certa="2">
+          <div class="qq-head"><span class="qq-badge">Questão 01</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">Plutão deixou de ser considerado planeta porque:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>Descobriram que ele não orbita o Sol.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>Ele não é redondo.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>Ele não "limpou" sua órbita: divide o caminho com muitos outros corpos.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>Ele é frio demais.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: C.</b> Dos três critérios, é o único que Plutão não cumpre. Hoje ele é um <b>planeta anão</b>.</div>
+          </div>
+        </div>
+        <div class="quiz-q" data-certa="1">
+          <div class="qq-head"><span class="qq-badge">Questão 02</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">A famosa "estrela cadente" é, na verdade:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>Uma estrela que caiu do céu.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>Um grão de poeira ou pedrinha queimando na atmosfera.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>Um satélite artificial explodindo.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>Um raio na alta atmosfera.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: B.</b> Chama-se <b>meteoro</b>. Estrelas são gigantescas e ficam a anos-luz &mdash; nenhuma delas "cai".</div>
+          </div>
+        </div>
+        <div class="quiz-q" data-certa="3">
+          <div class="qq-head"><span class="qq-badge">Questão 03</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">Sobre a massa do Sistema Solar, é correto dizer que:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>Está bem dividida entre o Sol e os oito planetas.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>Júpiter tem mais massa que o Sol.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>Os planetas rochosos concentram a maior parte.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>O Sol sozinho tem cerca de 99,8% de tudo.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: D.</b> Por isso a gravidade dele comanda o movimento de todo o sistema.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card placar" id="placar3">
+        <div class="pv" id="placarV3">0/3</div><div class="pm" id="placarM3"></div>
+        <button class="btn" data-refazer="3">&#8635; Refazer</button>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <h3 class="sec-title">Para levar do Encontro 3</h3>
+      <ul class="takeaways">
+        <li>O <b>Sol</b> é 99,8% da massa do sistema &mdash; é a gravidade dele que segura tudo.</li>
+        <li><b>Rochosos</b> perto e pequenos; <b>gasosos</b> longe e gigantes.</li>
+        <li>Quanto mais longe do Sol, <b>mais lento</b> o planeta orbita.</li>
+        <li>Plutão é <b>planeta anão</b> porque não limpou sua órbita.</li>
+        <li><b>Meteoro</b> no céu, <b>meteorito</b> no chão &mdash; e nenhum deles é estrela.</li>
+      </ul>
+      <div class="card fim-card">
+        <p class="body" style="margin-bottom:14px">Encontro 3 concluído?</p>
+        <button class="btn" data-concluir="3">&#10003; Concluir Encontro 3</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ===================== AULA 4 ===================== -->
+<div class="aula-panel" id="aula4" hidden>
+  <div class="wrap">
+    <div class="aula-head">
+      <div class="num">Encontro 4</div>
+      <h2>As Estrelas: fornalhas que fabricam tudo</h2>
+      <p>O que são aqueles pontinhos, por que brilham, por que têm cores diferentes &mdash; e o que acontece quando morrem.</p>
+    </div>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">1</span> O que é uma estrela</div>
+      <h3 class="sec-title">Uma bola de gás em guerra consigo mesma</h3>
+      <p class="lead">Estrela é uma esfera enorme de gás (principalmente hidrogênio) tão apertada no centro que os átomos se fundem &mdash; e essa fusão libera uma quantidade absurda de energia.</p>
+      <p class="body">A estrela vive de um <span class="hl">equilíbrio de forças</span>: a <b>gravidade</b> tentando esmagar tudo para dentro, e a <b>pressão</b> da energia produzida no núcleo empurrando para fora. Enquanto houver combustível, as duas se equilibram e a estrela fica estável. Quando o combustível acaba, a gravidade vence &mdash; e aí a estrela morre.</p>
+      <div class="note">
+        <span class="tag">O SOL É UMA ESTRELA COMUM</span>
+        Nada de especial: é uma estrela de tamanho médio, meia-idade (cerca de 4,6 bilhões de anos, com outros 5 bilhões pela frente). Parece diferente das outras <b>só porque está perto</b>. Se você afastasse o Sol até a distância das outras estrelas, ele seria mais um pontinho no céu.
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">2</span> Cor e distância</div>
+      <h3 class="sec-title">A cor da estrela conta a temperatura dela</h3>
+      <p class="body">Aqui vai algo que contraria a intuição: no céu, <b>azul é quente e vermelho é frio</b>. É o contrário das torneiras, mas é o mesmo princípio do ferro no fogo &mdash; ele começa vermelho, e quanto mais quente fica, mais para o branco-azulado ele vai.</p>
+
+      <div class="sim">
+        <div class="sim-head"><span class="ttl">&#127756; Cor, temperatura e tamanho das estrelas</span><span class="lbl">arraste</span></div>
+        <canvas id="estrCanvas" height="300"></canvas>
+        <div class="sim-controls">
+          <div class="ctrl">
+            <div class="ctrl-label"><span class="nm">Temperatura da superfície</span><span class="vl" id="estrTempV">5.500 &deg;C</span></div>
+            <input type="range" id="estrTemp" min="3000" max="30000" step="100" value="5500">
+          </div>
+          <div class="readout">
+            <div class="ro"><span class="k">COR</span><span class="v" id="estrCor">&mdash;</span></div>
+            <div class="ro"><span class="k">TIPO</span><span class="v" id="estrTipo">&mdash;</span></div>
+            <div class="ro"><span class="k">EXEMPLO</span><span class="v" id="estrEx">&mdash;</span></div>
+          </div>
+          <p class="hint">Arraste e encontre a temperatura do <b>nosso Sol</b> (cerca de 5.500 &deg;C).</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>&#128207; Distâncias: o ano-luz</h4>
+        <p>As distâncias são tão grandes que o quilômetro não serve. Usamos o <b>ano-luz</b>: a distância que a luz percorre em um ano, cerca de <b>9,5 trilhões de km</b>. Atenção: ano-luz é medida de <b>distância</b>, não de tempo.</p>
+        <p>A estrela mais próxima (fora o Sol) é <b>Proxima Centauri</b>, a 4,2 anos-luz. Isso significa que a luz dela saiu de lá há 4 anos e 2 meses. <b>Olhar para o céu é olhar para o passado</b> &mdash; algumas estrelas que vemos hoje talvez nem existam mais.</p>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">3</span> Nascer, viver e morrer</div>
+      <h3 class="sec-title">O ciclo de vida das estrelas</h3>
+      <p class="body">Estrelas nascem dentro de nuvens gigantes de gás e poeira, as <b>nebulosas</b>. E o destino de cada uma depende quase só de uma coisa: <span class="hl">a massa com que ela nasceu</span>.</p>
+
+      <div class="sim">
+        <div class="sim-head"><span class="ttl">&#127756; Escolha a massa e veja o destino</span><span class="lbl">interativo</span></div>
+        <canvas id="cicloCanvas" height="290"></canvas>
+        <div class="sim-controls">
+          <div class="seg">
+            <button id="cicloPeq" class="on">Pequena</button>
+            <button id="cicloMed">Como o Sol</button>
+            <button id="cicloGra">Gigante</button>
+          </div>
+          <div class="readout">
+            <div class="ro" style="min-width:100%"><span class="k">FINAL DA HISTÓRIA</span><span class="v" id="cicloFim" style="font-size:12px">&mdash;</span></div>
+          </div>
+          <p class="hint">Quanto <b>maior</b> a estrela, <b>mais curta</b> a vida &mdash; ela gasta o combustível muito mais rápido.</p>
+        </div>
+      </div>
+
+      <div class="note conversa">
+        <span class="tag">A FRASE MAIS BONITA DA ASTRONOMIA</span>
+        Quando uma estrela grande explode em <b>supernova</b>, ela espalha pelo espaço os elementos que fabricou: carbono, oxigênio, ferro, cálcio. Esse material entra em novas nuvens, que formam novas estrelas e planetas. <b>O ferro do seu sangue, o cálcio dos seus ossos e o oxigênio que você respira foram fabricados dentro de estrelas que morreram antes do Sol existir.</b> Nós somos, literalmente, poeira de estrelas.
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">4</span> Desenhos no céu</div>
+      <h3 class="sec-title">Constelações: os desenhos que a gente inventou</h3>
+      <p class="body">Constelação é uma figura que <b>nós</b> imaginamos ligando estrelas que, no céu, apenas <b>parecem</b> próximas. Na verdade elas podem estar a distâncias completamente diferentes &mdash; uma pode estar a 100 anos-luz e a vizinha a 800.</p>
+      <div class="map">
+        <div class="m"><span class="ic">&#10014;</span><span class="t">CRUZEIRO DO SUL</span><span class="d">Nossa marca registrada, na bandeira do Brasil. Aponta o Sul: prolongue o braço maior 4,5 vezes.</span></div>
+        <div class="m"><span class="ic">&#129446;</span><span class="t">ESCORPIÃO</span><span class="d">Uma das poucas que lembra mesmo o bicho. A estrela vermelha do "coração" é Antares.</span></div>
+        <div class="m"><span class="ic">&#8987;</span><span class="t">ÓRION</span><span class="d">As <b>Três Marias</b> são o cinturão dele. Fácil de achar e visível de todo o planeta.</span></div>
+      </div>
+      <div class="note atividade">
+        <span class="tag">PARA CASA (e vale nota de participação)</span>
+        Numa noite sem nuvens, saia de casa e tente encontrar <b>o Cruzeiro do Sul</b>. Depois use o braço maior para descobrir onde fica o <b>Sul</b>. Confira com a bússola do celular e traga o resultado para a próxima aula. No Encontro 6 vamos usar duas ferramentas que ajudam nisso.
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">5</span> Fixando</div>
+      <h3 class="sec-title">Teste rápido do Encontro 4</h3>
+      <div class="quiz" data-quiz="4">
+        <div class="quiz-q" data-certa="0">
+          <div class="qq-head"><span class="qq-badge">Questão 01</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">Comparando duas estrelas, uma azulada e uma avermelhada, podemos dizer que:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>A azulada é mais quente que a avermelhada.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>A avermelhada é mais quente que a azulada.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>As duas têm a mesma temperatura.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>A cor não tem relação com a temperatura.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: A.</b> Como o ferro no fogo: quanto mais quente, mais o brilho vai do vermelho para o branco-azulado.</div>
+          </div>
+        </div>
+        <div class="quiz-q" data-certa="2">
+          <div class="qq-head"><span class="qq-badge">Questão 02</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">Um ano-luz é:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>O tempo que a luz leva para dar a volta na Terra.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>O tempo de vida de uma estrela.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>A distância que a luz percorre em um ano.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>O tempo que a Terra leva para orbitar o Sol.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: C.</b> Apesar do nome, é medida de <b>distância</b>: cerca de 9,5 trilhões de quilômetros.</div>
+          </div>
+        </div>
+        <div class="quiz-q" data-certa="1">
+          <div class="qq-head"><span class="qq-badge">Questão 03</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">O que determina principalmente como uma estrela vai morrer?</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>A cor que ela tem hoje.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>A massa com que ela nasceu.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>A distância dela até a Terra.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>A quantidade de planetas em volta dela.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: B.</b> Estrelas como o Sol viram anã branca; as bem maiores explodem em supernova e deixam estrela de nêutrons ou buraco negro.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card placar" id="placar4">
+        <div class="pv" id="placarV4">0/3</div><div class="pm" id="placarM4"></div>
+        <button class="btn" data-refazer="4">&#8635; Refazer</button>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <h3 class="sec-title">Para levar do Encontro 4</h3>
+      <ul class="takeaways">
+        <li>Estrela é gás em <b>fusão nuclear</b>, equilibrando gravidade e pressão.</li>
+        <li>No céu, <b>azul é quente</b> e <b>vermelho é frio</b>.</li>
+        <li><b>Ano-luz</b> é distância; olhar longe é olhar para o passado.</li>
+        <li>A <b>massa inicial</b> decide o destino: anã branca, estrela de nêutrons ou buraco negro.</li>
+        <li>Os átomos do nosso corpo foram fabricados <b>dentro de estrelas</b>.</li>
+      </ul>
+      <div class="card fim-card">
+        <p class="body" style="margin-bottom:14px">Encontro 4 concluído?</p>
+        <button class="btn" data-concluir="4">&#10003; Concluir Encontro 4</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ===================== AULA 5 ===================== -->
+<div class="aula-panel" id="aula5" hidden>
+  <div class="wrap">
+    <div class="aula-head">
+      <div class="num">Encontro 5</div>
+      <h2>Galáxias e o Universo Inteiro</h2>
+      <p>Vamos afastar a câmera: da nossa rua até a borda do que é possível enxergar.</p>
+    </div>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">1</span> Nosso endereço</div>
+      <h3 class="sec-title">Onde a gente mora, de verdade</h3>
+      <p class="lead">Uma <b>galáxia</b> é um agrupamento gigantesco de estrelas, gás e poeira, tudo preso pela gravidade. A nossa se chama <span class="hl">Via Láctea</span>.</p>
+      <p class="body">Ela tem cerca de <b>100 a 400 bilhões de estrelas</b> e uns <b>100 mil anos-luz</b> de ponta a ponta. O Sol fica num braço lateral, a uns 26 mil anos-luz do centro &mdash; ou seja, nem no meio, nem na borda: no subúrbio. E ele leva cerca de <b>230 milhões de anos</b> para dar uma volta completa em torno do centro da galáxia. A última vez que o Sol esteve nessa posição, os dinossauros estavam começando a aparecer.</p>
+      <div class="note conversa">
+        <span class="tag">POR QUE "VIA LÁCTEA"?</span>
+        Em noites bem escuras, longe da luz da cidade, dá para ver uma faixa esbranquiçada cruzando o céu &mdash; parece leite derramado, e daí veio o nome. Quem morava na roça antigamente via isso todo dia. Galileu foi o primeiro a apontar a luneta para essa faixa e descobrir que ela é feita de <b>milhões de estrelas</b> juntinhas. No sertão, longe das luzes, ainda dá para ver muito bem &mdash; é uma das vantagens de morar longe da cidade grande.
+      </div>
+      <div class="map">
+        <div class="m"><span class="ic">&#127756;</span><span class="t">ESPIRAIS</span><span class="d">Com braços girando, cheias de gás e estrelas novas. A Via Láctea é uma delas.</span></div>
+        <div class="m"><span class="ic">&#11044;</span><span class="t">ELÍPTICAS</span><span class="d">Formato de bola de futebol americano, estrelas velhas e pouco gás novo.</span></div>
+        <div class="m"><span class="ic">&#10022;</span><span class="t">IRREGULARES</span><span class="d">Sem forma definida, geralmente pequenas e bagunçadas.</span></div>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">2</span> A escala</div>
+      <h3 class="sec-title">Do seu quintal até a borda do Universo</h3>
+      <p class="body">O maior desafio da astronomia não é entender as ideias &mdash; é <b>sentir os tamanhos</b>. Nossa cabeça simplesmente não foi feita para isso. Use a simulação abaixo para ir se afastando aos poucos:</p>
+
+      <div class="sim">
+        <div class="sim-head"><span class="ttl">&#128301; Viagem pelas escalas do Universo</span><span class="lbl">arraste</span></div>
+        <canvas id="escalaCanvas" height="300"></canvas>
+        <div class="sim-controls">
+          <div class="ctrl">
+            <div class="ctrl-label"><span class="nm">Afaste a câmera</span><span class="vl" id="escNivelV">1 / 10</span></div>
+            <input type="range" id="escNivel" min="0" max="9" value="0">
+          </div>
+          <div class="readout">
+            <div class="ro" style="min-width:100%"><span class="k">TAMANHO DESTE NÍVEL</span><span class="v" id="escTam" style="font-size:12.5px">&mdash;</span></div>
+          </div>
+          <p class="hint" id="escTexto">Arraste devagar e leia cada etapa &mdash; a graça está em perceber quando o número deixa de fazer sentido na cabeça.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>&#128170; Uma comparação que ajuda</h4>
+        <p>Se o Sol fosse uma <b>laranja</b> aqui em Potengi, a Terra seria um <b>grão de areia</b> a uns 15 metros de distância. E a estrela mais próxima, Proxima Centauri? Seria <b>outra laranja</b>... em <b>Fortaleza</b>. Todo o resto no meio é vazio.</p>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">3</span> O começo de tudo</div>
+      <h3 class="sec-title">O Big Bang e um Universo que cresce</h3>
+      <p class="body">No começo do século XX, descobriu-se algo estranhíssimo: <span class="hl">quase todas as galáxias estão se afastando de nós</span> &mdash; e quanto mais longe, mais rápido se afastam.</p>
+      <p class="body">Isso não quer dizer que somos o centro. Imagine um <b>bolo de fubá com passas</b> assando: conforme a massa cresce, <b>toda</b> passa se afasta de <b>todas</b> as outras. Não existe uma passa central. O que cresce é a massa entre elas &mdash; assim como o que cresce é o <b>espaço</b> entre as galáxias.</p>
+      <p class="body">Se tudo está se afastando, então no passado tudo estava mais junto. Voltando o filme até o começo, chega-se a um instante em que tudo estava concentrado num estado quentíssimo e densíssimo. Esse começo, há cerca de <b>13,8 bilhões de anos</b>, é o que chamamos de <span class="hl">Big Bang</span>.</p>
+      <div class="note mito">
+        <span class="tag">DOIS ENGANOS COMUNS</span>
+        <b>1)</b> O Big Bang não foi uma "explosão" que jogou matéria dentro de um espaço vazio que já existia &mdash; foi o próprio <b>espaço</b> começando a se expandir, em todo lugar ao mesmo tempo. <b>2)</b> Não existe um "lado de fora" nem um centro do Universo que a gente possa apontar no céu.
+      </div>
+      <div class="card">
+        <h4>&#128269; Como sabemos disso?</h4>
+        <p>Não é chute. Há três evidências fortes e independentes: <b>(1)</b> o afastamento das galáxias, medido pela cor da luz que chega; <b>(2)</b> uma radiação fraquinha que sobra do Universo bebê e banha o céu inteiro, prevista antes de ser encontrada; e <b>(3)</b> a proporção de hidrogênio e hélio no Universo, que bate exatamente com o previsto pela teoria.</p>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">4</span> Fixando</div>
+      <h3 class="sec-title">Teste rápido do Encontro 5</h3>
+      <div class="quiz" data-quiz="5">
+        <div class="quiz-q" data-certa="1">
+          <div class="qq-head"><span class="qq-badge">Questão 01</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">A Via Láctea é:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>Uma nuvem de gás dentro do Sistema Solar.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>A galáxia onde fica o nosso Sistema Solar.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>Outro nome para o Universo inteiro.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>Um conjunto de planetas parecidos com a Terra.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: B.</b> Nossa galáxia, com mais de 100 bilhões de estrelas. O Sol fica num braço lateral dela.</div>
+          </div>
+        </div>
+        <div class="quiz-q" data-certa="3">
+          <div class="qq-head"><span class="qq-badge">Questão 02</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">O fato de quase todas as galáxias estarem se afastando de nós indica que:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>A Terra está no centro do Universo.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>As galáxias estão fugindo da Via Láctea.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>O Universo está encolhendo.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>O espaço entre as galáxias está se expandindo.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: D.</b> Como as passas no bolo que cresce: todas se afastam de todas, sem nenhum centro privilegiado.</div>
+          </div>
+        </div>
+        <div class="quiz-q" data-certa="2">
+          <div class="qq-head"><span class="qq-badge">Questão 03</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">A idade estimada do Universo é de aproximadamente:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>6 mil anos.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>4,6 bilhões de anos.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>13,8 bilhões de anos.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>500 trilhões de anos.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: C.</b> Cuidado para não confundir: <b>4,6 bilhões</b> é a idade do <b>Sol e da Terra</b>, bem mais novos que o Universo.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card placar" id="placar5">
+        <div class="pv" id="placarV5">0/3</div><div class="pm" id="placarM5"></div>
+        <button class="btn" data-refazer="5">&#8635; Refazer</button>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <h3 class="sec-title">Para levar do Encontro 5</h3>
+      <ul class="takeaways">
+        <li>Moramos na <b>Via Láctea</b>, num braço lateral, a 26 mil anos-luz do centro.</li>
+        <li>O Universo tem <b>bilhões de galáxias</b>, e cada uma com bilhões de estrelas.</li>
+        <li>O <b>espaço se expande</b> &mdash; as galáxias se afastam como passas num bolo que cresce.</li>
+        <li>O <b>Big Bang</b> foi há 13,8 bilhões de anos e tem três evidências independentes.</li>
+        <li>Não existe centro nem borda do Universo para apontar no céu.</li>
+      </ul>
+      <div class="card fim-card">
+        <p class="body" style="margin-bottom:14px">Encontro 5 concluído?</p>
+        <button class="btn" data-concluir="5">&#10003; Concluir Encontro 5</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ===================== AULA 6 ===================== -->
+<div class="aula-panel" id="aula6" hidden>
+  <div class="wrap">
+    <div class="aula-head">
+      <div class="num">Encontro 6</div>
+      <h2>Mão na Massa: observar o céu de Potengi</h2>
+      <p>Agora a parte melhor: sair, olhar para cima e reconhecer o que a gente estudou.</p>
+    </div>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">1</span> As ferramentas</div>
+      <h3 class="sec-title">Duas ferramentas para explorar agora</h3>
+      <p class="body">Estas duas ferramentas foram feitas para esta turma. Abra no celular, de preferência <b>à noite</b> e num lugar com pouca luz:</p>
+
+      <div class="tool-grid">
+        <a class="tool-card" href="https://dellzzz.github.io/Planetario_Physica/" target="_blank" rel="noopener">
+          <span class="ic">&#127756;</span>
+          <b>PLANETÁRIO VIRTUAL</b>
+          <span>Passeie pelo Sistema Solar, veja as órbitas e compare os planetas de perto.</span>
+          <span class="abre">ABRIR PLANETÁRIO &#8599;</span>
+        </a>
+        <a class="tool-card" href="https://mapa-estelar-two.vercel.app" target="_blank" rel="noopener">
+          <span class="ic">&#10022;</span>
+          <b>MAPA ESTELAR AO VIVO</b>
+          <span>O céu de Potengi <b>neste exato momento</b>: estrelas, constelações, planetas, fases da Lua e a Estação Espacial.</span>
+          <span class="abre">ABRIR MAPA ESTELAR &#8599;</span>
+        </a>
+      </div>
+
+      <div class="note atividade">
+        <span class="tag">COMO USAR O MAPA ESTELAR</span>
+        <b>1.</b> Abra e toque em <b>"Ativar bússola do celular"</b> (aceite a permissão que aparecer). <b>2.</b> Aponte o celular <b>bem para o alto</b> por um instante, para ele se acertar. <b>3.</b> Agora aponte para qualquer direção do céu &mdash; a tela mostra o que está lá. <b>4.</b> Sem bússola, dá para <b>arrastar o dedo</b> para olhar em volta. Aponte para baixo e veja o céu do outro lado da Terra.
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">2</span> Como olhamos hoje</div>
+      <h3 class="sec-title">De lunetas a telescópios espaciais</h3>
+      <p class="body">A luneta de Galileu tinha o poder de aumento de um binóculo simples de hoje. De lá para cá:</p>
+      <div class="map">
+        <div class="m"><span class="ic">&#128301;</span><span class="t">TELESCÓPIOS ÓPTICOS</span><span class="d">Espelhos gigantes em montanhas altas e secas, longe da luz das cidades.</span></div>
+        <div class="m"><span class="ic">&#128225;</span><span class="t">RADIOTELESCÓPIOS</span><span class="d">Enxergam ondas de rádio &mdash; captam o que o olho não vê, inclusive de dia.</span></div>
+        <div class="m"><span class="ic">&#128760;</span><span class="t">TELESCÓPIOS ESPACIAIS</span><span class="d">Hubble e James Webb, fora da atmosfera, sem o "borrão" do ar.</span></div>
+      </div>
+      <p class="body">O <b>James Webb</b>, lançado em 2021, enxerga em infravermelho e consegue captar a luz de galáxias que se formaram pouco depois do Big Bang. Como olhar longe é olhar para o passado, ele funciona como uma <span class="hl">máquina do tempo</span>.</p>
+      <div class="card">
+        <h4>&#128640; O Brasil e o espaço</h4>
+        <p>Temos o <b>Observatório Nacional</b> (RJ), o <b>Observatório do Pico dos Dias</b> (MG) e participação em grandes telescópios internacionais. Além disso, a base de <b>Alcântara (MA)</b> é uma das melhores posições do mundo para lançamentos, por ficar quase em cima da linha do equador &mdash; ali o próprio giro da Terra dá um empurrão extra no foguete.</p>
+      </div>
+      <div class="note conversa">
+        <span class="tag">A ISS PASSA AQUI</span>
+        A <b>Estação Espacial Internacional</b> orbita a 400 km de altura, dando uma volta na Terra a cada 90 minutos, com gente morando lá dentro. Ela passa sobre o Ceará com frequência e, quando passa ao anoitecer, é visível <b>a olho nu</b>: um ponto brilhante que atravessa o céu em poucos minutos, sem piscar (avião pisca, ela não). O mapa estelar mostra quando ela está acima do horizonte.
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">3</span> Roteiro de observação</div>
+      <h3 class="sec-title">O que dá para ver sem nenhum equipamento</h3>
+      <p class="body">A olho nu, numa noite limpa e longe de poste de luz, dá para ver muita coisa. Siga esta ordem:</p>
+      <div class="table-wrap">
+        <table>
+          <tr><th>Ordem</th><th>O que procurar</th><th>Dica prática</th></tr>
+          <tr><td>1&ordm;</td><td>A Lua</td><td>Fácil. Repare na fase e em qual lado está iluminado.</td></tr>
+          <tr><td>2&ordm;</td><td>Planetas</td><td>São os pontos mais brilhantes e <b>não piscam</b>. Vênus é o mais forte de todos.</td></tr>
+          <tr><td>3&ordm;</td><td>Cruzeiro do Sul</td><td>Use o braço maior para achar o Sul.</td></tr>
+          <tr><td>4&ordm;</td><td>Três Marias (Órion)</td><td>Três estrelas alinhadas e igualmente espaçadas. Inconfundível.</td></tr>
+          <tr><td>5&ordm;</td><td>Escorpião</td><td>Procure a estrela avermelhada Antares, o "coração".</td></tr>
+          <tr><td>6&ordm;</td><td>Via Láctea</td><td>Só em noite escura e sem lua: a faixa esbranquiçada cruzando o céu.</td></tr>
+        </table>
+      </div>
+      <div class="note">
+        <span class="tag">O TRUQUE QUE POUCA GENTE SABE</span>
+        <b>Estrela pisca, planeta não.</b> A luz da estrela vem de um ponto tão distante que a atmosfera a embaralha e faz cintilar. O planeta é um disquinho, e o embaralhamento se compensa &mdash; por isso o brilho fica firme. Esse é o jeito mais fácil de diferenciar os dois no céu.
+      </div>
+      <div class="note atividade">
+        <span class="tag">ATIVIDADE FINAL &mdash; DIÁRIO DO CÉU (1 semana)</span>
+        Durante <b>sete noites seguidas</b>, no mesmo horário, olhe para a Lua e anote numa folha: <b>a data</b>, <b>um desenho da forma dela</b> e <b>onde ela estava no céu</b> (perto do horizonte? alto?). Se estiver nublado, anote "nublado" &mdash; isso também é dado científico! Ao final, traga para a turma: você terá construído, com as próprias mãos, o mesmo registro que os povos antigos faziam há milhares de anos. Compare seus desenhos com a simulação de fases do Encontro 2.
+      </div>
+    </section>
+
+    <section class="bloco">
+      <div class="kicker"><span class="num">4</span> Avaliação final</div>
+      <h3 class="sec-title">Teste geral dos 6 encontros</h3>
+      <p class="body">Cinco questões misturando tudo o que vimos. Sem pressa.</p>
+      <div class="quiz" data-quiz="6">
+        <div class="quiz-q" data-certa="2">
+          <div class="qq-head"><span class="qq-badge">Questão 01</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">Uma pessoa afirma: "é verão porque a Terra está mais perto do Sol". Como você responderia?</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>Está certa: a distância explica as estações.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>Está certa, mas só no hemisfério sul.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>Está errada: se fosse a distância, o mundo todo teria verão junto. A causa é a inclinação do eixo.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>Está errada: na verdade é o Sol que se aproxima da Terra.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: C.</b> Quando é verão aqui é inverno na Europa &mdash; à mesma distância do Sol.</div>
+          </div>
+        </div>
+        <div class="quiz-q" data-certa="1">
+          <div class="qq-head"><span class="qq-badge">Questão 02</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">Você vê no céu um ponto muito brilhante que <b>não pisca</b>. Provavelmente é:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>Uma estrela muito quente.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>Um planeta.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>Uma galáxia distante.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>Um meteoro.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: B.</b> Estrela cintila por ser um ponto distante; planeta é um disquinho e mantém o brilho firme.</div>
+          </div>
+        </div>
+        <div class="quiz-q" data-certa="0">
+          <div class="qq-head"><span class="qq-badge">Questão 03</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">Dizer que uma estrela está a 500 anos-luz significa que:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>A luz que vemos dela hoje saiu de lá há 500 anos.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>Ela tem 500 anos de idade.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>Ela vai durar mais 500 anos.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>Ela dá uma volta na galáxia a cada 500 anos.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: A.</b> Olhar longe é olhar para o passado &mdash; você está vendo o céu de 500 anos atrás.</div>
+          </div>
+        </div>
+        <div class="quiz-q" data-certa="3">
+          <div class="qq-head"><span class="qq-badge">Questão 04</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">Os átomos de ferro do nosso sangue vieram de onde?</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>Foram formados na Terra, no seu núcleo.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>Vieram de meteoros que caíram recentemente.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>Foram criados pelo Sol nos últimos milhões de anos.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>Foram fabricados dentro de estrelas que morreram antes do Sol existir.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: D.</b> Estrelas massivas fabricam elementos pesados e os espalham ao explodir em supernova. Somos poeira de estrelas.</div>
+          </div>
+        </div>
+        <div class="quiz-q" data-certa="1">
+          <div class="qq-head"><span class="qq-badge">Questão 05</span></div>
+          <div class="qq-body">
+            <p class="qq-enun">A Lua mostra sempre a mesma face para a Terra porque:</p>
+            <div class="qq-alts">
+              <button class="qq-alt"><span class="let">A</span><span>Ela não gira em torno de si mesma.</span></button>
+              <button class="qq-alt"><span class="let">B</span><span>Ela leva o mesmo tempo para girar em si e para orbitar a Terra.</span></button>
+              <button class="qq-alt"><span class="let">C</span><span>O outro lado é escuro e não reflete luz.</span></button>
+              <button class="qq-alt"><span class="let">D</span><span>A atmosfera da Terra impede a visão do outro lado.</span></button>
+            </div>
+            <div class="qq-sol"><b>Resposta: B.</b> Ela gira, sim &mdash; só que sincronizada com a órbita. E o outro lado também recebe sol: é <b>oculto</b>, não escuro.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card placar" id="placar6">
+        <div class="pv" id="placarV6">0/5</div><div class="pm" id="placarM6"></div>
+        <button class="btn" data-refazer="6">&#8635; Refazer</button>
+      </div>
+    </section>
+
+    <section class="bloco">
+      <h3 class="sec-title">Para levar dos 6 encontros</h3>
+      <ul class="takeaways">
+        <li>O céu foi o <b>primeiro calendário</b> da humanidade &mdash; e ainda está lá, de graça.</li>
+        <li>Dia, ano, estações, fases e marés vêm de <b>movimentos</b>, não de mistérios.</li>
+        <li>Somos um planeta pequeno, num braço lateral de uma galáxia entre bilhões.</li>
+        <li>Os <b>átomos do seu corpo</b> foram fabricados em estrelas.</li>
+        <li>Você não precisa de equipamento nenhum para começar a observar: só sair e olhar.</li>
+      </ul>
+      <div class="card fim-card">
+        <p class="body" style="margin-bottom:14px">Chegamos ao fim da jornada. Marque o último encontro como concluído:</p>
+        <button class="btn" data-concluir="6">&#10003; Concluir Encontro 6</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <p><span class="ft-logo">&#10022; Plataforma da Física</span></p>
+  <p style="margin-top:7px">Astronomia em 6 Encontros &mdash; Prof. Jardel A. Leite</p>
+</footer>
+
+<script>
+(function(){
+'use strict';
+var KEY='plataphysica_astronomia_v1';
+var AC='#8b7cff', AC2='#ffd76a', GRN='#27e88a', RED='#ff5a6e', CY='#5ad1ff', DIM='#8f8ab5', PINK='#ff9ed6';
+var TAU=Math.PI*2;
+
+/* ---------- utilidades ---------- */
+var sims=[];
+function fit(cv,h){
+  var dpr=window.devicePixelRatio||1;
+  var w=cv.parentElement?cv.parentElement.clientWidth:300;
+  if(!w) w=320;
+  cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr); cv.style.height=h+'px';
+  var ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx:ctx,w:w,h:h};
+}
+function pad2(n){n=''+n;return n.length<2?('0'+n):n;}
+function txt(ctx,s,x,y,cor,fonte,align){
+  ctx.fillStyle=cor||DIM; ctx.font=fonte||'11px Rajdhani, sans-serif';
+  ctx.textAlign=align||'center'; ctx.textBaseline='middle'; ctx.fillText(s,x,y);
+}
+function disco(ctx,x,y,r,cor,glow){
+  ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.fillStyle=cor;
+  if(glow){ctx.shadowColor=cor;ctx.shadowBlur=glow;} ctx.fill(); ctx.shadowBlur=0;
+}
+
+/* ---------- estado salvo ---------- */
+var salvo={concluidos:{},quiz:{}};
+try{ salvo=JSON.parse(localStorage.getItem(KEY))||salvo; }catch(e){}
+if(!salvo.concluidos) salvo.concluidos={};
+if(!salvo.quiz) salvo.quiz={};
+function grava(){ try{localStorage.setItem(KEY,JSON.stringify(salvo));}catch(e){} }
+
+/* ---------- abas ---------- */
+var TITULOS=['O Céu e a História','Terra, Sol e Lua','Sistema Solar','As Estrelas','Galáxias e Universo','Observar o Céu'];
+var abaAtual=1;
+function mostrarAba(n){
+  abaAtual=n;
+  for(var i=1;i<=6;i++){
+    document.getElementById('aula'+i).hidden = (i!==n);
+  }
+  var bts=document.querySelectorAll('#aulaTabs button');
+  bts.forEach(function(b){ b.classList.toggle('on', parseInt(b.dataset.aula,10)===n); });
+  sims.forEach(function(s){ try{s.resize();}catch(e){} });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('#aulaTabs button').forEach(function(b){
+  b.addEventListener('click', function(){ mostrarAba(parseInt(b.dataset.aula,10)); });
+});
+
+/* ---------- índice lateral ---------- */
+var toc=document.getElementById('toc'), tocNav=document.getElementById('tocNav');
+TITULOS.forEach(function(t,i){
+  var a=document.createElement('a'); a.href='#';
+  a.innerHTML='<span class="n">'+pad2(i+1)+'</span><span>'+t+'</span><span class="dot">&#10003;</span>';
+  a.addEventListener('click',function(e){ e.preventDefault(); mostrarAba(i+1); toc.classList.remove('open'); });
+  tocNav.appendChild(a);
+});
+var tocLinks=[].slice.call(tocNav.children);
+document.getElementById('tocBtn').addEventListener('click',function(){toc.classList.add('open');});
+document.getElementById('tocX').addEventListener('click',function(){toc.classList.remove('open');});
+toc.addEventListener('click',function(e){ if(e.target===toc) toc.classList.remove('open'); });
+
+/* ---------- progresso ---------- */
+function atualizaProgresso(){
+  var n=0;
+  for(var i=1;i<=6;i++){
+    var f=!!salvo.concluidos[i];
+    if(f) n++;
+    tocLinks[i-1].classList.toggle('done',f);
+    var bt=document.querySelector('#aulaTabs button[data-aula="'+i+'"]');
+    if(bt) bt.classList.toggle('feito',f);
+    var bc=document.querySelector('[data-concluir="'+i+'"]');
+    if(bc){
+      bc.classList.toggle('feito',f);
+      bc.innerHTML = f ? '&#10003; Encontro '+i+' concluído' : '&#10003; Concluir Encontro '+i;
+    }
+  }
+  var pct=Math.round(n/6*100);
+  document.getElementById('progBar').style.width=pct+'%';
+  document.getElementById('tbPct').textContent=pct+'%';
+}
+document.querySelectorAll('[data-concluir]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var n=b.dataset.concluir;
+    salvo.concluidos[n]=!salvo.concluidos[n];
+    grava(); atualizaProgresso();
+  });
+  // botão para seguir direto ao próximo encontro
+  var num=parseInt(b.dataset.concluir,10);
+  if(num<6){
+    var nb=document.createElement('button');
+    nb.className='btn sec';
+    nb.innerHTML='Ir para o Encontro '+(num+1)+' &#8594;';
+    nb.addEventListener('click',function(){ mostrarAba(num+1); });
+    b.parentNode.appendChild(nb);
+  }
+});
+
+/* ---------- quiz ---------- */
+document.querySelectorAll('.quiz').forEach(function(bloco){
+  var id=bloco.dataset.quiz;
+  var cards=[].slice.call(bloco.querySelectorAll('.quiz-q'));
+  var total=cards.length, resp=0, acertos=0;
+  function fim(){
+    var p=document.getElementById('placar'+id);
+    if(!p) return;
+    p.classList.add('show');
+    document.getElementById('placarV'+id).textContent=acertos+'/'+total;
+    var msgs=['Vale reler o encontro com calma - e não tem problema nenhum nisso.',
+              'Bom começo! Revise os pontos que escaparam.',
+              'Muito bem, quase tudo certo!',
+              'Excelente! Você pegou o conteúdo do encontro.'];
+    var idx = acertos<=total*0.34?0:(acertos<=total*0.6?1:(acertos<total?2:3));
+    document.getElementById('placarM'+id).textContent=msgs[idx];
+    salvo.quiz[id]=acertos+'/'+total; grava();
+  }
+  cards.forEach(function(card){
+    var certa=parseInt(card.dataset.certa,10);
+    var alts=[].slice.call(card.querySelectorAll('.qq-alt'));
+    var sol=card.querySelector('.qq-sol');
+    alts.forEach(function(alt,i){
+      alt.addEventListener('click',function(){
+        if(card._feito) return; card._feito=true;
+        alts.forEach(function(a){a.classList.add('travado');});
+        if(i===certa){ alt.classList.add('certo'); acertos++; }
+        else { alt.classList.add('errado'); alts[certa].classList.add('certo'); }
+        sol.classList.add('show'); resp++;
+        if(resp===total) fim();
+      });
+    });
+  });
+  var rf=document.querySelector('[data-refazer="'+id+'"]');
+  if(rf) rf.addEventListener('click',function(){
+    resp=0; acertos=0;
+    cards.forEach(function(card){
+      card._feito=false;
+      card.querySelectorAll('.qq-alt').forEach(function(a){a.classList.remove('travado','certo','errado');});
+      card.querySelector('.qq-sol').classList.remove('show');
+    });
+    document.getElementById('placar'+id).classList.remove('show');
+    bloco.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+
+/* ================= HERO ================= */
+(function(){
+  var cv=document.getElementById('heroCanvas'); if(!cv) return;
+  var D, parts=[];
+  function resize(){ D=fit(cv,(cv.parentElement?cv.parentElement.clientHeight:300)||300); }
+  for(var i=0;i<70;i++) parts.push({x:Math.random(),y:Math.random(),r:Math.random()*1.4+0.4,v:Math.random()*0.02+0.004,f:Math.random()*TAU});
+  resize(); window.addEventListener('resize',resize);
+  var t0=performance.now();
+  function draw(now){
+    if(D){
+      var ctx=D.ctx,w=D.w,h=D.h,t=(now-t0)/1000;
+      ctx.clearRect(0,0,w,h);
+      parts.forEach(function(p){
+        var x=((p.x + p.v*t*0.05)%1)*w, y=p.y*h;
+        var br=0.4+0.6*Math.abs(Math.sin(t*0.8+p.f));
+        ctx.globalAlpha=br*0.85;
+        disco(ctx,x,y,p.r,'#fff',4);
+        ctx.globalAlpha=1;
+      });
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+  sims.push({resize:resize});
+})();
+
+/* ================= AULA 1 - retrogrado de Marte ================= */
+(function(){
+  var cv=document.getElementById('retroCanvas'); if(!cv) return;
+  var D, modo='orb', rodando=false, t=0, ultimo=performance.now(), rastro=[];
+  function resize(){ D=fit(cv,330); desenha(); }
+  var bOrb=document.getElementById('retroVerOrb'), bCeu=document.getElementById('retroVerCeu');
+  bOrb.addEventListener('click',function(){modo='orb';bOrb.classList.add('on');bCeu.classList.remove('on');desenha();});
+  bCeu.addEventListener('click',function(){modo='ceu';bCeu.classList.add('on');bOrb.classList.remove('on');desenha();});
+  var bPlay=document.getElementById('retroPlay');
+  bPlay.addEventListener('click',function(){
+    rodando=!rodando; bPlay.innerHTML=rodando?'&#10073;&#10073; Pausar':'&#9654; Animar';
+    ultimo=performance.now(); if(rodando) requestAnimationFrame(loop);
+  });
+  document.getElementById('retroReset').addEventListener('click',function(){
+    t=0; rastro=[]; rodando=false; bPlay.innerHTML='&#9654; Animar'; desenha();
+  });
+  function pos(t){
+    var aT=t*TAU/1.0, aM=t*TAU/1.88;
+    return {xT:Math.cos(aT), yT:Math.sin(aT), xM:1.52*Math.cos(aM), yM:1.52*Math.sin(aM)};
+  }
+  function longitudeAparente(t){
+    var p=pos(t);
+    return Math.atan2(p.yM-p.yT, p.xM-p.xT);
+  }
+  function desenha(){
+    if(!D) return;
+    var ctx=D.ctx,w=D.w,h=D.h; ctx.clearRect(0,0,w,h);
+    var p=pos(t);
+    if(modo==='orb'){
+      var cx=w/2, cy=h/2, esc=Math.min(w,h)*0.27;
+      ctx.strokeStyle='rgba(139,124,255,0.22)'; ctx.lineWidth=1;
+      [1,1.52].forEach(function(r){ ctx.beginPath(); ctx.arc(cx,cy,r*esc,0,TAU); ctx.stroke(); });
+      disco(ctx,cx,cy,11,AC2,16);
+      txt(ctx,'Sol',cx,cy+22,AC2,'10px Orbitron, sans-serif');
+      var xT=cx+p.xT*esc, yT=cy+p.yT*esc, xM=cx+p.xM*esc, yM=cy+p.yM*esc;
+      // linha de visada da Terra para Marte, prolongada ate o "fundo do ceu"
+      var ang=Math.atan2(yM-yT,xM-xT), L=Math.max(w,h);
+      ctx.strokeStyle='rgba(255,215,106,0.35)'; ctx.setLineDash([4,4]); ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.moveTo(xT,yT); ctx.lineTo(xT+Math.cos(ang)*L, yT+Math.sin(ang)*L); ctx.stroke(); ctx.setLineDash([]);
+      disco(ctx,xT,yT,7,CY,10); txt(ctx,'Terra',xT,yT-16,CY,'10px Orbitron, sans-serif');
+      disco(ctx,xM,yM,6,RED,10); txt(ctx,'Marte',xM,yM-15,RED,'10px Orbitron, sans-serif');
+      txt(ctx,'Vista de cima do Sistema Solar',w/2,h-14,DIM,'11px Rajdhani, sans-serif');
+    } else {
+      // longitude aparente de Marte no ceu (eixo x) x tempo (eixo y, descendo)
+      var m=34, x0=m, x1=w-m, y0=22, y1=h-30;
+      ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x0,y1); ctx.lineTo(x1,y1); ctx.stroke();
+      txt(ctx,'posição de Marte no céu',(x0+x1)/2,h-12,DIM,'11px Rajdhani, sans-serif');
+      ctx.save(); ctx.translate(13,(y0+y1)/2); ctx.rotate(-Math.PI/2);
+      txt(ctx,'tempo',0,0,DIM,'10px Orbitron, sans-serif'); ctx.restore();
+      // estrelas de fundo
+      for(var i=0;i<26;i++){
+        var sx=x0+((i*97)%1000)/1000*(x1-x0), sy=y0+((i*61)%1000)/1000*(y1-y0);
+        disco(ctx,sx,sy,0.9,'rgba(255,255,255,0.28)');
+      }
+      var dur=2.6, N=170;
+      ctx.strokeStyle=RED; ctx.lineWidth=2.4; ctx.beginPath();
+      var base=longitudeAparente(0), primeiro=true;
+      for(var k=0;k<=N;k++){
+        var tk=k/N*dur; if(tk>t) break;
+        var lon=longitudeAparente(tk);
+        var d=lon-base; while(d>Math.PI)d-=TAU; while(d<-Math.PI)d+=TAU;
+        var px=(x0+x1)/2 + d*( (x1-x0)/2 )/2.4;
+        var py=y0+(tk/dur)*(y1-y0);
+        if(primeiro){ctx.moveTo(px,py);primeiro=false;} else ctx.lineTo(px,py);
+      }
+      ctx.stroke();
+      if(t>0){
+        var lonA=longitudeAparente(Math.min(t,dur));
+        var dA=lonA-base; while(dA>Math.PI)dA-=TAU; while(dA<-Math.PI)dA+=TAU;
+        var pxA=(x0+x1)/2 + dA*((x1-x0)/2)/2.4, pyA=y0+(Math.min(t,dur)/dur)*(y1-y0);
+        disco(ctx,pxA,pyA,5,RED,10);
+      }
+      txt(ctx,'quando a linha volta para trás = movimento retrógrado',(x0+x1)/2,y0-8,AC2,'10px Rajdhani, sans-serif');
+    }
+  }
+  function loop(now){
+    if(!rodando) return;
+    var dt=Math.min(0.05,(now-ultimo)/1000); ultimo=now;
+    t+=dt*0.42; if(t>2.6){ t=2.6; rodando=false; bPlay.innerHTML='&#9654; Animar'; }
+    desenha();
+    if(rodando) requestAnimationFrame(loop);
+  }
+  resize(); window.addEventListener('resize',resize);
+  sims.push({resize:resize});
+})();
+
+/* ================= AULA 2 - estacoes ================= */
+(function(){
+  var cv=document.getElementById('estCanvas'); if(!cv) return;
+  var D, MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  var sl=document.getElementById('estMes');
+  function resize(){ D=fit(cv,320); desenha(); }
+  sl.addEventListener('input',desenha);
+  function desenha(){
+    if(!D) return;
+    var ctx=D.ctx,w=D.w,h=D.h; ctx.clearRect(0,0,w,h);
+    var m=parseInt(sl.value,10);
+    document.getElementById('estMesV').textContent=MESES[m];
+    var cx=w*0.38, cy=h/2, ra=Math.min(w*0.3,h*0.36);
+    ctx.strokeStyle='rgba(139,124,255,0.2)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.ellipse(cx,cy,ra,ra*0.62,0,0,TAU); ctx.stroke();
+    disco(ctx,cx,cy,13,AC2,18); txt(ctx,'Sol',cx,cy+24,AC2,'10px Orbitron, sans-serif');
+    var ang=TAU*(m+0.5)/12;
+    var ex=cx+Math.cos(ang)*ra, ey=cy+Math.sin(ang)*ra*0.62;
+    // pequenas Terras nas outras posicoes
+    for(var k=0;k<12;k++){
+      if(k===m) continue;
+      var a2=TAU*(k+0.5)/12;
+      disco(ctx,cx+Math.cos(a2)*ra, cy+Math.sin(a2)*ra*0.62, 2.5,'rgba(90,209,255,0.28)');
+    }
+    // declinacao solar aproximada
+    var dec=23.44*Math.cos(TAU*(m+0.5-5.5)/12);
+    // Terra grande em destaque, com eixo inclinado sempre na mesma direcao
+    var R=26;
+    var gx=w*0.80, gy=h/2;
+    txt(ctx,'em '+MESES[m],gx,gy-R-34,DIM,'11px Rajdhani, sans-serif');
+    // luz vindo da esquerda
+    ctx.strokeStyle='rgba(255,215,106,0.5)'; ctx.lineWidth=1.4;
+    for(var i=-3;i<=3;i++){
+      var yy=gy+i*11;
+      ctx.beginPath(); ctx.moveTo(gx-R-52,yy); ctx.lineTo(gx-R-6,yy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(gx-R-14,yy-3); ctx.lineTo(gx-R-6,yy); ctx.lineTo(gx-R-14,yy+3); ctx.stroke();
+    }
+    // planeta
+    var grad=ctx.createLinearGradient(gx-R,gy,gx+R,gy);
+    grad.addColorStop(0,'#5ad1ff'); grad.addColorStop(0.5,'#2c6fa8'); grad.addColorStop(1,'#0d1f38');
+    ctx.beginPath(); ctx.arc(gx,gy,R,0,TAU); ctx.fillStyle=grad; ctx.fill();
+    // eixo inclinado 23.5 (inclinacao aparente muda de sinal conforme a estacao)
+    var tilt=(23.44*Math.PI/180);
+    var incl = dec>=0 ? -tilt : tilt;
+    var ax=Math.sin(incl)*(R+16), ay=-Math.cos(incl)*(R+16);
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(gx-ax,gy-ay); ctx.lineTo(gx+ax,gy+ay); ctx.stroke();
+    txt(ctx,'N',gx+ax*1.12,gy+ay*1.12,'#fff','9px Orbitron, sans-serif');
+    // linha do equador
+    ctx.strokeStyle='rgba(255,255,255,0.35)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(gx-R*Math.cos(incl),gy-R*Math.sin(incl)); ctx.lineTo(gx+R*Math.cos(incl),gy+R*Math.sin(incl)); ctx.stroke(); ctx.setLineDash([]);
+    // destaque do hemisferio mais iluminado
+    var sul = dec<0;
+    txt(ctx, sul?'mais luz aqui':'menos luz aqui', gx+R+40, gy+R*0.55, sul?AC2:DIM,'10px Rajdhani, sans-serif','center');
+    txt(ctx, sul?'menos luz aqui':'mais luz aqui', gx+R+40, gy-R*0.55, sul?DIM:AC2,'10px Rajdhani, sans-serif','center');
+    disco(ctx,ex,ey,6,CY,10);
+    var estSul = dec<-15?'VERÃO':(dec>15?'INVERNO':'ameno');
+    var estNor = dec<-15?'INVERNO':(dec>15?'VERÃO':'ameno');
+    document.getElementById('estSul').textContent=estSul;
+    document.getElementById('estNorte').textContent=estNor;
+  }
+  resize(); window.addEventListener('resize',resize);
+  sims.push({resize:resize});
+})();
+
+/* ================= AULA 2 - fases da Lua ================= */
+(function(){
+  var cv=document.getElementById('luaCanvas'); if(!cv) return;
+  var D, sl=document.getElementById('luaDia');
+  function resize(){ D=fit(cv,330); desenha(); }
+  sl.addEventListener('input',desenha);
+  function nomeFase(f){
+    if(f<0.03||f>0.97) return 'Lua Nova';
+    if(f<0.22) return 'Crescente';
+    if(f<0.28) return 'Quarto Crescente';
+    if(f<0.47) return 'Gibosa Cresc.';
+    if(f<0.53) return 'Lua Cheia';
+    if(f<0.72) return 'Gibosa Ming.';
+    if(f<0.78) return 'Quarto Ming.';
+    return 'Minguante';
+  }
+  function horaBoa(f){
+    if(f<0.03||f>0.97) return 'invisível';
+    if(f<0.28) return 'fim de tarde';
+    if(f<0.53) return 'início da noite';
+    if(f<0.78) return 'madrugada';
+    return 'de manhã';
+  }
+  function desenha(){
+    if(!D) return;
+    var ctx=D.ctx,w=D.w,h=D.h; ctx.clearRect(0,0,w,h);
+    var dias=parseInt(sl.value,10)/10;
+    var f=dias/29.5;
+    document.getElementById('luaDiaV').textContent=dias.toFixed(1).replace('.',',')+' dias';
+    var ilum=(1-Math.cos(f*TAU))/2;
+    document.getElementById('luaFase').textContent=nomeFase(f);
+    document.getElementById('luaIlum').textContent=Math.round(ilum*100)+'%';
+    document.getElementById('luaHora').textContent=horaBoa(f);
+    // ---- painel esquerdo: vista de cima ----
+    var cx=w*0.30, cy=h/2, orb=Math.min(w*0.22,h*0.32);
+    ctx.strokeStyle='rgba(255,215,106,0.45)'; ctx.lineWidth=1.3;
+    for(var i=-2;i<=2;i++){
+      var yy=cy+i*15;
+      ctx.beginPath(); ctx.moveTo(4,yy); ctx.lineTo(cx-orb-24,yy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx-orb-32,yy-3); ctx.lineTo(cx-orb-24,yy); ctx.lineTo(cx-orb-32,yy+3); ctx.stroke();
+    }
+    txt(ctx,'luz do Sol',30,cy-46,AC2,'10px Rajdhani, sans-serif','left');
+    ctx.strokeStyle='rgba(139,124,255,0.22)'; ctx.beginPath(); ctx.arc(cx,cy,orb,0,TAU); ctx.stroke();
+    // Terra
+    disco(ctx,cx,cy,11,'#2c6fa8'); 
+    ctx.save(); ctx.beginPath(); ctx.arc(cx,cy,11,0,TAU); ctx.clip();
+    ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(cx,cy-11,11,22); ctx.restore();
+    txt(ctx,'Terra',cx,cy+22,CY,'9px Orbitron, sans-serif');
+    // Lua na orbita (angulo 0 = lua nova = entre Sol e Terra, ou seja, a esquerda)
+    var aL=Math.PI + f*TAU;
+    var lx=cx+Math.cos(aL)*orb, ly=cy+Math.sin(aL)*orb;
+    disco(ctx,lx,ly,7,'#d8d3ee');
+    ctx.save(); ctx.beginPath(); ctx.arc(lx,ly,7,0,TAU); ctx.clip();
+    ctx.fillStyle='rgba(10,8,26,0.88)'; ctx.fillRect(lx,ly-7,8,14); ctx.restore();
+    txt(ctx,'vista de cima',cx,h-12,DIM,'10px Rajdhani, sans-serif');
+    // ---- painel direito: o que vemos ----
+    var vx=w*0.76, vy=h/2-6, R=Math.min(w*0.15,52);
+    disco(ctx,vx,vy,R+8,'rgba(139,124,255,0.05)');
+    // desenha a fase
+    ctx.save(); ctx.beginPath(); ctx.arc(vx,vy,R,0,TAU); ctx.clip();
+    ctx.fillStyle='#14122a'; ctx.fillRect(vx-R,vy-R,2*R,2*R);
+    var crescendo = f<0.5;
+    ctx.fillStyle='#f2ecff'; ctx.beginPath();
+    if(crescendo) ctx.arc(vx,vy,R,-Math.PI/2,Math.PI/2);
+    else ctx.arc(vx,vy,R,Math.PI/2,3*Math.PI/2);
+    ctx.closePath(); ctx.fill();
+    var largura=R*Math.abs(1-2*ilum);
+    ctx.fillStyle = ilum<0.5 ? '#14122a' : '#f2ecff';
+    ctx.beginPath(); ctx.ellipse(vx,vy,largura,R,0,0,TAU); ctx.fill();
+    ctx.restore();
+    ctx.strokeStyle='rgba(255,255,255,0.16)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(vx,vy,R,0,TAU); ctx.stroke();
+    txt(ctx,'como vemos daqui',vx,vy+R+22,DIM,'10px Rajdhani, sans-serif');
+  }
+  resize(); window.addEventListener('resize',resize);
+  sims.push({resize:resize});
+})();
+
+/* ================= AULA 2 - eclipses ================= */
+(function(){
+  var cv=document.getElementById('eclCanvas'); if(!cv) return;
+  var D, tipo='solar', sl=document.getElementById('eclInc');
+  function resize(){ D=fit(cv,290); desenha(); }
+  sl.addEventListener('input',desenha);
+  var bS=document.getElementById('eclSolar'), bL=document.getElementById('eclLunar');
+  bS.addEventListener('click',function(){tipo='solar';bS.classList.add('on');bL.classList.remove('on');desenha();});
+  bL.addEventListener('click',function(){tipo='lunar';bL.classList.add('on');bS.classList.remove('on');desenha();});
+  function desenha(){
+    if(!D) return;
+    var ctx=D.ctx,w=D.w,h=D.h; ctx.clearRect(0,0,w,h);
+    var inc=parseInt(sl.value,10);
+    document.getElementById('eclIncV').textContent = inc===0?'0° (alinhado)':(inc/10).toFixed(1).replace('.',',')+'°';
+    var desvio=inc*1.15;
+    var cy=h/2;
+    var sx=w*0.10, tx=w*0.62, mx=(tipo==='solar')? w*0.40 : w*0.84;
+    // Sol
+    disco(ctx,sx,cy,17,AC2,20); txt(ctx,'Sol',sx,cy+30,AC2,'10px Orbitron, sans-serif');
+    // raios
+    ctx.strokeStyle='rgba(255,215,106,0.28)'; ctx.lineWidth=1;
+    for(var i=-2;i<=2;i++){ ctx.beginPath(); ctx.moveTo(sx+19,cy+i*9); ctx.lineTo(w-6,cy+i*9); ctx.stroke(); }
+    var my=cy-desvio;
+    var ok;
+    if(tipo==='solar'){
+      // Lua entre Sol e Terra -> sombra na Terra
+      disco(ctx,tx,cy,20,'#2c6fa8'); txt(ctx,'Terra',tx,cy+34,CY,'10px Orbitron, sans-serif');
+      disco(ctx,mx,my,7,'#d8d3ee'); txt(ctx,'Lua',mx,my-16,'#d8d3ee','9px Orbitron, sans-serif');
+      // cone de sombra da Lua
+      ctx.fillStyle='rgba(10,8,26,0.55)';
+      ctx.beginPath(); ctx.moveTo(mx,my-7); ctx.lineTo(tx+24,my-7-(desvio*0.1)); ctx.lineTo(tx+24,my+7); ctx.lineTo(mx,my+7); ctx.closePath(); ctx.fill();
+      ok = Math.abs(my-cy) < 20;
+      document.getElementById('eclStatus').textContent = ok?'ECLIPSE SOLAR!':'sombra passa longe';
+      txt(ctx, ok?'a sombra da Lua atinge a Terra':'a sombra passa acima da Terra', w/2, h-14, ok?GRN:DIM,'11px Rajdhani, sans-serif');
+    } else {
+      // Terra entre Sol e Lua -> sombra na Lua
+      disco(ctx,tx,cy,20,'#2c6fa8'); txt(ctx,'Terra',tx,cy+34,CY,'10px Orbitron, sans-serif');
+      // cone de sombra da Terra
+      ctx.fillStyle='rgba(10,8,26,0.6)';
+      ctx.beginPath(); ctx.moveTo(tx,cy-20); ctx.lineTo(w-4,cy-13); ctx.lineTo(w-4,cy+13); ctx.lineTo(tx,cy+20); ctx.closePath(); ctx.fill();
+      disco(ctx,mx,my,8,'#d8d3ee'); txt(ctx,'Lua',mx,my-18,'#d8d3ee','9px Orbitron, sans-serif');
+      ok = Math.abs(my-cy) < 15;
+      document.getElementById('eclStatus').textContent = ok?'ECLIPSE LUNAR!':'Lua passa fora da sombra';
+      txt(ctx, ok?'a Lua entra na sombra da Terra':'a Lua passa acima da sombra', w/2, h-14, ok?GRN:DIM,'11px Rajdhani, sans-serif');
+    }
+  }
+  resize(); window.addEventListener('resize',resize);
+  sims.push({resize:resize});
+})();
+
+/* ================= AULA 3 - Sistema Solar ================= */
+(function(){
+  var cv=document.getElementById('ssCanvas'); if(!cv) return;
+  var PL=[
+    {n:'Mercúrio',r:0.39,per:0.24,cor:'#b9a48c',tam:0.38,dado:'88 dias de ano; sem atmosfera'},
+    {n:'Vênus',r:0.55,per:0.62,cor:'#e8c98a',tam:0.95,dado:'o mais quente: 460 °C'},
+    {n:'Terra',r:0.72,per:1.0,cor:'#5ad1ff',tam:1.0,dado:'nossa casa; 1 lua'},
+    {n:'Marte',r:0.90,per:1.88,cor:'#e2745a',tam:0.53,dado:'o maior vulcão do sistema'},
+    {n:'Júpiter',r:1.22,per:11.9,cor:'#d9a066',tam:11.2,dado:'gigante; mais de 90 luas'},
+    {n:'Saturno',r:1.48,per:29.5,cor:'#e3cf9a',tam:9.4,dado:'anéis de gelo e rocha'},
+    {n:'Urano',r:1.70,per:84,cor:'#9fdbe8',tam:4.0,dado:'gira deitado de lado'},
+    {n:'Netuno',r:1.90,per:165,cor:'#6f8fe8',tam:3.9,dado:'ventos de 2.000 km/h'}
+  ];
+  var D, modo='orb', rodando=true, t=0, ultimo=performance.now(), sel=-1, pontos=[];
+  var slVel=document.getElementById('ssVel');
+  function resize(){ D=fit(cv,340); desenha(); }
+  var bPlay=document.getElementById('ssPlay');
+  bPlay.addEventListener('click',function(){
+    rodando=!rodando; bPlay.innerHTML=rodando?'&#10073;&#10073; Pausar':'&#9654; Animar';
+    ultimo=performance.now(); if(rodando) requestAnimationFrame(loop);
+  });
+  var bTam=document.getElementById('ssTamanho');
+  bTam.addEventListener('click',function(){
+    modo = (modo==='orb')?'tam':'orb';
+    bTam.innerHTML = (modo==='orb')?'&#8646; Comparar tamanhos':'&#8635; Ver as órbitas';
+    desenha();
+  });
+  slVel.addEventListener('input',function(){
+    var v=parseInt(slVel.value,10);
+    document.getElementById('ssVelV').textContent = v<3?'devagar':(v<7?'normal':'rápido');
+  });
+  cv.addEventListener('click',function(e){
+    var r=cv.getBoundingClientRect();
+    var px=(e.clientX-r.left)*(D.w/r.width), py=(e.clientY-r.top)*(D.h/r.height);
+    var melhor=-1, dmin=1e9;
+    pontos.forEach(function(p,i){ var d=Math.hypot(p.x-px,p.y-py); if(d<p.r+13&&d<dmin){dmin=d;melhor=p.idx;} });
+    sel=melhor;
+    var info=document.getElementById('ssInfo');
+    info.textContent = sel>=0 ? PL[sel].n+' - '+PL[sel].dado : 'toque em um planeta';
+    info.style.fontSize = sel>=0 ? '11px' : '14px';
+    desenha();
+  });
+  function desenha(){
+    if(!D) return;
+    var ctx=D.ctx,w=D.w,h=D.h; ctx.clearRect(0,0,w,h);
+    pontos=[];
+    if(modo==='orb'){
+      var cx=w/2, cy=h/2, esc=Math.min(w*0.46,h*0.46)/1.95;
+      disco(ctx,cx,cy,12,AC2,18);
+      PL.forEach(function(p,i){
+        ctx.strokeStyle = (sel===i)?'rgba(255,215,106,0.5)':'rgba(139,124,255,0.15)';
+        ctx.lineWidth=1;
+        ctx.beginPath(); ctx.ellipse(cx,cy,p.r*esc,p.r*esc*0.55,0,0,TAU); ctx.stroke();
+        var a=t*TAU/p.per + i*0.7;
+        var x=cx+Math.cos(a)*p.r*esc, y=cy+Math.sin(a)*p.r*esc*0.55;
+        var rr = 3+Math.min(6,Math.sqrt(p.tam)*1.6);
+        disco(ctx,x,y,rr,p.cor, sel===i?14:6);
+        if(sel===i){ ctx.strokeStyle=AC2; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(x,y,rr+5,0,TAU); ctx.stroke(); }
+        pontos.push({x:x,y:y,r:rr,idx:i});
+      });
+      txt(ctx,'toque num planeta para ver os dados',w/2,h-12,DIM,'10px Rajdhani, sans-serif');
+    } else {
+      // comparacao de tamanhos, com o Sol de referencia
+      var baseY=h*0.62, x=14;
+      var escT=Math.min(w/34, 5.2);
+      // Sol (reduzido para caber)
+      ctx.save();
+      ctx.beginPath(); ctx.arc(x+2, baseY, 40, 0, TAU); ctx.fillStyle=AC2; ctx.globalAlpha=0.85; ctx.fill(); ctx.restore();
+      txt(ctx,'Sol',x+2,baseY+52,AC2,'10px Orbitron, sans-serif');
+      txt(ctx,'(reduzido)',x+2,baseY+64,DIM,'9px Rajdhani, sans-serif');
+      x=68;
+      PL.forEach(function(p,i){
+        var rr=Math.max(2.2,p.tam*escT);
+        x+=rr+7;
+        disco(ctx,x,baseY,rr,p.cor,sel===i?12:4);
+        pontos.push({x:x,y:baseY,r:rr,idx:i});
+        if(p.tam>3||sel===i) txt(ctx,p.n,x,baseY+rr+13,DIM,'9px Rajdhani, sans-serif');
+        x+=rr+7;
+      });
+      txt(ctx,'Tamanhos reais comparados (a Terra é a referência)',w/2,26,'#f4f1ff','12px Rajdhani, sans-serif');
+      txt(ctx,'Júpiter tem 11 vezes o diâmetro da Terra',w/2,h-14,DIM,'11px Rajdhani, sans-serif');
+    }
+  }
+  function loop(now){
+    if(!rodando) return;
+    var dt=Math.min(0.05,(now-ultimo)/1000); ultimo=now;
+    t+=dt*(parseInt(slVel.value,10)/12);
+    if(modo==='orb') desenha();
+    requestAnimationFrame(loop);
+  }
+  resize(); window.addEventListener('resize',resize);
+  requestAnimationFrame(loop);
+  sims.push({resize:resize});
+})();
+
+/* ================= AULA 4 - cor e temperatura ================= */
+(function(){
+  var cv=document.getElementById('estrCanvas'); if(!cv) return;
+  var D, sl=document.getElementById('estrTemp');
+  function resize(){ D=fit(cv,300); desenha(); }
+  sl.addEventListener('input',desenha);
+  function corDaTemp(T){
+    // aproximacao simples e didatica da cor pela temperatura
+    if(T<3800) return {c:'#ff6b3d',n:'vermelha',t:'anã vermelha',ex:'Proxima Centauri'};
+    if(T<5200) return {c:'#ffab5e',n:'laranja',t:'anã laranja',ex:'Arcturus'};
+    if(T<6200) return {c:'#fff2c4',n:'amarela',t:'como o Sol',ex:'o Sol'};
+    if(T<7600) return {c:'#ffffff',n:'branca',t:'branca',ex:'Procyon'};
+    if(T<10500) return {c:'#eaf1ff',n:'branco-azulada',t:'branco-azulada',ex:'Sirius'};
+    if(T<20000) return {c:'#cfe0ff',n:'azulada',t:'azul quente',ex:'Rigel'};
+    return {c:'#b6cfff',n:'azul',t:'azul supergigante',ex:'Alnitak'};
+  }
+  function desenha(){
+    if(!D) return;
+    var ctx=D.ctx,w=D.w,h=D.h; ctx.clearRect(0,0,w,h);
+    var T=parseInt(sl.value,10);
+    document.getElementById('estrTempV').textContent = T.toLocaleString('pt-BR')+' °C';
+    var info=corDaTemp(T);
+    document.getElementById('estrCor').textContent=info.n;
+    document.getElementById('estrTipo').textContent=info.t;
+    document.getElementById('estrEx').textContent=info.ex;
+    // estrela
+    var cx=w/2, cy=h*0.40, R=Math.min(w*0.16,54);
+    var g=ctx.createRadialGradient(cx,cy,0,cx,cy,R*2.1);
+    g.addColorStop(0,info.c); g.addColorStop(0.42,info.c); g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.beginPath(); ctx.arc(cx,cy,R*2.1,0,TAU); ctx.fillStyle=g; ctx.fill();
+    disco(ctx,cx,cy,R,info.c,26);
+    // escala de temperatura
+    var bx=26, bw=w-52, by=h-56, bh=15;
+    var grad=ctx.createLinearGradient(bx,0,bx+bw,0);
+    grad.addColorStop(0,'#ff6b3d'); grad.addColorStop(0.22,'#ffab5e'); grad.addColorStop(0.42,'#fff2c4');
+    grad.addColorStop(0.58,'#ffffff'); grad.addColorStop(0.78,'#cfe0ff'); grad.addColorStop(1,'#b6cfff');
+    ctx.fillStyle=grad; ctx.fillRect(bx,by,bw,bh);
+    var frac=(T-3000)/27000;
+    var mx=bx+frac*bw;
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(mx,by-6); ctx.lineTo(mx,by+bh+6); ctx.stroke();
+    txt(ctx,'mais fria',bx+2,by+bh+18,DIM,'10px Rajdhani, sans-serif','left');
+    txt(ctx,'mais quente',bx+bw-2,by+bh+18,DIM,'10px Rajdhani, sans-serif','right');
+    // marca do Sol
+    var fs=(5500-3000)/27000, sxx=bx+fs*bw;
+    ctx.strokeStyle=AC2; ctx.lineWidth=1; ctx.setLineDash([2,2]);
+    ctx.beginPath(); ctx.moveTo(sxx,by-14); ctx.lineTo(sxx,by); ctx.stroke(); ctx.setLineDash([]);
+    txt(ctx,'Sol',sxx,by-20,AC2,'9px Orbitron, sans-serif');
+  }
+  resize(); window.addEventListener('resize',resize);
+  sims.push({resize:resize});
+})();
+
+/* ================= AULA 4 - ciclo de vida ================= */
+(function(){
+  var cv=document.getElementById('cicloCanvas'); if(!cv) return;
+  var CAM={
+    peq:{nome:'Estrela pequena (anã vermelha)',
+      etapas:[['Nuvem de gás','#8f8ab5'],['Anã vermelha','#ff6b3d'],['Vive trilhões de anos','#ff9d3d'],['Esfria devagar','#7a5f52']],
+      fim:'Vive tanto que nenhuma delas morreu ainda desde o Big Bang'},
+    med:{nome:'Estrela como o Sol',
+      etapas:[['Nuvem de gás','#8f8ab5'],['Estrela amarela','#fff2c4'],['Gigante vermelha','#ff6b3d'],['Anã branca','#eaf1ff']],
+      fim:'Incha, engole os planetas próximos e sobra um caroço quente: a anã branca'},
+    gra:{nome:'Estrela gigante',
+      etapas:[['Nuvem de gás','#8f8ab5'],['Estrela azul','#b6cfff'],['Supergigante','#ff6b3d'],['SUPERNOVA','#ffd76a'],['Buraco negro','#2a2a44']],
+      fim:'Explode em supernova e deixa uma estrela de nêutrons ou um buraco negro'}
+  };
+  var D, atual='peq';
+  function resize(){ D=fit(cv,290); desenha(); }
+  [['cicloPeq','peq'],['cicloMed','med'],['cicloGra','gra']].forEach(function(a){
+    var el=document.getElementById(a[0]);
+    el.addEventListener('click',function(){
+      atual=a[1];
+      ['cicloPeq','cicloMed','cicloGra'].forEach(function(id){document.getElementById(id).classList.remove('on');});
+      el.classList.add('on'); desenha();
+    });
+  });
+  function desenha(){
+    if(!D) return;
+    var ctx=D.ctx,w=D.w,h=D.h; ctx.clearRect(0,0,w,h);
+    var c=CAM[atual], et=c.etapas, n=et.length;
+    txt(ctx,c.nome,w/2,24,'#f4f1ff','13px Orbitron, sans-serif');
+    var estreito = w < 460;
+    if(estreito){
+      // lista vertical no celular
+      var y0=52, dy=(h-84)/n;
+      et.forEach(function(e,i){
+        var y=y0+dy*i+dy*0.4;
+        disco(ctx,34,y,11,e[1], e[0]==='SUPERNOVA'?20:8);
+        txt(ctx,e[0],54,y,'#e6e3f7','13px Rajdhani, sans-serif','left');
+        if(i<n-1){ ctx.strokeStyle='rgba(139,124,255,0.3)'; ctx.lineWidth=1.5;
+          ctx.beginPath(); ctx.moveTo(34,y+11); ctx.lineTo(34,y+dy-11); ctx.stroke(); }
+      });
+    } else {
+      var m=40, x0=m, x1=w-m, dx=(x1-x0)/(n-1), y=h*0.44;
+      et.forEach(function(e,i){
+        var x=x0+dx*i;
+        if(i<n-1){ ctx.strokeStyle='rgba(139,124,255,0.3)'; ctx.lineWidth=1.5;
+          ctx.beginPath(); ctx.moveTo(x+16,y); ctx.lineTo(x+dx-16,y); ctx.stroke();
+          ctx.fillStyle='rgba(139,124,255,0.5)';
+          ctx.beginPath(); ctx.moveTo(x+dx-16,y); ctx.lineTo(x+dx-22,y-4); ctx.lineTo(x+dx-22,y+4); ctx.closePath(); ctx.fill();
+        }
+        disco(ctx,x,y,e[0]==='SUPERNOVA'?15:12,e[1], e[0]==='SUPERNOVA'?22:8);
+        txt(ctx,e[0],x,y+30,'#e6e3f7','11px Rajdhani, sans-serif');
+      });
+    }
+    document.getElementById('cicloFim').textContent=c.fim;
+  }
+  resize(); window.addEventListener('resize',resize);
+  sims.push({resize:resize});
+})();
+
+/* ================= AULA 5 - escalas do universo ================= */
+(function(){
+  var cv=document.getElementById('escalaCanvas'); if(!cv) return;
+  var NIVEIS=[
+    {t:'Você, aqui em Potengi',tam:'cerca de 1,7 metro',d:'O ponto de partida de toda medida.',cor:'#5ad1ff',pts:1},
+    {t:'A Terra',tam:'12.742 km de diâmetro',d:'Daria a volta nela em avião em cerca de 2 dias.',cor:'#2c6fa8',pts:1},
+    {t:'A Terra e a Lua',tam:'384.400 km de distância',d:'Caberiam 30 Terras enfileiradas entre as duas.',cor:'#d8d3ee',pts:2},
+    {t:'O Sistema Solar interno',tam:'150 milhões de km até o Sol',d:'A luz do Sol leva 8 minutos para chegar aqui.',cor:'#ffd76a',pts:5},
+    {t:'Todo o Sistema Solar',tam:'cerca de 9 horas-luz até Netuno',d:'A sonda Voyager levou 12 anos para chegar lá.',cor:'#8b7cff',pts:9},
+    {t:'As estrelas vizinhas',tam:'4,2 anos-luz até a mais próxima',d:'Com a nave mais rápida de hoje, seriam uns 6 mil anos de viagem.',cor:'#ffffff',pts:22},
+    {t:'A Via Láctea',tam:'100 mil anos-luz de ponta a ponta',d:'De 100 a 400 bilhões de estrelas. O Sol é uma delas.',cor:'#cfe0ff',pts:120},
+    {t:'O Grupo Local',tam:'cerca de 10 milhões de anos-luz',d:'A Via Láctea, Andrômeda e mais umas 50 galáxias vizinhas.',cor:'#b6cfff',pts:34},
+    {t:'Aglomerados de galáxias',tam:'centenas de milhões de anos-luz',d:'Galáxias se agrupam em teias gigantescas de filamentos.',cor:'#9fdbe8',pts:90},
+    {t:'O Universo observável',tam:'93 bilhões de anos-luz',d:'Tudo o que a luz teve tempo de nos mostrar em 13,8 bilhões de anos.',cor:'#8b7cff',pts:200}
+  ];
+  var D, sl=document.getElementById('escNivel'), semente=[];
+  for(var i=0;i<260;i++) semente.push({x:Math.random(),y:Math.random(),r:Math.random()});
+  function resize(){ D=fit(cv,300); desenha(); }
+  sl.addEventListener('input',desenha);
+  function desenha(){
+    if(!D) return;
+    var ctx=D.ctx,w=D.w,h=D.h; ctx.clearRect(0,0,w,h);
+    var k=parseInt(sl.value,10), N=NIVEIS[k];
+    document.getElementById('escNivelV').textContent=(k+1)+' / 10';
+    document.getElementById('escTam').textContent=N.tam;
+    document.getElementById('escTexto').textContent=N.d;
+    var cx=w/2, cy=h*0.45;
+    if(k<=1){
+      disco(ctx,cx,cy,k===0?9:52,N.cor,14);
+      if(k===0){ txt(ctx,'você',cx,cy+24,DIM,'11px Rajdhani, sans-serif'); }
+    } else if(k===2){
+      disco(ctx,cx-70,cy,34,'#2c6fa8',10); txt(ctx,'Terra',cx-70,cy+50,DIM,'10px Rajdhani, sans-serif');
+      disco(ctx,cx+80,cy,10,'#d8d3ee',8); txt(ctx,'Lua',cx+80,cy+26,DIM,'10px Rajdhani, sans-serif');
+      ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.setLineDash([4,4]); ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(cx-36,cy); ctx.lineTo(cx+70,cy); ctx.stroke(); ctx.setLineDash([]);
+    } else if(k<=4){
+      disco(ctx,cx,cy,13,AC2,18);
+      var qtd = k===3?4:8;
+      for(var i2=0;i2<qtd;i2++){
+        var r=28+i2*(Math.min(w*0.42,h*0.42)-28)/qtd;
+        ctx.strokeStyle='rgba(139,124,255,0.18)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.ellipse(cx,cy,r,r*0.5,0,0,TAU); ctx.stroke();
+        var a=i2*1.1;
+        disco(ctx,cx+Math.cos(a)*r, cy+Math.sin(a)*r*0.5, 3.5, i2===2?'#5ad1ff':'#b9a48c',5);
+      }
+    } else if(k===5){
+      disco(ctx,cx-60,cy,7,AC2,12); txt(ctx,'Sol',cx-60,cy+22,DIM,'10px Rajdhani, sans-serif');
+      disco(ctx,cx+70,cy-20,5,'#ff6b3d',10); txt(ctx,'Proxima',cx+70,cy-38,DIM,'10px Rajdhani, sans-serif');
+      for(var i3=0;i3<12;i3++){
+        var sx=cx-120+ (i3*83)%260, sy=cy-60+(i3*47)%120;
+        disco(ctx,sx,sy,1.4,'rgba(255,255,255,0.5)');
+      }
+    } else if(k===6){
+      // galaxia espiral vista quase de frente
+      var Rg=Math.min(w*0.40,h*0.42), acha=0.55;
+      // halo difuso
+      var hg=ctx.createRadialGradient(cx,cy,0,cx,cy,Rg*1.15);
+      hg.addColorStop(0,'rgba(207,224,255,0.16)'); hg.addColorStop(1,'rgba(207,224,255,0)');
+      ctx.beginPath(); ctx.ellipse(cx,cy,Rg*1.15,Rg*1.15*acha,0,0,TAU); ctx.fillStyle=hg; ctx.fill();
+      // bracos espirais
+      for(var b=0;b<4;b++){
+        for(var s=0;s<300;s++){
+          var f2=s/300;
+          var rr=Rg*(0.12+f2*0.88);
+          var ang=b*(TAU/4) + f2*3.0 + (semente[(b*300+s)%semente.length].x-0.5)*0.16;
+          var jitter=(semente[(b*300+s)%semente.length].y-0.5)*Rg*0.07;
+          var gx2=cx+Math.cos(ang)*rr+jitter;
+          var gy2=cy+(Math.sin(ang)*rr)*acha+jitter*acha;
+          var br=0.30+0.55*(1-f2);
+          disco(ctx,gx2,gy2,1+semente[(b*300+s)%semente.length].r*1.1,'rgba(214,228,255,'+br.toFixed(2)+')');
+        }
+      }
+      // nucleo
+      var ng=ctx.createRadialGradient(cx,cy,0,cx,cy,Rg*0.30);
+      ng.addColorStop(0,'#fff6d6'); ng.addColorStop(0.5,'rgba(255,230,170,0.5)'); ng.addColorStop(1,'rgba(255,214,120,0)');
+      ctx.beginPath(); ctx.ellipse(cx,cy,Rg*0.30,Rg*0.30*acha,0,0,TAU); ctx.fillStyle=ng; ctx.fill();
+      // posicao do Sol
+      var solX=cx+Rg*0.60, solY=cy+Rg*0.16*acha;
+      disco(ctx,solX,solY,3.5,AC2,12);
+      ctx.strokeStyle=AC2; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(solX+6,solY-4); ctx.lineTo(solX+24,solY-20); ctx.stroke();
+      txt(ctx,'o Sol fica aqui',solX+26,solY-26,AC2,'10px Rajdhani, sans-serif','left');
+    } else {
+      // muitas galaxias
+      var qtdG = k===7?12:(k===8?45:150);
+      for(var g=0;g<qtdG;g++){
+        var p=semente[g];
+        var gx=p.x*w, gy=p.y*(h-60)+18, gr=1.2+p.r*(k===9?1.6:3.6);
+        ctx.globalAlpha=0.45+p.r*0.5;
+        disco(ctx,gx,gy,gr,'rgba(207,224,255,0.9)');
+        ctx.globalAlpha=1;
+      }
+      if(k===7){ disco(ctx,w*0.42,h*0.45,7,AC2,12); txt(ctx,'Via Láctea',w*0.42,h*0.45+22,AC2,'10px Rajdhani, sans-serif'); }
+    }
+    txt(ctx,N.t,w/2,h-18,'#f4f1ff','14px Orbitron, sans-serif');
+  }
+  resize(); window.addEventListener('resize',resize);
+  sims.push({resize:resize});
+})();
+
+/* ---------- inicializa ---------- */
+atualizaProgresso();
+mostrarAba(1);
+
+})();
+</script>
+</body>
+</html>
