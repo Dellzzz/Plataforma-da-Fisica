@@ -277,6 +277,7 @@
           <a onclick="filterCategory('mod03')">Módulo 03: Ondulatória</a>
           <a onclick="filterCategory('mod04')">Módulo 04: Eletromagnetismo</a>
           <a onclick="filterCategory('mod05')">Módulo 05: Moderna</a>
+          <a onclick="filterCategory('extra')">Módulo Extra: Astronomia e História</a>
         </div>
       </div>
     </div>
@@ -435,6 +436,29 @@
       <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
     </div>
 
+    <div class="category-section" id="sec-extra">
+      <h2>Módulo Extra: Astronomia e História da Física</h2>
+      <div class="exp-grid">
+        <div class="exp-card">
+          <span class="tag">EX01</span>
+          <div>
+            <h3>Astronomia em 6 Encontros</h3>
+            <p>Curso completo dividido em seis aulas: a história do céu, Terra-Sol-Lua, Sistema Solar, estrelas, galáxias e observação prática. Com 9 simulações interativas, quizzes e acesso ao Planetário e ao Mapa Estelar ao vivo.</p>
+          </div>
+          <a href="aulas/astronomia.html" class="btn-start">Acessar Aula</a>
+        </div>
+        <div class="exp-card">
+          <span class="tag">EX02</span>
+          <div>
+            <h3>A Grande Jornada da Física</h3>
+            <p>A linha do tempo das ideias que mudaram o mundo: de Copérnico e Galileu a Newton, Faraday, Einstein, a Mecânica Quântica e a Cosmologia Moderna.</p>
+          </div>
+          <a href="aulas/historia-da-fisica.html" class="btn-start">Acessar Aula</a>
+        </div>
+      </div>
+      <div class="empty-message">Ainda não há aulas desse conteúdo.</div>
+    </div>
+
   </div>
 
   <script>
@@ -473,7 +497,8 @@
         'mod02': 'Módulo 02: Termologia ▾',
         'mod03': 'Módulo 03: Ondulatória ▾',
         'mod04': 'Módulo 04: Eletromagnetismo ▾',
-        'mod05': 'Módulo 05: Moderna ▾'
+        'mod05': 'Módulo 05: Moderna ▾',
+        'extra': 'Módulo Extra: Astronomia e História ▾'
       };
       
       if(names[category]) button.innerText = names[category];
